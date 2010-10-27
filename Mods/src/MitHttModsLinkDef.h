@@ -6,6 +6,7 @@
 #include "MitHtt/Mods/interface/ZeeAnalysis.h"
 #include "MitHtt/Mods/interface/ZmmAnalysis.h"
 #include "MitHtt/Mods/interface/ZttAnalysis.h"
+#include "MitHtt/Mods/interface/EMUAnalysis.h"
 #endif
 
 #ifdef __CINT__
@@ -20,4 +21,5 @@
 #pragma link C++ class mithep::ZeeAnalysis+;
 #pragma link C++ class mithep::ZmmAnalysis+;
 #pragma link C++ class mithep::ZttAnalysis+;
+#pragma link C++ class mithep::EMUAnalysis+;
 #endif
