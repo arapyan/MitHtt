@@ -1,4 +1,4 @@
-// $Id: MitHttModsLinkDef.h,v 1.2 2010/10/27 20:15:07 klute Exp $
+// $Id: MitHttModsLinkDef.h,v 1.3 2010/10/29 13:25:41 klute Exp $
 
 #ifndef MITHTT_MODS_LINKDEF_H
 #define MITHTT_MODS_LINKDEF_H
@@ -6,7 +6,7 @@
 #include "MitHtt/Mods/interface/ZeeAnalysis.h"
 #include "MitHtt/Mods/interface/ZmmAnalysis.h"
 #include "MitHtt/Mods/interface/ZttAnalysis.h"
-//#include "MitHtt/Mods/interface/EMUAnalysis.h"
+#include "MitHtt/Mods/interface/EMUAnalysis.h"
 #endif
 
 #ifdef __CINT__
@@ -21,5 +21,5 @@
 #pragma link C++ class mithep::ZeeAnalysis+;
 #pragma link C++ class mithep::ZmmAnalysis+;
 #pragma link C++ class mithep::ZttAnalysis+;
-//#pragma link C++ class mithep::EMUAnalysis+;
+#pragma link C++ class mithep::EMUAnalysis+;
 #endif
