@@ -2,10 +2,9 @@
 #===================================================================================================
 # Script to process our complete analysis task.
 #
+# note: cannot give this two versions of the same dataset
 #                                                                             Ch.Paus (Aug 15, 2010)
 #===================================================================================================
-
-source envir.sh
 
 echo " Config: ${MIT_HTT_DIR}/config/${MIT_PROD_CFG}.txt"
 for dataset in `cat ${MIT_HTT_DIR}/config/${MIT_PROD_CFG}.txt|grep -v ^#|tr -s ' '|cut -d' ' -f 2`
