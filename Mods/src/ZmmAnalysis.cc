@@ -2,6 +2,7 @@
 
 #include <TMath.h>
 #include <TH1D.h>
+#include <TNtuple.h>
 #include "MitCommon/MathTools/interface/MathUtils.h"
 #include "MitAna/DataUtil/interface/Debug.h"
 #include "MitAna/DataTree/interface/Names.h"
@@ -172,6 +173,22 @@ void ZmmAnalysis::Process()
 
       // only consider pairs, where at least one muon triggered
       if (isP1Trig || isP2Trig) {
+	
+
+	// write in ntuple
+	int lEvt   = GetEventHeader()->EvtNum();
+	int lLumi  = GetEventHeader()->LumiSec();
+	int lRun   = GetEventHeader()->RunNum();
+	if (1)
+	  {
+	    Float_t vals[17] = {lEvt, lLumi, lRun, p1->Pt(), p2->Pt(), 
+				p1->Eta(),p2->Eta(), p1->Phi(), p2->Phi(),
+				p1->D0PV(), p2->D0PV(), p1->Charge(), p2->Charge(), 
+				mass, 
+				0, 0, 0};
+	    fNt->Fill(vals);
+	  }
+	
         hMuonEt1   ->Fill(p1->Et());
         hMuonEt2   ->Fill(p2->Et());
         hMuonEta1  ->Fill(p1->Eta());
@@ -213,10 +230,10 @@ void ZmmAnalysis::Process()
     }
   }
 
-  if (fTriggeredMuons.size()<=0) {
-    if (fSkimming)
-      SkipEvent();
-  }
+  // if (fTriggeredMuons.size()<=0) {
+  // if (fSkimming)
+  // SkipEvent();
+  // }
 
   return;
 }
@@ -227,7 +244,16 @@ void ZmmAnalysis::SlaveBegin()
   // Run startup code on the computer (slave) doing the actual analysis. Here,
   // we typically initialize histograms and other analysis objects and request
   // branches or objects created by earlier modules.
-
+  if (1)
+    {
+      string s;
+      s = "run:evt:lumi:pt1:pt2:eta1:eta2:phi1:phi2:dca1:dca2:ch1:ch2:mass:met:trigm:trigm";
+      
+      fNt = new TNtuple("ntZmumu","ZmmmAnalysisMod",s.c_str());
+      
+      AddOutput(fNt);
+    }
+  
   // initialize some variables
   double pi = TMath::Pi();
   double mPi = -1.0 * TMath::Pi();

@@ -214,10 +214,10 @@ void ZeeAnalysis::Process()
     }
   }
 
-  if (fTriggeredElecs.size()<=0) {
-    if (fSkimming)
-      SkipEvent();
-  }
+  //if (fTriggeredElecs.size()<=0) {
+  //if (fSkimming)
+  //  SkipEvent();
+  // }
 
   return;
 }
