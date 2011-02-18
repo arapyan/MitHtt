@@ -45,6 +45,10 @@ void plot(const char *name, const char* title, int logy,
   TString hstDir = getEnv("MIT_ANA_HIST");
   TString anaCfg = getEnv("MIT_ANA_CFG");
   TString prdCfg = getEnv("MIT_PROD_CFG");
+
+  TString plotdir("/home/dkralph/cms/plots/");
+  plotdir += prdCfg;
+
   // now define sample
   TaskSamples* samples = new TaskSamples(prdCfg.Data(),hstDir.Data());
   samples->SetNameTxt(prdCfg.Data());
@@ -70,11 +74,12 @@ void plot(const char *name, const char* title, int logy,
   plotTask->SetAxisTitles(title,"Number of Events");
   plotTask->PlotStack("",name);
   // make a png file
+  system(Form("mkdir -p %s",plotdir.Data()));
+  canvas->SaveAs((plotdir+TString("/")+TString(name)+TString("_log.png")).Data());
   if (logy == 1)
-    canvas->SaveAs((TString("png/")+TString(name)+TString("_log.png")).Data());
+    canvas->SaveAs((plotdir+TString("/")+TString(name)+TString("_log.png")).Data());
   else
-    canvas->SaveAs((TString("png/")+TString(name)+TString("_lin.png")).Data());
-
+    canvas->SaveAs((plotdir+TString("/")+TString(name)+TString("_lin.png")).Data());
   return;
 }
 

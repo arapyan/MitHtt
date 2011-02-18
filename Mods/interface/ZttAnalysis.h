@@ -26,25 +26,40 @@ namespace mithep
 		const char *title = "Z To Tau Tau Analysis");
     
     void         SetCleanLeptonsName(const char *n)  { fCleanLeptonsName = n; }
-    void         SetMetName(const char *n)           { fMetName = n; }
+    void         SetMetName(const char *n)           { fMetName = n;          }
     void         SetIgnoreElCharge(Bool_t b)         { fIgnoreElCharge = b;   }
     void         SetMaxZMass(Double_t m)             { fMaxZMass = m;         }
     void         SetMinDilMass(Double_t m)           { fDilMinMass = m;       }
     void         SetMinPt(Double_t pt)               { fMinPt      = pt;      }
     void         SetMinZMass(Double_t m)             { fMinZMass = m;         }
+    void         SetElecName(TString name)           { fElecName = name; }
+    void         SetMuonName(TString name)           { fMuonName = name; }
+    void         SetTrigObjsName(const char *name)   { fTrigObjsName = name; }
     
   protected:
-    void                     Begin();
-    void                     Process();
-    void                     SlaveBegin();
-    void                     SlaveTerminate();
-    void                     Terminate();
-
+    void         Begin();
+    void         Process();
+    void         SlaveBegin();
+    void         SlaveTerminate();
+    void         Terminate();
+    
+    void         MatchCollections(Bool_t *, const char *, const char *);
+    Bool_t       *MatchTriggerCollection(const char *, const char *);
     //----------------------------------------------------------------------------------------------
     // input collections
     TString      fCleanLeptonsName;     //clean leptons name (input)
     TString      fMetName;              //met name (input)
+    TString      fTrigObjsName;         // name of trigger objects
+    TString                  fMuonName;                 // name of muon collection
+    const MuonCol           *fMuons;                    //! muon from data stream
+    TString                  fElecName;                 // name of electron collection
+    const ElectronCol       *fElecs;                    //! elec from data stream
+    const MCEventInfo       *fMcEventInfo;              //! MC event information branch
  
+    //----------------------------------------------------------------------------------------------
+    // module setup
+    TString      fFinalState;           // used to set two leptons and name of histograms
+    UInt_t        fFinalStateId;        //       
     //----------------------------------------------------------------------------------------------
     // selection cuts
     Double_t     fMinPt;                //minimum pt for leptons
@@ -56,57 +71,42 @@ namespace mithep
     //----------------------------------------------------------------------------------------------
     // histograms
     TH1D        *fNAccCounters;         //!history of cuts
-    TH1D        *fAllDiLepMass;         //!dilepton mass for all dilepton pairs
-    TH1D        *fDiElMass;             //!dielectron mass 
-    TH1D        *fDiMuMass;             //!dimuon mass
-    TH1D        *fElMuMass;             //!electron-muon mass 
-    TH1D        *fAllDiLepMassAcc;      //!accepted dilepton mass for all dilepton pairs
-    TH1D        *fDiElMassAcc;          //!accepted dielectron mass 
-    TH1D        *fDiMuMassAcc;          //!accepted dimuon mass
-    TH1D        *fElMuMassAcc;          //!accepted electron-muon mass 
+    TH1D        *fLLMass;               //!dilepton mass for all dilepton pairs
     TH1D        *fNLeptons;             //!number of leptons
+    TH1D        *fNMuons;         
+    TH1D        *fNElecs;         
+    TH1D        *fNAccMuons;      
+    TH1D        *fNAccElecs;      
+    TH1D        *fAllMuonPt;
+    TH1D        *fAllMuonEta;
+    TH1D        *fAllElecPt;
+    TH1D        *fAllElecEta;
+
+    TH1D        *fNVertex;              //!number of vertices
     TH1D        *fNGPairs;              //!number of good pairs
     TH1D        *fNZPairs;              //!number of bad (Z) pairs
 
-    TH1D        *fAllDiLepMet;          //!met for all dilepton pairs
-    TH1D        *fAllDiLepPt1;          //!pt1 for all dilepton pairs
-    TH1D        *fAllDiLepPt2;          //!pt2 for all dilepton pairs
-    TH1D        *fAllDiLepDPhi;         //!dphi for all dilepton pairs
-    TH1D        *fAllDiLepDEta;         //!deta for all dilepton pairs
-    TH1D        *fAllDiLepDPhiMetOne;   //!dphi for all dilepton pairs between first lepton and met
-    TH1D        *fAllDiLepDPhiMetTwo;   //!dphi for all dilepton pairs between second lepton and met
-    TH1D        *fAllDiLepMtOne;        //!transverse mass for 1st lepton
-    TH1D        *fAllDiLepMtTwo;        //!transverse mass for 2nd lepton
+    TH1D        *fmet;                  //!met for all dilepton pairs
+    TH1D        *fpt1;                  //!pt1 for all dilepton pairs
+    TH1D        *fpt2;                  //!pt2 for all dilepton pairs
+    TH1D        *feta1;                 //!eta1 for all dilepton pairs
+    TH1D        *feta2;                 //!eta2 for all dilepton pairs
+    TH1D        *fphi1;                 //!eta1 for all dilepton pairs
+    TH1D        *fphi2;                 //!eta2 for all dilepton pairs
+    TH1D        *fdphi;                 //!dphi for all dilepton pairs
+    TH1D        *fdeta;                 //!deta for all dilepton pairs
+    TH1D        *fdphiMet1;             //!dphi for all dilepton pairs between first lepton and met
+    TH1D        *fdphiMet2;             //!dphi for all dilepton pairs between second lepton and met
+    TH1D        *fmt1;                  //!transverse mass for 1st lepton
+    TH1D        *fmt2;                  //!transverse mass for 2nd lepton
 
-    TH1D        *fDiTauRecoMass;
-    TH1D        *fDiTauTransverseMass;
-    TH1D        *fDiTauTransverseEll;
-    TH1D        *fDiTauTransverseEnn;
-    TH1D        *fDiTauVisMass;
-    TH1D        *fDiTauXTau1;
-    TH1D        *fDiTauXTau2;         
-    TH1D        *fEmuRecoMass;
-    TH1D        *fEmuTransverseMass;
-    TH1D        *fEmuTransverseEll;
-    TH1D        *fEmuTransverseEnn;
-    TH1D        *fEmuVisMass;
-    TH1D        *fEmuXTau1;
-    TH1D        *fEmuXTau2;         
-    TH1D        *fMumuRecoMass;
-    TH1D        *fMumuTransverseMass;
-    TH1D        *fMumuTransverseEll;
-    TH1D        *fMumuTransverseEnn;
-    TH1D        *fMumuVisMass;
-    TH1D        *fMumuXTau1;
-    TH1D        *fMumuXTau2;         
-    TH1D        *fEeRecoMass;
-    TH1D        *fEeTransverseMass;
-    TH1D        *fEeTransverseEll;
-    TH1D        *fEeTransverseEnn;
-    TH1D        *fEeVisMass;
-    TH1D        *fEeXTau1;
-    TH1D        *fEeXTau2;         
-    
+    TH1D        *frecoMass;
+    TH1D        *ftransMass;
+    TH1D        *ftransEll;
+    TH1D        *ftransEnn;
+    TH1D        *fvisMass;
+    TH1D        *fxtau1;
+    TH1D        *fxtau2;         
     //----------------------------------------------------------------------------------------------
     ClassDef(ZttAnalysis, 1) // Z to Tau Tau analysis
   };

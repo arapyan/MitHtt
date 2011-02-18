@@ -15,6 +15,7 @@
 #include "MitAna/DataTree/interface/CollectionsFwd.h"
 
 class TH1D;
+class TNtuple;
 class MCEventInfo;
 
 namespace mithep 
@@ -113,6 +114,7 @@ namespace mithep
     TH1D                    *hNTrigMuons;        //! number of muons, selected and triggered
     TH1D                    *h2TrigMuonMass;     //! di-muon mass (2 triggered muons)
     
+    TNtuple     *fNt;
     ClassDef(ZmmAnalysis, 1) // Z to Muon Muon analysis
   };
 }

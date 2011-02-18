@@ -41,29 +41,27 @@ void plotsHtt(double lumi = 3000.)
   //  plot("hHttNtuple","di-photon mass [GeV/c^{2}]",  0, 100.,  200., 0., -1.,1,lumi,"hmass",cut,100);
 
   //plot from TH1D
-  plot("hDAllEvents","Events",                           0, 0.,  0., 0., 0.,1,lumi);
-  return;
-  plot("hPhotonEta1",     "photon #eta_{1}",             0, 0.,  0., 0., 50.,2,lumi);
-  plot("hPhotonEta2",     "photon #eta_{2}",             0, 0.,  0., 0., 50.,2,lumi);
-  plot("hPhotonPhi1",     "photon #phi_{1}",             0, 0.,  0., 0., 75.,4,lumi);
-  plot("hPhotonPhi2",     "photon #phi_{2}",             0, 0.,  0., 0., 75.,4,lumi);
-  plot("hPhotonDelR",     "di-elec #Delta R",            0, 0.,  0., 0., -1.,2,lumi);
-  plot("hPhotonEt1",      "E_{T,1} [GeV]",               0, 0.,200., 0., -1.,1,lumi);
-  plot("hPhotonEt2",      "E_{T,2} [GeV]",               0, 0.,200., 0., -1.,1,lumi);
-  plot("hPhotonR91",      "R9_{1}",                      0, 0.,  0., 0.,-1.0,2,lumi);
-  plot("hPhotonR92",      "R9_{2}",                      0, 0.,  0., 0.,-1.0,2,lumi);
-  plot("h2R9PhotonMass",  "di-photon mass [GeV/c^{2}]",  0, 0.,  0., 0.,-1.0,8,lumi);
-  plot("h2PhotonPt",      "di-photon p_{T} [GeV/c]",     0, 0.,  0., 0., -1.,4,lumi);
-  plot("h2PhotonMass",    "di-photon mass [GeV/c^{2}]",  0, 0.,  0., 0., -1.,8,lumi);
-  plot("h2TrigPhotonMass","di-photon mass [GeV/c^{2}]",  0, 0.,  0., 0., -1.,8,lumi);
-  //plot("h2SelePhotonMass","di-photon mass [GeV/c^{2}]",  0, 0.,  0., 0., -1.,8,lumi);
+  //  plot("hDAllEvents","Events",                           0, 0.,  0., 0., 0.,1,lumi);
 
-
-  plot("hPhotonEt1",      "E_{T,1} [GeV]",               1, 0.,200., 0.005, -1.,1,lumi);
-  plot("hPhotonEt2",      "E_{T,2} [GeV]",               1, 0.,200., 0.005, -1.,1,lumi);
-  plot("h2PhotonPt",      "di-photon p_{T} [GeV/c]",     1, 0.,200., 0.005, -1.,2,lumi);
-
-  plot("h2PhotonMass",    "di-photon mass [GeV/c^{2}]",  1, 0.,  0., 0.005, -1.,8,lumi);
+  plot("hTauPlay_NGenTaus",  "NGenTaus;N Gen Taus;",                             1, 0.,  0., 0., 0.,1,lumi);
+  plot("hTauPlay_NPFTaus",   "NPFTaus;N PF Taus;",            	                 1, 0.,  0., 0., 0.,1,lumi);
+  plot("hTauPlay_NHPSTaus",   "NHPSTaus;N HPS Taus;",         	                 1, 0.,  0., 0., 0.,1,lumi);
+  plot("hTauPlay_PtGenTau",  "PtGenTau;Gen Tau Pt [GeV];",    	                 1, 0.,  0., 0., 0.,1,lumi);
+  plot("hTauPlay_PtPFTau",   "PtPFTau;PF Tau Pt [GeV];",      	                 1, 0.,  0., 0., 0.,1,lumi);
+  plot("hTauPlay_PtHPSTau",   "PtHPSTau;HPS Tau Pt [GeV];",   	                 1, 0.,  0., 0., 0.,1,lumi);
+  plot("hTauPlay_PtDiff",    "PtDiff;#Delta Pt HPS-Gen Taus;",	                 1, 0.,  0., 0., 0.,1,lumi);
+  plot("hTauPlay_Eff",       "Efficiency;NHPSTaus/NGenTaus;",                    1, 0.,  0., 0., 0.,1,lumi);    
+  plot("hWWTauRepeat_PtLepton_pre",       "PtLepton_pre;Pt [GeV];",              1, 0.,  0., 0., 0.,2,lumi);
+  plot("hWWTauRepeat_EtMet_pre",          "EtMet_pre;Et [GeV];",                 1, 0.,  0., 0., 0.,2,lumi);
+  plot("hWWTauRepeat_PtHPSTau_pre",       "PtHPSTau_pre;Pt [GeV];",              1, 0.,  0., 0., 0.,2,lumi);
+  plot("hWWTauRepeat_DeltaPhiLepTau_pre", "DeltaPhiLepTau_pre;#Delta #phi;",     1, 0.,  0., 0., 0.,2,lumi);
+  plot("hWWTauRepeat_PtLepton_NMinusOne", "PtLepton_NMinusOne;Pt [GeV];",        1, 0.,  0., 0., 0.,2,lumi);
+  plot("hWWTauRepeat_EtMet_NMinusOne",    "EtMet_NMinusOne;Et [GeV];",           1, 0.,  0., 0., 0.,2,lumi);
+  plot("hWWTauRepeat_PtHPSTau_NMinusOne", "PtHPSTau_NMinusOne;Pt [GeV];",        1, 0.,  0., 0., 0.,2,lumi);
+  plot("hWWTauRepeat_PtLepton_after",     "PtLepton_after;Pt [GeV];",            1, 0.,  0., 0., 0.,2,lumi);
+  plot("hWWTauRepeat_EtMet_after",        "EtMet_after;Et [GeV];",               1, 0.,  0., 0., 0.,2,lumi);
+  plot("hWWTauRepeat_PtHPSTau_after",     "PtHPSTau_after;Pt [GeV];lx",          1, 0.,  0., 0., 0.,2,lumi);
+  plot("hWWTauRepeat_DeltaPhiLepTau_after", "DeltaPhiLepTau_after;#Delta #phi;", 1, 0.,  0., 0., 0.,2,lumi); 
 
   return;
 }

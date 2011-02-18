@@ -7,7 +7,6 @@
 #===================================================================================================
 # FilenameHead has to be MIT_ANA_CFG sometimes, sometimes MIT_PROD_CFG
 
-
 mergeHist.py \
     --InputPath=$MIT_PROD_HIST/$MIT_PROD_CFG/$MIT_PROD_BOOK \
     --OutputPath=$MIT_PROD_HIST/$MIT_PROD_CFG/$MIT_PROD_BOOK/merged \

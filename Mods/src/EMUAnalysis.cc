@@ -9,7 +9,6 @@
 #include "MitAna/DataTree/interface/MetCol.h"
 #include "MitAna/DataTree/interface/MuonCol.h"
 #include "MitAna/DataTree/interface/ElectronCol.h"
-#include "MitAna/DataTree/interface/VertexCol.h"
 #include "MitPhysics/Init/interface/ModNames.h"
 #include "MitCommon/MathTools/interface/MathUtils.h"
 #include "MitPhysics/Utils/interface/DiTauSystem.h"
@@ -34,7 +33,6 @@ EMUAnalysis::EMUAnalysis(const char *name, const char *title) :
   fJetsName(ModNames::gkPubJetsName),
   fCaloJetsName("AKt5Jets"),
   fMetName("PubPFMet"),
-  fVertexName(ModNames::gkGoodVertexesName),
   // initialize the histograms
   cutPtLeadingMuon(15.),
   cutPtLeadingElec(15.),
@@ -66,11 +64,10 @@ void EMUAnalysis::Process()
 
   const MuonCol     *muons     = GetObjThisEvt<MuonCol>(fMuonsName);
   const ElectronCol *electrons = GetObjThisEvt<ElectronCol>(fElectronsName);
-  const JetCol      *jets      = GetObjThisEvt<JetCol>(fJetsName);
+  const JetCol      *jets      = GetObjThisEvt<JetCol>(fJetsName);//Corrected, ID'd ("good"), Cleaned PF jets 
   const MetCol      *metCol    = dynamic_cast<ObjArray<Met>* >(FindObjThisEvt(fMetName));
-  const VertexCol   *fVertices = GetObjThisEvt<VertexOArr>(fVertexName);
   
-  LoadBranch(fCaloJetsName);
+  LoadBranch(fCaloJetsName);//ungood, unclean calojets (?)
 
   if (!muons) { SkipEvent(); return; }
 
@@ -113,7 +110,7 @@ void EMUAnalysis::Process()
   UInt_t nJetsPt25= 0;
   UInt_t nBJetsPt20SV2= 0;
   UInt_t nBJetsPt20SV05= 0;
-  Double_t btag = 0;
+  Double_t btag = 0;//highest b-tag disc of any of the calojets 
 
   // dimuon and dielectron mass if there is two ee or two mu
   if (nMuons > 1) {
@@ -134,15 +131,16 @@ void EMUAnalysis::Process()
     }
   }
 
-  for (UInt_t i=0; i<nJets; ++i) {
-    if (jets->At(i)->Pt() > 15.)    // we do b-tagging for 15 GeV jets
+  for (UInt_t i=0; i<nJets; ++i) {//jets: good, clean calojets. fCaloJet: ungood, unclean calojets?
+    if (jets->At(i)->Pt() > 15.) nJetsPt15++;
+    if (jets->At(i)->Pt() > 20.) 
       {
-	nJetsPt15++;
+	nJetsPt20++;
 	// match pf and calo jets and extract b-tagging info
 	int nCloseStdJet = -1;
 	double deltaRMin = 999.;
-	for(UInt_t njet=0; njet<fCaloJet->GetEntries(); njet++){
-	  const CaloJet *caloJet = fCaloJet->At(njet);
+	for(UInt_t njet=0; njet<fCaloJet->GetEntries(); njet++){//Loop through the calojets to find
+	  const CaloJet *caloJet = fCaloJet->At(njet);          //the closest one
 	  Double_t deltaR = MathUtils::DeltaR(jets->At(i)->Mom(),caloJet->Mom());
 	  if(deltaR < deltaRMin) {
 	    nCloseStdJet = njet;
@@ -150,24 +148,19 @@ void EMUAnalysis::Process()
 	  }
 	}
 	
-	if(nCloseStdJet >= 0 && deltaRMin < 0.5)
-	  {
+	if(nCloseStdJet >= 0 && deltaRMin < 0.5)//If we found any jets, and if deltaR of closest
+	  {                                     //is below 0.5
 	    Double_t csvbtag = fCaloJet->At(nCloseStdJet)->TrackCountingHighEffBJetTagsDisc();
-	    if (csvbtag > btag ) btag = csvbtag;
-	    if (csvbtag > 2.)  nBJetsPt20SV2++;
+	    if (csvbtag > btag ) btag = csvbtag; //Looking for calojet with highest b-tag disc.
+	    if (csvbtag > 2.)  nBJetsPt20SV2++;  //just counting the number of b-tagged calojets
 	    if (csvbtag > 0.5) nBJetsPt20SV05++;
 	  }
       }
 
-    if (jets->At(i)->Pt() > 20.) nJetsPt20++;
     if (jets->At(i)->Pt() > 25.) nJetsPt25++;
   }
 
   // fill the ntuple for events with at least one electron and muon and cuts as defined in the ID modules.
-  int lEvt   = GetEventHeader()->EvtNum();
-  int lLumi  = GetEventHeader()->LumiSec();
-  int lRun   = GetEventHeader()->RunNum();
-  
   if (nMuons > 0 && nElecs > 0)
     {
       const Muon *muon = muons->At(0);
@@ -177,8 +170,9 @@ void EMUAnalysis::Process()
       // !!! leading muon fired trigger 15 GeV 
       UInt_t matchedTrigMuons = 0;
       UInt_t matchedTrigElecs = 0;
+      //Just counting how many are matched
       if (1) {
-	for (UInt_t j=0; j<nEnts; ++j) {
+	for (UInt_t j=0; j<nEnts; ++j) {//nEnts: number of trigger objects
 	  const TriggerObject *to = tos->At(j);
 	  if (to->Pt() > cutPtTriggerMuon) {
 	    if (fabs(muon->Eta()-to->Eta()) < 0.20 && fabs(muon->Phi()-to->Phi()) < 0.10)   
@@ -192,6 +186,9 @@ void EMUAnalysis::Process()
       }	
 
       // write in ntuple
+      int lEvt   = GetEventHeader()->EvtNum();
+      int lLumi  = GetEventHeader()->LumiSec();
+      int lRun   = GetEventHeader()->RunNum();
       if (1)
 	{
 	  Float_t vals[17] = {lEvt, lLumi, lRun, muon->Pt(), elec->Pt(), 
@@ -203,11 +200,7 @@ void EMUAnalysis::Process()
 	}
       delete diTau; 
     }
-
-
-  // !!! has good vertex
-  if(fVertices->GetEntries() == 0) return;
-  fNAccCounters->Fill(iAccCounter++);
+  // Now start cutting: 
 
   // !!! has at least one good muon
   if (nMuons < 1) return;
@@ -229,7 +222,8 @@ void EMUAnalysis::Process()
   const Electron *elec = electrons->At(0);
 
   // !!! leading muon fired trigger 15 GeV 
-  UInt_t matchedTrigMuons = 0;
+  //Just count the number of matched elecs and muons:
+  UInt_t matchedTrigMuons = 0; //(This is the second time we've done this)
   UInt_t matchedTrigElecs = 0;
   if (1) {
     for (UInt_t j=0; j<nEnts; ++j) {
@@ -255,22 +249,17 @@ void EMUAnalysis::Process()
   fNAccCounters->Fill(iAccCounter++);
 
   fptmnotrig->Fill(muon->Pt());          
-  if (matchedTrigMuons < cutTriggerMuon) return;
+  if (matchedTrigMuons < cutTriggerMuon) { //default: 1 for mu
+    return;
+  }
   fptmtrig->Fill(muon->Pt());          
 
-  if (matchedTrigElecs < cutTriggerElec) return;
+  if (matchedTrigElecs < cutTriggerElec) { //default: 0 for elec
+    return;
+  }
+
   fNAccCounters->Fill(iAccCounter++);
 
-  // look at the vertex
-  double dzmuon = muon->BestTrk()->DzCorrected(*fVertices->At(0));
-  double dzelec = elec->GsfTrk()->DzCorrected(*fVertices->At(0));
-  fdzlepton       ->Fill(dzmuon-dzelec);
-  fdzmuon         ->Fill(dzmuon);
-  fdzelec         ->Fill(dzelec);
-  
-  if (dzmuon >= 1. || dzelec >= 1.) return;
-  fNAccCounters->Fill(iAccCounter++);
-  
   // muon plots
   fptm->Fill(muon->Pt());          
   fetam->Fill(muon->Eta());          
@@ -285,19 +274,19 @@ void EMUAnalysis::Process()
   fchargee->Fill(elec->Charge()); 
  
   // !!! di lepton pair has minimal mass
+  fNAccCounters->Fill(iAccCounter++);
     
   // di-tau kinematics
-  
   DiTauSystem *diTau = new DiTauSystem(muon,elec,met);
   frecoMass       ->Fill(diTau->RecoMass());      
   ftransMass      ->Fill(diTau->TransverseMass());    
   ftransEll       ->Fill(diTau->TransverseEll());    
   ftransEnn       ->Fill(diTau->TransverseEnn());    
-  fproj           ->Fill(diTau->Projected());  
-  fprojVis        ->Fill(diTau->ProjectedVis()); 
-  fprojMet        ->Fill(diTau->ProjectedMet()); 
-  fprojPhi        ->Fill(diTau->ProjectedPhi()); 
-  fhT             ->Fill(diTau->Ht());    
+//   fproj           ->Fill(diTau->Projected());  
+//   fprojVis        ->Fill(diTau->ProjectedVis()); 
+//   fprojMet        ->Fill(diTau->ProjectedMet()); 
+//   fprojPhi        ->Fill(diTau->ProjectedPhi()); 
+//   fhT             ->Fill(diTau->Ht());    
 
   fvisMass        ->Fill(e_scale*diTau->VisMass());    
   fscaledVisMass  ->Fill(e_scale*1.8*diTau->VisMass());    
@@ -343,19 +332,13 @@ void EMUAnalysis::Process()
   if (mTW[0] < 60. && mTW[1] < 60.)
     fvisMassCut1 ->Fill(diTau->VisMass());
   //
-  if (mTW[0] < 50. && mTW[1] < 50.) {
+  if (mTW[0] < 50. && mTW[1] < 50.)
     fvisMassCut2 ->Fill(diTau->VisMass());
-    
-    cout << "HTT Cand: run=" << lRun << "\t lumi=" << lLumi << "\t evt=" << lEvt 
-	 << "\t muon pT=" << muon->Pt() << "\t  elec pT=" << elec->Pt() 
-	 << "\t  vis mass=" << diTau->VisMass() << endl;
+//   if (diTau->ProjectedVis() < 20.)
+//     fvisMassCut3 ->Fill(diTau->VisMass());  
 
-  }
-  if (diTau->ProjectedVis() < 20.)
-    fvisMassCut3 ->Fill(diTau->VisMass());  
-
-  // require just on b-tag
-  if (btag > 2.1) 
+  // require just one b-tag
+  if (btag > 2.1) //btag is highest discr. value among the jets 
     fvisMassCut4 ->Fill(diTau->VisMass());
 
   // require transverse mass and btag or w/o btag
@@ -493,9 +476,6 @@ void EMUAnalysis::SlaveBegin()
   AddTH1(fbtag,"hEMUbtag","",400,0.,20.);
   AddTH1(fmmmass,"hEMUmmmass",";visible mass [GeV];#",600,0,300); 
   AddTH1(feemass,"hEMUeemass",";visible mass [GeV];#",600,0,300); 
-  AddTH1(fdzlepton,"hEMUdzlepton",";delta(z) leptons;#",400,-2.,2.); 
-  AddTH1(fdzelec,"hEMUdzelec",";delta(z) elec;#",400,-2.,2.); 
-  AddTH1(fdzmuon,"hEMUdzmuon",";delta(z) muon;#",400,-2.,2.); 
 
   AddTH1(fvisMassCut1,"hHTTvisMassCut1",";visible mass [GeV];#",600,0,300); 
   AddTH1(fvisMassCut2,"hHTTvisMassCut2",";visible mass [GeV];#",600,0,300); 

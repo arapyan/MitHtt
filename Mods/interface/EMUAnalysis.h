@@ -51,7 +51,6 @@ namespace mithep
     TString      fJetsName;             
     TString      fCaloJetsName;             
     TString      fMetName;              
-    TString      fVertexName;     
     const MCEventInfo       *fMcEventInfo;
     const CaloJetCol        *fCaloJet;             
  
@@ -124,9 +123,7 @@ namespace mithep
     TH1D        *fbtag;  
     TH1D        *feemass;
     TH1D        *fmmmass;
-    TH1D        *fdzlepton;
-    TH1D        *fdzelec;
-    TH1D        *fdzmuon;
+
 
     // higgs selection
     TH1D        *fvisMassCut1;
