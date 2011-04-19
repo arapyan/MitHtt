@@ -1,9 +1,7 @@
 //--------------------------------------------------------------------------------------------------
-// $Id: $
+// $Id: TauPlayAnalysis.h,v 1.1 2011/02/18 14:56:34 dkralph Exp $
 //
 // TauPlayAnalysis
-//
-// This module doesn't do much yet
 //
 // Authors:
 //--------------------------------------------------------------------------------------------------
@@ -27,52 +25,20 @@ namespace mithep
 		const char *title = "Messing around with taus");
     ~TauPlayAnalysis();
     
-    void         SetCleanLeptonsName(const char *n)  { fCleanLeptonsName = n; }
-    void         SetTrigObjsName(const char *n)      { fTrigObjsName = n;     }
-    void         SetElecName(TString name)           { fElectronsName = name; }
-    void         SetMuonName(TString name)           { fMuonsName = name;     }
-    void         SetTauName(TString name)            { fTausName = name;      }
-    void         SetHPSTauCandidatesName(TString name)         { fHPSTauCandidatesName = name; }
-    void         SetMetName(const char *n)           { fMetColName = n;          }
-    void         SetJetName(const char *n)           { fJetsName = n;          }
+    void         SetTausName(TString name)            { fTausName = name;      }
     
   protected:
-    void         Begin();
-    void         Process();
     void         SlaveBegin();
-    void         SlaveTerminate();
-    void         Terminate();
+    void         Process();
     
     //----------------------------------------------------------------------------------------------
     // input collections
-    TString      fCleanLeptonsName;     
-    TString      fTrigObjsName;         
-    TString      fMuonsName;            
-    TString      fElectronsName;
     TString      fTausName;
-    TString      fHPSTauCandidatesName;
-    TString      fMetColName;
-    TString      fJetsName;
-    TString              fMCPartName;         //name of MCParticle branch                                             
-    const MCEventInfo   *fMcEventInfo;
-    const ParticleCol   *fLeptons;
     const PFTauCol      *fTaus;
-    const PFTauCol      *fHPSTauCandidates;
-    const MCParticleCol *fParticles;          //!MCParticle branch                                                    
  
-    //----------------------------------------------------------------------------------------------
-    // module setup
-    vector<PlotInfo*> finfov;
-    vector<TH1D*> fHistsv;
-    UInt_t fnhists;
-    map<string,int> fmap;
-    //----------------------------------------------------------------------------------------------
-    // selection cuts
-    //----------------------------------------------------------------------------------------------
     // histograms
-    TH1D        *fNAccCounters;         //!history of cuts
-
-    //----------------------------------------------------------------------------------------------
+    TH1D *tauPt;
+    TH1D *tauEta;
 
     //----------------------------------------------------------------------------------------------
     ClassDef(TauPlayAnalysis, 1) // Messing around with Taus
