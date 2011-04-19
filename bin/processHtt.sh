@@ -9,8 +9,9 @@
 echo " Config: ${MIT_HTT_DIR}/config/${MIT_PROD_CFG}.txt"
 for dataset in `cat ${MIT_HTT_DIR}/config/${MIT_PROD_CFG}.txt|grep -v ^#|tr -s ' '|cut -d' ' -f 2`
 do
+  echo "===================================================================================================================="
   # find the line to this dataset and do further analysis
-  line=`grep $dataset ${MIT_HTT_DIR}/config/${MIT_PROD_CFG}.txt`
+  line=`grep -v ^# ${MIT_HTT_DIR}/config/${MIT_PROD_CFG}.txt | grep $dataset`
   # determine the MIT version of this sample
   export VERSION=`echo $line | tr -s ' ' | cut -d ' ' -f 1`
   # find potential JSON file
