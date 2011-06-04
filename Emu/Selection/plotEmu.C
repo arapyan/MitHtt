@@ -154,8 +154,9 @@ void plotEmu(const TString  conf,         // input file
   vector<TH1F*> hPtElev, hEtaElev, hPhiElev; 	// electron
   vector<TH1F*> hJetPt1v, hJetEta1v; 		// leading jet
   vector<TH1F*> hJetPt2v, hJetEta2v; 		// second pt jet
-  vector<TH1F*> hJetDPhiv;           		// kinem. of first two jets
-  vector<TH1F*> hMjjv, hDEtav, hEtaProdv;
+  vector<TH1F*> hJetDPhiv;           		// dphi of first two jets
+  vector<TH1F*> hMjjv, hDEtav, hEtaProdv;       // kinematics of first two jets
+  vector<TH1F*> hBJetPtv, hBJetEtav, hBJetPhiv; // leading b-jet (can be same as leading two jets)
   vector<TH1F*> hNPVv;                          // primary vertexes
 
   // inclusive
@@ -208,31 +209,34 @@ void plotEmu(const TString  conf,         // input file
     sprintf(hname,"hNjets_%i",isam);         hNjetsv.push_back(new TH1F(hname,"",5,-0.5,4.5));      hNjetsv[isam]->Sumw2();
     sprintf(hname,"hNbjets_%i",isam);        hNbjetsv.push_back(new TH1F(hname,"",5,-0.5,4.5));     hNbjetsv[isam]->Sumw2();
     sprintf(hname,"hBdiscr_%i",isam);        hBdiscrv.push_back(new TH1F(hname,"",50,0,15));          hBdiscrv[isam]->Sumw2();
-    sprintf(hname,"hDPhi_%i",isam);    hDPhiv.push_back(new TH1F(hname,"",18,0,180));     hDPhiv[isam]->Sumw2();
-    sprintf(hname,"hMt_%i",isam);      hMtv.push_back(new TH1F(hname,"",30,0,210));       hMtv[isam]->Sumw2();
-    sprintf(hname,"hPt_%i",isam);      hPtv.push_back(new TH1F(hname,"",30,0,120));       hPtv[isam]->Sumw2();
-    sprintf(hname,"hMetDPhi_%i",isam); hMetDPhiv.push_back(new TH1F(hname,"",30,0,180));  hMetDPhiv[isam]->Sumw2();
-    sprintf(hname,"hPt1_%i",isam);     hPt1v.push_back(new TH1F(hname,"",30,0,150));      hPt1v[isam]->Sumw2();
-    sprintf(hname,"hEta1_%i",isam);    hEta1v.push_back(new TH1F(hname,"",30,-3,3));      hEta1v[isam]->Sumw2();
-    sprintf(hname,"hPhi1_%i",isam);    hPhi1v.push_back(new TH1F(hname,"",20,-3.2,3.2));  hPhi1v[isam]->Sumw2();  
-    sprintf(hname,"hPt2_%i",isam);     hPt2v.push_back(new TH1F(hname,"",30,0,150));      hPt2v[isam]->Sumw2();
-    sprintf(hname,"hEta2_%i",isam);    hEta2v.push_back(new TH1F(hname,"",30,-3,3));      hEta2v[isam]->Sumw2();
-    sprintf(hname,"hPhi2_%i",isam);    hPhi2v.push_back(new TH1F(hname,"",20,-3.2,3.2));  hPhi2v[isam]->Sumw2();
-    sprintf(hname,"hPtMu_%i",isam);    hPtMuv.push_back(new TH1F(hname,"",40,0,100));     hPtMuv[isam]->Sumw2();
-    sprintf(hname,"hEtaMu_%i",isam);   hEtaMuv.push_back(new TH1F(hname,"",30,-3,3));     hEtaMuv[isam]->Sumw2();
-    sprintf(hname,"hPhiMu_%i",isam);   hPhiMuv.push_back(new TH1F(hname,"",20,-3.2,3.2)); hPhiMuv[isam]->Sumw2();  
-    sprintf(hname,"hPtEle_%i",isam);   hPtElev.push_back(new TH1F(hname,"",40,0,100));    hPtElev[isam]->Sumw2();
-    sprintf(hname,"hEtaEle_%i",isam);  hEtaElev.push_back(new TH1F(hname,"",30,-3,3));    hEtaElev[isam]->Sumw2();
-    sprintf(hname,"hPhiEle_%i",isam);  hPhiElev.push_back(new TH1F(hname,"",20,-3.2,3.2));hPhiElev[isam]->Sumw2();
-    sprintf(hname,"hJetPt1_%i",isam);  hJetPt1v.push_back(new TH1F(hname,"",30,0,300));   hJetPt1v[isam]->Sumw2();
-    sprintf(hname,"hJetEta1_%i",isam); hJetEta1v.push_back(new TH1F(hname,"",20,-5,5));   hJetEta1v[isam]->Sumw2();
-    sprintf(hname,"hJetPt2_%i",isam);  hJetPt2v.push_back(new TH1F(hname,"",30,0,300));   hJetPt2v[isam]->Sumw2();
-    sprintf(hname,"hJetEta2_%i",isam); hJetEta2v.push_back(new TH1F(hname,"",20,-5,5));   hJetEta2v[isam]->Sumw2();
-    sprintf(hname,"hJetDPhi_%i",isam); hJetDPhiv.push_back(new TH1F(hname,"",30,0,180));  hJetDPhiv[isam]->Sumw2();
-    sprintf(hname,"hMjj_%i",isam);     hMjjv.push_back(new TH1F(hname,"",25,200,1200));   hMjjv[isam]->Sumw2();
-    sprintf(hname,"hDEta_%i",isam);    hDEtav.push_back(new TH1F(hname,"",20,0,8));       hDEtav[isam]->Sumw2();
+    sprintf(hname,"hDPhi_%i",isam);    hDPhiv.push_back(new TH1F(hname,"",18,0,180));       hDPhiv[isam]->Sumw2();
+    sprintf(hname,"hMt_%i",isam);      hMtv.push_back(new TH1F(hname,"",30,0,210));         hMtv[isam]->Sumw2();
+    sprintf(hname,"hPt_%i",isam);      hPtv.push_back(new TH1F(hname,"",30,0,120));         hPtv[isam]->Sumw2();
+    sprintf(hname,"hMetDPhi_%i",isam); hMetDPhiv.push_back(new TH1F(hname,"",30,0,180));    hMetDPhiv[isam]->Sumw2();
+    sprintf(hname,"hPt1_%i",isam);     hPt1v.push_back(new TH1F(hname,"",30,0,150));        hPt1v[isam]->Sumw2();
+    sprintf(hname,"hEta1_%i",isam);    hEta1v.push_back(new TH1F(hname,"",30,-3,3));        hEta1v[isam]->Sumw2();
+    sprintf(hname,"hPhi1_%i",isam);    hPhi1v.push_back(new TH1F(hname,"",20,-3.2,3.2));    hPhi1v[isam]->Sumw2();  
+    sprintf(hname,"hPt2_%i",isam);     hPt2v.push_back(new TH1F(hname,"",30,0,150));        hPt2v[isam]->Sumw2();
+    sprintf(hname,"hEta2_%i",isam);    hEta2v.push_back(new TH1F(hname,"",30,-3,3));        hEta2v[isam]->Sumw2();
+    sprintf(hname,"hPhi2_%i",isam);    hPhi2v.push_back(new TH1F(hname,"",20,-3.2,3.2));    hPhi2v[isam]->Sumw2();
+    sprintf(hname,"hPtMu_%i",isam);    hPtMuv.push_back(new TH1F(hname,"",40,0,100));       hPtMuv[isam]->Sumw2();
+    sprintf(hname,"hEtaMu_%i",isam);   hEtaMuv.push_back(new TH1F(hname,"",30,-3,3));       hEtaMuv[isam]->Sumw2();
+    sprintf(hname,"hPhiMu_%i",isam);   hPhiMuv.push_back(new TH1F(hname,"",20,-3.2,3.2));   hPhiMuv[isam]->Sumw2();  
+    sprintf(hname,"hPtEle_%i",isam);   hPtElev.push_back(new TH1F(hname,"",40,0,100));      hPtElev[isam]->Sumw2();
+    sprintf(hname,"hEtaEle_%i",isam);  hEtaElev.push_back(new TH1F(hname,"",30,-3,3));      hEtaElev[isam]->Sumw2();
+    sprintf(hname,"hPhiEle_%i",isam);  hPhiElev.push_back(new TH1F(hname,"",20,-3.2,3.2));  hPhiElev[isam]->Sumw2();
+    sprintf(hname,"hJetPt1_%i",isam);  hJetPt1v.push_back(new TH1F(hname,"",30,0,300));     hJetPt1v[isam]->Sumw2();
+    sprintf(hname,"hJetEta1_%i",isam); hJetEta1v.push_back(new TH1F(hname,"",20,-5,5));     hJetEta1v[isam]->Sumw2();
+    sprintf(hname,"hJetPt2_%i",isam);  hJetPt2v.push_back(new TH1F(hname,"",30,0,300));     hJetPt2v[isam]->Sumw2();
+    sprintf(hname,"hJetEta2_%i",isam); hJetEta2v.push_back(new TH1F(hname,"",20,-5,5));     hJetEta2v[isam]->Sumw2();
+    sprintf(hname,"hJetDPhi_%i",isam); hJetDPhiv.push_back(new TH1F(hname,"",30,0,180));    hJetDPhiv[isam]->Sumw2();
+    sprintf(hname,"hMjj_%i",isam);     hMjjv.push_back(new TH1F(hname,"",25,200,1200));     hMjjv[isam]->Sumw2();
+    sprintf(hname,"hDEta_%i",isam);    hDEtav.push_back(new TH1F(hname,"",20,0,8));         hDEtav[isam]->Sumw2();
     sprintf(hname,"hEtaProd_%i",isam); hEtaProdv.push_back(new TH1F(hname,"",30,-7.5,7.5)); hEtaProdv[isam]->Sumw2();
-    sprintf(hname,"hNPV_%i",isam);     hNPVv.push_back(new TH1F(hname,"",20,-0.5,19.5));  hNPVv[isam]->Sumw2();
+    sprintf(hname,"hBJetPt_%i",isam);  hBJetPtv.push_back(new TH1F(hname,"",30,0,150));     hBJetPtv[isam]->Sumw2();
+    sprintf(hname,"hBJetEta_%i",isam); hBJetEtav.push_back(new TH1F(hname,"",30,-3,3));     hBJetEtav[isam]->Sumw2();
+    sprintf(hname,"hBJetPhi_%i",isam); hBJetPhiv.push_back(new TH1F(hname,"",20,-3.2,3.2)); hBJetPhiv[isam]->Sumw2();
+    sprintf(hname,"hNPV_%i",isam);     hNPVv.push_back(new TH1F(hname,"",20,-0.5,19.5));    hNPVv[isam]->Sumw2();
 
     // inclusive
     sprintf(hname,"hMass_i_%i",isam);    hMass_iv.push_back(new TH1F(hname,"",20,0,200));     hMass_iv[isam]->Sumw2();
@@ -366,6 +370,11 @@ void plotEmu(const TString  conf,         // input file
 	hMjjv[isam]	->Fill(data.mjj,     wgt);
 	hDEtav[isam]	->Fill(fabs(data.jeta1 - data.jeta2),   wgt);
 	hEtaProdv[isam]	->Fill(data.jeta1*data.jeta2,           wgt);
+      }
+      if(data.bjpt>0) {
+	hBJetPtv[isam]	->Fill(data.bjpt,    wgt);
+	hBJetEtav[isam]	->Fill(data.bjeta,   wgt);
+	hBJetPhiv[isam]	->Fill(data.bjphi,   wgt);
       }
       hNPVv[isam]    ->Fill(data.nPV,    wgt);
 
@@ -881,7 +890,7 @@ void plotEmu(const TString  conf,         // input file
   plotJetEta2.Draw(c,kTRUE,format);
 
   sprintf(ylabel,"Events / %.2f",hJetDPhiv[0]->GetBinWidth(1));
-  CPlot plotJetDPhi("jetdphi","","jet #Delta #phi",ylabel);
+  CPlot plotJetDPhi("jetdphi","","#Delta#phi (jj)",ylabel);
   if(hasData) { plotJetDPhi.AddHist1D(hJetDPhiv[0],samplev[0]->label,"E"); }
   for(UInt_t isam=1; isam<samplev.size(); isam++)
     plotJetDPhi.AddToStack(hJetDPhiv[isam],samplev[isam]->label,samplev[isam]->color);
@@ -900,7 +909,7 @@ void plotEmu(const TString  conf,         // input file
   plotMjj.Draw(c,kTRUE,format);
 
   sprintf(ylabel,"Events / %.2f",hDEtav[0]->GetBinWidth(1));
-  CPlot plotDEta("jetdeta","","jet #Delta #eta",ylabel);
+  CPlot plotDEta("jetdeta","","#Delta#eta (jj)",ylabel);
   if(hasData) { plotDEta.AddHist1D(hDEtav[0],samplev[0]->label,"E"); }
   plotDEta.AddToStack((TH1F*)fVBFDijetDeltaEta,"fakes",860); cout << "deta: " << fVBFDijetDeltaEta->Integral() << endl;
   for(UInt_t isam=1; isam<samplev.size(); isam++)
@@ -910,7 +919,7 @@ void plotEmu(const TString  conf,         // input file
   plotDEta.Draw(c,kTRUE,format);
 
   sprintf(ylabel,"Events / %.2f",hEtaProdv[0]->GetBinWidth(1));
-  CPlot plotEtaProd("jetEtaProd","","jet #eta1*#eta2",ylabel);
+  CPlot plotEtaProd("jetEtaProd","","#eta1*#eta2(jj)",ylabel);
   if(hasData) { plotEtaProd.AddHist1D(hEtaProdv[0],samplev[0]->label,"E"); }
   for(UInt_t isam=1; isam<samplev.size(); isam++)
     plotEtaProd.AddToStack(hEtaProdv[isam],samplev[isam]->label,samplev[isam]->color);
@@ -920,6 +929,39 @@ void plotEmu(const TString  conf,         // input file
   else
     plotEtaProd.TransLegend(0.1,0);
   plotEtaProd.Draw(c,kTRUE,format);
+
+  sprintf(ylabel,"Events / %.2f",hBJetPtv[0]->GetBinWidth(1));
+  CPlot plotBJetPt("bjetpt","","lead b-jet pt [GeV]",ylabel);
+  if(hasData) { plotBJetPt.AddHist1D(hBJetPtv[0],samplev[0]->label,"E"); }
+  for(UInt_t isam=1; isam<samplev.size(); isam++)
+    plotBJetPt.AddToStack(hBJetPtv[isam],samplev[isam]->label,samplev[isam]->color);
+  if(lumi>0) plotBJetPt.AddTextBox(lumitext,0.41,0.85,0.61,0.8,0);
+  if(samplev.size()>5)
+    plotBJetPt.SetLegend(0.75,0.55,0.98,0.9);
+  else
+    plotBJetPt.TransLegend(0.1,0);
+  plotBJetPt.Draw(c,kTRUE,format);
+
+  sprintf(ylabel,"Events / %.2f",hBJetEtav[0]->GetBinWidth(1));
+  CPlot plotBJetEta("bjeteta","","lead b-jet #eta",ylabel);
+  if(hasData) { plotBJetEta.AddHist1D(hBJetEtav[0],samplev[0]->label,"E"); }
+  for(UInt_t isam=1; isam<samplev.size(); isam++)
+    plotBJetEta.AddToStack(hBJetEtav[isam],samplev[isam]->label,samplev[isam]->color);
+  if(lumi>0) plotBJetEta.AddTextBox(lumitext,0.21,0.85,0.41,0.8,0);
+  if(samplev.size()>5)
+    plotBJetEta.SetLegend(0.75,0.55,0.98,0.9);
+  else
+    plotBJetEta.TransLegend(0.1,0);
+  plotBJetEta.Draw(c,kTRUE,format);
+
+  sprintf(ylabel,"Events / %.2f",hBJetPhiv[0]->GetBinWidth(1));
+  CPlot plotBJetPhi("bjetphi","","lead b-jet #phi",ylabel);
+  if(hasData) { plotBJetPhi.AddHist1D(hBJetPhiv[0],samplev[0]->label,"E"); }
+  for(UInt_t isam=1; isam<samplev.size(); isam++)
+    plotBJetPhi.AddToStack(hBJetPhiv[isam],samplev[isam]->label,samplev[isam]->color);
+  if(lumi>0) plotBJetPhi.AddTextBox(lumitext,0.21,0.85,0.41,0.8,0);
+  plotBJetPhi.TransLegend(-0.3,-0.14);
+  plotBJetPhi.Draw(c,kTRUE,format);
 
   CPlot plotNPV("nvertices_reweighted","","N_{PV}","Events");
   if(hasData) { plotNPV.AddHist1D(hNPVv[0],samplev[0]->label,"E"); }
@@ -1208,9 +1250,10 @@ void makeHTML(const TString outDir)
   htmlfile << "<td width=\"25%\"><a target=\"_blank\" href=\"plots/jeteta2.png\"><img src=\"plots/jeteta2.png\" alt=\"plots/jeteta2.png\" width=\"100%\"></a></td>" << endl;
   htmlfile << "</tr>" << endl;
   htmlfile << "<tr>" << endl;
-  htmlfile << "<td width=\"25%\"><a target=\"_blank\" href=\"plots/jetpt3.png\"><img src=\"plots/jetpt3.png\" alt=\"plots/jetpt3.png\" width=\"100%\"></a></td>" << endl;
-  htmlfile << "<td width=\"25%\"><a target=\"_blank\" href=\"plots/jeteta3.png\"><img src=\"plots/jeteta3.png\" alt=\"plots/jeteta3.png\" width=\"100%\"></a></td>" << endl;
-  htmlfile << "<td width=\"25%\"><a></a></td>" << endl;
+  htmlfile << "<td width=\"25%\"><a target=\"_blank\" href=\"plots/bjetpt.png\"><img src=\"plots/bjetpt.png\" alt=\"plots/bjetpt.png\" width=\"100%\"></a></td>" << endl;
+  htmlfile << "<td width=\"25%\"><a target=\"_blank\" href=\"plots/bjeteta.png\"><img src=\"plots/bjeteta.png\" alt=\"plots/bjeteta.png\" width=\"100%\"></a></td>" << endl;
+  htmlfile << "<td width=\"25%\"><a target=\"_blank\" href=\"plots/bjetphi.png\"><img src=\"plots/bjetphi.png\" alt=\"plots/bjetphi.png\" width=\"100%\"></a></td>" << endl;
+
   htmlfile << "<td width=\"25%\"><a></a></td>" << endl;
   htmlfile << "</tr>" << endl;
   htmlfile << "<tr>" << endl;

@@ -226,7 +226,7 @@ void selectEmu(const TString conf,         // input file
     const UInt_t kMaxPt20Jets=15;
     TArrayF btagArray; btagArray.Set(kMaxPt20Jets); // array to hold b-tag values for pt-20 jets
     outtree.Branch("Events",&data.runNum,
-"runNum/i:evtNum:lumiSec:nPV:njets:nbjets:met/F:metphi:mass:dphi:mt:pt:phi:pmet:pvis:lpt1:leta1:lphi1:lpt2:leta2:lphi2:jpt1:jeta1:jphi1:jpt2:jeta2:jphi2:mjj:weight:state/I");
+"runNum/i:evtNum:lumiSec:nPV:njets:nbjets:met/F:metphi:mass:dphi:mt:pt:phi:pmet:pvis:lpt1:leta1:lphi1:lpt2:leta2:lphi2:jpt1:jeta1:jphi1:jpt2:jeta2:jphi2:bjpt:bjeta:bjphi:mjj:weight:state/I");
 
     // extra branches
     outtree.Branch("npt20jets",&npt20jets);
@@ -426,20 +426,20 @@ void selectEmu(const TString conf,         // input file
           if(fabs(jet->eta) > 5) continue;
 
 	  // look for b-jets
-	  if(jet->pt > kBJetPtMin) { // note: bjet can be the same as jet1 or jet2
+	  if((jet->pt > kBJetPtMin) && (fabs(jet->eta) < 2.4)) { // note: bjet can be the same as jet1 or jet2
 	    assert(npt20jets<kMaxPt20Jets);
 	    btagArray.AddAt(jet->tche,npt20jets); npt20jets++;
 	    if(jet->tche > 3.3) {
 	      nbjets++;
 	      if(!bjet || jet->pt > bjet->pt)
-		bjet = jet;
+		bjet = jet; // leading b-jet
 	    }
 	  }
 
 	  // look for vbf jets
           if(jet->pt > kJetPtMin) {
   	    njets++;
-	    if(!jet1 || jet->pt > jet1->pt) { // arrange so jet1 is highest pt, jet2 next highest
+	    if(!jet1 || jet->pt > jet1->pt) { // jet1 is highest pt, jet2 next highest
 	      jet2 = jet1;
 	      jet1 = jet;
 	    } else if(!jet2 || jet->pt > jet2->pt) {
@@ -449,28 +449,10 @@ void selectEmu(const TString conf,         // input file
         }
 
         TLorentzVector jv1, jv2, dijet;
-	const mithep::TJet *jet3=0;
 	if(njets>1) {
 	  jv1.SetPtEtaPhiM(jet1->pt,jet1->eta,jet1->phi,jet1->mass);
 	  jv2.SetPtEtaPhiM(jet2->pt,jet2->eta,jet2->phi,jet2->mass);
           dijet = jv1+jv2;
-      
-          for(Int_t i=0; i<jetArr->GetEntriesFast(); i++) { // look for a third jet
-            const mithep::TJet *jet = (mithep::TJet*)((*jetArr)[i]);
-
-            if(toolbox::deltaR(jet->eta,jet->phi,lep1.Eta(),lep1.Phi()) < 0.3) continue;
-            if(toolbox::deltaR(jet->eta,jet->phi,lep2.Eta(),lep2.Phi()) < 0.3) continue;
-            if(jet == jet1) continue;
-            if(jet == jet2) continue;
-//????????????????????????????????????????????????????????????????????????????????????????
-// should be 2.4 for b-jets
-//????????????????????????????????????????????????????????????????????????????????????????
-            if(fabs(jet->eta) > 5)         continue;
-            if(jet->pt        < kJetPtMin) continue;
-            
-	    if(!jet3 || jet->pt > jet3->pt)
-              jet3 = jet;
-	  }
         } 
 	
 	/******** We have a candidate! Hide the fruit! ********/        
@@ -494,9 +476,6 @@ void selectEmu(const TString conf,         // input file
 	if(corrector) corrector->Correct(met,metphi,gen->vpt,gen->vphi,dilep.Pt(),dilep.Phi());
 	metv.SetPtEtaPhi(met,0,metphi); // corrected met
 	projMet  =   metv.Dot(bisector);
-
-	if(counter[0]>10) break;
-	counter[0]++;
 
 	// skip non-ww events in vvj sample
 	if( (samp->fnamev[ifile].Contains("-vvj-")) && (gen->id != EGenType::kWW) )    continue;
@@ -561,6 +540,9 @@ void selectEmu(const TString conf,         // input file
         data.jpt2    = (jet2) ? jet2->pt  : 0;
 	data.jeta2   = (jet2) ? jet2->eta : 0;
 	data.jphi2   = (jet2) ? jet2->phi : 0;
+        data.bjpt    = (bjet) ? bjet->pt  : 0;
+	data.bjeta   = (bjet) ? bjet->eta : 0;
+	data.bjphi   = (bjet) ? bjet->phi : 0;
         data.mjj     = (njets>1) ? dijet.M() : 0;
         data.weight  = (isam==0) ? 1 : weight*kf*npvWgt*trigeff/lumi;
         data.state   = finalState;  	   
