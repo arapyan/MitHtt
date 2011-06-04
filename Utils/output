@@ -1,0 +1,2213 @@
+
+Processing correctZtt.C+...
+====> Met Before ==>       7.15     -1.27      ====> Met Before ==>       7.15     -1.27
+   => Met  After ==>      16.73     -2.53         => Met After  ==>      16.73     -2.53
+====> Met Before ==>      12.57     -2.90      ====> Met Before ==>      12.57     -2.90
+   => Met  After ==>      16.68     -2.61         => Met After  ==>      16.68     -2.61
+====> Met Before ==>      32.05      3.08      ====> Met Before ==>      32.05      3.08
+   => Met  After ==>      18.51      2.33         => Met After  ==>      18.51      2.33
+====> Met Before ==>      19.90     -1.76      ====> Met Before ==>      19.90     -1.76
+   => Met  After ==>      25.72     -1.49         => Met After  ==>      25.72     -1.49
+====> Met Before ==>      14.47      2.33      ====> Met Before ==>      14.47      2.33
+   => Met  After ==>       6.18      2.65         => Met After  ==>       6.18      2.65
+====> Met Before ==>      10.71     -2.68      ====> Met Before ==>      10.71     -2.68
+   => Met  After ==>      16.21     -0.80         => Met After  ==>      16.21     -0.80
+====> Met Before ==>      17.33     -2.55      ====> Met Before ==>      17.33     -2.55
+   => Met  After ==>      24.13      2.98         => Met After  ==>      24.13      2.98
+====> Met Before ==>      19.96     -0.45      ====> Met Before ==>      19.96     -0.45
+   => Met  After ==>      15.51      0.01         => Met After  ==>      15.51      0.01
+====> Met Before ==>      24.43      0.82      ====> Met Before ==>      24.43      0.82
+   => Met  After ==>      26.08     -0.39         => Met After  ==>      26.08     -0.39
+====> Met Before ==>       5.64     -1.41      ====> Met Before ==>       5.64     -1.41
+   => Met  After ==>       5.57      0.97         => Met After  ==>       5.57      0.97
+====> Met Before ==>       4.36     -2.34      ====> Met Before ==>       4.36     -2.34
+   => Met  After ==>      25.01      0.22         => Met After  ==>      25.01      0.22
+====> Met Before ==>      44.34      2.70      ====> Met Before ==>      44.34      2.70
+   => Met  After ==>      22.73      2.18         => Met After  ==>      22.73      2.18
+====> Met Before ==>      36.22      0.04      ====> Met Before ==>      36.22      0.04
+   => Met  After ==>      28.96      0.01         => Met After  ==>      28.96      0.01
+====> Met Before ==>      30.23     -2.44      ====> Met Before ==>      30.23     -2.44
+   => Met  After ==>      22.36     -2.58         => Met After  ==>      22.36     -2.58
+====> Met Before ==>       3.74      2.98      ====> Met Before ==>       3.74      2.98
+   => Met  After ==>       5.45     -3.06         => Met After  ==>       5.45     -3.06
+====> Met Before ==>       7.29      2.34      ====> Met Before ==>       7.29      2.34
+   => Met  After ==>      11.60     -0.73         => Met After  ==>      11.60     -0.73
+====> Met Before ==>      12.88      2.80      ====> Met Before ==>      12.88      2.80
+   => Met  After ==>      14.59     -1.60         => Met After  ==>      14.59     -1.60
+====> Met Before ==>      11.74     -0.52      ====> Met Before ==>      11.74     -0.52
+   => Met  After ==>      24.83     -1.28         => Met After  ==>      24.83     -1.28
+====> Met Before ==>      24.08     -2.63      ====> Met Before ==>      24.08     -2.63
+   => Met  After ==>      15.65      2.27         => Met After  ==>      15.65      2.27
+====> Met Before ==>       5.94     -1.57      ====> Met Before ==>       5.94     -1.57
+   => Met  After ==>      14.71     -0.33         => Met After  ==>      14.71     -0.33
+====> Met Before ==>      12.56      1.65      ====> Met Before ==>      12.56      1.65
+   => Met  After ==>       6.29     -0.08         => Met After  ==>       6.29     -0.08
+====> Met Before ==>      10.37     -0.22      ====> Met Before ==>      10.37     -0.22
+   => Met  After ==>      27.76      0.70         => Met After  ==>      27.76      0.70
+====> Met Before ==>      98.83     -0.67      ====> Met Before ==>      98.83     -0.67
+   => Met  After ==>     101.31     -0.65         => Met After  ==>     101.31     -0.65
+====> Met Before ==>      15.58      2.59      ====> Met Before ==>      15.58      2.59
+   => Met  After ==>      20.62      2.84         => Met After  ==>      20.62      2.84
+====> Met Before ==>      14.53     -2.88      ====> Met Before ==>      14.53     -2.88
+   => Met  After ==>      12.99     -2.35         => Met After  ==>      12.99     -2.35
+====> Met Before ==>      18.03     -2.67      ====> Met Before ==>      18.03     -2.67
+   => Met  After ==>       8.44     -2.53         => Met After  ==>       8.44     -2.53
+====> Met Before ==>      37.69     -2.88      ====> Met Before ==>      37.69     -2.88
+   => Met  After ==>      25.59     -2.74         => Met After  ==>      25.59     -2.74
+====> Met Before ==>       7.28     -3.08      ====> Met Before ==>       7.28     -3.08
+   => Met  After ==>      21.21      0.40         => Met After  ==>      21.21      0.40
+====> Met Before ==>      19.78      1.64      ====> Met Before ==>      19.78      1.64
+   => Met  After ==>      10.83      1.09         => Met After  ==>      10.83      1.09
+====> Met Before ==>      29.06      2.60      ====> Met Before ==>      29.06      2.60
+   => Met  After ==>      15.70      2.15         => Met After  ==>      15.70      2.15
+====> Met Before ==>      58.24      1.88      ====> Met Before ==>      58.24      1.88
+   => Met  After ==>      39.57      1.96         => Met After  ==>      39.57      1.96
+====> Met Before ==>       6.09      2.38      ====> Met Before ==>       6.09      2.38
+   => Met  After ==>      10.09      1.16         => Met After  ==>      10.09      1.16
+====> Met Before ==>      12.97     -2.48      ====> Met Before ==>      12.97     -2.48
+   => Met  After ==>       9.61     -1.66         => Met After  ==>       9.61     -1.66
+====> Met Before ==>       8.92      2.34      ====> Met Before ==>       8.92      2.34
+   => Met  After ==>      20.37     -0.03         => Met After  ==>      20.37     -0.03
+====> Met Before ==>      18.47     -1.79      ====> Met Before ==>      18.47     -1.79
+   => Met  After ==>       6.80      0.52         => Met After  ==>       6.80      0.52
+====> Met Before ==>      46.04      0.02      ====> Met Before ==>      46.04      0.02
+   => Met  After ==>      38.61      0.39         => Met After  ==>      38.61      0.39
+====> Met Before ==>      15.59     -2.81      ====> Met Before ==>      15.59     -2.81
+   => Met  After ==>      19.71     -3.14         => Met After  ==>      19.71     -3.14
+====> Met Before ==>       8.52     -2.59      ====> Met Before ==>       8.52     -2.59
+   => Met  After ==>      13.42      1.11         => Met After  ==>      13.42      1.11
+====> Met Before ==>       7.42     -0.00      ====> Met Before ==>       7.42     -0.00
+   => Met  After ==>      19.63     -0.70         => Met After  ==>      19.63     -0.70
+====> Met Before ==>       3.69      0.20      ====> Met Before ==>       3.69      0.20
+   => Met  After ==>      12.21      0.45         => Met After  ==>      12.21      0.45
+====> Met Before ==>       5.12     -2.54      ====> Met Before ==>       5.12     -2.54
+   => Met  After ==>       6.66      1.60         => Met After  ==>       6.66      1.60
+====> Met Before ==>      18.00      1.57      ====> Met Before ==>      18.00      1.57
+   => Met  After ==>      26.87      0.76         => Met After  ==>      26.87      0.76
+====> Met Before ==>      13.35      1.01      ====> Met Before ==>      13.35      1.01
+   => Met  After ==>       6.40      2.30         => Met After  ==>       6.40      2.30
+====> Met Before ==>      30.34     -2.35      ====> Met Before ==>      30.34     -2.35
+   => Met  After ==>      32.91     -1.88         => Met After  ==>      32.91     -1.88
+====> Met Before ==>       6.99      0.46      ====> Met Before ==>       6.99      0.46
+   => Met  After ==>      12.46     -0.46         => Met After  ==>      12.46     -0.46
+====> Met Before ==>      12.84      0.57      ====> Met Before ==>      12.84      0.57
+   => Met  After ==>       9.92      0.04         => Met After  ==>       9.92      0.04
+====> Met Before ==>      14.88      2.37      ====> Met Before ==>      14.88      2.37
+   => Met  After ==>      17.97      1.94         => Met After  ==>      17.97      1.94
+====> Met Before ==>      26.09      0.66      ====> Met Before ==>      26.09      0.66
+   => Met  After ==>      22.45      0.15         => Met After  ==>      22.45      0.15
+====> Met Before ==>       3.36      1.05      ====> Met Before ==>       3.36      1.05
+   => Met  After ==>      21.80     -3.11         => Met After  ==>      21.80     -3.11
+====> Met Before ==>       4.69     -2.13      ====> Met Before ==>       4.69     -2.13
+   => Met  After ==>      14.50     -3.13         => Met After  ==>      14.50     -3.13
+====> Met Before ==>      21.69     -2.09      ====> Met Before ==>      21.69     -2.09
+   => Met  After ==>      16.42     -2.73         => Met After  ==>      16.42     -2.73
+====> Met Before ==>       8.85      2.01      ====> Met Before ==>       8.85      2.01
+   => Met  After ==>      16.90     -2.16         => Met After  ==>      16.90     -2.16
+====> Met Before ==>      12.27     -1.12      ====> Met Before ==>      12.27     -1.12
+   => Met  After ==>      34.16     -0.85         => Met After  ==>      34.16     -0.85
+====> Met Before ==>      15.31      3.02      ====> Met Before ==>      15.31      3.02
+   => Met  After ==>       8.27      1.21         => Met After  ==>       8.27      1.21
+====> Met Before ==>       9.27     -0.36      ====> Met Before ==>       9.27     -0.36
+   => Met  After ==>      10.82      2.83         => Met After  ==>      10.82      2.83
+====> Met Before ==>      29.11      1.19      ====> Met Before ==>      29.11      1.19
+   => Met  After ==>      19.36      0.50         => Met After  ==>      19.36      0.50
+====> Met Before ==>      19.82     -1.68      ====> Met Before ==>      19.82     -1.68
+   => Met  After ==>      24.08     -2.60         => Met After  ==>      24.08     -2.60
+====> Met Before ==>      28.30     -0.85      ====> Met Before ==>      28.30     -0.85
+   => Met  After ==>      19.09      1.27         => Met After  ==>      19.09      1.27
+====> Met Before ==>      13.11     -3.01      ====> Met Before ==>      13.11     -3.01
+   => Met  After ==>      23.27      2.75         => Met After  ==>      23.27      2.75
+====> Met Before ==>      24.66     -2.84      ====> Met Before ==>      24.66     -2.84
+   => Met  After ==>      42.87     -2.28         => Met After  ==>      42.87     -2.28
+====> Met Before ==>       3.42      2.42      ====> Met Before ==>       3.42      2.42
+   => Met  After ==>      13.54     -0.50         => Met After  ==>      13.54     -0.50
+====> Met Before ==>      16.21      0.47      ====> Met Before ==>      16.21      0.47
+   => Met  After ==>      16.60      2.23         => Met After  ==>      16.60      2.23
+====> Met Before ==>       5.80     -0.36      ====> Met Before ==>       5.80     -0.36
+   => Met  After ==>      18.42     -0.70         => Met After  ==>      18.42     -0.70
+====> Met Before ==>      10.05     -1.16      ====> Met Before ==>      10.05     -1.16
+   => Met  After ==>       2.13     -1.63         => Met After  ==>       2.13     -1.63
+====> Met Before ==>      15.53      0.51      ====> Met Before ==>      15.53      0.51
+   => Met  After ==>      14.85      3.10         => Met After  ==>      14.85      3.10
+====> Met Before ==>      13.45     -1.11      ====> Met Before ==>      13.45     -1.11
+   => Met  After ==>       9.43     -1.62         => Met After  ==>       9.43     -1.62
+====> Met Before ==>       5.00     -2.05      ====> Met Before ==>       5.00     -2.05
+   => Met  After ==>       9.67     -1.64         => Met After  ==>       9.67     -1.64
+====> Met Before ==>      20.84      0.12      ====> Met Before ==>      20.84      0.12
+   => Met  After ==>      16.46     -0.40         => Met After  ==>      16.46     -0.40
+====> Met Before ==>      21.28      0.63      ====> Met Before ==>      21.28      0.63
+   => Met  After ==>      10.41      1.77         => Met After  ==>      10.41      1.77
+====> Met Before ==>      30.84      2.78      ====> Met Before ==>      30.84      2.78
+   => Met  After ==>      21.45     -2.69         => Met After  ==>      21.45     -2.69
+====> Met Before ==>       6.09      1.28      ====> Met Before ==>       6.09      1.28
+   => Met  After ==>      10.63      0.25         => Met After  ==>      10.63      0.25
+====> Met Before ==>      13.86     -0.22      ====> Met Before ==>      13.86     -0.22
+   => Met  After ==>      12.66     -0.68         => Met After  ==>      12.66     -0.68
+====> Met Before ==>      11.75     -2.02      ====> Met Before ==>      11.75     -2.02
+   => Met  After ==>      26.82      2.61         => Met After  ==>      26.82      2.61
+====> Met Before ==>     236.55     -0.60      ====> Met Before ==>     236.55     -0.60
+   => Met  After ==>     180.55     -0.58         => Met After  ==>     180.55     -0.58
+====> Met Before ==>       9.19     -0.32      ====> Met Before ==>       9.19     -0.32
+   => Met  After ==>      19.11      1.55         => Met After  ==>      19.11      1.55
+====> Met Before ==>      52.79     -2.06      ====> Met Before ==>      52.79     -2.06
+   => Met  After ==>      32.91     -1.45         => Met After  ==>      32.91     -1.45
+====> Met Before ==>      20.76     -1.47      ====> Met Before ==>      20.76     -1.47
+   => Met  After ==>      11.09     -1.30         => Met After  ==>      11.09     -1.30
+====> Met Before ==>      14.77      0.81      ====> Met Before ==>      14.77      0.81
+   => Met  After ==>      21.41      1.08         => Met After  ==>      21.41      1.08
+====> Met Before ==>      25.20     -0.09      ====> Met Before ==>      25.20     -0.09
+   => Met  After ==>      17.40     -0.78         => Met After  ==>      17.40     -0.78
+====> Met Before ==>      13.52     -2.46      ====> Met Before ==>      13.52     -2.46
+   => Met  After ==>      13.51      2.54         => Met After  ==>      13.51      2.54
+====> Met Before ==>      24.63      0.63      ====> Met Before ==>      24.63      0.63
+   => Met  After ==>      13.22      0.51         => Met After  ==>      13.22      0.51
+====> Met Before ==>      37.61      2.98      ====> Met Before ==>      37.61      2.98
+   => Met  After ==>      23.02      2.10         => Met After  ==>      23.02      2.10
+====> Met Before ==>       7.70     -2.84      ====> Met Before ==>       7.70     -2.84
+   => Met  After ==>       6.86     -2.77         => Met After  ==>       6.86     -2.77
+====> Met Before ==>      18.57      1.80      ====> Met Before ==>      18.57      1.80
+   => Met  After ==>      10.87      1.43         => Met After  ==>      10.87      1.43
+====> Met Before ==>      13.33      2.98      ====> Met Before ==>      13.33      2.98
+   => Met  After ==>       9.28     -1.80         => Met After  ==>       9.28     -1.80
+====> Met Before ==>       3.29     -0.98      ====> Met Before ==>       3.29     -0.98
+   => Met  After ==>      22.76      2.78         => Met After  ==>      22.76      2.78
+====> Met Before ==>      16.26     -1.43      ====> Met Before ==>      16.26     -1.43
+   => Met  After ==>      25.78      2.18         => Met After  ==>      25.78      2.18
+====> Met Before ==>       3.36     -0.46      ====> Met Before ==>       3.36     -0.46
+   => Met  After ==>      17.00      0.59         => Met After  ==>      17.00      0.59
+====> Met Before ==>      13.43     -2.87      ====> Met Before ==>      13.43     -2.87
+   => Met  After ==>      12.09     -2.85         => Met After  ==>      12.09     -2.85
+====> Met Before ==>      29.27     -0.47      ====> Met Before ==>      29.27     -0.47
+   => Met  After ==>      33.46     -1.12         => Met After  ==>      33.46     -1.12
+====> Met Before ==>       8.01      1.12      ====> Met Before ==>       8.01      1.12
+   => Met  After ==>      21.00     -0.87         => Met After  ==>      21.00     -0.87
+====> Met Before ==>      15.29      0.49      ====> Met Before ==>      15.29      0.49
+   => Met  After ==>       7.87     -0.72         => Met After  ==>       7.87     -0.72
+====> Met Before ==>      21.46     -0.69      ====> Met Before ==>      21.46     -0.69
+   => Met  After ==>      13.39     -0.90         => Met After  ==>      13.39     -0.90
+====> Met Before ==>       1.76     -1.40      ====> Met Before ==>       1.76     -1.40
+   => Met  After ==>       8.06      1.21         => Met After  ==>       8.06      1.21
+====> Met Before ==>      28.06      1.73      ====> Met Before ==>      28.06      1.73
+   => Met  After ==>      26.94      2.89         => Met After  ==>      26.94      2.89
+====> Met Before ==>      20.59     -1.38      ====> Met Before ==>      20.59     -1.38
+   => Met  After ==>       4.19      0.35         => Met After  ==>       4.19      0.35
+====> Met Before ==>      21.75      3.08      ====> Met Before ==>      21.75      3.08
+   => Met  After ==>      24.48      2.57         => Met After  ==>      24.48      2.57
+====> Met Before ==>      16.84     -1.92      ====> Met Before ==>      16.84     -1.92
+   => Met  After ==>       6.08     -3.11         => Met After  ==>       6.08     -3.11
+====> Met Before ==>      10.93      0.07      ====> Met Before ==>      10.93      0.07
+   => Met  After ==>      20.93     -1.40         => Met After  ==>      20.93     -1.40
+====> Met Before ==>      17.59      1.70      ====> Met Before ==>      17.59      1.70
+   => Met  After ==>      26.02      1.32         => Met After  ==>      26.02      1.32
+====> Met Before ==>      30.77     -1.01      ====> Met Before ==>      30.77     -1.01
+   => Met  After ==>      26.65     -1.01         => Met After  ==>      26.65     -1.01
+====> Met Before ==>      29.83      0.55      ====> Met Before ==>      29.83      0.55
+   => Met  After ==>      12.34     -0.09         => Met After  ==>      12.34     -0.09
+====> Met Before ==>      88.49     -1.98
+   => Met  After ==>      74.33     -1.91
+====> Met Before ==>      11.85      0.95
+   => Met  After ==>      25.53      0.77
+====> Met Before ==>      94.84      1.92
+   => Met  After ==>      98.54      2.07
+====> Met Before ==>      14.19     -0.09
+   => Met  After ==>      12.80     -0.07
+====> Met Before ==>      18.50      2.47
+   => Met  After ==>      13.57     -0.54
+====> Met Before ==>      19.66      2.30
+   => Met  After ==>      10.59     -2.62
+====> Met Before ==>      20.35     -0.23
+   => Met  After ==>      10.01     -0.71
+====> Met Before ==>      16.44     -1.88
+   => Met  After ==>      25.93      3.05
+====> Met Before ==>      11.93     -1.78
+   => Met  After ==>       0.99      0.56
+====> Met Before ==>       2.18      2.32
+   => Met  After ==>      10.59      1.71
+====> Met Before ==>      11.55      0.78
+   => Met  After ==>      14.40      0.55
+====> Met Before ==>      35.60     -2.42
+   => Met  After ==>      22.04     -2.03
+====> Met Before ==>      17.05      1.64
+   => Met  After ==>      14.83     -0.43
+====> Met Before ==>      28.54      0.19
+   => Met  After ==>       9.25      1.40
+====> Met Before ==>       8.20     -0.50
+   => Met  After ==>      16.46      1.39
+====> Met Before ==>       5.17      1.99
+   => Met  After ==>      10.61      0.61
+====> Met Before ==>      23.44     -0.30
+   => Met  After ==>       6.35     -2.84
+====> Met Before ==>      41.08     -1.34
+   => Met  After ==>      45.93     -0.45
+====> Met Before ==>       9.60     -2.25
+   => Met  After ==>       7.89      1.22
+====> Met Before ==>      12.95      0.98
+   => Met  After ==>      14.92      0.71
+====> Met Before ==>      12.57      1.14
+   => Met  After ==>      15.65      1.66
+====> Met Before ==>      10.96     -1.58
+   => Met  After ==>      10.40      2.98
+====> Met Before ==>      13.19      2.79
+   => Met  After ==>      18.75      1.65
+====> Met Before ==>      33.21     -1.30
+   => Met  After ==>      23.18     -1.21
+====> Met Before ==>      22.21     -0.61
+   => Met  After ==>      21.61      1.78
+====> Met Before ==>       9.80     -2.67
+   => Met  After ==>       6.62     -2.60
+====> Met Before ==>       6.24     -2.37
+   => Met  After ==>      15.96     -2.50
+====> Met Before ==>      21.51     -0.33
+   => Met  After ==>      27.38     -2.34
+====> Met Before ==>       6.99      1.85
+   => Met  After ==>      22.00     -1.05
+====> Met Before ==>      11.62      1.98
+   => Met  After ==>      14.96      0.31
+====> Met Before ==>      16.01     -2.97
+   => Met  After ==>      15.55     -1.33
+====> Met Before ==>       3.76     -3.12
+   => Met  After ==>       4.13      0.24
+====> Met Before ==>      23.44      2.82
+   => Met  After ==>       8.29      1.74
+====> Met Before ==>      23.54     -2.07
+   => Met  After ==>      10.33     -3.08
+====> Met Before ==>       4.67      0.68
+   => Met  After ==>       8.97     -0.45
+====> Met Before ==>       3.81      0.92
+   => Met  After ==>       7.61     -0.83
+====> Met Before ==>      21.21      3.02
+   => Met  After ==>      16.06      2.04
+====> Met Before ==>      33.48     -2.51
+   => Met  After ==>       5.88     -2.04
+====> Met Before ==>      16.26      1.63
+   => Met  After ==>      17.15     -3.04
+====> Met Before ==>       3.77     -2.09
+   => Met  After ==>      27.17      2.67
+====> Met Before ==>       1.76      1.15
+   => Met  After ==>      14.17     -0.26
+====> Met Before ==>      32.81      2.31
+   => Met  After ==>      33.12     -2.96
+====> Met Before ==>      16.89      1.70
+   => Met  After ==>      19.56      0.15
+====> Met Before ==>      15.48     -0.31
+   => Met  After ==>      24.12     -0.20
+====> Met Before ==>      11.59     -2.07
+   => Met  After ==>      14.66      1.02
+====> Met Before ==>      15.61      0.70
+   => Met  After ==>      16.14     -0.34
+====> Met Before ==>      10.25     -1.86
+   => Met  After ==>       8.64      0.58
+====> Met Before ==>      23.06      2.35
+   => Met  After ==>      28.19     -0.91
+====> Met Before ==>      11.61     -1.06
+   => Met  After ==>       9.00     -0.46
+====> Met Before ==>      32.82     -2.56
+   => Met  After ==>      17.64     -3.03
+====> Met Before ==>      28.63     -2.38
+   => Met  After ==>      21.59      2.97
+====> Met Before ==>      19.47      1.91
+   => Met  After ==>      24.17      1.60
+====> Met Before ==>       3.38     -1.08
+   => Met  After ==>       5.13     -1.44
+====> Met Before ==>      11.47      1.41
+   => Met  After ==>      10.89     -0.98
+====> Met Before ==>       9.11      2.14
+   => Met  After ==>       4.35      1.56
+====> Met Before ==>       5.78      2.57
+   => Met  After ==>       7.77      1.86
+====> Met Before ==>      22.22     -1.73
+   => Met  After ==>       9.61      0.17
+====> Met Before ==>      29.11      2.35
+   => Met  After ==>      24.35      2.61
+====> Met Before ==>      12.73      2.18
+   => Met  After ==>      20.30      2.76
+====> Met Before ==>       9.02      2.01
+   => Met  After ==>      22.21      0.16
+====> Met Before ==>      43.52     -1.86
+   => Met  After ==>      26.18     -2.28
+====> Met Before ==>      21.03     -1.07
+   => Met  After ==>      36.33      0.02
+====> Met Before ==>      12.85     -2.46
+   => Met  After ==>      23.20     -2.45
+====> Met Before ==>      27.62     -1.80
+   => Met  After ==>      18.25     -2.22
+====> Met Before ==>      16.22      1.42
+   => Met  After ==>       6.82      1.62
+====> Met Before ==>      13.33      3.07
+   => Met  After ==>      11.93     -2.61
+====> Met Before ==>       9.49      1.99
+   => Met  After ==>       7.50     -3.05
+====> Met Before ==>      13.22     -0.22
+   => Met  After ==>      31.63     -0.33
+====> Met Before ==>      16.30      2.81
+   => Met  After ==>      11.76      2.98
+====> Met Before ==>      11.60      0.79
+   => Met  After ==>      11.32      1.98
+====> Met Before ==>       7.43     -2.50
+   => Met  After ==>       8.28      2.08
+====> Met Before ==>       8.88      2.25
+   => Met  After ==>      28.35      1.73
+====> Met Before ==>       2.60      2.83
+   => Met  After ==>       2.12      0.98
+====> Met Before ==>      14.97     -2.59
+   => Met  After ==>      10.22     -1.57
+====> Met Before ==>       9.17     -2.63
+   => Met  After ==>       2.98     -2.59
+====> Met Before ==>       6.82     -3.02
+   => Met  After ==>      20.20      2.59
+====> Met Before ==>      20.71     -1.70
+   => Met  After ==>       8.17      1.04
+====> Met Before ==>       7.47     -0.66
+   => Met  After ==>      18.09      0.01
+====> Met Before ==>      15.93      0.45
+   => Met  After ==>      12.86     -2.05
+====> Met Before ==>      13.84      1.93
+   => Met  After ==>      15.77      1.94
+====> Met Before ==>      65.72     -1.70
+   => Met  After ==>      50.05     -1.94
+====> Met Before ==>      15.82     -2.84
+   => Met  After ==>       7.02     -2.66
+====> Met Before ==>      23.62     -1.12
+   => Met  After ==>      17.38     -1.11
+====> Met Before ==>      15.83     -0.71
+   => Met  After ==>       9.04      0.29
+====> Met Before ==>       4.22     -3.13
+   => Met  After ==>      19.95     -1.53
+====> Met Before ==>      34.21      1.71
+   => Met  After ==>      34.45      1.45
+====> Met Before ==>      36.19     -3.02
+   => Met  After ==>      77.59     -2.72
+====> Met Before ==>       4.28     -2.91
+   => Met  After ==>      14.92      1.86
+====> Met Before ==>       5.78      2.67
+   => Met  After ==>      35.44      0.35
+====> Met Before ==>       7.74     -2.80
+   => Met  After ==>       9.42     -2.22
+====> Met Before ==>      16.91     -1.33
+   => Met  After ==>      31.62     -1.34
+====> Met Before ==>       7.22      1.63
+   => Met  After ==>      10.41     -1.19
+====> Met Before ==>      12.24     -0.34
+   => Met  After ==>      37.07      1.54
+====> Met Before ==>      16.56     -1.20
+   => Met  After ==>      14.47     -1.91
+====> Met Before ==>       8.35     -0.88
+   => Met  After ==>       4.97      0.43
+====> Met Before ==>      25.31     -3.05
+   => Met  After ==>      14.45     -2.18
+====> Met Before ==>       7.14      1.79
+   => Met  After ==>      19.86     -0.42
+====> Met Before ==>      11.28      2.49
+   => Met  After ==>      14.06      1.80
+====> Met Before ==>      13.67      0.65
+   => Met  After ==>      14.54      2.14
+====> Met Before ==>       6.00     -0.71
+   => Met  After ==>      23.93      2.97
+====> Met Before ==>      16.68      2.79
+   => Met  After ==>      18.40      3.12
+====> Met Before ==>       7.17     -2.82
+   => Met  After ==>       7.83      2.10
+====> Met Before ==>      10.15      2.84
+   => Met  After ==>      10.97      2.54
+====> Met Before ==>       7.48     -1.93
+   => Met  After ==>      19.10     -0.83
+====> Met Before ==>       8.49      3.00
+   => Met  After ==>      34.59     -2.96
+====> Met Before ==>      14.46      1.99
+   => Met  After ==>       4.08     -0.09
+====> Met Before ==>       4.62      3.03
+   => Met  After ==>      15.74     -1.18
+====> Met Before ==>      17.76     -1.73
+   => Met  After ==>      20.00     -2.09
+====> Met Before ==>       8.14      3.11
+   => Met  After ==>      22.69     -2.28
+====> Met Before ==>      22.82      1.85
+   => Met  After ==>      11.06      3.00
+====> Met Before ==>      38.43     -2.07
+   => Met  After ==>      31.81     -2.13
+====> Met Before ==>      23.46     -2.33
+   => Met  After ==>      30.15      2.19
+====> Met Before ==>      13.68      2.67
+   => Met  After ==>       7.10      2.47
+====> Met Before ==>      44.92     -0.07
+   => Met  After ==>      62.00      0.40
+====> Met Before ==>      10.85     -1.34
+   => Met  After ==>      17.82     -1.22
+====> Met Before ==>      12.37      1.46
+   => Met  After ==>       6.51      1.11
+====> Met Before ==>      15.40     -0.63
+   => Met  After ==>      17.29     -1.16
+====> Met Before ==>       8.34      1.94
+   => Met  After ==>       7.07      1.82
+====> Met Before ==>      21.29     -1.25
+   => Met  After ==>      15.15     -1.38
+====> Met Before ==>       8.57     -0.96
+   => Met  After ==>       8.33      0.42
+====> Met Before ==>      10.60      1.13
+   => Met  After ==>       7.87      1.45
+====> Met Before ==>       9.46     -2.64
+   => Met  After ==>      20.20     -2.37
+====> Met Before ==>      21.24     -1.05
+   => Met  After ==>      10.56      0.06
+====> Met Before ==>      62.57      2.90
+   => Met  After ==>      72.34      2.77
+====> Met Before ==>      20.21      0.23
+   => Met  After ==>      14.89      0.44
+====> Met Before ==>      16.37     -0.07
+   => Met  After ==>       9.01      1.41
+====> Met Before ==>      11.09      1.09
+   => Met  After ==>      29.38     -1.85
+====> Met Before ==>      13.27     -1.41
+   => Met  After ==>      11.49      3.00
+====> Met Before ==>      15.20     -1.06
+   => Met  After ==>      13.90      0.26
+====> Met Before ==>       7.85      0.83
+   => Met  After ==>      34.36      1.98
+====> Met Before ==>      21.42     -0.54
+   => Met  After ==>      17.67     -0.52
+====> Met Before ==>      20.24     -2.60
+   => Met  After ==>      24.46     -1.85
+====> Met Before ==>       5.42      0.83
+   => Met  After ==>      28.73      0.15
+====> Met Before ==>      47.36     -2.50
+   => Met  After ==>      26.57     -2.37
+====> Met Before ==>      16.63      0.64
+   => Met  After ==>      14.06     -0.59
+====> Met Before ==>      11.43     -1.67
+   => Met  After ==>      18.21     -1.43
+====> Met Before ==>       2.91      2.28
+   => Met  After ==>       5.49      2.15
+====> Met Before ==>      74.07     -0.21
+   => Met  After ==>      71.21     -0.25
+====> Met Before ==>      17.76      0.29
+   => Met  After ==>      10.71      0.90
+====> Met Before ==>       7.23      0.32
+   => Met  After ==>      11.03     -1.45
+====> Met Before ==>      16.11     -3.14
+   => Met  After ==>      15.63     -1.22
+====> Met Before ==>      10.45     -1.89
+   => Met  After ==>       7.69     -0.19
+====> Met Before ==>       2.50     -1.93
+   => Met  After ==>      18.63     -0.91
+====> Met Before ==>       7.62     -2.59
+   => Met  After ==>      23.17      3.14
+====> Met Before ==>      43.30      1.35
+   => Met  After ==>      54.42      1.73
+====> Met Before ==>       5.62      1.64
+   => Met  After ==>      26.12     -2.31
+====> Met Before ==>      26.26     -3.09
+   => Met  After ==>      27.79      2.38
+====> Met Before ==>      10.25     -0.19
+   => Met  After ==>      12.32     -1.87
+====> Met Before ==>       7.03      1.71
+   => Met  After ==>      10.80     -2.29
+====> Met Before ==>      29.05     -1.62
+   => Met  After ==>      19.08     -1.58
+====> Met Before ==>      16.80     -1.63
+   => Met  After ==>      25.81     -0.39
+====> Met Before ==>      29.15     -2.45
+   => Met  After ==>      33.78     -2.48
+====> Met Before ==>      13.71     -2.31
+   => Met  After ==>      10.03     -2.41
+====> Met Before ==>      23.21      0.36
+   => Met  After ==>      19.20      0.28
+====> Met Before ==>      10.24      1.08
+   => Met  After ==>      26.09      0.44
+====> Met Before ==>      20.58      0.80
+   => Met  After ==>       5.20      0.94
+====> Met Before ==>      25.47      1.61
+   => Met  After ==>       9.09      1.42
+====> Met Before ==>      15.91      0.90
+   => Met  After ==>       3.16      0.22
+====> Met Before ==>      12.38     -1.98
+   => Met  After ==>      10.59      0.37
+====> Met Before ==>      25.58     -0.37
+   => Met  After ==>      19.09     -0.70
+====> Met Before ==>      13.91      3.01
+   => Met  After ==>      10.96      0.29
+====> Met Before ==>       6.15     -2.31
+   => Met  After ==>      10.92      0.92
+====> Met Before ==>      25.67     -1.07
+   => Met  After ==>      30.19     -1.09
+====> Met Before ==>       3.11      2.42
+   => Met  After ==>      30.94      0.74
+====> Met Before ==>      10.39      0.44
+   => Met  After ==>      21.14     -1.64
+====> Met Before ==>      20.40     -3.08
+   => Met  After ==>      18.92      1.81
+====> Met Before ==>      38.51      1.11
+   => Met  After ==>      11.41      2.26
+====> Met Before ==>       5.10      2.80
+   => Met  After ==>       5.74      1.20
+====> Met Before ==>      23.45      1.98
+   => Met  After ==>      15.84      1.87
+====> Met Before ==>       6.11     -1.72
+   => Met  After ==>      13.53     -0.31
+====> Met Before ==>       8.15     -1.54
+   => Met  After ==>       9.23     -0.61
+====> Met Before ==>      28.20     -0.47
+   => Met  After ==>       7.24     -0.51
+====> Met Before ==>      10.61      1.10
+   => Met  After ==>       9.77     -0.71
+====> Met Before ==>      40.01     -2.12
+   => Met  After ==>      18.87     -2.49
+====> Met Before ==>      24.42      0.69
+   => Met  After ==>      18.48     -0.75
+====> Met Before ==>      49.26      1.77
+   => Met  After ==>       9.96      1.66
+====> Met Before ==>      24.47      0.15
+   => Met  After ==>       5.01      0.55
+====> Met Before ==>      13.04     -1.03
+   => Met  After ==>      14.60      0.07
+====> Met Before ==>      20.51      1.64
+   => Met  After ==>      12.75      1.34
+====> Met Before ==>      22.31     -0.49
+   => Met  After ==>      20.01     -0.61
+====> Met Before ==>      10.79     -2.13
+   => Met  After ==>       8.61      2.79
+====> Met Before ==>       3.80      0.76
+   => Met  After ==>       7.14     -2.06
+====> Met Before ==>      42.64      3.06
+   => Met  After ==>      23.18      1.87
+====> Met Before ==>      32.73      2.01
+   => Met  After ==>       7.57     -0.83
+====> Met Before ==>       5.55      1.34
+   => Met  After ==>       8.18     -0.28
+====> Met Before ==>       8.15      1.00
+   => Met  After ==>      22.00     -2.03
+====> Met Before ==>      30.43     -2.28
+   => Met  After ==>      29.78     -2.39
+====> Met Before ==>      15.64     -1.52
+   => Met  After ==>       6.94     -2.15
+====> Met Before ==>       7.64     -3.04
+   => Met  After ==>       7.55     -1.32
+====> Met Before ==>      26.44     -0.05
+   => Met  After ==>      27.61     -1.32
+====> Met Before ==>       4.13     -0.57
+   => Met  After ==>       8.40     -0.09
+====> Met Before ==>      16.03      2.18
+   => Met  After ==>      27.52      3.04
+====> Met Before ==>      13.74      0.24
+   => Met  After ==>      18.16      1.30
+====> Met Before ==>      16.33      1.55
+   => Met  After ==>      23.41      0.95
+====> Met Before ==>       4.33      0.18
+   => Met  After ==>      22.51     -0.56
+====> Met Before ==>      35.75     -2.80
+   => Met  After ==>      42.28     -2.42
+====> Met Before ==>      29.58      1.47
+   => Met  After ==>      12.81      1.98
+====> Met Before ==>      26.34     -2.33
+   => Met  After ==>      20.49     -2.40
+====> Met Before ==>      11.52     -0.03
+   => Met  After ==>      11.77     -1.18
+====> Met Before ==>      22.90     -0.51
+   => Met  After ==>      14.62      0.79
+====> Met Before ==>       2.93      0.42
+   => Met  After ==>       8.42      2.70
+====> Met Before ==>      34.35     -1.78
+   => Met  After ==>      21.72      2.33
+====> Met Before ==>      11.17      0.10
+   => Met  After ==>      10.01     -0.72
+====> Met Before ==>      11.79     -1.39
+   => Met  After ==>      14.11     -1.67
+====> Met Before ==>      32.76      1.77
+   => Met  After ==>      27.53      2.22
+====> Met Before ==>      31.27      0.91
+   => Met  After ==>      16.95      0.54
+====> Met Before ==>       8.16     -0.03
+   => Met  After ==>      15.27     -0.84
+====> Met Before ==>      13.79     -2.11
+   => Met  After ==>      13.68     -1.27
+====> Met Before ==>       3.64      2.58
+   => Met  After ==>      26.36      0.29
+====> Met Before ==>      12.47      1.76
+   => Met  After ==>       7.52      1.72
+====> Met Before ==>      19.28      1.66
+   => Met  After ==>      14.69      2.68
+====> Met Before ==>      12.03      2.88
+   => Met  After ==>      30.52     -1.27
+====> Met Before ==>       7.77      0.48
+   => Met  After ==>      10.06     -2.69
+====> Met Before ==>       7.91      0.36
+   => Met  After ==>       9.08     -3.07
+====> Met Before ==>     158.97     -0.28
+   => Met  After ==>     190.39     -0.33
+====> Met Before ==>      14.50     -2.34
+   => Met  After ==>      17.34      2.18
+====> Met Before ==>      17.45      1.05
+   => Met  After ==>      13.70     -2.84
+====> Met Before ==>      10.57     -0.93
+   => Met  After ==>       7.57      0.67
+====> Met Before ==>      45.79     -2.03
+   => Met  After ==>      49.49      0.24
+====> Met Before ==>      19.25      1.95
+   => Met  After ==>       8.10      1.91
+====> Met Before ==>      16.03     -0.62
+   => Met  After ==>      24.59     -0.65
+====> Met Before ==>       1.53     -2.77
+   => Met  After ==>      20.32      1.63
+====> Met Before ==>       4.98      2.90
+   => Met  After ==>       7.37     -2.02
+====> Met Before ==>      23.70     -1.89
+   => Met  After ==>      12.65     -0.97
+====> Met Before ==>       9.19      0.47
+   => Met  After ==>      20.39      2.66
+====> Met Before ==>      12.20     -2.64
+   => Met  After ==>       3.48      1.84
+====> Met Before ==>      26.88      1.36
+   => Met  After ==>      15.98     -0.71
+====> Met Before ==>      25.15      1.83
+   => Met  After ==>      16.85      1.81
+====> Met Before ==>      12.56      0.04
+   => Met  After ==>       5.99     -0.43
+====> Met Before ==>      13.36      0.85
+   => Met  After ==>       4.82      2.99
+====> Met Before ==>      16.19     -0.41
+   => Met  After ==>      21.15      0.49
+====> Met Before ==>      13.15      3.00
+   => Met  After ==>      26.58      2.25
+====> Met Before ==>      13.79     -1.31
+   => Met  After ==>      27.99     -0.35
+====> Met Before ==>       8.36      0.89
+   => Met  After ==>      11.62     -2.79
+====> Met Before ==>      19.33     -2.56
+   => Met  After ==>      35.98     -1.56
+====> Met Before ==>      47.03     -0.60
+   => Met  After ==>       4.99      2.78
+====> Met Before ==>      11.83      2.89
+   => Met  After ==>       4.80     -0.98
+====> Met Before ==>      12.38      0.51
+   => Met  After ==>       5.10      0.44
+====> Met Before ==>      13.79      2.96
+   => Met  After ==>      14.32     -2.59
+====> Met Before ==>      27.74     -0.63
+   => Met  After ==>      21.36      0.29
+====> Met Before ==>      20.01     -1.53
+   => Met  After ==>      18.20     -2.35
+====> Met Before ==>      24.90      2.85
+   => Met  After ==>      22.59      2.71
+====> Met Before ==>       8.72     -2.80
+   => Met  After ==>       9.14     -0.80
+====> Met Before ==>       5.89     -2.15
+   => Met  After ==>      20.63     -2.53
+====> Met Before ==>       6.58      2.97
+   => Met  After ==>       7.49     -1.01
+====> Met Before ==>       7.64     -0.35
+   => Met  After ==>       6.29      0.04
+====> Met Before ==>      13.81     -1.66
+   => Met  After ==>       9.36     -2.06
+====> Met Before ==>       6.27     -1.75
+   => Met  After ==>      15.00     -3.12
+====> Met Before ==>      22.21     -2.53
+   => Met  After ==>      42.84     -2.57
+====> Met Before ==>       8.22     -1.87
+   => Met  After ==>      21.82     -2.60
+====> Met Before ==>      80.02      2.61
+   => Met  After ==>      38.57      3.02
+====> Met Before ==>       9.97     -2.92
+   => Met  After ==>       9.36     -1.09
+====> Met Before ==>      32.75      0.87
+   => Met  After ==>      11.63      1.36
+====> Met Before ==>      28.38      3.11
+   => Met  After ==>      16.78      2.48
+====> Met Before ==>      16.01      1.68
+   => Met  After ==>      10.15     -0.75
+====> Met Before ==>      10.83     -2.88
+   => Met  After ==>      21.46     -2.25
+====> Met Before ==>      17.74     -2.94
+   => Met  After ==>      13.17      1.63
+====> Met Before ==>      16.52     -0.34
+   => Met  After ==>      17.42     -0.54
+====> Met Before ==>      39.80     -2.43
+   => Met  After ==>      35.54     -2.45
+====> Met Before ==>      32.84     -1.84
+   => Met  After ==>       9.59     -2.49
+====> Met Before ==>      22.36     -1.18
+   => Met  After ==>       7.09      3.05
+====> Met Before ==>      13.65     -0.36
+   => Met  After ==>      12.62     -0.96
+====> Met Before ==>      10.62      2.60
+   => Met  After ==>      33.43      1.90
+====> Met Before ==>      15.37     -1.23
+   => Met  After ==>      12.94     -0.39
+====> Met Before ==>      23.49      0.33
+   => Met  After ==>       9.40     -0.39
+====> Met Before ==>      12.43     -1.77
+   => Met  After ==>      37.50     -2.25
+====> Met Before ==>      22.34      1.80
+   => Met  After ==>       8.20      1.77
+====> Met Before ==>       6.60     -0.57
+   => Met  After ==>      15.74      0.94
+====> Met Before ==>      66.00     -1.49
+   => Met  After ==>     102.49     -1.42
+====> Met Before ==>      35.27     -2.79
+   => Met  After ==>      31.63     -2.87
+====> Met Before ==>      12.08      2.38
+   => Met  After ==>      25.68      0.63
+====> Met Before ==>      16.30     -0.37
+   => Met  After ==>       5.22     -2.76
+====> Met Before ==>       8.79     -1.94
+   => Met  After ==>       3.16      2.42
+====> Met Before ==>      19.58     -1.26
+   => Met  After ==>       1.97     -1.65
+====> Met Before ==>      10.44     -2.47
+   => Met  After ==>      15.41     -1.33
+====> Met Before ==>      11.81     -0.38
+   => Met  After ==>      28.25     -2.51
+====> Met Before ==>      20.77     -2.22
+   => Met  After ==>      15.48      3.13
+====> Met Before ==>      14.10     -1.76
+   => Met  After ==>       7.76     -2.68
+====> Met Before ==>      12.48     -2.98
+   => Met  After ==>      16.20     -3.05
+====> Met Before ==>       9.67     -1.54
+   => Met  After ==>      12.52      0.75
+====> Met Before ==>      13.82     -2.15
+   => Met  After ==>       7.29      2.08
+====> Met Before ==>       4.51     -1.78
+   => Met  After ==>      18.55     -3.02
+====> Met Before ==>      16.77     -1.25
+   => Met  After ==>      21.27     -0.32
+====> Met Before ==>      12.81      1.86
+   => Met  After ==>      17.35      1.40
+====> Met Before ==>      10.18      0.90
+   => Met  After ==>      37.00     -1.02
+====> Met Before ==>      10.55     -2.22
+   => Met  After ==>       0.97      1.88
+====> Met Before ==>      12.81      0.53
+   => Met  After ==>      13.51      0.81
+====> Met Before ==>      19.06     -0.47
+   => Met  After ==>      23.04      0.11
+====> Met Before ==>      18.00      0.04
+   => Met  After ==>      23.93     -0.31
+====> Met Before ==>       8.68     -2.75
+   => Met  After ==>      14.94     -1.80
+====> Met Before ==>       7.65     -2.24
+   => Met  After ==>       8.02     -0.28
+====> Met Before ==>      12.37     -2.20
+   => Met  After ==>       7.43      0.22
+====> Met Before ==>      12.37      1.28
+   => Met  After ==>       7.38     -0.72
+====> Met Before ==>      11.30      2.39
+   => Met  After ==>      21.47     -1.37
+====> Met Before ==>      17.33      1.41
+   => Met  After ==>      27.45      2.01
+====> Met Before ==>      10.88     -2.49
+   => Met  After ==>       4.57     -3.02
+====> Met Before ==>      47.63     -0.43
+   => Met  After ==>      22.03      0.59
+====> Met Before ==>       8.16      0.87
+   => Met  After ==>      16.36      0.98
+====> Met Before ==>      10.14     -0.63
+   => Met  After ==>      12.16     -0.63
+====> Met Before ==>      34.78      0.08
+   => Met  After ==>      28.31     -0.56
+====> Met Before ==>      15.83      0.02
+   => Met  After ==>      11.27      0.11
+====> Met Before ==>      18.61     -1.23
+   => Met  After ==>      20.21     -0.73
+====> Met Before ==>       3.52     -0.76
+   => Met  After ==>      13.39     -2.16
+====> Met Before ==>      18.28     -2.28
+   => Met  After ==>      15.67     -2.15
+====> Met Before ==>       9.16      0.20
+   => Met  After ==>      15.42     -3.04
+====> Met Before ==>      25.08     -1.52
+   => Met  After ==>      19.41     -1.99
+====> Met Before ==>      31.01      0.74
+   => Met  After ==>      42.74      0.54
+====> Met Before ==>      10.50      1.51
+   => Met  After ==>      10.78     -0.33
+====> Met Before ==>      16.76     -0.55
+   => Met  After ==>      25.27     -0.15
+====> Met Before ==>      21.24      1.14
+   => Met  After ==>       7.32     -0.39
+====> Met Before ==>       7.24      2.71
+   => Met  After ==>      13.20      0.88
+====> Met Before ==>      52.96      1.85
+   => Met  After ==>      22.24     -0.10
+====> Met Before ==>      27.01      1.58
+   => Met  After ==>      32.02      2.64
+====> Met Before ==>       8.11      2.65
+   => Met  After ==>      19.84     -2.56
+====> Met Before ==>      14.89      2.20
+   => Met  After ==>      35.64      2.41
+====> Met Before ==>      24.92     -2.76
+   => Met  After ==>      13.67      3.11
+====> Met Before ==>       3.57     -0.74
+   => Met  After ==>       7.58     -0.74
+====> Met Before ==>      63.06     -3.12
+   => Met  After ==>      47.57     -3.01
+====> Met Before ==>      12.41      2.53
+   => Met  After ==>       6.91      0.61
+====> Met Before ==>      25.70      1.81
+   => Met  After ==>       2.63      2.35
+====> Met Before ==>       8.39     -0.24
+   => Met  After ==>      22.88      0.98
+====> Met Before ==>      12.03     -0.47
+   => Met  After ==>      42.12     -0.04
+====> Met Before ==>       5.25     -2.90
+   => Met  After ==>      14.83     -1.50
+====> Met Before ==>       8.89     -3.11
+   => Met  After ==>       3.26      1.67
+====> Met Before ==>      12.93      0.74
+   => Met  After ==>      19.50      0.20
+====> Met Before ==>      21.99     -2.33
+   => Met  After ==>      18.61     -1.95
+====> Met Before ==>       7.23     -2.60
+   => Met  After ==>       7.90     -3.02
+====> Met Before ==>      23.12     -2.66
+   => Met  After ==>      22.55     -2.42
+====> Met Before ==>      66.68     -2.69
+   => Met  After ==>      56.93     -2.97
+====> Met Before ==>       7.25     -0.47
+   => Met  After ==>      32.24     -0.66
+====> Met Before ==>      28.47     -0.13
+   => Met  After ==>      20.98      1.02
+====> Met Before ==>      18.29     -0.30
+   => Met  After ==>      23.59     -0.34
+====> Met Before ==>       5.51     -2.08
+   => Met  After ==>       4.26     -0.62
+====> Met Before ==>      20.23     -2.29
+   => Met  After ==>      15.95      1.90
+====> Met Before ==>      49.81      2.93
+   => Met  After ==>     111.06      2.55
+====> Met Before ==>      19.05     -2.96
+   => Met  After ==>       4.84      2.66
+====> Met Before ==>      13.40     -2.23
+   => Met  After ==>      27.39     -1.97
+====> Met Before ==>      12.16     -0.36
+   => Met  After ==>      14.17     -0.51
+====> Met Before ==>      25.95      2.11
+   => Met  After ==>      24.74      2.17
+====> Met Before ==>      18.49      3.10
+   => Met  After ==>      21.91     -2.13
+====> Met Before ==>      20.06      2.72
+   => Met  After ==>      33.51      2.57
+====> Met Before ==>      46.77     -0.85
+   => Met  After ==>      40.24     -0.49
+====> Met Before ==>      69.65      0.14
+   => Met  After ==>      37.12      0.04
+====> Met Before ==>      17.51     -0.48
+   => Met  After ==>       8.68      2.86
+====> Met Before ==>       6.00     -0.85
+   => Met  After ==>       6.26      0.63
+====> Met Before ==>      22.69      2.15
+   => Met  After ==>      17.86      2.29
+====> Met Before ==>       0.57     -2.92
+   => Met  After ==>      12.73      2.75
+====> Met Before ==>      15.29     -0.26
+   => Met  After ==>      10.52      1.09
+====> Met Before ==>       5.61      2.29
+   => Met  After ==>      15.81      1.61
+====> Met Before ==>      18.20      2.70
+   => Met  After ==>      11.24     -1.55
+====> Met Before ==>      30.05     -1.35
+   => Met  After ==>      23.30     -1.17
+====> Met Before ==>       8.74     -2.49
+   => Met  After ==>      10.21     -2.79
+====> Met Before ==>       1.51     -1.83
+   => Met  After ==>       7.37      0.35
+====> Met Before ==>      14.48     -2.36
+   => Met  After ==>      38.78     -0.84
+====> Met Before ==>      15.82      0.73
+   => Met  After ==>      22.99     -0.09
+====> Met Before ==>      11.06      1.22
+   => Met  After ==>       6.41      2.63
+====> Met Before ==>      13.18      0.12
+   => Met  After ==>      10.72     -1.32
+====> Met Before ==>      11.54      0.97
+   => Met  After ==>       7.25      0.99
+====> Met Before ==>      15.13      2.96
+   => Met  After ==>      12.95      2.62
+====> Met Before ==>      10.89      1.28
+   => Met  After ==>      26.00      0.75
+====> Met Before ==>       8.26     -0.61
+   => Met  After ==>      14.72      0.54
+====> Met Before ==>       4.44      3.04
+   => Met  After ==>      10.12     -1.58
+====> Met Before ==>      18.13     -1.66
+   => Met  After ==>      12.00     -2.51
+====> Met Before ==>      40.18      1.95
+   => Met  After ==>      23.88      2.29
+====> Met Before ==>      11.50     -3.06
+   => Met  After ==>      12.85     -1.22
+====> Met Before ==>      23.25     -0.25
+   => Met  After ==>      12.46      0.51
+====> Met Before ==>       8.59     -2.54
+   => Met  After ==>       4.46      1.74
+====> Met Before ==>      10.58      0.17
+   => Met  After ==>      12.15     -0.67
+====> Met Before ==>       9.85      3.06
+   => Met  After ==>      22.76      1.86
+====> Met Before ==>       6.07     -0.98
+   => Met  After ==>      15.68     -1.41
+====> Met Before ==>      14.08      2.02
+   => Met  After ==>      25.91      2.88
+====> Met Before ==>      18.49     -0.74
+   => Met  After ==>       7.32     -0.94
+====> Met Before ==>       6.83     -3.00
+   => Met  After ==>      38.77      2.59
+====> Met Before ==>      26.53      2.16
+   => Met  After ==>      43.42      2.38
+====> Met Before ==>       7.60      0.77
+   => Met  After ==>       4.56      0.44
+====> Met Before ==>      30.49     -0.98
+   => Met  After ==>      25.34      0.47
+====> Met Before ==>      18.60      0.06
+   => Met  After ==>      44.33     -0.75
+====> Met Before ==>      25.99     -1.50
+   => Met  After ==>      30.91     -1.35
+====> Met Before ==>      18.70     -0.78
+   => Met  After ==>      28.18     -1.16
+====> Met Before ==>       4.32      1.36
+   => Met  After ==>      16.98      2.27
+====> Met Before ==>      67.28     -0.93
+   => Met  After ==>      82.66     -1.07
+====> Met Before ==>      21.18     -1.66
+   => Met  After ==>      25.86     -2.48
+====> Met Before ==>       1.25     -2.85
+   => Met  After ==>       5.93      2.31
+====> Met Before ==>      24.82     -1.97
+   => Met  After ==>      10.68     -3.03
+====> Met Before ==>      13.31     -2.59
+   => Met  After ==>       6.18      1.73
+====> Met Before ==>      13.34      0.59
+   => Met  After ==>      27.15      1.54
+====> Met Before ==>       9.00     -2.90
+   => Met  After ==>      13.04     -0.85
+====> Met Before ==>      13.03      1.95
+   => Met  After ==>      23.38      2.05
+====> Met Before ==>      21.91      0.63
+   => Met  After ==>      12.33      0.52
+====> Met Before ==>      22.65     -3.08
+   => Met  After ==>       6.09     -2.39
+====> Met Before ==>      12.00     -3.07
+   => Met  After ==>      15.10      2.58
+====> Met Before ==>      16.10      1.61
+   => Met  After ==>       9.55      3.05
+====> Met Before ==>      27.14     -0.87
+   => Met  After ==>      36.71     -0.62
+====> Met Before ==>      15.25     -2.23
+   => Met  After ==>      17.80     -2.32
+====> Met Before ==>      43.89     -2.68
+   => Met  After ==>      18.99      2.34
+====> Met Before ==>       6.19     -3.01
+   => Met  After ==>      15.98     -2.42
+====> Met Before ==>       7.29      0.32
+   => Met  After ==>      23.47     -2.38
+====> Met Before ==>      10.97      2.29
+   => Met  After ==>      13.62      2.58
+====> Met Before ==>      12.36      2.43
+   => Met  After ==>      17.37     -1.50
+====> Met Before ==>      19.72      0.42
+   => Met  After ==>      40.29      0.74
+====> Met Before ==>      15.02      2.45
+   => Met  After ==>      27.25      2.24
+====> Met Before ==>       6.19      0.03
+   => Met  After ==>       4.57     -0.53
+====> Met Before ==>       7.85     -2.87
+   => Met  After ==>      23.46      0.94
+====> Met Before ==>       5.68     -0.80
+   => Met  After ==>      26.29     -0.47
+====> Met Before ==>      11.68      1.82
+   => Met  After ==>       9.42      0.11
+====> Met Before ==>      31.48      0.74
+   => Met  After ==>      19.34      1.07
+====> Met Before ==>       2.95     -1.32
+   => Met  After ==>       6.65      1.76
+====> Met Before ==>      12.22     -2.89
+   => Met  After ==>      26.85     -1.86
+====> Met Before ==>      31.30      2.60
+   => Met  After ==>      55.48      2.44
+====> Met Before ==>       5.71      0.46
+   => Met  After ==>      10.47      1.60
+====> Met Before ==>      23.75     -0.79
+   => Met  After ==>      12.69      0.33
+====> Met Before ==>      19.14      0.50
+   => Met  After ==>      27.40      2.05
+====> Met Before ==>      25.54     -2.92
+   => Met  After ==>      19.62     -2.79
+====> Met Before ==>      13.78     -3.00
+   => Met  After ==>       8.12      2.77
+====> Met Before ==>      28.81      0.24
+   => Met  After ==>       9.33      2.07
+====> Met Before ==>       7.89      0.38
+   => Met  After ==>      35.94     -2.99
+====> Met Before ==>       2.60     -1.13
+   => Met  After ==>       7.20      2.78
+====> Met Before ==>      18.78     -0.32
+   => Met  After ==>      13.05      0.37
+====> Met Before ==>      21.68     -2.59
+   => Met  After ==>       8.96     -2.53
+====> Met Before ==>      24.74      0.54
+   => Met  After ==>      12.43     -2.05
+====> Met Before ==>      27.20     -1.07
+   => Met  After ==>      16.67     -1.17
+====> Met Before ==>      12.09      0.10
+   => Met  After ==>       3.91      0.55
+====> Met Before ==>       2.78     -2.35
+   => Met  After ==>      19.95      2.11
+====> Met Before ==>      18.20     -3.09
+   => Met  After ==>      26.70      2.66
+====> Met Before ==>       1.40     -1.94
+   => Met  After ==>       3.61     -2.79
+====> Met Before ==>      44.03      2.04
+   => Met  After ==>      39.35      2.60
+====> Met Before ==>      11.97     -0.51
+   => Met  After ==>      22.59     -0.27
+====> Met Before ==>      12.80      1.74
+   => Met  After ==>       7.52     -3.07
+====> Met Before ==>       7.17     -2.08
+   => Met  After ==>       6.15      2.59
+====> Met Before ==>      14.51      2.97
+   => Met  After ==>       7.67     -2.42
+====> Met Before ==>      22.56     -0.12
+   => Met  After ==>      23.71      0.20
+====> Met Before ==>      16.37     -1.96
+   => Met  After ==>      15.66     -2.39
+====> Met Before ==>      14.14     -2.79
+   => Met  After ==>      10.00     -1.96
+====> Met Before ==>      17.63     -1.52
+   => Met  After ==>      31.35     -0.32
+====> Met Before ==>      53.71      2.69
+   => Met  After ==>      52.19      2.42
+====> Met Before ==>      19.56      2.41
+   => Met  After ==>       7.40      1.85
+====> Met Before ==>       0.98     -0.03
+   => Met  After ==>      11.35     -1.17
+====> Met Before ==>      11.47      1.18
+   => Met  After ==>       9.42      2.87
+====> Met Before ==>      82.98     -2.57
+   => Met  After ==>      50.81     -2.49
+====> Met Before ==>      23.54      0.39
+   => Met  After ==>       4.58      1.54
+====> Met Before ==>      31.00     -0.22
+   => Met  After ==>      27.62     -0.13
+====> Met Before ==>      20.38     -0.85
+   => Met  After ==>       8.53     -2.33
+====> Met Before ==>      31.70     -1.68
+   => Met  After ==>      20.27     -1.80
+====> Met Before ==>     106.65      3.08
+   => Met  After ==>     140.85      3.12
+====> Met Before ==>      15.72     -1.35
+   => Met  After ==>      19.09     -2.59
+====> Met Before ==>      20.68     -1.10
+   => Met  After ==>      22.47     -1.63
+====> Met Before ==>      14.33      2.54
+   => Met  After ==>       9.33      2.26
+====> Met Before ==>      12.27      2.91
+   => Met  After ==>       5.83     -1.31
+====> Met Before ==>       9.52      3.08
+   => Met  After ==>      12.90      0.53
+====> Met Before ==>      13.21      1.76
+   => Met  After ==>      14.17      1.95
+====> Met Before ==>       4.69     -2.35
+   => Met  After ==>       8.48      1.57
+====> Met Before ==>      18.12      1.75
+   => Met  After ==>      15.14      0.59
+====> Met Before ==>      23.84     -0.84
+   => Met  After ==>      21.08     -0.08
+====> Met Before ==>       8.71      2.90
+   => Met  After ==>      13.57      2.32
+====> Met Before ==>       9.06      0.33
+   => Met  After ==>       6.94      2.39
+====> Met Before ==>      14.60      0.47
+   => Met  After ==>      35.89      1.59
+====> Met Before ==>      20.47      2.51
+   => Met  After ==>      14.33      1.24
+====> Met Before ==>      43.38     -2.26
+   => Met  After ==>      27.78     -2.09
+====> Met Before ==>      44.23      3.12
+   => Met  After ==>      52.61      3.07
+====> Met Before ==>      17.16      1.18
+   => Met  After ==>      11.80      2.18
+====> Met Before ==>      17.88     -1.17
+   => Met  After ==>      26.58     -0.88
+====> Met Before ==>      55.48     -1.29
+   => Met  After ==>      52.41     -1.18
+====> Met Before ==>      43.33     -1.71
+   => Met  After ==>      13.42      1.82
+====> Met Before ==>       7.22     -2.94
+   => Met  After ==>       7.93      1.07
+====> Met Before ==>      30.09     -0.91
+   => Met  After ==>      34.37     -1.02
+====> Met Before ==>       9.39      1.04
+   => Met  After ==>      11.90     -0.08
+====> Met Before ==>       1.31     -0.05
+   => Met  After ==>      15.09      0.81
+====> Met Before ==>      19.91     -1.49
+   => Met  After ==>      32.93     -1.39
+====> Met Before ==>       6.16      2.06
+   => Met  After ==>      27.97      1.06
+====> Met Before ==>      29.56     -1.63
+   => Met  After ==>      55.67     -1.06
+====> Met Before ==>      19.09     -1.47
+   => Met  After ==>      13.13     -1.90
+====> Met Before ==>      10.20     -1.50
+   => Met  After ==>       1.77     -0.35
+====> Met Before ==>      21.85      1.99
+   => Met  After ==>       3.27      2.61
+====> Met Before ==>      20.70      1.82
+   => Met  After ==>      24.00     -3.00
+====> Met Before ==>      21.97     -0.64
+   => Met  After ==>      14.92     -0.63
+====> Met Before ==>       9.61      0.02
+   => Met  After ==>      15.92     -0.01
+====> Met Before ==>      16.74     -1.06
+   => Met  After ==>       2.88     -0.48
+====> Met Before ==>       2.46     -2.97
+   => Met  After ==>      24.73      2.71
+====> Met Before ==>      12.84     -2.96
+   => Met  After ==>      20.57      2.68
+====> Met Before ==>      31.28     -1.90
+   => Met  After ==>      26.07     -2.86
+====> Met Before ==>       3.99      1.81
+   => Met  After ==>      14.45      2.05
+====> Met Before ==>      23.06      1.61
+   => Met  After ==>      23.11      1.52
+====> Met Before ==>      64.83      1.57
+   => Met  After ==>      75.00      1.60
+====> Met Before ==>       8.54     -2.89
+   => Met  After ==>      13.39      0.80
+====> Met Before ==>      26.41      3.04
+   => Met  After ==>      33.56      2.75
+====> Met Before ==>      21.05      0.85
+   => Met  After ==>      36.95      1.13
+====> Met Before ==>      26.37      2.99
+   => Met  After ==>      47.61      2.62
+====> Met Before ==>      34.45      0.28
+   => Met  After ==>      26.94      0.62
+====> Met Before ==>       3.17     -1.85
+   => Met  After ==>       3.22      2.06
+====> Met Before ==>      28.33      1.99
+   => Met  After ==>      30.57      1.56
+====> Met Before ==>      24.85     -2.53
+   => Met  After ==>       9.02      0.11
+====> Met Before ==>     220.94     -2.96
+   => Met  After ==>     269.26     -3.08
+====> Met Before ==>      14.66      2.52
+   => Met  After ==>      29.60      1.49
+====> Met Before ==>      29.40     -2.09
+   => Met  After ==>      37.46     -2.25
+====> Met Before ==>       7.29      2.72
+   => Met  After ==>       6.11      0.84
+====> Met Before ==>      19.38     -0.84
+   => Met  After ==>      11.23     -0.25
+====> Met Before ==>      16.04     -0.92
+   => Met  After ==>       5.58      1.04
+====> Met Before ==>      34.41     -0.10
+   => Met  After ==>      21.75     -0.20
+====> Met Before ==>      14.22     -2.46
+   => Met  After ==>      26.76     -1.80
+====> Met Before ==>      14.85     -2.24
+   => Met  After ==>      16.39     -2.60
+====> Met Before ==>      11.84     -1.01
+   => Met  After ==>      17.91      0.52
+====> Met Before ==>      40.73     -0.05
+   => Met  After ==>      44.68      0.35
+====> Met Before ==>      18.74     -2.82
+   => Met  After ==>      34.85     -2.93
+====> Met Before ==>      11.99      1.52
+   => Met  After ==>       6.88     -1.99
+====> Met Before ==>      10.22      1.67
+   => Met  After ==>       6.46      1.51
+====> Met Before ==>      34.81     -2.76
+   => Met  After ==>      16.18      3.01
+====> Met Before ==>      17.72     -0.40
+   => Met  After ==>       8.87     -0.47
+====> Met Before ==>      12.05     -0.19
+   => Met  After ==>      14.94     -0.35
+====> Met Before ==>       6.15     -1.32
+   => Met  After ==>      11.17     -1.90
+====> Met Before ==>     131.75      0.79
+   => Met  After ==>      17.71     -0.12
+====> Met Before ==>       2.91     -1.55
+   => Met  After ==>       5.13      0.01
+====> Met Before ==>      14.48      1.57
+   => Met  After ==>      36.56      0.80
+====> Met Before ==>      24.67     -0.30
+   => Met  After ==>      20.02      0.80
+====> Met Before ==>      33.83      2.10
+   => Met  After ==>      11.85      1.68
+====> Met Before ==>       0.87      0.77
+   => Met  After ==>       9.94     -0.19
+====> Met Before ==>      35.18      1.30
+   => Met  After ==>      24.61      1.94
+====> Met Before ==>      19.12      3.10
+   => Met  After ==>       6.64      1.41
+====> Met Before ==>      19.65      3.06
+   => Met  After ==>      31.01      1.67
+====> Met Before ==>      14.76     -0.40
+   => Met  After ==>      33.22     -0.39
+====> Met Before ==>      29.63     -0.23
+   => Met  After ==>      26.20     -0.46
+====> Met Before ==>      11.77      1.97
+   => Met  After ==>      10.82     -3.10
+====> Met Before ==>      35.27      0.29
+   => Met  After ==>      19.79      0.27
+====> Met Before ==>      44.99     -1.03
+   => Met  After ==>      52.60     -1.91
+====> Met Before ==>      15.44     -1.79
+   => Met  After ==>      28.41     -1.80
+====> Met Before ==>       9.43      1.86
+   => Met  After ==>      14.58      1.84
+====> Met Before ==>      39.30     -1.95
+   => Met  After ==>       9.01     -2.78
+====> Met Before ==>      32.12     -1.28
+   => Met  After ==>       6.31      2.07
+====> Met Before ==>      49.56      1.71
+   => Met  After ==>      36.64      1.66
+====> Met Before ==>      22.85     -0.84
+   => Met  After ==>      14.34     -1.15
+====> Met Before ==>       5.17     -3.12
+   => Met  After ==>      15.15     -1.19
+====> Met Before ==>       5.29      1.67
+   => Met  After ==>       5.69     -0.66
+====> Met Before ==>       7.38      0.59
+   => Met  After ==>       6.19     -0.29
+====> Met Before ==>      16.10      0.97
+   => Met  After ==>      24.98      0.93
+====> Met Before ==>      18.41     -1.42
+   => Met  After ==>      33.15     -0.05
+====> Met Before ==>      10.62      3.07
+   => Met  After ==>      11.36      1.92
+====> Met Before ==>      19.29     -0.44
+   => Met  After ==>      11.74      2.07
+====> Met Before ==>       6.79      2.12
+   => Met  After ==>       5.93     -2.65
+====> Met Before ==>      21.97      2.46
+   => Met  After ==>      28.99      2.69
+====> Met Before ==>      15.10      2.95
+   => Met  After ==>      43.14      2.80
+====> Met Before ==>      10.15     -2.63
+   => Met  After ==>      10.26      0.24
+====> Met Before ==>      34.81      0.29
+   => Met  After ==>      12.35      0.05
+====> Met Before ==>      24.59     -1.97
+   => Met  After ==>      18.60     -3.00
+====> Met Before ==>      29.01      2.56
+   => Met  After ==>       7.97      3.05
+====> Met Before ==>      29.09     -0.91
+   => Met  After ==>      13.13     -1.61
+====> Met Before ==>      12.95     -1.56
+   => Met  After ==>       8.66      2.01
+====> Met Before ==>       8.87     -2.85
+   => Met  After ==>      10.13     -0.84
+====> Met Before ==>      10.59     -3.11
+   => Met  After ==>      12.74      3.08
+====> Met Before ==>      23.08      3.03
+   => Met  After ==>      17.79     -2.32
+====> Met Before ==>      27.57      0.10
+   => Met  After ==>      17.80      0.03
+====> Met Before ==>      19.79     -1.35
+   => Met  After ==>      35.32     -1.20
+====> Met Before ==>       8.03      1.26
+   => Met  After ==>       7.56     -1.93
+====> Met Before ==>     112.13     -2.08
+   => Met  After ==>     130.53     -2.09
+====> Met Before ==>      21.57      2.49
+   => Met  After ==>      21.72      2.47
+====> Met Before ==>      12.82      1.15
+   => Met  After ==>       8.56      2.41
+====> Met Before ==>       2.25     -1.79
+   => Met  After ==>      17.20     -2.47
+====> Met Before ==>       7.36     -1.77
+   => Met  After ==>      14.62     -0.72
+====> Met Before ==>      69.26      0.50
+   => Met  After ==>      61.73      0.53
+====> Met Before ==>       9.48      2.92
+   => Met  After ==>       7.39     -0.97
+====> Met Before ==>      16.60      1.22
+   => Met  After ==>      12.19     -0.07
+====> Met Before ==>       1.80     -0.16
+   => Met  After ==>      22.15     -0.57
+====> Met Before ==>      12.78     -0.35
+   => Met  After ==>      11.76      1.39
+====> Met Before ==>      31.29     -0.46
+   => Met  After ==>      16.91     -0.01
+====> Met Before ==>      24.80      3.05
+   => Met  After ==>       3.40      1.08
+====> Met Before ==>      25.58      1.32
+   => Met  After ==>      12.66      0.64
+====> Met Before ==>       5.77      2.19
+   => Met  After ==>      14.15      1.08
+====> Met Before ==>      18.19     -0.16
+   => Met  After ==>       8.32      1.65
+====> Met Before ==>      11.71      0.34
+   => Met  After ==>      31.61      1.48
+====> Met Before ==>      11.09     -0.90
+   => Met  After ==>      23.84      0.12
+====> Met Before ==>      34.11     -1.54
+   => Met  After ==>      31.01     -2.16
+====> Met Before ==>      13.93     -0.08
+   => Met  After ==>      15.72     -2.50
+====> Met Before ==>      28.86      0.34
+   => Met  After ==>      29.10     -0.06
+====> Met Before ==>      18.22     -1.34
+   => Met  After ==>      22.87     -0.61
+====> Met Before ==>      20.61     -0.48
+   => Met  After ==>      21.69      0.88
+====> Met Before ==>      35.49     -1.77
+   => Met  After ==>      20.86     -0.65
+====> Met Before ==>      17.75      2.93
+   => Met  After ==>      24.27      2.27
+====> Met Before ==>      25.93      1.66
+   => Met  After ==>      18.09      2.00
+====> Met Before ==>      13.42      2.41
+   => Met  After ==>      29.47      0.62
+====> Met Before ==>      28.66      2.66
+   => Met  After ==>      38.81      2.20
+====> Met Before ==>      17.90     -1.11
+   => Met  After ==>      12.08     -1.94
+====> Met Before ==>       5.86      0.54
+   => Met  After ==>       7.99     -2.33
+====> Met Before ==>      25.49      1.44
+   => Met  After ==>       9.09     -0.93
+====> Met Before ==>       0.59     -1.68
+   => Met  After ==>       6.84      2.90
+====> Met Before ==>      11.26      2.80
+   => Met  After ==>       9.79     -1.38
+====> Met Before ==>      19.24     -2.16
+   => Met  After ==>      19.38     -1.39
+====> Met Before ==>       9.90      0.35
+   => Met  After ==>       8.14     -1.04
+====> Met Before ==>      22.85      2.15
+   => Met  After ==>       9.23      2.02
+====> Met Before ==>      21.86      3.01
+   => Met  After ==>       2.08     -2.77
+====> Met Before ==>      14.26     -0.71
+   => Met  After ==>      17.18     -0.36
+====> Met Before ==>      23.87      0.12
+   => Met  After ==>      28.93      0.73
+====> Met Before ==>      22.15      0.13
+   => Met  After ==>      34.78      0.32
+====> Met Before ==>      17.10      2.23
+   => Met  After ==>      20.07      2.58
+====> Met Before ==>      26.08     -0.28
+   => Met  After ==>      25.63     -0.71
+====> Met Before ==>      20.61      2.01
+   => Met  After ==>      13.32      1.59
+====> Met Before ==>      40.96     -1.13
+   => Met  After ==>      40.87     -0.83
+====> Met Before ==>      79.38     -2.76
+   => Met  After ==>      62.11     -2.78
+====> Met Before ==>       4.40     -1.58
+   => Met  After ==>       2.67     -0.83
+====> Met Before ==>      17.71     -1.07
+   => Met  After ==>       3.73     -1.18
+====> Met Before ==>      13.20     -0.46
+   => Met  After ==>       2.51      1.79
+====> Met Before ==>       6.76     -0.82
+   => Met  After ==>      12.23     -0.46
+====> Met Before ==>      19.77     -0.39
+   => Met  After ==>      33.63     -0.52
+====> Met Before ==>      18.48     -1.32
+   => Met  After ==>      22.41     -0.47
+====> Met Before ==>       9.82     -0.96
+   => Met  After ==>       0.96      1.11
+====> Met Before ==>      26.33     -0.89
+   => Met  After ==>      16.01     -1.59
+====> Met Before ==>      39.00      0.10
+   => Met  After ==>      38.59     -0.34
+====> Met Before ==>      14.54     -0.72
+   => Met  After ==>       9.93     -0.34
+====> Met Before ==>      10.57     -0.46
+   => Met  After ==>      21.78     -2.00
+====> Met Before ==>      12.51      3.13
+   => Met  After ==>      26.50      2.74
+====> Met Before ==>       9.07     -2.04
+   => Met  After ==>      11.67     -2.28
+====> Met Before ==>      14.32     -0.32
+   => Met  After ==>      29.53     -0.13
+====> Met Before ==>      15.27     -1.75
+   => Met  After ==>      20.06     -1.61
+====> Met Before ==>      26.83      2.74
+   => Met  After ==>      31.57      2.33
+====> Met Before ==>      13.93      0.35
+   => Met  After ==>      31.50      1.97
+====> Met Before ==>       9.11     -1.56
+   => Met  After ==>      17.47      2.40
+====> Met Before ==>      18.24      1.59
+   => Met  After ==>      40.41      1.92
+====> Met Before ==>      14.87     -1.15
+   => Met  After ==>      24.05     -0.96
+====> Met Before ==>       5.35     -1.50
+   => Met  After ==>       3.44     -2.61
+====> Met Before ==>       6.33     -2.32
+   => Met  After ==>      18.43     -2.83
+====> Met Before ==>      26.96      2.47
+   => Met  After ==>      13.70     -2.86
+====> Met Before ==>       9.05      0.16
+   => Met  After ==>       2.39     -1.12
+====> Met Before ==>       7.57      0.33
+   => Met  After ==>      19.79      2.15
+====> Met Before ==>       8.17     -0.79
+   => Met  After ==>      13.58     -0.99
+====> Met Before ==>      21.24      0.24
+   => Met  After ==>      23.56      0.18
+====> Met Before ==>      14.85     -0.48
+   => Met  After ==>       4.25     -2.01
+====> Met Before ==>       5.63     -0.67
+   => Met  After ==>      11.70     -2.42
+====> Met Before ==>       6.97     -0.67
+   => Met  After ==>      13.10      0.65
+====> Met Before ==>      21.34     -2.33
+   => Met  After ==>      13.20     -1.52
+====> Met Before ==>      10.14      0.15
+   => Met  After ==>      12.25      0.54
+====> Met Before ==>      41.69      1.58
+   => Met  After ==>      23.08      1.28
+====> Met Before ==>      19.57      3.11
+   => Met  After ==>      27.99     -2.26
+====> Met Before ==>       7.98      1.32
+   => Met  After ==>      13.19      0.17
+====> Met Before ==>      10.66      0.75
+   => Met  After ==>      10.01      1.16
+====> Met Before ==>      18.75     -1.86
+   => Met  After ==>      28.85     -2.44
+====> Met Before ==>      12.98      1.93
+   => Met  After ==>       5.30      1.95
+====> Met Before ==>      28.41      2.24
+   => Met  After ==>      45.61      2.10
+====> Met Before ==>      17.52     -2.03
+   => Met  After ==>       2.20     -0.14
+====> Met Before ==>      10.29     -1.27
+   => Met  After ==>      23.54     -2.36
+====> Met Before ==>      23.24     -2.83
+   => Met  After ==>      14.95     -2.12
+====> Met Before ==>      23.11      0.64
+   => Met  After ==>      17.52      1.55
+====> Met Before ==>      63.24      0.56
+   => Met  After ==>      43.91      0.20
+====> Met Before ==>       7.77      2.78
+   => Met  After ==>      16.52      0.47
+====> Met Before ==>      18.68      2.47
+   => Met  After ==>      26.33      2.02
+====> Met Before ==>      47.90      0.01
+   => Met  After ==>      51.45     -0.01
+====> Met Before ==>       9.97      0.55
+   => Met  After ==>      17.71      0.66
+====> Met Before ==>      13.85     -0.68
+   => Met  After ==>      17.17     -0.90
+====> Met Before ==>      15.77      1.80
+   => Met  After ==>       3.41      2.78
+====> Met Before ==>      15.04      2.01
+   => Met  After ==>       9.28      2.91
+====> Met Before ==>      19.72     -2.52
+   => Met  After ==>       8.27     -2.55
+====> Met Before ==>      28.47     -1.60
+   => Met  After ==>      39.27     -1.76
+====> Met Before ==>      30.03      2.66
+   => Met  After ==>      37.62     -3.04
+====> Met Before ==>       8.76      2.75
+   => Met  After ==>      12.92      0.85
+====> Met Before ==>       4.27      2.11
+   => Met  After ==>      13.09     -1.17
+====> Met Before ==>      10.87     -1.91
+   => Met  After ==>      14.28      1.03
+====> Met Before ==>       8.65     -1.56
+   => Met  After ==>      11.44     -1.38
+====> Met Before ==>       6.36      1.96
+   => Met  After ==>       7.51      2.43
+====> Met Before ==>       2.85     -1.25
+   => Met  After ==>       3.57     -2.15
+====> Met Before ==>      70.44      2.81
+   => Met  After ==>      41.86      2.63
+====> Met Before ==>      18.84     -2.95
+   => Met  After ==>      28.35      2.77
+====> Met Before ==>      24.83     -1.03
+   => Met  After ==>      14.92     -1.59
+====> Met Before ==>      24.36     -2.60
+   => Met  After ==>      17.38      2.01
+====> Met Before ==>      10.86     -2.09
+   => Met  After ==>      10.52     -2.89
+====> Met Before ==>      21.97     -1.21
+   => Met  After ==>       3.28     -2.07
+====> Met Before ==>       4.49      1.70
+   => Met  After ==>       6.28      1.79
+====> Met Before ==>      15.55      1.47
+   => Met  After ==>       7.77      0.67
+====> Met Before ==>       5.48     -0.48
+   => Met  After ==>      14.64      1.29
+====> Met Before ==>       9.51      3.07
+   => Met  After ==>      28.73      1.54
+====> Met Before ==>      11.13     -2.48
+   => Met  After ==>      11.99      0.45
+====> Met Before ==>       8.82      2.13
+   => Met  After ==>      18.14      2.35
+====> Met Before ==>       7.47      1.02
+   => Met  After ==>      16.06     -2.13
+====> Met Before ==>      22.94     -2.95
+   => Met  After ==>      36.32      2.98
+====> Met Before ==>      30.47     -1.97
+   => Met  After ==>       7.44      2.28
+====> Met Before ==>      22.37      1.07
+   => Met  After ==>       8.61      2.19
+====> Met Before ==>      22.25      0.44
+   => Met  After ==>      12.57     -0.19
+====> Met Before ==>      11.37     -1.60
+   => Met  After ==>       5.43     -1.77
+====> Met Before ==>       3.99      1.34
+   => Met  After ==>      12.19     -1.73
+====> Met Before ==>       3.66      2.14
+   => Met  After ==>       9.31     -1.40
+====> Met Before ==>      19.76      2.61
+   => Met  After ==>       7.14     -1.53
+====> Met Before ==>      25.23      2.93
+   => Met  After ==>      28.23      2.59
+====> Met Before ==>      27.00     -2.31
+   => Met  After ==>      20.10     -1.71
+====> Met Before ==>      15.73      0.49
+   => Met  After ==>      40.98      0.98
+====> Met Before ==>      27.68      0.56
+   => Met  After ==>       5.51      0.04
+====> Met Before ==>       8.93      2.90
+   => Met  After ==>      10.73     -1.89
+====> Met Before ==>      16.51     -1.07
+   => Met  After ==>      12.00     -0.61
+====> Met Before ==>      22.59     -1.44
+   => Met  After ==>       3.55      2.82
+====> Met Before ==>      65.25     -0.07
+   => Met  After ==>      30.38      0.33
+====> Met Before ==>       4.50     -1.07
+   => Met  After ==>      10.92     -0.92
+====> Met Before ==>      19.34      0.60
+   => Met  After ==>      17.91      0.58
+====> Met Before ==>      14.49     -0.64
+   => Met  After ==>       9.33     -1.75
+====> Met Before ==>       5.37      0.18
+   => Met  After ==>      23.57      1.34
+====> Met Before ==>       3.08      1.35
+   => Met  After ==>      11.50      1.68
+====> Met Before ==>      13.67      2.53
+   => Met  After ==>      15.99      1.48
+====> Met Before ==>       9.43     -2.71
+   => Met  After ==>      22.55     -1.82
+====> Met Before ==>      42.43     -1.48
+   => Met  After ==>      40.13     -1.46
+====> Met Before ==>      22.35      2.14
+   => Met  After ==>       7.34      1.65
+====> Met Before ==>      30.51     -0.34
+   => Met  After ==>      32.38      0.32
+====> Met Before ==>       8.26     -0.41
+   => Met  After ==>      20.05     -0.51
+====> Met Before ==>      14.15      2.70
+   => Met  After ==>      17.97     -2.88
+====> Met Before ==>       7.17     -2.48
+   => Met  After ==>      13.35      3.02
+====> Met Before ==>     103.63      0.27
+   => Met  After ==>      79.28      0.19
+====> Met Before ==>       8.73      1.71
+   => Met  After ==>       7.04      1.24
+====> Met Before ==>       9.44      1.78
+   => Met  After ==>       2.79      0.97
+====> Met Before ==>       3.63      0.37
+   => Met  After ==>       8.37      1.02
+====> Met Before ==>       9.86      1.94
+   => Met  After ==>      16.82      3.02
+====> Met Before ==>      11.63      1.47
+   => Met  After ==>      20.10      0.90
+====> Met Before ==>       2.35     -2.14
+   => Met  After ==>      10.91      0.89
+====> Met Before ==>      28.60      3.14
+   => Met  After ==>      25.45      2.47
+====> Met Before ==>      24.47     -3.12
+   => Met  After ==>      17.85     -2.25
+====> Met Before ==>       8.27     -2.37
+   => Met  After ==>      51.20     -0.93
+====> Met Before ==>      32.61     -2.23
+   => Met  After ==>      10.50     -1.90
+====> Met Before ==>      10.30      1.64
+   => Met  After ==>      18.00      2.52
+====> Met Before ==>      10.11     -1.14
+   => Met  After ==>      12.38      0.92
+====> Met Before ==>      12.60      1.43
+   => Met  After ==>      12.95      1.74
+====> Met Before ==>      30.36     -0.12
+   => Met  After ==>       7.08     -0.63
+====> Met Before ==>      26.53      0.35
+   => Met  After ==>      28.08      1.31
+====> Met Before ==>       3.36      1.14
+   => Met  After ==>       2.84      0.47
+====> Met Before ==>      20.66      0.44
+   => Met  After ==>       8.64      1.02
+====> Met Before ==>      19.89      1.07
+   => Met  After ==>      28.02      1.08
+====> Met Before ==>       2.41      0.58
+   => Met  After ==>       5.40     -1.59
+====> Met Before ==>      66.86     -2.82
+   => Met  After ==>      66.95     -2.72
+====> Met Before ==>      33.91     -1.66
+   => Met  After ==>       5.52     -2.25
+====> Met Before ==>      25.11      0.75
+   => Met  After ==>      36.38      0.43
+====> Met Before ==>      14.46     -1.14
+   => Met  After ==>       6.15      1.00
+====> Met Before ==>       1.11      0.10
+   => Met  After ==>       7.80     -2.49
+====> Met Before ==>      18.16      0.02
+   => Met  After ==>      11.51      0.31
+====> Met Before ==>      22.50      0.14
+   => Met  After ==>      21.91      0.05
+====> Met Before ==>      28.48      1.49
+   => Met  After ==>      10.44      0.80
+====> Met Before ==>      12.79     -2.36
+   => Met  After ==>      20.33     -3.11
+====> Met Before ==>      16.38     -2.08
+   => Met  After ==>      31.87     -2.14
+====> Met Before ==>       3.62     -2.55
+   => Met  After ==>      15.65      1.54
+====> Met Before ==>      17.36     -2.49
+   => Met  After ==>      18.43     -1.40
+====> Met Before ==>      28.93      2.73
+   => Met  After ==>       8.10      2.60
+====> Met Before ==>       3.57      2.31
+   => Met  After ==>      39.70      0.47
+====> Met Before ==>       9.68      1.05
+   => Met  After ==>      27.05      1.70
+====> Met Before ==>      32.27     -1.07
+   => Met  After ==>      25.27     -1.67
+====> Met Before ==>      16.18     -0.72
+   => Met  After ==>      16.02     -0.73
+====> Met Before ==>      16.95      0.20
+   => Met  After ==>      20.07     -0.84
+====> Met Before ==>      12.21     -0.65
+   => Met  After ==>      24.00     -0.67
+====> Met Before ==>      13.96     -2.50
+   => Met  After ==>      22.73     -2.79
+====> Met Before ==>      17.96      1.93
+   => Met  After ==>      13.16      1.83
+====> Met Before ==>       5.29      2.69
+   => Met  After ==>      16.30      2.77
+====> Met Before ==>      13.58      0.31
+   => Met  After ==>      17.53      1.09
+====> Met Before ==>      17.86     -2.63
+   => Met  After ==>       6.22     -2.23
+====> Met Before ==>      12.82      1.99
+   => Met  After ==>      20.33      0.00
+====> Met Before ==>      14.88     -0.77
+   => Met  After ==>      24.27     -0.16
+====> Met Before ==>      11.76      2.50
+   => Met  After ==>       1.66      0.68
+====> Met Before ==>       5.57      2.54
+   => Met  After ==>       8.98      2.56
+====> Met Before ==>      15.91     -1.51
+   => Met  After ==>      32.17     -2.28
+====> Met Before ==>      19.48      2.71
+   => Met  After ==>      25.45     -2.49
+====> Met Before ==>      13.44     -0.73
+   => Met  After ==>      18.77      2.11
+====> Met Before ==>      14.99      2.56
+   => Met  After ==>      18.14      0.51
+====> Met Before ==>      14.83      0.56
+   => Met  After ==>       5.79      0.31
+====> Met Before ==>      11.69     -0.82
+   => Met  After ==>      19.96     -2.16
+====> Met Before ==>      10.49     -2.49
+   => Met  After ==>      28.68      1.03
+====> Met Before ==>       6.84      1.03
+   => Met  After ==>       5.67      2.10
+====> Met Before ==>      21.21      1.87
+   => Met  After ==>      48.86      2.60
+====> Met Before ==>      38.91      2.07
+   => Met  After ==>      18.18      0.74
+====> Met Before ==>      13.97     -1.63
+   => Met  After ==>      17.20      0.90
+====> Met Before ==>      16.10      0.31
+   => Met  After ==>      15.64      0.98
+====> Met Before ==>      13.36      2.87
+   => Met  After ==>      15.38      0.13
+====> Met Before ==>      15.22     -2.76
+   => Met  After ==>       9.72      1.97
+====> Met Before ==>      19.90      3.01
+   => Met  After ==>       5.27     -2.49
+====> Met Before ==>      25.27      1.26
+   => Met  After ==>      36.18      1.13
+====> Met Before ==>      79.67      2.79
+   => Met  After ==>      38.42      2.08
+====> Met Before ==>       9.86     -1.43
+   => Met  After ==>      25.96      2.90
+====> Met Before ==>      11.22      2.81
+   => Met  After ==>      32.63     -1.69
+====> Met Before ==>      25.90     -2.98
+   => Met  After ==>      20.33     -3.03
+====> Met Before ==>      21.18      0.03
+   => Met  After ==>      22.38     -0.25
+====> Met Before ==>       6.41      3.00
+   => Met  After ==>       7.89      2.15
+====> Met Before ==>      23.13     -0.35
+   => Met  After ==>      11.32     -0.20
+====> Met Before ==>       4.42      3.05
+   => Met  After ==>      23.48     -2.24
+====> Met Before ==>      10.33     -0.53
+   => Met  After ==>       5.14      1.09
+====> Met Before ==>      14.27     -0.54
+   => Met  After ==>      31.16     -1.53
+====> Met Before ==>       7.03      0.21
+   => Met  After ==>       3.72      0.93
+====> Met Before ==>       5.16      2.34
+   => Met  After ==>      11.46      0.98
+====> Met Before ==>       7.68      1.26
+   => Met  After ==>       9.94      1.74
+====> Met Before ==>      10.99      2.92
+   => Met  After ==>       9.67     -1.99
+====> Met Before ==>      28.94      2.19
+   => Met  After ==>      10.93      1.13
+====> Met Before ==>      21.94     -1.08
+   => Met  After ==>      21.36     -1.93
+====> Met Before ==>      22.82     -0.81
+   => Met  After ==>      19.82     -0.95
+====> Met Before ==>      18.50      1.91
+   => Met  After ==>      18.29      1.42
+====> Met Before ==>      22.78      2.66
+   => Met  After ==>      31.88      2.11
+====> Met Before ==>      10.60     -1.69
+   => Met  After ==>       6.74     -0.37
+====> Met Before ==>      13.94     -0.83
+   => Met  After ==>       4.43     -0.82
+====> Met Before ==>      15.33     -2.73
+   => Met  After ==>       8.59     -3.05
+====> Met Before ==>      31.56     -1.14
+   => Met  After ==>      45.17     -1.33
+====> Met Before ==>      16.11      0.72
+   => Met  After ==>       7.89     -2.81
+====> Met Before ==>      17.54      0.63
+   => Met  After ==>      13.71     -0.49
+====> Met Before ==>      49.73      1.61
+   => Met  After ==>      56.37      1.68
+====> Met Before ==>      20.10     -2.77
+   => Met  After ==>      33.17     -2.55
+====> Met Before ==>      16.29      2.20
+   => Met  After ==>       6.21      2.70
+====> Met Before ==>       9.39      2.43
+   => Met  After ==>       1.76     -0.57
+====> Met Before ==>      22.86      1.80
+   => Met  After ==>      10.58      0.23
+====> Met Before ==>      29.98      0.92
+   => Met  After ==>      46.59      0.50
+====> Met Before ==>       4.96      2.34
+   => Met  After ==>      21.67      2.53
+====> Met Before ==>      19.48     -1.75
+   => Met  After ==>      16.38      2.55
+====> Met Before ==>       5.80     -2.12
+   => Met  After ==>      11.27      2.53
+====> Met Before ==>      13.23      1.88
+   => Met  After ==>      21.18      2.58
+====> Met Before ==>      23.55     -2.95
+   => Met  After ==>      16.91     -2.82
+====> Met Before ==>      24.81      1.57
+   => Met  After ==>      10.32      2.39
+====> Met Before ==>      26.66     -0.01
+   => Met  After ==>      24.76     -1.47
+====> Met Before ==>       9.08      0.87
+   => Met  After ==>      11.93     -1.47
+====> Met Before ==>      23.37     -2.66
+   => Met  After ==>      31.85     -3.05
+====> Met Before ==>       4.15     -1.47
+   => Met  After ==>      22.57     -0.54
+====> Met Before ==>       9.51     -0.28
+   => Met  After ==>      17.40      0.89
+====> Met Before ==>      13.90     -1.62
+   => Met  After ==>      21.86     -2.76
+====> Met Before ==>       7.14     -2.56
+   => Met  After ==>       6.96      2.71
+====> Met Before ==>      10.28     -2.13
+   => Met  After ==>       6.52     -1.71
+====> Met Before ==>      11.28     -1.82
+   => Met  After ==>       9.81     -0.88
+====> Met Before ==>      16.77      0.64
+   => Met  After ==>      27.29      1.07
+====> Met Before ==>       6.23      2.09
+   => Met  After ==>      28.21     -1.89
+====> Met Before ==>      22.10      2.73
+   => Met  After ==>       9.01      1.12
+====> Met Before ==>       5.36     -2.53
+   => Met  After ==>       7.66     -2.49
+====> Met Before ==>      12.51     -1.06
+   => Met  After ==>      17.03     -2.53
+====> Met Before ==>      29.09     -2.40
+   => Met  After ==>      20.01     -2.86
+====> Met Before ==>       6.57     -1.82
+   => Met  After ==>      19.73     -2.97
+====> Met Before ==>       9.50      2.08
+   => Met  After ==>      22.61     -2.65
+====> Met Before ==>      31.81      2.28
+   => Met  After ==>      23.05      2.76
+====> Met Before ==>      20.25     -0.70
+   => Met  After ==>       5.95     -1.46
+====> Met Before ==>      11.99      1.74
+   => Met  After ==>      15.52      2.11
+====> Met Before ==>      21.35     -2.83
+   => Met  After ==>      32.41     -2.65
+====> Met Before ==>       6.98     -0.07
+   => Met  After ==>       8.49     -0.19
+====> Met Before ==>      17.44      1.68
+   => Met  After ==>      18.96     -1.41
+====> Met Before ==>       9.29      1.09
+   => Met  After ==>      10.89      2.66
+====> Met Before ==>      11.44     -2.57
+   => Met  After ==>      15.82      2.13
+====> Met Before ==>       6.47     -1.44
+   => Met  After ==>      11.19     -1.20
+====> Met Before ==>      42.09      1.18
+   => Met  After ==>      27.40      1.62
+====> Met Before ==>      16.49     -1.66
+   => Met  After ==>       5.18      0.21
+====> Met Before ==>      15.60     -1.24
+   => Met  After ==>       4.90     -2.51
+====> Met Before ==>      24.84      1.19
+   => Met  After ==>       2.39      1.54
+====> Met Before ==>       3.32     -0.36
+   => Met  After ==>      23.51     -1.62
+====> Met Before ==>       7.40     -2.82
+   => Met  After ==>      20.93     -1.56
+====> Met Before ==>      53.60     -0.07
+   => Met  After ==>      55.58     -0.24
+====> Met Before ==>      27.33      1.85
+   => Met  After ==>      12.29     -1.51
+====> Met Before ==>      17.31      2.92
+   => Met  After ==>      22.27      2.75
+====> Met Before ==>      18.02     -3.09
+   => Met  After ==>      18.13     -3.03
+====> Met Before ==>      27.34      2.01
+   => Met  After ==>       8.84      1.07
+====> Met Before ==>      12.69     -2.79
+   => Met  After ==>      20.41     -2.60
+====> Met Before ==>      32.89      2.07
+   => Met  After ==>      22.15      2.54
+====> Met Before ==>      23.13     -0.36
+   => Met  After ==>      21.07     -2.30
+====> Met Before ==>      26.99     -2.91
+   => Met  After ==>      18.99     -2.05
+====> Met Before ==>      11.08      2.93
+   => Met  After ==>      14.51      2.10
+====> Met Before ==>      26.80      0.53
+   => Met  After ==>      17.14      1.38
+====> Met Before ==>      23.86      0.38
+   => Met  After ==>       2.35      0.08
+====> Met Before ==>      26.36      0.26
+   => Met  After ==>      23.90     -0.21
+====> Met Before ==>      20.35     -1.45
+   => Met  After ==>      27.70     -2.14
+====> Met Before ==>      13.34      1.76
+   => Met  After ==>       7.98      1.25
+====> Met Before ==>      18.19      0.40
+   => Met  After ==>      11.41     -0.76
+====> Met Before ==>       9.96      2.46
+   => Met  After ==>      15.03     -2.56
+====> Met Before ==>      26.18      0.65
+   => Met  After ==>       5.13      1.81
+====> Met Before ==>      27.89      0.42
+   => Met  After ==>      30.76     -0.37
+====> Met Before ==>       9.78      1.81
+   => Met  After ==>       9.20     -3.12
+====> Met Before ==>      17.03      1.26
+   => Met  After ==>      14.76      1.84
+====> Met Before ==>      32.29     -1.04
+   => Met  After ==>      18.22     -1.47
+====> Met Before ==>      17.24      1.90
+   => Met  After ==>      13.42      1.35
+====> Met Before ==>       8.82      1.42
+   => Met  After ==>       7.28     -0.96
+====> Met Before ==>      21.72     -1.17
+   => Met  After ==>      14.81     -2.37
+====> Met Before ==>       7.00     -2.90
+   => Met  After ==>      11.13      1.40
+====> Met Before ==>      16.93      0.06
+   => Met  After ==>       8.63     -0.72
+====> Met Before ==>      19.39     -0.38
+   => Met  After ==>      26.35     -0.84
+====> Met Before ==>      25.98      3.13
+   => Met  After ==>      26.58      1.68
+====> Met Before ==>      17.38     -2.82
+   => Met  After ==>      13.92     -2.16
+====> Met Before ==>      41.28      1.10
+   => Met  After ==>      18.26     -0.12
+====> Met Before ==>      14.98      2.75
+   => Met  After ==>      22.97      0.26
+====> Met Before ==>      13.92      0.04
+   => Met  After ==>      15.65     -0.26
+====> Met Before ==>      20.66     -1.13
+   => Met  After ==>      11.63     -1.01
+====> Met Before ==>      13.46     -1.55
+   => Met  After ==>      13.76     -1.91
+====> Met Before ==>       5.96      1.88
+   => Met  After ==>       6.58      1.96
+====> Met Before ==>      23.27     -1.12
+   => Met  After ==>      17.74     -0.94
+====> Met Before ==>      18.24     -2.23
+   => Met  After ==>      30.23      3.12
+====> Met Before ==>      14.63      3.13
+   => Met  After ==>      16.42     -3.08
+====> Met Before ==>      16.54      0.62
+   => Met  After ==>      14.98      1.54
+====> Met Before ==>      12.74     -0.49
+   => Met  After ==>       7.42      2.10
+====> Met Before ==>      14.91      1.22
+   => Met  After ==>      39.86      1.03
+====> Met Before ==>      32.83      1.76
+   => Met  After ==>      26.20      1.59
+====> Met Before ==>      28.85      2.24
+   => Met  After ==>      23.08      2.33
+====> Met Before ==>      24.70      1.46
+   => Met  After ==>      24.22      1.31
+====> Met Before ==>       5.89     -0.99
+   => Met  After ==>       3.64     -0.95
+====> Met Before ==>      10.54     -1.77
+   => Met  After ==>       9.37      2.55
+====> Met Before ==>      10.00     -0.21
+   => Met  After ==>      24.42      0.27
+====> Met Before ==>      13.15     -2.17
+   => Met  After ==>       8.07     -0.53
+====> Met Before ==>       8.58     -0.53
+   => Met  After ==>      19.76     -0.72
+====> Met Before ==>      46.53      0.23
+   => Met  After ==>      45.87      0.56
+====> Met Before ==>      27.67      2.35
+   => Met  After ==>       3.40      1.57
+====> Met Before ==>       9.70     -1.59
+   => Met  After ==>      17.66      0.51
+====> Met Before ==>      12.16      2.56
+   => Met  After ==>      27.21      1.97
+====> Met Before ==>       9.63      1.63
+   => Met  After ==>      17.28      2.69
+====> Met Before ==>      17.42      2.74
+   => Met  After ==>      25.90      2.61
+====> Met Before ==>       9.48     -1.84
+   => Met  After ==>      39.85      1.75
+====> Met Before ==>       7.29      1.47
+   => Met  After ==>      20.60     -2.44
+====> Met Before ==>      28.63      2.94
+   => Met  After ==>       6.21      2.45
+====> Met Before ==>      24.26     -1.29
+   => Met  After ==>      23.70     -0.87
+====> Met Before ==>      20.89     -0.66
+   => Met  After ==>      20.57     -0.11
+====> Met Before ==>      10.54      2.91
+   => Met  After ==>       5.99      1.65
+====> Met Before ==>      20.69      0.88
+   => Met  After ==>      24.80      1.47
+====> Met Before ==>      12.22     -0.22
+   => Met  After ==>      15.58      0.93
+====> Met Before ==>      10.06     -2.44
+   => Met  After ==>      35.89     -0.69
+====> Met Before ==>       3.77     -1.81
+   => Met  After ==>      26.98     -0.20
+====> Met Before ==>      16.63      2.14
+   => Met  After ==>      10.48      1.39
+====> Met Before ==>      23.87     -0.86
+   => Met  After ==>      22.44      0.12
+====> Met Before ==>      23.12     -2.32
+   => Met  After ==>      13.31     -2.63
+====> Met Before ==>      32.04      2.71
+   => Met  After ==>      43.88      3.00
+====> Yield ===> 0.96004
+
+Processing runRecoil.C+...
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
