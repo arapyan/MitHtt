@@ -261,6 +261,7 @@ void selectEmu(const TString conf,         // input file
       mithep::RunLumiRangeMap rlrm;
       if((samp->jsonv.size()>0) && (samp->jsonv[ifile].CompareTo("NONE")!=0)) { 
         hasJSON = kTRUE;
+	ifstream jsonchk; jsonchk.open(samp->jsonv[ifile].Data()); assert(jsonchk.is_open()); jsonchk.close();
         rlrm.AddJSONFile(samp->jsonv[ifile].Data()); 
       }
 
@@ -494,8 +495,8 @@ void selectEmu(const TString conf,         // input file
 	metv.SetPtEtaPhi(met,0,metphi); // corrected met
 	projMet  =   metv.Dot(bisector);
 
-// 	if(counter[0]>10) break;
-// 	counter[0]++;
+	if(counter[0]>10) break;
+	counter[0]++;
 
 	// skip non-ww events in vvj sample
 	if( (samp->fnamev[ifile].Contains("-vvj-")) && (gen->id != EGenType::kWW) )    continue;
