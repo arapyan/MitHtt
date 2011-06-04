@@ -1,0 +1,707 @@
+//================================================================================================
+// pzeta defs: /home/vdutta/cms/cmssw/020a/CMSSW_4_1_3_patch2/src/MitPhysics/Utils/src/DiTauSystem.cc
+//  0.85*diTau->ProjectedVis() - diTau->ProjectedMet() < 25
+//________________________________________________________________________________________________
+
+#if !defined(__CINT__) || defined(__MAKECINT__)
+#include <TROOT.h>                  // access to gROOT, entry point to ROOT system
+#include <TSystem.h>                // interface to OS
+#include <TFile.h>                  // file handle class
+#include <TH1.h>                    // histogram base class
+#include <TNtuple.h>                  // class to access ntuples
+#include <TTree.h>                  // class to access ntuples
+#include <TClonesArray.h>           // ROOT array class
+#include <TBenchmark.h>             // class to track macro running statistics
+#include <TLorentzVector.h>         // 4-vector class
+#include <TVector3.h>               // 3-vector class
+#include <TMath.h>                  // ROOT math functions
+#include <vector>                   // STL vector class
+#include <iostream>                 // standard I/O
+#include <iomanip>                  // functions to format standard I/O
+#include <fstream>                  // functions for file I/O
+#include <string>                   // C++ string class
+#include <sstream>                  // class for parsing strings
+
+#include "Common/MitStyleRemix.hh"  // style settings for drawing
+#include "Common/CSample.hh"        // helper class for organizing input ntuple files
+#include "Common/MyTools.hh"        // miscellaneous helper functions
+#include "Common/CPlot.hh"          // helper class for plots
+
+// define structures to read in ntuple
+#include "MitHtt/Ntupler/interface/HiggsAnaDefs.hh"
+#include "MitHtt/Ntupler/interface/TEventInfo.hh"
+#include "MitHtt/Ntupler/interface/TGenInfo.hh"
+#include "MitHtt/Ntupler/interface/TMuon.hh" 
+#include "MitHtt/Ntupler/interface/TElectron.hh"
+#include "MitHtt/Ntupler/interface/TJet.hh"   
+#define BYTETOBINARYPATTERN "%d%d%d%d%d%d%d%d"
+#define BYTETOBINARY(byte)  \
+  (byte & 0x80 ? 1 : 0),    \
+    (byte & 0x40 ? 1 : 0),  \
+    (byte & 0x20 ? 1 : 0), \
+    (byte & 0x10 ? 1 : 0), \
+    (byte & 0x08 ? 1 : 0), \
+    (byte & 0x04 ? 1 : 0), \
+    (byte & 0x02 ? 1 : 0), \
+    (byte & 0x01 ? 1 : 0)
+//printf("Leading text "BYTETOBINARYPATTERN"\n", BYTETOBINARY(byte));
+
+#include "MitHtt/Utils/RecoilCorrector.hh"
+
+// lumi section selection with JSON files
+#include "MitAna/DataCont/interface/RunLumiRangeMap.h"
+#include "MitAna/DataCont/interface/RunLumiSet.h"
+
+// lepton ID helper functions
+#include "MitHtt/Utils/LeptonIDCuts.hh"
+
+// define structure for output ntuple
+#include "EmuData.hh"
+#endif
+
+
+//=== FUNCTION DECLARATIONS ======================================================================================
+
+// Initialize k-factors
+TH1F* kfInit(const TString kfdata);
+
+// Get k-factor
+Double_t kfValue(const Double_t pt, const TH1F* hKF);
+
+// Initialize vertex weights
+TH1F* npvInit(TString fname);
+
+// Get weight for N vertices
+Double_t npvWgtValue(Int_t npv, TH1F *hNpvWgts);
+
+void printtrig(UInt_t ktrig);
+
+//=== MAIN MACRO =================================================================================================
+
+void selectEmu(const TString conf,         // input file
+               const TString outputDir,    // output directory
+	       const Double_t lumi         // luminosity pb^-1
+) {
+
+  gBenchmark->Start("selectEmu");
+  
+  //--------------------------------------------------------------------------------------------------------------
+  // Settings 
+  //============================================================================================================== 
+
+  vector<TString>  snamev;      // sample name (for output file)  
+  vector<CSample*> samplev;     // data/MC samples
+
+  //
+  // parse .conf file
+  //
+  ifstream ifs;
+  ifs.open(conf.Data());
+  assert(ifs.is_open());
+  string line;
+  Int_t state=0;
+  while(getline(ifs,line)) {
+    if(line[0]=='#') continue;
+    if(line[0]=='%') { 
+      state++; 
+      continue; 
+    }
+    if(line[0]=='$') {
+      samplev.push_back(new CSample());
+      stringstream ss(line);
+      string chr;
+      string sname;
+      Int_t color;
+      ss >> chr >> sname >> color;
+      string label = line.substr(line.find('@')+1);
+      snamev.push_back(sname);
+      samplev.back()->label = label;
+      samplev.back()->color = color;
+      continue;
+    }
+    
+    if(state==0) {  // define data sample
+      string fname;
+      string json;
+      Int_t type;
+      stringstream ss(line);
+      ss >> fname >> type >> json;
+      samplev.back()->fnamev.push_back(fname);
+      samplev.back()->typev.push_back(type);
+      samplev.back()->xsecv.push_back(0);
+      samplev.back()->jsonv.push_back(json);
+    
+    } else if(state==1) {  // define MC samples
+      string fname;
+      Double_t xsec;
+      stringstream ss(line);
+      ss >> fname >> xsec;
+      samplev.back()->fnamev.push_back(fname);
+      samplev.back()->typev.push_back(0);
+      samplev.back()->xsecv.push_back(xsec);
+    }
+  }
+  ifs.close();
+
+  const TString ntupDir = outputDir + TString("/ntuples");
+  gSystem->mkdir(ntupDir,kTRUE);
+  const TString jsonDir = outputDir + TString("/json");
+  gSystem->mkdir(jsonDir,kTRUE);
+
+
+  enum { eMC, eMuEl, eDiMu, eMu, eDiEl, eEl };  // dataset type  
+  enum { kMuMu, kEleEle, kEleMu, kMuEle };      // final state type
+  
+  const Double_t kMuonPt1Min = 20;
+  const Double_t kMuonPt2Min = 15;
+  
+  const Double_t kElePt1Min  = 20;
+  const Double_t kElePt2Min  = 15;
+
+  const Double_t kJetPtMin   = 30;
+  const Double_t kBJetPtMin  = 20;
+  
+//   Bool_t doKFactors = kTRUE;
+  Bool_t doKFactors = kFALSE;
+  TString kfdata("/home/ksung/releases/CMSSW_4_1_3/src/MitPhysics/data/HWW_KFactors_PowhegToNNLL_160_7TeV.dat");
+  
+  Bool_t doNpvRwgt = kTRUE;
+  TString npvfname("data/nvtxhists.root");
+  
+  //--------------------------------------------------------------------------------------------------------------
+  // Main analysis code 
+  //==============================================================================================================  
+   
+  const Double_t pi = 3.14159265358979;
+  
+  Bool_t hasData = (samplev[0]->fnamev.size()>0);
+
+  //
+  // Set up NNLO-NNLL k-factor reweighting (if necessary)
+  // 
+  TH1F *hKFactors = (doKFactors) ? kfInit(kfdata) : 0;
+
+  // get hist of N vtx weights
+  TH1F *hNpvWgts  = (doNpvRwgt)  ? npvInit(npvfname) : 0;
+  
+  TriggerEfficiency TEff;
+  Double_t trigeff = 1;
+
+  //
+  // Access samples and fill histograms
+  //  
+  TFile *infile=0;
+  TTree *eventTree=0;  
+  
+  // Data structures to store info from TTrees
+  mithep::TEventInfo *info  = new mithep::TEventInfo();
+  mithep::TGenInfo *gen     = new mithep::TGenInfo();
+  TClonesArray *muonArr     = new TClonesArray("mithep::TMuon");
+  TClonesArray *electronArr = new TClonesArray("mithep::TElectron");
+  TClonesArray *jetArr      = new TClonesArray("mithep::TJet");
+  TClonesArray *pvArr       = new TClonesArray("mithep::TVertex");
+
+  //
+  // loop over samples
+  //
+  for(UInt_t isam=0; isam<samplev.size(); isam++) {
+    if(isam==0 && !hasData) continue;
+  
+    CSample* samp = samplev[isam];
+
+    Double_t nSelEvents[3];
+    for(Int_t i=0; i<3; i++)
+      nSelEvents[i]=0;	
+	  
+    //
+    // Set up output ntuple file for the sample
+    //
+    TString outfname = ntupDir + TString("/") + snamev[isam] + TString("_select.root");
+    TFile outfile(outfname,"RECREATE");
+    TTree outtree("Events","Events");
+
+    EmuData data;
+    Double_t rawMet,rawprojvar;
+    UInt_t npt20jets;
+    const UInt_t kMaxPt20Jets=15;
+    TArrayF btagArray; btagArray.Set(kMaxPt20Jets); // array to hold b-tag values for pt-20 jets
+    outtree.Branch("Events",&data.runNum,
+"runNum/i:evtNum:lumiSec:nPV:njets:nbjets:met/F:metphi:mass:dphi:mt:pt:phi:pmet:pvis:lpt1:leta1:lphi1:lpt2:leta2:lphi2:jpt1:jeta1:jphi1:jpt2:jeta2:jphi2:mjj:weight:state/I");
+
+    // extra branches
+    outtree.Branch("npt20jets",&npt20jets);
+    outtree.Branch("btagArray",&btagArray);
+    outtree.Branch("trigeff",&trigeff);
+    outtree.Branch("rawMet",&rawMet);
+    outtree.Branch("rawprojvar",&rawprojvar);
+
+    //
+    // loop through files
+    //
+
+    cout <<  "processing " << snamev[isam] << ":" << endl;
+    const UInt_t nfiles = samp->fnamev.size();
+    for(UInt_t ifile=0; ifile<nfiles; ifile++) {
+      printf("        %-55s",(samp->fnamev[ifile]+"...").Data()); fflush(stdout);
+      infile = new TFile(samp->fnamev[ifile]); 
+      assert(infile);
+      Bool_t isdata = !(samp->typev[ifile]==eMC);
+      
+      // make name for output json file of processed runlumis
+      TString fname = samplev[isam]->fnamev[ifile];
+      Ssiz_t i1 = fname.Last('/');  // strip off leading directories
+      Ssiz_t i2 = fname.First('_'); // and trailing characters
+      string jsonfname((jsonDir + TString("/") + fname(i1+1, i2-i1-1) + TString(".json")).Data());
+
+      mithep::RunLumiSet rlset; // processed runlumis in this file
+      mithep::RunLumiRangeMap::RunLumiPairType lastrl(0,0); // last processed rl
+
+      // setup selecting with JSON file, if necessary
+      Bool_t hasJSON = kFALSE;
+      mithep::RunLumiRangeMap rlrm;
+      if((samp->jsonv.size()>0) && (samp->jsonv[ifile].CompareTo("NONE")!=0)) { 
+        hasJSON = kTRUE;
+        rlrm.AddJSONFile(samp->jsonv[ifile].Data()); 
+      }
+
+      RecoilCorrector *corrector=0;
+      if( (samp->fnamev[ifile].Contains("ztt")) || (samp->fnamev[ifile].Contains("zll")))   corrector = new RecoilCorrector;
+
+      // Get the TTree
+      eventTree = (TTree*)infile->Get("Events"); assert(eventTree);
+
+      // Set branch address to structures that will store the info  
+      eventTree->SetBranchAddress("Info",     &info);        TBranch *infoBr     = eventTree->GetBranch("Info");
+      eventTree->SetBranchAddress("Muon",     &muonArr);     TBranch *muonBr     = eventTree->GetBranch("Muon");
+      eventTree->SetBranchAddress("Electron", &electronArr); TBranch *electronBr = eventTree->GetBranch("Electron");
+      eventTree->SetBranchAddress("PFJet",    &jetArr);      TBranch *jetBr      = eventTree->GetBranch("PFJet");      
+      eventTree->SetBranchAddress("PV",       &pvArr);       TBranch *pvBr       = eventTree->GetBranch("PV");
+      Bool_t getGen =  corrector                               ||
+	(doKFactors && samp->fnamev[ifile].Contains("-gf-"))   ||
+	samp->fnamev[ifile].Contains("-vvj-")                  ||
+	samp->fnamev[ifile].Contains("-zll50-");
+      TBranch *genBr=0;
+      if(getGen) {
+        eventTree->SetBranchAddress("Gen", &gen);
+        genBr = eventTree->GetBranch("Gen");
+      }
+      
+      Double_t weight = 1; // (only initialized for each *file*)
+      if(!isdata) {
+        weight = lumi*(samp->xsecv[ifile])/(Double_t)eventTree->GetEntries(); // (assumes you've merged filesets)
+      }
+      samp->weightv.push_back(weight);
+                  
+      Double_t nsel[3], nselvar[3];
+      for(Int_t i=0; i<3; i++) { nsel[i] = nselvar[i] = 0; }
+
+      Double_t counter[15];
+      for(Int_t i=0; i<15; i++) { counter[i] = 0; }
+
+      // loop over events
+      for(UInt_t ientry=0; ientry<eventTree->GetEntries(); ientry++) {
+        infoBr->GetEntry(ientry);
+
+        mithep::RunLumiRangeMap::RunLumiPairType rl(info->runNum, info->lumiSec);
+        if(hasJSON && !rlrm.HasRunLumi(rl)) continue;  // not certified run? Skip to next event...
+	if(hasJSON && rl!=lastrl) {
+	  lastrl = rl;
+	  rlset.Add(rl);
+	}
+
+	UInt_t trigger = kHLT_Mu17_Ele8_CaloIdL | kHLT_Mu8_Ele17_CaloIdL;
+	if(isdata) {
+	  if(!(info->triggerBits & trigger)) continue;  // no trigger accept? Skip to next event...
+	}
+
+        // No good primary vertex? Skip to next event...
+        if(!info->hasGoodPV) continue;
+	pvArr->Clear();
+	pvBr->GetEntry(ientry);	
+
+        // loop through muons
+        vector<const mithep::TMuon*> goodMuonsv;
+        muonArr->Clear();
+        muonBr->GetEntry(ientry);
+        for(Int_t i=0; i<muonArr->GetEntriesFast(); i++) {
+          const mithep::TMuon *muon = (mithep::TMuon*)((*muonArr)[i]);    
+	  
+	  if(isdata  && !(muon->hltMatchBits & trigger)) continue;
+          if(muon->pt < kMuonPt2Min)                     continue;
+	  if(fabs(muon->eta) > 2.1)                      continue;
+
+	  if(passMuonID(muon))  goodMuonsv.push_back(muon);
+        }
+
+        // loop through electrons 
+        vector<const mithep::TElectron*> goodElectronsv;   
+        electronArr->Clear();
+        electronBr->GetEntry(ientry);
+        for(Int_t i=0; i<electronArr->GetEntriesFast(); i++) {
+          const mithep::TElectron *electron = (mithep::TElectron*)((*electronArr)[i]);    
+
+	  if(isdata && !(electron->hltMatchBits & trigger)) continue;
+          if(electron->pt < kElePt2Min)                     continue;
+          if(fabs(electron->eta) > 2.5)   	            continue;
+          //if(!(electron->isEcalDriven)) 	             continue;
+      
+          Bool_t hasMuonTrack=kFALSE;
+          for(UInt_t imu=0; imu<goodMuonsv.size(); imu++) {
+            if(electron->trkID == goodMuonsv[imu]->trkID) hasMuonTrack=kTRUE;
+          }
+          if(hasMuonTrack) continue;
+
+	  if(passEleID(electron))    goodElectronsv.push_back(electron);
+        }
+
+        TLorentzVector lep1, lep2, dilep;  // lepton 4-vectors
+        Int_t finalState=-1;	           // final state type
+
+	//----------------------------------------------------------------------------------------
+	if(goodMuonsv.size()<1 || goodElectronsv.size()<1) continue;
+
+	const mithep::TMuon *mu	   = goodMuonsv[0];
+	const mithep::TElectron *ele = goodElectronsv[0];
+
+//????????????????????????????????????????????????????????????????????????????????????????
+// 	// data pt requirements
+// 	if(isdata) {
+// 	  if       (info->triggerBits & kHLT_Mu8_Ele17_CaloIdL) {
+// 	    if(mu->pt  < kMuonPt2Min) continue;
+// 	    if(ele->pt < kElePt1Min)  continue;
+// 	  } else if(info->triggerBits & kHLT_Mu17_Ele8_CaloIdL) {
+// 	    if(ele->pt < kElePt2Min)  continue;
+// 	    if(mu->pt  < kMuonPt1Min) continue;
+// 	  } else continue; // can only get here if I change the triggers at the top
+// 	}
+// 	// MC pt requirements
+// 	else {
+// 	  if(mu->pt < kMuonPt2Min  || ele->pt < kElePt2Min) continue;
+// 	  if(mu->pt < kMuonPt1Min  && ele->pt < kElePt1Min) continue;
+// 	}
+
+//????????????????????????????????????????????????????????????????????????????????????????
+
+	if(mu->pt < kMuonPt2Min  || ele->pt < kElePt2Min) continue;
+	if(mu->pt < kMuonPt1Min  && ele->pt < kElePt1Min) continue;
+
+	// trigger requirements
+	if(isdata) {
+	  if(mu->pt  < kMuonPt1Min) {
+	    if(!(info->triggerBits & kHLT_Mu8_Ele17_CaloIdL)) continue; // if failed trig1
+	  }
+	  else if(ele->pt < kElePt1Min) {
+	    if(!(info->triggerBits & kHLT_Mu17_Ele8_CaloIdL)) continue; // if failed trig2
+	  }
+	}
+//????????????????????????????????????????????????????????????????????????????????????????
+	
+	if(mu->q == ele->q) continue; // skip same-sign events
+
+	if(mu->pt > ele->pt) {
+	  lep1.SetPtEtaPhiM(mu->pt,  mu->eta,  mu->phi,  0.105658369);
+	  lep2.SetPtEtaPhiM(ele->pt, ele->eta, ele->phi, 0.000511);
+	} else {
+	  lep1.SetPtEtaPhiM(ele->pt, ele->eta, ele->phi, 0.000511);
+	  lep2.SetPtEtaPhiM(mu->pt,  mu->eta,  mu->phi,  0.105658369);
+	}
+	dilep = lep1+lep2;
+
+	if(ele->pt > mu->pt) finalState=kEleMu; 
+	else                 finalState=kMuEle;
+
+        // loop through jets      
+        jetArr->Clear();
+        jetBr->GetEntry(ientry);
+        UInt_t njets = 0, nbjets = 0;
+        const mithep::TJet *jet1=0, *jet2=0, *bjet=0;
+	btagArray.Reset(); npt20jets=0;
+        for(Int_t i=0; i<jetArr->GetEntriesFast(); i++) {
+          const mithep::TJet *jet = (mithep::TJet*)((*jetArr)[i]);
+
+          if(toolbox::deltaR(jet->eta,jet->phi,lep1.Eta(),lep1.Phi()) < 0.3) continue;
+          if(toolbox::deltaR(jet->eta,jet->phi,lep2.Eta(),lep2.Phi()) < 0.3) continue;
+
+          if(fabs(jet->eta) > 5) continue;
+
+	  // look for b-jets
+	  if(jet->pt > kBJetPtMin) { // note: bjet can be the same as jet1 or jet2
+	    assert(npt20jets<kMaxPt20Jets);
+	    btagArray.AddAt(jet->tche,npt20jets); npt20jets++;
+	    if(jet->tche > 3.3) {
+	      nbjets++;
+	      if(!bjet || jet->pt > bjet->pt)
+		bjet = jet;
+	    }
+	  }
+
+	  // look for vbf jets
+          if(jet->pt > kJetPtMin) {
+  	    njets++;
+	    if(!jet1 || jet->pt > jet1->pt) { // arrange so jet1 is highest pt, jet2 next highest
+	      jet2 = jet1;
+	      jet1 = jet;
+	    } else if(!jet2 || jet->pt > jet2->pt) {
+	      jet2 = jet;
+	    }
+          }		    
+        }
+
+        TLorentzVector jv1, jv2, dijet;
+	const mithep::TJet *jet3=0;
+	if(njets>1) {
+	  jv1.SetPtEtaPhiM(jet1->pt,jet1->eta,jet1->phi,jet1->mass);
+	  jv2.SetPtEtaPhiM(jet2->pt,jet2->eta,jet2->phi,jet2->mass);
+          dijet = jv1+jv2;
+      
+          for(Int_t i=0; i<jetArr->GetEntriesFast(); i++) { // look for a third jet
+            const mithep::TJet *jet = (mithep::TJet*)((*jetArr)[i]);
+
+            if(toolbox::deltaR(jet->eta,jet->phi,lep1.Eta(),lep1.Phi()) < 0.3) continue;
+            if(toolbox::deltaR(jet->eta,jet->phi,lep2.Eta(),lep2.Phi()) < 0.3) continue;
+            if(jet == jet1) continue;
+            if(jet == jet2) continue;
+//????????????????????????????????????????????????????????????????????????????????????????
+// should be 2.4 for b-jets
+//????????????????????????????????????????????????????????????????????????????????????????
+            if(fabs(jet->eta) > 5)         continue;
+            if(jet->pt        < kJetPtMin) continue;
+            
+	    if(!jet3 || jet->pt > jet3->pt)
+              jet3 = jet;
+	  }
+        } 
+	
+	/******** We have a candidate! Hide the fruit! ********/        
+
+	if(getGen)  genBr->GetEntry(ientry);
+   
+	// calculate projection variables
+	TVector3 m,e,metv;
+	m.SetPtEtaPhi(mu->pt,0,mu->phi);
+	e.SetPtEtaPhi(ele->pt,0,ele->phi);
+	metv.SetPtEtaPhi(info->pfMET,0,info->pfMETphi); // uncorrected met
+	TVector3 bisector(m.Unit() + e.Unit());
+	bisector = bisector.Unit();
+	Double_t projVis  = (m+e).Dot(bisector);
+	Double_t projMet  =   metv.Dot(bisector);
+	rawprojvar  = 0.85*projVis - projMet;
+
+	// recoil corrections
+	rawMet = info->pfMET;
+	Double_t met=info->pfMET,metphi=info->pfMETphi;
+	if(corrector) corrector->Correct(met,metphi,gen->vpt,gen->vphi,dilep.Pt(),dilep.Phi());
+	metv.SetPtEtaPhi(met,0,metphi); // corrected met
+	projMet  =   metv.Dot(bisector);
+
+// 	if(counter[0]>10) break;
+// 	counter[0]++;
+
+	// skip non-ww events in vvj sample
+	if( (samp->fnamev[ifile].Contains("-vvj-")) && (gen->id != EGenType::kWW) )    continue;
+
+	// skip non-tau events in madgraph sample
+	if( (samp->fnamev[ifile].Contains("-zll50-"))  && (fabs(gen->id_1)<3 || fabs(gen->id_1)>6) )    continue;
+
+        // get k-factor if necessary
+        Double_t kf=1;
+        if(doKFactors && samp->fnamev[ifile].Contains("-gf-"))    kf = kfValue(gen->vpt, hKFactors);      
+
+	// do vertex reweighting
+	Double_t npvWgt = 1;
+	if(doNpvRwgt && !isdata)    npvWgt = npvWgtValue(pvArr->GetEntriesFast(), hNpvWgts);
+
+	// multiply by trigger effic. in MC
+	trigeff = 1;
+	if(!isdata) {
+	  Double_t t1eff = TEff.trigEff(mu->pt,mu->eta,ele->pt,ele->eta,"Mu8","Ele17");
+	  Double_t t2eff = TEff.trigEff(mu->pt,mu->eta,ele->pt,ele->eta,"Mu15","Ele8");
+	  if(mu->pt < kMuonPt1Min)        trigeff = t1eff;
+	  else if(ele->pt > kElePt1Min)   trigeff = t1eff + t2eff*(1-t1eff);
+	  else                            trigeff = t2eff;
+// 	  old parametrisations:
+// 	  Double_t t1eff = trigEff(kHLT_Mu8_Ele17_CaloIdL, mu, ele);
+// 	  Double_t t2eff = trigEff(kHLT_Mu17_Ele8_CaloIdL, mu, ele);
+// 	  if(mu->pt < kMuonPt1Min)        trigeff = t1eff;
+// 	  else if(ele->pt > kElePt1Min)   trigeff = t1eff + t2eff*(1-t1eff);
+// 	  else                            trigeff = t2eff;
+	}
+
+	nsel[0]    += weight*kf*npvWgt*trigeff; // events passing selection in this file
+        nselvar[0] += weight*weight*kf*kf*npvWgt*npvWgt*trigeff*trigeff;
+
+	// passing events in whole sample 
+        nSelEvents[0] += weight*kf*npvWgt*trigeff;
+
+        data.runNum  = info->runNum;
+        data.evtNum  = info->evtNum;
+        data.lumiSec = info->lumiSec;
+        data.nPV     = pvArr->GetEntriesFast();
+        data.njets   = njets;
+        data.nbjets  = nbjets;
+        data.met     = met;
+	data.metphi  = metphi;
+        data.mass    = dilep.M();
+	data.dphi    = toolbox::deltaPhi(lep1.Phi(),lep2.Phi());
+	data.mt      = sqrt( 2.0 * (dilep.Pt()) * met * (1.0-cos(toolbox::deltaPhi(dilep.Phi(),metphi))) );
+	data.pt      = dilep.Pt();
+	data.phi     = dilep.Phi();
+	data.pmet    = projMet;
+	data.pvis    = projVis;
+        data.lpt1    = lep1.Pt();
+	data.leta1   = lep1.Eta();
+	data.lphi1   = lep1.Phi();
+        data.lpt2    = lep2.Pt();
+	data.leta2   = lep2.Eta();
+	data.lphi2   = lep2.Phi();
+        data.jpt1    = (jet1) ? jet1->pt  : 0;
+	data.jeta1   = (jet1) ? jet1->eta : 0;
+	data.jphi1   = (jet1) ? jet1->phi : 0;
+        data.jpt2    = (jet2) ? jet2->pt  : 0;
+	data.jeta2   = (jet2) ? jet2->eta : 0;
+	data.jphi2   = (jet2) ? jet2->phi : 0;
+        data.mjj     = (njets>1) ? dijet.M() : 0;
+        data.weight  = (isam==0) ? 1 : weight*kf*npvWgt*trigeff/lumi;
+        data.state   = finalState;  	   
+
+	outtree.Fill();
+
+      }
+      printf("%8.2f +/- %-8.2f\n",nsel[0],sqrt(nselvar[0]));
+
+      if(hasJSON) {
+	rlset.DumpJSONFile(jsonfname);
+      }
+
+//       for(UInt_t i=0;i<5;i++)
+// 	cout << "   " << counter[i];
+//       cout << endl;
+	
+      delete infile;
+      if(corrector) delete corrector;
+      infile=0, eventTree=0;    
+    }
+    outfile.Write();
+    outfile.Close();
+
+    if(samp->typev.size()>0 && samp->typev[0]==eMC)
+      printf("    Yields for %1.2f/fb:",lumi/1000.);
+    else
+      printf("    Yields for data:    ");
+
+    printf("%10.2f\n",nSelEvents[0]);
+    cout << endl;
+  }
+
+  delete info;
+  delete gen;
+  delete muonArr;
+  delete electronArr;
+  delete jetArr;
+
+  if(doNpvRwgt) delete hNpvWgts;
+     
+  //--------------------------------------------------------------------------------------------------------------
+  // Summary print out
+  //==============================================================================================================
+
+  cout << endl;
+  cout << " <-> Output saved in " << outputDir << "/" << endl;    
+  cout << endl; 
+  
+  gBenchmark->Show("selectEmu");
+}
+
+
+//=== FUNCTION DEFINITIONS ======================================================================================
+
+//--------------------------------------------------------------------------------------------------
+TH1F* kfInit(const TString kfdata)
+{
+  cout << endl;
+  cout << "Initializing k-factors from " << kfdata << "...";
+  cout << endl;
+  
+  Int_t nbins;
+  Double_t xlow, xhigh;
+  string line;
+  ifstream ifs;
+  ifs.open(kfdata.Data());
+  assert(ifs.is_open());
+  
+  // read in header
+  getline(ifs,line); stringstream ssnbins(line); ssnbins >> nbins;
+  getline(ifs,line); stringstream ssxlow(line);  ssxlow  >> xlow;
+  getline(ifs,line); stringstream ssxhigh(line); ssxhigh >> xhigh;
+  getline(ifs,line); 
+  getline(ifs,line); 
+  getline(ifs,line); 
+  
+  TH1F *h = new TH1F("hKFactors","",nbins,xlow,xhigh);
+  while(getline(ifs,line)) {
+    stringstream ss(line);
+    Int_t ibin;
+    Double_t scale;
+    ss >> ibin >> scale;
+    h->SetBinContent(ibin,scale);
+  }
+  ifs.close();
+  
+  return h;
+}
+
+//--------------------------------------------------------------------------------------------------
+Double_t kfValue(const Double_t pt, const TH1F* hKF)
+{
+  if(pt < hKF->GetBinLowEdge(1)) {
+    return hKF->GetBinContent(0);
+  
+  } else if(pt > hKF->GetBinLowEdge(hKF->GetNbinsX())) {
+    return hKF->GetBinContent(hKF->GetNbinsX()+1);
+  
+  } else {
+    for(Int_t ibin=1; ibin<=hKF->GetNbinsX(); ibin++) {
+      if(pt >= hKF->GetBinLowEdge(ibin) && pt < hKF->GetBinLowEdge(ibin+1)) {
+        return hKF->GetBinContent(ibin);
+      }
+    }
+  }
+  return 1;
+}
+//----------------------------------------------------------------------------------------
+TH1F* npvInit(TString fname)
+{
+  TFile npvfile(fname);
+  TH1F* hdata=0;
+  TH1F* hmc=0;
+  npvfile.GetObject("npv_data",hdata); hdata->SetDirectory(0);
+  hdata->Scale(1./hdata->Integral());
+  npvfile.GetObject("npv_ztt",hmc); hmc->SetDirectory(0);
+  hmc->Scale(1./hmc->Integral());
+  npvfile.Close();
+  TH1F *hNpvWgts = new TH1F(*hmc);
+  hNpvWgts->Reset();
+  hNpvWgts->SetName("hNpvWgts");
+  hNpvWgts->SetTitle("weights for mc");
+
+  for(Int_t i=0;i<hmc->GetNbinsX()+2;i++) {
+    Double_t wgt = hmc->GetBinContent(i)==0 ? 0 : hdata->GetBinContent(i)/hmc->GetBinContent(i);
+    hNpvWgts->SetBinContent(i,wgt);
+  }
+
+  return hNpvWgts;
+}
+//----------------------------------------------------------------------------------------
+Double_t npvWgtValue(Int_t npv, TH1F *hNpvWgts)
+{
+  Double_t wgt=1;
+  Int_t bin = hNpvWgts->FindBin(npv);
+  wgt = hNpvWgts->GetBinContent(bin);
+  return wgt;
+}  
+//----------------------------------------------------------------------------------------    
+void printtrig(UInt_t ktrig)
+{
+  printf("  "BYTETOBINARYPATTERN""BYTETOBINARYPATTERN""BYTETOBINARYPATTERN"",
+	 BYTETOBINARY(ktrig>>8),BYTETOBINARY(ktrig>>16),BYTETOBINARY(ktrig>>24));
+}
