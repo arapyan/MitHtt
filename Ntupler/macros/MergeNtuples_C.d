@@ -1,0 +1,54 @@
+
+# DO NOT DELETE
+
+./../macros/MergeNtuples_C.so: /server/02a/cmsprod/cmssoft/slc5_amd64_gcc434/lcg/root/5.27.06b-cms14/include/TROOT.h
+./../macros/MergeNtuples_C.so: /server/02a/cmsprod/cmssoft/slc5_amd64_gcc434/lcg/root/5.27.06b-cms14/include/TDirectory.h
+./../macros/MergeNtuples_C.so: /server/02a/cmsprod/cmssoft/slc5_amd64_gcc434/lcg/root/5.27.06b-cms14/include/TNamed.h
+./../macros/MergeNtuples_C.so: /server/02a/cmsprod/cmssoft/slc5_amd64_gcc434/lcg/root/5.27.06b-cms14/include/TObject.h
+./../macros/MergeNtuples_C.so: /server/02a/cmsprod/cmssoft/slc5_amd64_gcc434/lcg/root/5.27.06b-cms14/include/Rtypes.h
+./../macros/MergeNtuples_C.so: /server/02a/cmsprod/cmssoft/slc5_amd64_gcc434/lcg/root/5.27.06b-cms14/include/RConfig.h
+./../macros/MergeNtuples_C.so: /server/02a/cmsprod/cmssoft/slc5_amd64_gcc434/lcg/root/5.27.06b-cms14/include/RVersion.h
+./../macros/MergeNtuples_C.so: /server/02a/cmsprod/cmssoft/slc5_amd64_gcc434/lcg/root/5.27.06b-cms14/include/DllImport.h
+./../macros/MergeNtuples_C.so: /server/02a/cmsprod/cmssoft/slc5_amd64_gcc434/lcg/root/5.27.06b-cms14/include/Rtypeinfo.h
+./../macros/MergeNtuples_C.so: /server/02a/cmsprod/cmssoft/slc5_amd64_gcc434/lcg/root/5.27.06b-cms14/include/snprintf.h
+./../macros/MergeNtuples_C.so: /server/02a/cmsprod/cmssoft/slc5_amd64_gcc434/lcg/root/5.27.06b-cms14/include/strlcpy.h
+./../macros/MergeNtuples_C.so: /server/02a/cmsprod/cmssoft/slc5_amd64_gcc434/lcg/root/5.27.06b-cms14/include/TGenericClassInfo.h
+./../macros/MergeNtuples_C.so: /server/02a/cmsprod/cmssoft/slc5_amd64_gcc434/lcg/root/5.27.06b-cms14/include/TSchemaHelper.h
+./../macros/MergeNtuples_C.so: /server/02a/cmsprod/cmssoft/slc5_amd64_gcc434/lcg/root/5.27.06b-cms14/include/TStorage.h
+./../macros/MergeNtuples_C.so: /server/02a/cmsprod/cmssoft/slc5_amd64_gcc434/lcg/root/5.27.06b-cms14/include/TVersionCheck.h
+./../macros/MergeNtuples_C.so: /server/02a/cmsprod/cmssoft/slc5_amd64_gcc434/lcg/root/5.27.06b-cms14/include/Riosfwd.h
+./../macros/MergeNtuples_C.so: /server/02a/cmsprod/cmssoft/slc5_amd64_gcc434/lcg/root/5.27.06b-cms14/include/TBuffer.h
+./../macros/MergeNtuples_C.so: /server/02a/cmsprod/cmssoft/slc5_amd64_gcc434/lcg/root/5.27.06b-cms14/include/TString.h
+./../macros/MergeNtuples_C.so: /server/02a/cmsprod/cmssoft/slc5_amd64_gcc434/lcg/root/5.27.06b-cms14/include/TRefCnt.h
+./../macros/MergeNtuples_C.so: /server/02a/cmsprod/cmssoft/slc5_amd64_gcc434/lcg/root/5.27.06b-cms14/include/TMathBase.h
+./../macros/MergeNtuples_C.so: /server/02a/cmsprod/cmssoft/slc5_amd64_gcc434/lcg/root/5.27.06b-cms14/include/TList.h
+./../macros/MergeNtuples_C.so: /server/02a/cmsprod/cmssoft/slc5_amd64_gcc434/lcg/root/5.27.06b-cms14/include/TSeqCollection.h
+./../macros/MergeNtuples_C.so: /server/02a/cmsprod/cmssoft/slc5_amd64_gcc434/lcg/root/5.27.06b-cms14/include/TCollection.h
+./../macros/MergeNtuples_C.so: /server/02a/cmsprod/cmssoft/slc5_amd64_gcc434/lcg/root/5.27.06b-cms14/include/TIterator.h
+./../macros/MergeNtuples_C.so: /server/02a/cmsprod/cmssoft/slc5_amd64_gcc434/lcg/root/5.27.06b-cms14/include/TDatime.h
+./../macros/MergeNtuples_C.so: /server/02a/cmsprod/cmssoft/slc5_amd64_gcc434/lcg/root/5.27.06b-cms14/include/TUUID.h
+./../macros/MergeNtuples_C.so: /server/02a/cmsprod/cmssoft/slc5_amd64_gcc434/lcg/root/5.27.06b-cms14/include/TChain.h
+./../macros/MergeNtuples_C.so: /server/02a/cmsprod/cmssoft/slc5_amd64_gcc434/lcg/root/5.27.06b-cms14/include/TTree.h
+./../macros/MergeNtuples_C.so: /server/02a/cmsprod/cmssoft/slc5_amd64_gcc434/lcg/root/5.27.06b-cms14/include/TBranch.h
+./../macros/MergeNtuples_C.so: /server/02a/cmsprod/cmssoft/slc5_amd64_gcc434/lcg/root/5.27.06b-cms14/include/TObjArray.h
+./../macros/MergeNtuples_C.so: /server/02a/cmsprod/cmssoft/slc5_amd64_gcc434/lcg/root/5.27.06b-cms14/include/TAttFill.h
+./../macros/MergeNtuples_C.so: /server/02a/cmsprod/cmssoft/slc5_amd64_gcc434/lcg/root/5.27.06b-cms14/include/TAttLine.h
+./../macros/MergeNtuples_C.so: /server/02a/cmsprod/cmssoft/slc5_amd64_gcc434/lcg/root/5.27.06b-cms14/include/TAttMarker.h
+./../macros/MergeNtuples_C.so: /server/02a/cmsprod/cmssoft/slc5_amd64_gcc434/lcg/root/5.27.06b-cms14/include/TArrayD.h
+./../macros/MergeNtuples_C.so: /server/02a/cmsprod/cmssoft/slc5_amd64_gcc434/lcg/root/5.27.06b-cms14/include/TArray.h
+./../macros/MergeNtuples_C.so: /server/02a/cmsprod/cmssoft/slc5_amd64_gcc434/lcg/root/5.27.06b-cms14/include/TArrayI.h
+./../macros/MergeNtuples_C.so: /server/02a/cmsprod/cmssoft/slc5_amd64_gcc434/lcg/root/5.27.06b-cms14/include/TDataType.h
+./../macros/MergeNtuples_C.so: /server/02a/cmsprod/cmssoft/slc5_amd64_gcc434/lcg/root/5.27.06b-cms14/include/TDictionary.h
+./../macros/MergeNtuples_C.so: /server/02a/cmsprod/cmssoft/slc5_amd64_gcc434/lcg/root/5.27.06b-cms14/include/Property.h
+./../macros/MergeNtuples_C.so: /server/02a/cmsprod/cmssoft/slc5_amd64_gcc434/lcg/root/5.27.06b-cms14/include/TClass.h
+./../macros/MergeNtuples_C.so: /server/02a/cmsprod/cmssoft/slc5_amd64_gcc434/lcg/root/5.27.06b-cms14/include/TObjString.h
+./../macros/MergeNtuples_C.so: /server/02a/cmsprod/cmssoft/slc5_amd64_gcc434/lcg/root/5.27.06b-cms14/include/TVirtualTreePlayer.h
+./../macros/MergeNtuples_C.so: /server/02a/cmsprod/cmssoft/slc5_amd64_gcc434/lcg/root/5.27.06b-cms14/include/TFile.h
+./../macros/MergeNtuples_C.so: /server/02a/cmsprod/cmssoft/slc5_amd64_gcc434/lcg/root/5.27.06b-cms14/include/TDirectoryFile.h
+./../macros/MergeNtuples_C.so: /server/02a/cmsprod/cmssoft/slc5_amd64_gcc434/lcg/root/5.27.06b-cms14/include/TUrl.h
+./../macros/MergeNtuples_C.so: /server/02a/cmsprod/cmssoft/slc5_amd64_gcc434/lcg/root/5.27.06b-cms14/include/TMap.h
+./../macros/MergeNtuples_C.so: /server/02a/cmsprod/cmssoft/slc5_amd64_gcc434/lcg/root/5.27.06b-cms14/include/THashTable.h
+./../macros/MergeNtuples_C.so: /server/02a/cmsprod/cmssoft/slc5_amd64_gcc434/lcg/root/5.27.06b-cms14/include/TBenchmark.h
+./../macros/MergeNtuples_C.so: /server/02a/cmsprod/cmssoft/slc5_amd64_gcc434/lcg/root/5.27.06b-cms14/include/TStopwatch.h
+./../macros/MergeNtuples_C.so: /server/02a/cmsprod/cmssoft/slc5_amd64_gcc434/lcg/root/5.27.06b-cms14/include/cintdictversion.h /server/02a/cmsprod/cmssoft/slc5_amd64_gcc434/lcg/root/5.27.06b-cms14/include/RVersion.h
+MergeNtuples_C__ROOTBUILDVERSION= 5.27/06b
