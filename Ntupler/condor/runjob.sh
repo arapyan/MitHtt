@@ -23,7 +23,7 @@ ls -l
 tar pxf job_files.tar
 mkdir -p /tmp/$USER/.krb5
 chmod og-rwx /tmp/$USER/.krb5/
-mv tmp/krb5cc_`id -u` /tmp/$USER/.krb5/ticket.$clusterid
+mv tmp/krb5cc_`id -u`* /tmp/$USER/.krb5/ticket.$clusterid
 export KRB5CCNAME=/tmp/$USER/.krb5/ticket.$clusterid
 klist -5
 

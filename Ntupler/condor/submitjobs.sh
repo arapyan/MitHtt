@@ -33,8 +33,8 @@ cp ../macros/$soFile                 $workDir
 
 klist -5 &> /dev/null
 [ "$?" != "0" ] && ( echo "-------> warning: check credentials cache." )
-# should maybe do this: KRB5CCNAME=`klist -5 | sed -n 's/Ticket cache: FILE:\(.*\)/\1/p'`
-tar pcf job_files.tar rootlogon.C $runMacro $soFile /tmp/krb5cc_`id -u` &> /dev/null
+tktcache=`klist -5 | sed -n 's/Ticket cache: FILE:\(.*\)/\1/p'`
+tar pcf job_files.tar rootlogon.C $runMacro $soFile $tktcache &> /dev/null
 if [ "$?" != "0" ]; then
   echo "-------> error: tar failed."
   exit 1
