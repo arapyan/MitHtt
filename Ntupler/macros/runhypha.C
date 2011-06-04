@@ -3,7 +3,7 @@
 #include "MitAna/DataUtil/interface/Debug.h"
 #include "MitAna/Catalog/interface/Catalog.h"
 #include "MitAna/TreeMod/interface/Analysis.h"
-#include "HiggsAna/Ntupler/interface/HyphaMod.hh"
+#include "MitHtt/Ntupler/interface/HyphaMod.hh"
 #endif
 
 using namespace mithep;

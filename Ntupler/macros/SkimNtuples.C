@@ -13,14 +13,14 @@
 #include <string>
 
 // define structures to read in ntuple
-#include "HiggsAna/Ntupler/interface/HiggsAnaDefs.hh"
-#include "HiggsAna/Ntupler/interface/TGenInfo.hh"
-#include "HiggsAna/Ntupler/interface/TEventInfo.hh"
-#include "HiggsAna/Ntupler/interface/TMuon.hh"
-#include "HiggsAna/Ntupler/interface/TElectron.hh"
-#include "HiggsAna/Ntupler/interface/TPhoton.hh"
-#include "HiggsAna/Ntupler/interface/TJet.hh"
-#include "HiggsAna/Ntupler/interface/TVertex.hh"
+#include "MitHtt/Ntupler/interface/HiggsAnaDefs.hh"
+#include "MitHtt/Ntupler/interface/TGenInfo.hh"
+#include "MitHtt/Ntupler/interface/TEventInfo.hh"
+#include "MitHtt/Ntupler/interface/TMuon.hh"
+#include "MitHtt/Ntupler/interface/TElectron.hh"
+#include "MitHtt/Ntupler/interface/TPhoton.hh"
+#include "MitHtt/Ntupler/interface/TJet.hh"
+#include "MitHtt/Ntupler/interface/TVertex.hh"
 
 // lumi section selection with JSON files
 #include "MitAna/DataCont/interface/RunLumiRangeMap.h"

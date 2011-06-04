@@ -16,14 +16,14 @@
     gROOT->Macro("$CMSSW_BASE/src/Common/MitStyleRemix.cc+");
     gSystem->Load("$CMSSW_BASE/lib/$SCRAM_ARCH/libMitHttNtupler.so");  
   }
-  else {
-    cout << "initializing with hardcoded CMSSW_BASE: " << endl;
-    gROOT->Macro("/home/dkralph/cms/cmssw/020/CMSSW_4_1_3/src/Common/CPlot.cc+");
-    gROOT->Macro("/home/dkralph/cms/cmssw/020/CMSSW_4_1_3/src/Common/MitStyleRemix.cc+");
-    gROOT->Macro("/home/dkralph/cms/cmssw/020/src/MitAna/macros/setRootEnv.C+");
-    gSystem->Load("/home/dkralph/cms/cmssw/020/CMSSW_4_1_3/lib/slc5_amd64_gcc434/libMitCommonMathTools.so");
-    gSystem->Load("/home/dkralph/cms/cmssw/020/CMSSW_4_1_3/lib/slc5_amd64_gcc434/libHiggsAnaNtupler.so");  
-  }
+  // else {
+  //   cout << "initializing with hardcoded CMSSW_BASE: " << endl;
+  //   gROOT->Macro("/home/dkralph/cms/cmssw/020/CMSSW_4_1_3/src/Common/CPlot.cc+");
+  //   gROOT->Macro("/home/dkralph/cms/cmssw/020/CMSSW_4_1_3/src/Common/MitStyleRemix.cc+");
+  //   gROOT->Macro("/home/dkralph/cms/cmssw/020/src/MitAna/macros/setRootEnv.C+");
+  //   gSystem->Load("/home/dkralph/cms/cmssw/020/CMSSW_4_1_3/lib/slc5_amd64_gcc434/libMitCommonMathTools.so");
+  //   gSystem->Load("/home/dkralph/cms/cmssw/020/CMSSW_4_1_3/lib/slc5_amd64_gcc434/libMitHttNtupler.so");  
+  // }
 
   // Show which process needs debugging
   gInterpreter->ProcessLine(".! ps |grep root.exe");
