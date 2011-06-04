@@ -4,8 +4,8 @@
 //
 //==================================================================================================
 
-#ifndef HIGGSANA_NTUPLER_BAMBUGENDUMPERMOD_HH
-#define HIGGSANA_NTUPLER_BAMBUGENDUMPERMOD_HH
+#ifndef MITHTT_NTUPLER_BAMBUGENDUMPERMOD_HH
+#define MITHTT_NTUPLER_BAMBUGENDUMPERMOD_HH
 
 #include "MitAna/TreeMod/interface/BaseMod.h" 
 #include "MitAna/DataTree/interface/MCParticleFwd.h"

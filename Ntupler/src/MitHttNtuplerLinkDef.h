@@ -1,15 +1,15 @@
 #ifndef MITHTT_NTUPLER_LINKDEF_H
 #define MITHTT_NTUPLER_LINKDEF_H
-#include "HiggsAna/Ntupler/interface/BambuGenDumperMod.hh"
-#include "HiggsAna/Ntupler/interface/HyphaMod.hh"
-#include "HiggsAna/Ntupler/interface/TEventInfo.hh"
-#include "HiggsAna/Ntupler/interface/TGenInfo.hh"
-#include "HiggsAna/Ntupler/interface/TMuon.hh"
-#include "HiggsAna/Ntupler/interface/TElectron.hh"
-#include "HiggsAna/Ntupler/interface/TJet.hh"
-#include "HiggsAna/Ntupler/interface/TPhoton.hh"
-#include "HiggsAna/Ntupler/interface/TVertex.hh"
-#include "HiggsAna/Ntupler/interface/TMuonLite.hh"
+#include "MitHtt/Ntupler/interface/BambuGenDumperMod.hh"
+#include "MitHtt/Ntupler/interface/HyphaMod.hh"
+#include "MitHtt/Ntupler/interface/TEventInfo.hh"
+#include "MitHtt/Ntupler/interface/TGenInfo.hh"
+#include "MitHtt/Ntupler/interface/TMuon.hh"
+#include "MitHtt/Ntupler/interface/TElectron.hh"
+#include "MitHtt/Ntupler/interface/TJet.hh"
+#include "MitHtt/Ntupler/interface/TPhoton.hh"
+#include "MitHtt/Ntupler/interface/TVertex.hh"
+#include "MitHtt/Ntupler/interface/TMuonLite.hh"
 #endif
 
 #ifdef __CINT__
