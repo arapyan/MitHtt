@@ -1,2 +1,2 @@
-#include "HiggsAna/Ntupler/interface/TPhoton.hh"
+#include "MitHtt/Ntupler/interface/TPhoton.hh"
 ClassImp(mithep::TPhoton)

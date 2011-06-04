@@ -1,2 +1,2 @@
-#include "HiggsAna/Ntupler/interface/TVertex.hh"
+#include "MitHtt/Ntupler/interface/TVertex.hh"
 ClassImp(mithep::TVertex)

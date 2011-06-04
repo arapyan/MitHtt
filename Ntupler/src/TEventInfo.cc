@@ -1,2 +1,2 @@
-#include "HiggsAna/Ntupler/interface/TEventInfo.hh"
+#include "MitHtt/Ntupler/interface/TEventInfo.hh"
 ClassImp(mithep::TEventInfo)

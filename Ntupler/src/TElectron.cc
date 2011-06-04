@@ -1,2 +1,2 @@
-#include "HiggsAna/Ntupler/interface/TElectron.hh"
+#include "MitHtt/Ntupler/interface/TElectron.hh"
 ClassImp(mithep::TElectron)

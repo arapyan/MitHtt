@@ -5,5 +5,5 @@
     gROOT->Macro("$CMSSW_BASE/src/MitAna/macros/setRootEnv.C+");
   }
   
-  loadLibraries("libHiggsAnaNtupler.so");
+  loadLibraries("libMitHttNtupler.so");
 }

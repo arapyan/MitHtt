@@ -1,4 +1,4 @@
-#include "HiggsAna/Ntupler/interface/HyphaMod.hh"
+#include "MitHtt/Ntupler/interface/HyphaMod.hh"
 #include "MitAna/DataTree/interface/Names.h"
 #include "MitAna/DataTree/interface/MCParticleCol.h"
 #include "MitAna/DataTree/interface/MuonCol.h"

@@ -1,5 +1,5 @@
-#ifndef HIGGSANA_NTUPLER_HYPHAMOD_H
-#define HIGGSANA_NTUPLER_HYPHAMOD_H
+#ifndef MITHTT_NTUPLER_HYPHAMOD_H
+#define MITHTT_NTUPLER_HYPHAMOD_H
 
 #include "MitAna/TreeMod/interface/BaseMod.h"
 #include "MitAna/DataTree/interface/MCEventInfo.h"

@@ -1,2 +1,2 @@
-#include "HiggsAna/Ntupler/interface/TMuonLite.hh"
+#include "MitHtt/Ntupler/interface/TMuonLite.hh"
 ClassImp(mithep::TMuonLite)
