@@ -1,0 +1,17 @@
+Instructions for running on Ntuples:
+
+selectEmu.C reads the ntuples and does lepton, jet id and computes variables. Since this takes
+about five minutes, it then writes another ntuple (in my case to
+/scratch/dkralph/htt/selections/<selection-name>/ntuples) to be read by the plotting macro
+plotEmu.C, which also does some selection.
+
+Steps:
+
+1) Adjust emu.conf to reflect the ntuples which you've made and want to run over and
+your json location. If you like syntax highlighting, don't use the ancient emacs that
+ships with SL5.
+2) change command-line arguments in run.sh to reflect what you want to happen. Probably
+just run selectEmu.C by itself to start with.
+3) ./run.sh
+4) change run.sh to run plotEmu.C with the arguments you want.
+5) ./run.sh
