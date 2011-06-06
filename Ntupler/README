@@ -1,0 +1,34 @@
+Instructions for running Ntupler:
+
+It takes the datasets in hypha.config and outputs ntuples for each one in, in my case,
+/scratch/dkralph/htt. The only event selection is a trigger requirement in data (although
+I try to add all triggers, so this isn't really a requirement). The object selections
+are very, very loose.
+
+Steps to run:
+
+1)  compile Ntupler
+1b) test runmacro, of course (probably runhypha.C)
+2)  cd condor
+2b) choose datasets to comment in hypha.config
+3)  ./process.sh
+4)  wait for jobs to finish
+5)  ./checkResults.sh <condor-results-dir>
+6)  ./checkRootFiles.sh
+7)  ./runMerge.sh
+8)  ./clean.sh
+
+Explanation:
+
+3) reads lines from hypha.config, then calls submitjobs.sh for each dataset. This then calls runjob.sh
+on each fileset. Specify output dir in process.sh
+
+5) greps for many errors in the condor output files.
+
+6) checks that all files are present. Not as useful as it was in CP's framework, since now if a job crashes halfway
+through you still get half an output file, rather than none.
+
+7) specify output dir here. If a job failed halfway through this will complain, but charge on regardless,
+so if you ignored the errors in (5) you will again be warned here.
+
+8) specify output dir here.
