@@ -313,7 +313,7 @@ void HyphaMod::Process()
   fVertex.SetPosition(bestPV->X(),bestPV->Y(),bestPV->Z());
   fVertex.SetErrors(bestPV->XErr(),bestPV->YErr(),bestPV->ZErr());
   
-   
+
   //
   // Loop through muons (and general tracks if desired).
   //
@@ -361,7 +361,8 @@ void HyphaMod::Process()
   assert(fPFJets);
   for(UInt_t i=0; i<fPFJets->GetEntries(); ++i) {
     const PFJet *jet = fPFJets->At(i);
-    
+
+    assert(0);
     const FourVectorM rawMom = jet->RawMom();
     fJetCorrector->setJetEta(rawMom.Eta());
     fJetCorrector->setJetPt(rawMom.Pt());
@@ -373,11 +374,21 @@ void HyphaMod::Process()
     // and all jets with valid b-tag value (Track Counting High Efficiency method default is -100)
     Double_t rho     = fPUEnergyDensity->At(0)->RhoHighEta();
     Double_t jetArea = jet->JetArea();
-    if(((rawMom.Pt()-rho*jetArea)*(fJetCorrector->getCorrection()) > fJetPtMin) || 
-       (jet->TrackCountingHighEffBJetTagsDisc() != -100)) { 
-       FillJet(jet);
+    Double_t correction = fJetCorrector->getCorrection();
+    Double_t pt = (rawMom.Pt()-rho*jetArea)*correction;
+    if(pt > fJetPtMin || (jet->TrackCountingHighEffBJetTagsDisc() != -100)) {
+
+      if(jet->E()==0) continue;
+      if(jet->ChargedHadronEnergy()/jet->E()  <=  0)	continue;  //   'chargedHadronEnergyFraction > 0.0 &'	  
+      if(jet->NeutralHadronEnergy()/jet->E()   >  0.99)	continue;  //	'neutralHadronEnergyFraction < 0.99 &'	  
+      if(jet->ChargedEmEnergy()/jet->E()       >  0.99)	continue;  //	'chargedEmEnergyFraction < 0.99 &'	  
+      if(jet->NeutralEmEnergy()/jet->E()       >  0.99)	continue;  //	'neutralEmEnergyFraction < 0.99 &'	  
+      if(jet->ChargedMultiplicity()           ==  0)	continue;  //	'chargedMultiplicity > 0 &'		  
+      if(jet->NConstituents()                  <  2)	continue;  //	'nConstituents > 1'
+
+      FillJet(jet);
     }
-  }  
+  }
     
   //
   // Loop through photons

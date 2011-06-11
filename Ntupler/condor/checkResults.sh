@@ -3,7 +3,7 @@
 # and prints all lines in the .err and .out files that contain the
 # listed strings.
 #
-parentdir=$src/MitHtt/Ntupler/condor/
+parentdir=$src/MitHtt/Ntupler/condor
 if [ ! "$*" ]; then echo "error: provide directories as args."; fi
 for dir in $*; do
     outputdir=/home/$USER/cms/cmssw/020/CMSSW_4_1_3/src/MitHtt/Ntupler/condor/$dir

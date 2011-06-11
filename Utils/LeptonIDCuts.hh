@@ -13,6 +13,7 @@
 #include <iostream>
 
 Bool_t passMuonID(const mithep::TMuon *muon);
+Bool_t passLooseMuonID(const mithep::TMuon *muon);
 Bool_t passEleID(const mithep::TElectron *electron);
 
 Bool_t isSoftMuon(const mithep::TMuon *muon);
@@ -60,10 +61,20 @@ Bool_t passMuonID(const mithep::TMuon *muon)
 //*/
 }
 
+//----------------------------------------------------------------------------------------
+Bool_t passLooseMuonID(const mithep::TMuon *muon)
+{
+  return kTRUE;
+
+  // if(muon->nSeg	  <  2)                return kFALSE;
+  // if(!(muon->typeBits & kStandalone))  return kFALSE;
+  // return (muon->trkIso03 < 0.20*muon->pt);
+}
+
 //--------------------------------------------------------------------------------------------------
 Bool_t passEleID(const mithep::TElectron *electron)
 {
-  if(fabs(electron->d0) > 0.02)  return kFALSE;
+  if(fabs(electron->d0) > 0.02)   return kFALSE;
   if(fabs(electron->dz) > 0.1)    return kFALSE;
   
   // conversion rejection

@@ -31,7 +31,7 @@
 ./runhypha_C.so: /server/02a/cmsprod/cmssoft/slc5_amd64_gcc434/lcg/root/5.27.06b-cms14/include/TError.h
 ./runhypha_C.so: /home/dkralph/cms/cmssw/020/CMSSW_4_1_3/src/MitAna/Catalog/interface/Catalog.h
 ./runhypha_C.so: /home/dkralph/cms/cmssw/020/CMSSW_4_1_3/src/MitAna/TreeMod/interface/Analysis.h
-./runhypha_C.so: /home/dkralph/cms/cmssw/020/CMSSW_4_1_3/src/HiggsAna/Ntupler/interface/HyphaMod.hh
+./runhypha_C.so: /home/dkralph/cms/cmssw/020/CMSSW_4_1_3/src/MitHtt/Ntupler/interface/HyphaMod.hh
 ./runhypha_C.so: /home/dkralph/cms/cmssw/020/CMSSW_4_1_3/src/MitAna/TreeMod/interface/BaseMod.h
 ./runhypha_C.so: /server/02a/cmsprod/cmssoft/slc5_amd64_gcc434/lcg/root/5.27.06b-cms14/include/TObjString.h
 ./runhypha_C.so: /home/dkralph/cms/cmssw/020/CMSSW_4_1_3/src/MitAna/TAM/interface/TAModule.h
@@ -182,13 +182,13 @@
 ./runhypha_C.so: /home/dkralph/cms/cmssw/020/CMSSW_4_1_3/src/MitCommon/DataFormats/interface/Vect3.h
 ./runhypha_C.so: /home/dkralph/cms/cmssw/020/CMSSW_4_1_3/src/MitAna/DataTree/interface/TriggerMask.h
 ./runhypha_C.so: /server/02a/cmsprod/cmssoft/slc5_amd64_gcc434/cms/cmssw/CMSSW_4_1_3/src/CondFormats/JetMETObjects/interface/FactorizedJetCorrector.h
-./runhypha_C.so: /home/dkralph/cms/cmssw/020/CMSSW_4_1_3/src/HiggsAna/Ntupler/interface/HiggsAnaDefs.hh
-./runhypha_C.so: /home/dkralph/cms/cmssw/020/CMSSW_4_1_3/src/HiggsAna/Ntupler/interface/TEventInfo.hh
-./runhypha_C.so: /home/dkralph/cms/cmssw/020/CMSSW_4_1_3/src/HiggsAna/Ntupler/interface/TGenInfo.hh
-./runhypha_C.so: /home/dkralph/cms/cmssw/020/CMSSW_4_1_3/src/HiggsAna/Ntupler/interface/TMuon.hh
-./runhypha_C.so: /home/dkralph/cms/cmssw/020/CMSSW_4_1_3/src/HiggsAna/Ntupler/interface/TElectron.hh
-./runhypha_C.so: /home/dkralph/cms/cmssw/020/CMSSW_4_1_3/src/HiggsAna/Ntupler/interface/TJet.hh
-./runhypha_C.so: /home/dkralph/cms/cmssw/020/CMSSW_4_1_3/src/HiggsAna/Ntupler/interface/TPhoton.hh
-./runhypha_C.so: /home/dkralph/cms/cmssw/020/CMSSW_4_1_3/src/HiggsAna/Ntupler/interface/TVertex.hh
+./runhypha_C.so: /home/dkralph/cms/cmssw/020/CMSSW_4_1_3/src/MitHtt/Ntupler/interface/HiggsAnaDefs.hh
+./runhypha_C.so: /home/dkralph/cms/cmssw/020/CMSSW_4_1_3/src/MitHtt/Ntupler/interface/TEventInfo.hh
+./runhypha_C.so: /home/dkralph/cms/cmssw/020/CMSSW_4_1_3/src/MitHtt/Ntupler/interface/TGenInfo.hh
+./runhypha_C.so: /home/dkralph/cms/cmssw/020/CMSSW_4_1_3/src/MitHtt/Ntupler/interface/TMuon.hh
+./runhypha_C.so: /home/dkralph/cms/cmssw/020/CMSSW_4_1_3/src/MitHtt/Ntupler/interface/TElectron.hh
+./runhypha_C.so: /home/dkralph/cms/cmssw/020/CMSSW_4_1_3/src/MitHtt/Ntupler/interface/TJet.hh
+./runhypha_C.so: /home/dkralph/cms/cmssw/020/CMSSW_4_1_3/src/MitHtt/Ntupler/interface/TPhoton.hh
+./runhypha_C.so: /home/dkralph/cms/cmssw/020/CMSSW_4_1_3/src/MitHtt/Ntupler/interface/TVertex.hh
 ./runhypha_C.so: /server/02a/cmsprod/cmssoft/slc5_amd64_gcc434/lcg/root/5.27.06b-cms14/include/cintdictversion.h /server/02a/cmsprod/cmssoft/slc5_amd64_gcc434/lcg/root/5.27.06b-cms14/include/RVersion.h
 runhypha_C__ROOTBUILDVERSION= 5.27/06b

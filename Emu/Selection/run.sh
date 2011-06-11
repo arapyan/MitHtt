@@ -1,8 +1,5 @@
-#ntupledir=full
-#plotdir=full
-#root -b -q selectEmu.C+\(\"emu.conf\",\"/scratch/dkralph/htt/selections/full\",190\)
-root -b -q selectEmu.C+\(\"emu.conf\",\"test\",190\)
-
-# to get right binning for limits you have to write to a directory name containing "limit"
-#root -b -q plotEmu.C+\(\"emu.conf\",\"/scratch/dkralph/htt/selections/full/ntuples\",\"/scratch/dkralph/htt/selections/full\",\"png\",190\)
-#root -b -q plotEmu.C+\(\"emu.conf\",\"test/ntuples\",\"test\",\"png\",190\)
+ntupledir=/scratch/dkralph/htt/selections/test
+plotdir=/scratch/dkralph/htt/selection/test
+#root -b -q -l selectEmu.C+\(\"emu.conf\",\"$ntupledir\",190\)
+root -b -q -l selectMuMu.C+\(\"mumu.conf\",\"$ntupledir\",190\)
+#root -l -b -q plotEmu.C+\(\"emu.conf\",\"$ntupledir/ntuples\",\"$plotdir\",\"png\",190\) 2>&1 | grep -v 'Info in <TCanvas::'

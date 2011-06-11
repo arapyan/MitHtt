@@ -1,8 +1,3 @@
-//================================================================================================
-// pzeta defs: /home/vdutta/cms/cmssw/020a/CMSSW_4_1_3_patch2/src/MitPhysics/Utils/src/DiTauSystem.cc
-//  0.85*diTau->ProjectedVis() - diTau->ProjectedMet() < 25
-//________________________________________________________________________________________________
-
 #if !defined(__CINT__) || defined(__MAKECINT__)
 #include <TROOT.h>                  // access to gROOT, entry point to ROOT system
 #include <TSystem.h>                // interface to OS
@@ -37,13 +32,13 @@
 #define BYTETOBINARYPATTERN "%d%d%d%d%d%d%d%d"
 #define BYTETOBINARY(byte)  \
   (byte & 0x80 ? 1 : 0),    \
-    (byte & 0x40 ? 1 : 0),  \
-    (byte & 0x20 ? 1 : 0), \
-    (byte & 0x10 ? 1 : 0), \
-    (byte & 0x08 ? 1 : 0), \
-    (byte & 0x04 ? 1 : 0), \
-    (byte & 0x02 ? 1 : 0), \
-    (byte & 0x01 ? 1 : 0)
+  (byte & 0x40 ? 1 : 0),    \
+  (byte & 0x20 ? 1 : 0),    \
+  (byte & 0x10 ? 1 : 0),    \
+  (byte & 0x08 ? 1 : 0),    \
+  (byte & 0x04 ? 1 : 0),    \
+  (byte & 0x02 ? 1 : 0),    \
+  (byte & 0x01 ? 1 : 0)
 //printf("Leading text "BYTETOBINARYPATTERN"\n", BYTETOBINARY(byte));
 
 #include "MitHtt/Utils/RecoilCorrector.hh"
@@ -74,6 +69,7 @@ TH1F* npvInit(TString fname);
 // Get weight for N vertices
 Double_t npvWgtValue(Int_t npv, TH1F *hNpvWgts);
 
+// print UInt_t in base-2 
 void printtrig(UInt_t ktrig);
 
 //=== MAIN MACRO =================================================================================================
@@ -161,7 +157,6 @@ void selectEmu(const TString conf,         // input file
   const Double_t kJetPtMin   = 30;
   const Double_t kBJetPtMin  = 20;
   
-//   Bool_t doKFactors = kTRUE;
   Bool_t doKFactors = kFALSE;
   TString kfdata("/home/ksung/releases/CMSSW_4_1_3/src/MitPhysics/data/HWW_KFactors_PowhegToNNLL_160_7TeV.dat");
   
@@ -183,7 +178,7 @@ void selectEmu(const TString conf,         // input file
 
   // get hist of N vtx weights
   TH1F *hNpvWgts  = (doNpvRwgt)  ? npvInit(npvfname) : 0;
-  
+
   TriggerEfficiency TEff;
   Double_t trigeff = 1;
 
@@ -206,6 +201,7 @@ void selectEmu(const TString conf,         // input file
   //
   for(UInt_t isam=0; isam<samplev.size(); isam++) {
     if(isam==0 && !hasData) continue;
+
   
     CSample* samp = samplev[isam];
 
@@ -293,11 +289,11 @@ void selectEmu(const TString conf,         // input file
       }
       samp->weightv.push_back(weight);
                   
-      Double_t nsel[3], nselvar[3];
+      Double_t nsel[3], nselvar[3]; // (weighted) predicted number of events selected
       for(Int_t i=0; i<3; i++) { nsel[i] = nselvar[i] = 0; }
 
-      Double_t counter[15];
-      for(Int_t i=0; i<15; i++) { counter[i] = 0; }
+      Double_t counter[30];
+      for(Int_t i=0; i<30; i++) { counter[i] = 0; }
 
       // loop over events
       for(UInt_t ientry=0; ientry<eventTree->GetEntries(); ientry++) {
@@ -310,7 +306,7 @@ void selectEmu(const TString conf,         // input file
 	  rlset.Add(rl);
 	}
 
-	UInt_t trigger = kHLT_Mu17_Ele8_CaloIdL | kHLT_Mu8_Ele17_CaloIdL;
+	UInt_t trigger =  kHLT_Mu8_Ele17_CaloIdL | kHLT_Mu17_Ele8_CaloIdL;
 	if(isdata) {
 	  if(!(info->triggerBits & trigger)) continue;  // no trigger accept? Skip to next event...
 	}
@@ -322,10 +318,14 @@ void selectEmu(const TString conf,         // input file
 
         // loop through muons
         vector<const mithep::TMuon*> goodMuonsv;
+        vector<const mithep::TMuon*> looseMuonsv;
         muonArr->Clear();
         muonBr->GetEntry(ientry);
+
         for(Int_t i=0; i<muonArr->GetEntriesFast(); i++) {
-          const mithep::TMuon *muon = (mithep::TMuon*)((*muonArr)[i]);    
+          const mithep::TMuon *muon = (mithep::TMuon*)((*muonArr)[i]);
+
+	  if(passLooseMuonID(muon)) looseMuonsv.push_back(muon);
 	  
 	  if(isdata  && !(muon->hltMatchBits & trigger)) continue;
           if(muon->pt < kMuonPt2Min)                     continue;
@@ -339,18 +339,25 @@ void selectEmu(const TString conf,         // input file
         electronArr->Clear();
         electronBr->GetEntry(ientry);
         for(Int_t i=0; i<electronArr->GetEntriesFast(); i++) {
-          const mithep::TElectron *electron = (mithep::TElectron*)((*electronArr)[i]);    
+          const mithep::TElectron *electron = (mithep::TElectron*)((*electronArr)[i]);
 
 	  if(isdata && !(electron->hltMatchBits & trigger)) continue;
           if(electron->pt < kElePt2Min)                     continue;
           if(fabs(electron->eta) > 2.5)   	            continue;
-          //if(!(electron->isEcalDriven)) 	             continue;
       
           Bool_t hasMuonTrack=kFALSE;
           for(UInt_t imu=0; imu<goodMuonsv.size(); imu++) {
             if(electron->trkID == goodMuonsv[imu]->trkID) hasMuonTrack=kTRUE;
           }
           if(hasMuonTrack) continue;
+
+	  // clean against loose muons
+          Bool_t matchLooseMuon=kFALSE;
+	  for(UInt_t imu=0;imu<looseMuonsv.size();imu++) {
+	    const mithep::TMuon *mu = looseMuonsv[imu];
+	    if(toolbox::deltaR(electron->eta,electron->phi,mu->eta,mu->phi) < 0.3) matchLooseMuon=kTRUE;
+	  }
+	  if(matchLooseMuon) continue;
 
 	  if(passEleID(electron))    goodElectronsv.push_back(electron);
         }
@@ -364,25 +371,6 @@ void selectEmu(const TString conf,         // input file
 	const mithep::TMuon *mu	   = goodMuonsv[0];
 	const mithep::TElectron *ele = goodElectronsv[0];
 
-//????????????????????????????????????????????????????????????????????????????????????????
-// 	// data pt requirements
-// 	if(isdata) {
-// 	  if       (info->triggerBits & kHLT_Mu8_Ele17_CaloIdL) {
-// 	    if(mu->pt  < kMuonPt2Min) continue;
-// 	    if(ele->pt < kElePt1Min)  continue;
-// 	  } else if(info->triggerBits & kHLT_Mu17_Ele8_CaloIdL) {
-// 	    if(ele->pt < kElePt2Min)  continue;
-// 	    if(mu->pt  < kMuonPt1Min) continue;
-// 	  } else continue; // can only get here if I change the triggers at the top
-// 	}
-// 	// MC pt requirements
-// 	else {
-// 	  if(mu->pt < kMuonPt2Min  || ele->pt < kElePt2Min) continue;
-// 	  if(mu->pt < kMuonPt1Min  && ele->pt < kElePt1Min) continue;
-// 	}
-
-//????????????????????????????????????????????????????????????????????????????????????????
-
 	if(mu->pt < kMuonPt2Min  || ele->pt < kElePt2Min) continue;
 	if(mu->pt < kMuonPt1Min  && ele->pt < kElePt1Min) continue;
 
@@ -395,7 +383,6 @@ void selectEmu(const TString conf,         // input file
 	    if(!(info->triggerBits & kHLT_Mu17_Ele8_CaloIdL)) continue; // if failed trig2
 	  }
 	}
-//????????????????????????????????????????????????????????????????????????????????????????
 	
 	if(mu->q == ele->q) continue; // skip same-sign events
 
@@ -499,12 +486,6 @@ void selectEmu(const TString conf,         // input file
 	  if(mu->pt < kMuonPt1Min)        trigeff = t1eff;
 	  else if(ele->pt > kElePt1Min)   trigeff = t1eff + t2eff*(1-t1eff);
 	  else                            trigeff = t2eff;
-// 	  old parametrisations:
-// 	  Double_t t1eff = trigEff(kHLT_Mu8_Ele17_CaloIdL, mu, ele);
-// 	  Double_t t2eff = trigEff(kHLT_Mu17_Ele8_CaloIdL, mu, ele);
-// 	  if(mu->pt < kMuonPt1Min)        trigeff = t1eff;
-// 	  else if(ele->pt > kElePt1Min)   trigeff = t1eff + t2eff*(1-t1eff);
-// 	  else                            trigeff = t2eff;
 	}
 
 	nsel[0]    += weight*kf*npvWgt*trigeff; // events passing selection in this file
@@ -556,10 +537,6 @@ void selectEmu(const TString conf,         // input file
 	rlset.DumpJSONFile(jsonfname);
       }
 
-//       for(UInt_t i=0;i<5;i++)
-// 	cout << "   " << counter[i];
-//       cout << endl;
-	
       delete infile;
       if(corrector) delete corrector;
       infile=0, eventTree=0;    
@@ -657,9 +634,9 @@ TH1F* npvInit(TString fname)
   TFile npvfile(fname);
   TH1F* hdata=0;
   TH1F* hmc=0;
-  npvfile.GetObject("npv_data",hdata); hdata->SetDirectory(0);
+  npvfile.GetObject("npv_data",hdata); assert(hdata); hdata->SetDirectory(0);
   hdata->Scale(1./hdata->Integral());
-  npvfile.GetObject("npv_ztt",hmc); hmc->SetDirectory(0);
+  npvfile.GetObject("npv_ztt",hmc); assert(hmc); hmc->SetDirectory(0);
   hmc->Scale(1./hmc->Integral());
   npvfile.Close();
   TH1F *hNpvWgts = new TH1F(*hmc);

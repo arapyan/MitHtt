@@ -8,7 +8,7 @@
 #include <TROOT.h>
 #include "MitAna/DataUtil/interface/Debug.h"
 #include "MitAna/TreeMod/interface/Analysis.h"
-#include "MitHtt/Ntupler/interface/BambuGenDumperMod.hh"
+#include "HiggsAna/Ntupler/interface/BambuGenDumperMod.hh"
 #endif
 
 using namespace mithep;
