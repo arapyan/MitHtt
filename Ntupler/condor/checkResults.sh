@@ -6,7 +6,7 @@
 parentdir=$src/MitHtt/Ntupler/condor
 if [ ! "$*" ]; then echo "error: provide directories as args."; fi
 for dir in $*; do
-    outputdir=/home/$USER/cms/cmssw/020/CMSSW_4_1_3/src/MitHtt/Ntupler/condor/$dir
+    outputdir=$CMSSW_BASE/src/MitHtt/Ntupler/condor/$dir
     for dset in `ls $outputdir` #w10-ggww-z2-v8-pu11 
       do
       dsetdir=$outputdir/$dset
@@ -14,7 +14,7 @@ for dir in $*; do
 	do
 	errors=`sed -n '/_condor_stderr/ d
                         /Muon.ptErr/     d
-                        /no such\|not be\|[eE][rR][rR]\|[Ff]atal\|Attaching\|condor_exec.exe: Status - [^0]/ p' <$dsetdir/$file`
+                        /no such\|not be\|[eE][rR][rR]\|[Ff]atal\|Attaching\|[fF]ail\|condor_exec.exe: Status - [^0]/ p' <$dsetdir/$file`
 	if [ "$errors" ]
 	    then
 	    echo $dsetdir/$file

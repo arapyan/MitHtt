@@ -3,11 +3,12 @@
 config=hypha.config
 if [ "` hostname | grep '\.mit\.edu'`" ]; then
     catalog=/home/cmsprod/catalog
+    outputDir=/scratch/$USER/htt
 else
     catalog=/home/mitprod/catalog
+    outputDir=/data/blue/$USER/htt
 fi
 runMacro=runhypha.C
-outputDir=/scratch/$USER/htt
 mkdir -p $outputDir
 
 for dataset in `cat $config | grep -v ^# | tr -s ' ' | cut -d' ' -f 1`
@@ -20,10 +21,11 @@ do
   usegen=`echo $line 		| tr -s ' ' | cut -d ' ' -f 5`
   nevents=`echo $line 		| tr -s ' ' | cut -d ' ' -f 6`
   skiphltfail=`echo $line 	| tr -s ' ' | cut -d ' ' -f 7`
+  json=`echo $line      	| tr -s ' ' | cut -d ' ' -f 8`
 
-  ./submitjobs.sh $outputDir $runMacro $dataset $book $catalog $isdata $usegen $nevents $skiphltfail
-  sleep 3
+  ./submitjobs.sh $outputDir $runMacro $dataset $book $catalog $isdata $usegen $nevents $skiphltfail $json
 
+  sleep 0.5
 done
 
 exit 0

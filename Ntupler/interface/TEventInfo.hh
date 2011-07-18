@@ -18,10 +18,8 @@ namespace mithep
       UInt_t  triggerBits;		             // HLT trigger bits 
       Float_t pvx, pvy, pvz;		             // best primary vertex
       Float_t bsx, bsy, bsz;		             // beamspot
-      Float_t tcMET, tcMETphi, tcSumET;	             // track-corrected MET
       Float_t pfMET, pfMETphi, pfSumET;	             // particle flow MET
       Float_t trkMET, trkMETphi, trkSumET;           // track MET
-      Float_t trkneuMET, trkneuMETphi, trkneuSumET;  // track+neutral MET
       Float_t rho;                                   // average energy density for isolation correction
       Bool_t  hasGoodPV;                             // event has a good PV?
 

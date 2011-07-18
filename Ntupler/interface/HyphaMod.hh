@@ -8,12 +8,16 @@
 #include "MitAna/DataTree/interface/PileupEnergyDensityFwd.h"
 #include "MitAna/DataTree/interface/BaseVertex.h"
 #include "MitAna/DataTree/interface/TriggerMask.h"
+#include "MitAna/DataCont/interface/RunLumiRangeMap.h"
+#include "MitAna/DataCont/interface/RunLumiSet.h"
 #include "CondFormats/JetMETObjects/interface/FactorizedJetCorrector.h"
+#include "CondFormats/JetMETObjects/interface/JetCorrectionUncertainty.h"
 
 #include "HiggsAnaDefs.hh"
 #include "TEventInfo.hh"
 #include "TGenInfo.hh"
 #include <TClonesArray.h>
+#include <TLorentzVector.h>
 #include "TMuon.hh"
 #include "TElectron.hh"
 #include "TJet.hh"
@@ -56,18 +60,34 @@ namespace mithep
       void SetMaxRho(const Double_t rho)        { fMaxRho = rho; }
       void SetPrintHLT(const Bool_t flag)       { fPrintTable = flag; }
       
-      void AddTrigger(const char* name,  UInt_t id, const Double_t minPt=0,
-                      const char* firstObjectModuleName  = "", UInt_t firstObjectId=0,
-                      const char* secondObjectModuleName = "", UInt_t secondObjectId=0) {
-	fTriggerNamesv.push_back(name);
+      void AddTrigger(const char* name, const ULong_t id,
+                      const char* objName1="", const ULong_t objId1=0, const Double_t minPt1=0,
+		      const char* objName2="", const ULong_t objId2=0, const Double_t minPt2=0) {
+        fTriggerNamesv.push_back(name);
 	fTriggerIdsv.push_back(id);
-	fTriggerMinPtv.push_back(minPt);
-	fFirstTriggerObjectModuleNamesv.push_back(firstObjectModuleName);
-        fFirstTriggerObjectIdsv.push_back(firstObjectId);
-	fSecondTriggerObjectModuleNamesv.push_back(secondObjectModuleName);
-        fSecondTriggerObjectIdsv.push_back(secondObjectId);
+	
+	fTriggerObjNames1v.push_back(objName1);
+        fTriggerObjIds1v.push_back(objId1);
+	fTriggerObjMinPt1v.push_back(minPt1);
+	
+	fTriggerObjNames2v.push_back(objName2);
+        fTriggerObjIds2v.push_back(objId2);
+	fTriggerObjMinPt2v.push_back(minPt2);
+      }
+      
+      void AddJetCorr(const char* name) {
+	ifstream jetcorrchk;
+	jetcorrchk.open(name); assert(jetcorrchk.is_open()); jetcorrchk.close();
+        fJetCorrParsv.push_back(name);
       }
 
+      void AddJSON(const char *name) {
+	ifstream jsonchk;
+	jsonchk.open(name); assert(jsonchk.is_open()); jsonchk.close();
+	fJSONv.push_back(name);
+	cout << "adding " << name << endl;
+      }
+    
     protected:
       void Begin();
       void BeginRun();
@@ -99,8 +119,8 @@ namespace mithep
       void FillPV(const Vertex *pv);
       
       // Match muon to HLT primitive
-      UInt_t MatchHLT(const Double_t eta, const Double_t phi);
-      UInt_t MatchHLT(const Double_t pt, const Double_t eta, const Double_t phi);
+      ULong_t MatchHLT(const Double_t eta, const Double_t phi);
+      ULong_t MatchHLT(const Double_t pt, const Double_t eta, const Double_t phi);
       
       // Check for conversion with MVF
       Bool_t IsConversion(const Electron *ele);
@@ -121,7 +141,6 @@ namespace mithep
       TString                       fPFJetName;            // particle flow jet collection name
       TString                       fPhotonName;           // photon collection name
       TString                       fTrigMaskName;         // trigger mask name
-      TString                       fTCMetName;            // track-corrected MET collection name
       TString                       fPFMetName;            // particle flow MET collection name
       TString                       fConversionName;       // conversion collection name
       TString                       fPileupName;           // pile-up info name
@@ -137,7 +156,6 @@ namespace mithep
       const PFJetCol               *fPFJets;          // particle flow jet collection handle
       const PhotonCol              *fPhotons;         // photon collection handle
       const TriggerMask            *fTrigMask;        // trigger mask handle
-      const MetCol                 *fTCMet;           // track-corrected MET handle
       const PFMetCol               *fPFMet;           // particle flow MET handle
       const DecayParticleCol       *fConversions;     // conversion collection handle
       const PileupInfoCol          *fPileup;          // pile-up info handle
@@ -165,6 +183,8 @@ namespace mithep
       Double_t                fMaxRho;          // maximum transverse displacement for a good primary vertex 
       
       TTree*                  fEventTree;       // event tree
+      // TTree*                  fTauTree;         // gen info about taus
+      // TLorentzVector          fTau1,fTau2;      // 
 
       BaseVertex              fVertex;          // best primary vertex in the event
             
@@ -177,16 +197,27 @@ namespace mithep
       TClonesArray           *fPVArr;           // valid primary vertex array
       
       vector<TString>         fTriggerNamesv;       // names of triggers we're interested in 
-      vector<UInt_t>          fTriggerIdsv;         // corresponding ETriggerBit value
-      vector<Double_t>        fTriggerMinPtv;       // minimum pT threshold for trigger object
-      vector<TString>         fFirstTriggerObjectModuleNamesv; // 
-      vector<TString>         fSecondTriggerObjectModuleNamesv; // 
-      vector<UInt_t>          fFirstTriggerObjectIdsv;   // ETriggerObjectBit
-      vector<UInt_t>          fSecondTriggerObjectIdsv;  // ETriggerObjectBit
+      vector<ULong_t>         fTriggerIdsv;         // corresponding ETriggerBit value
 
+      vector<TString>         fTriggerObjNames1v;
+      vector<ULong_t>         fTriggerObjIds1v;
+      vector<Double_t>        fTriggerObjMinPt1v;
 
-      FactorizedJetCorrector *fJetCorrector;    // CMSSW class to handle jet corrections
+      vector<TString>         fTriggerObjNames2v;
+      vector<ULong_t>         fTriggerObjIds2v;
+      vector<Double_t>        fTriggerObjMinPt2v;
       
+      vector<TString>         fJetCorrParsv;
+      FactorizedJetCorrector *fJetCorrector;    // CMSSW class to handle jet corrections
+      JetCorrectionUncertainty *fJetUnc;
+
+      Bool_t                  fhasJSON;
+      vector<TString>         fJSONv;
+      RunLumiRangeMap         frlrm;            // certified runlumis
+
+      RunLumiSet                       fRunLumiSet;
+      RunLumiRangeMap::RunLumiPairType fLastRunLumi;
+
     ClassDef(HyphaMod,1)
   };
 }

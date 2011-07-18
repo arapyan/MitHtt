@@ -12,13 +12,14 @@ namespace mithep
       ~TJet(){}
 
       Float_t pt, eta, phi, mass;  // kinematics
+      Float_t unc;                 // energy scale uncertainty
       Float_t area;                // jet area
       Float_t tche;                // TrackCountingHighEfficiency b-tag discriminator
       Float_t tchp;                // TrackCountingHighPurity b-tag discriminator
       Int_t   mcFlavor;            // PDG ID of matched parton flavor
       UInt_t  hltMatchBits;        // bits from matching with HLT primitives
 
-    ClassDef(TJet,1)
+    ClassDef(TJet,2)
   };
 }
 #endif

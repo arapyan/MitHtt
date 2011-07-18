@@ -12,6 +12,7 @@ echo "  --> $*"
      usegen=$7
     nevents=$8
 skiphltfail=$9
+       json=${10}
 
 workDir=`pwd`            # should be run from $src/xxx/condor
 script=runjob.sh
@@ -51,7 +52,7 @@ mkdir -p $condorOutDir
 # Looping through each single fileset and submitting the condor jobs
 filesets=$catalog/$book/$dataset/Filesets
 for fileset in `cat $filesets | cut -d' ' -f1 `; do
-#     if [ "$fileset" != "0000" ]; then
+#     if [ "$fileset" == "0000" ]; then
 #       continue
 #     fi
   # check if the output already exists
@@ -64,14 +65,14 @@ for fileset in `cat $filesets | cut -d' ' -f1 `; do
   logFile=/tmp/$USER/$logFile
   mkdir -p /tmp/$USER
   rm    -f $logFile
-  echo "      $script $runMacro $outputDir $clusterstr $fileset $dataset $book $catalog $isdata $usegen $nevents $skiphltfail"
+  echo "      $script $runMacro $outputDir $clusterstr $fileset $dataset $book $catalog $isdata $usegen $nevents $skiphltfail $json"
   
 cat > submit.cmd <<EOF
 Universe                = vanilla
 Requirements            = (Arch == "X86_64") && (OpSys == "LINUX") && (Disk >= DiskUsage) && ((Memory * 1024) >= ImageSize) && (HasFileTransfer)
 Notification            = Error
 Executable              = $script
-Arguments               = $runMacro $outputDir $clusterstr $fileset $dataset $book $catalog $isdata $usegen $nevents $skiphltfail
+Arguments               = $runMacro $outputDir $clusterstr $fileset $dataset $book $catalog $isdata $usegen $nevents $skiphltfail $json
 Rank                    = Mips
 GetEnv                  = True
 Initialdir              = $workDir
@@ -89,6 +90,10 @@ EOF
   condor_submit submit.cmd >& /dev/null;
   rm submit.cmd
 done
+
+rm rootlogon.C
+rm $runMacro  
+rm $soFile    
 
 exit 0
 

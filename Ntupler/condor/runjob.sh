@@ -12,6 +12,7 @@
      usegen=$9
     nevents=${10}
 skiphltfail=${11}
+       json=${12}
 
 scramdir=/home/$USER/cms/cmssw/$MIT_VERS/$CMSSW_VERSION/src
 workDir=`pwd`
@@ -32,14 +33,15 @@ SCRAM_ARCH=slc5_amd64_gcc434
 eval `scramv1 runtime -sh`
 cd $workDir
 
-root -b -q ./rootlogon.C \
-  $runMacro+\(\"${fileset}\",\"${dataset}\",\"${book}\",\"${catalog}\",${isdata},${usegen},${nevents},${skiphltfail}\)
+root -b -l -q ./rootlogon.C \
+  $runMacro+\(\"${fileset}\",\"${dataset}\",\"${book}\",\"${catalog}\",${isdata},${usegen},${nevents},${skiphltfail},\"${json}\"\)
 
 status=`echo $?`
 echo "Status - $status"
 
 mkdir -p $outputDir
 mv ${dataset}_${fileset}_ntuple.root $outputDir/
+mv ${dataset}_${fileset}_ntuple.json $outputDir/
 
 rm -vf /tmp/$USER/.krb5/ticket.$clusterid
 

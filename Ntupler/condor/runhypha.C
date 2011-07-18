@@ -22,8 +22,10 @@ using namespace mithep;
  * Run on a BAMBU fileset
  *
  * Example usage:
- *   root -b -q runhypha.C+\(\"0000\",\"p11-h160ww2l-gf-v1g1-pu\",\"cern/filefi/020\",\"/home/mitprod/catalog\",0,1,-1,0\)
- *
+ *   root -b -l -q runhypha.C+\(\"0000\",\"r11a-del-pr-v4\",\"t2mit/filefi/022\",\"/home/cmsprod/catalog\",1,0,100,1\)
+ *   root -b -l -q runhypha.C+\(\"0000\",\"s11-h100tt-gf-v1g1-pu\",\"local/filefi/022\",\"/home/cmsprod/catalog\",0,1,10,0\)
+ *   root -b -l -q runhypha.C+\(\"0000\",\"r11a-mueg-m10-v1\",\"local/filefi/021\",\"/home/cmsprod/catalog\",1,0,-1,1\)
+ *   root -b -l -q runhypha.C+\(\"0000\",\"r11a-mueg-m10-v1\",\"local/filefi/021\",\"/home/cmsprod/catalog\",1,0,100,1,\"foo.json\"\)|grep -v '^\*'         
  * Output file name has standard format: <dataset>_<fileset>_ntuple.root
  *
  */
@@ -35,7 +37,8 @@ void runhypha(
     const Bool_t  isData,       // flag to indicate processing of collision data
     const Int_t   useGen,       // which MC process? 
     const Int_t   nevents,      // number of events to process
-    const Bool_t  skipHLTFail   // skip events if no HLT accept
+    const Bool_t  skipHLTFail,  // skip events if no HLT accept
+    const char   *json=""       // file with certified runlumis
   )
 {
   gDebugMask  = Debug::kAnalysis;  // debug message category
@@ -105,126 +108,185 @@ void runhypha(
   hymod->SetMaxAbsZ(maxAbsZ);
   hymod->SetMaxRho(maxRho);
 
-  hymod->AddTrigger("HLT_Mu8_v1",     kHLT_Mu8);
-  hymod->AddTrigger("HLT_Mu8_v2",     kHLT_Mu8);
-  hymod->AddTrigger("HLT_Mu8_v3",     kHLT_Mu8);
-  hymod->AddTrigger("HLT_Mu9",        kHLT_Mu9);
-  hymod->AddTrigger("HLT_Mu11",       kHLT_Mu9); // note: same number as mu9
-  hymod->AddTrigger("HLT_Mu15_v1",    kHLT_Mu15);
-  hymod->AddTrigger("HLT_Mu15_v2",    kHLT_Mu15);
-  hymod->AddTrigger("HLT_Mu15_v3",    kHLT_Mu15);
-  hymod->AddTrigger("HLT_Mu15_v4",    kHLT_Mu15);
-  hymod->AddTrigger("HLT_Mu21_v1",    kHLT_Mu21, 24);
-  hymod->AddTrigger("HLT_Mu24_v1",    kHLT_Mu24);
-  hymod->AddTrigger("HLT_Mu24_v2",    kHLT_Mu24);
-  hymod->AddTrigger("HLT_Mu24_v3",    kHLT_Mu24);
-  hymod->AddTrigger("HLT_IsoMu17_v4", kHLT_IsoMu17);
-  hymod->AddTrigger("HLT_IsoMu17_v5", kHLT_IsoMu17);
-  hymod->AddTrigger("HLT_IsoMu17_v6", kHLT_IsoMu17);
-  hymod->AddTrigger("HLT_IsoMu17_v8", kHLT_IsoMu17);
 
-  hymod->AddTrigger("HLT_Ele8_v1",                                               kHLT_Ele8);
-  hymod->AddTrigger("HLT_Ele8_v2",                                               kHLT_Ele8);
-  hymod->AddTrigger("HLT_Ele8_v3",                                               kHLT_Ele8);
-  hymod->AddTrigger("HLT_Ele8_v4",                                               kHLT_Ele8);
-  hymod->AddTrigger("HLT_Ele8_CaloIdL_CaloIsoVL_v1",                             kHLT_Ele8_CaloIdL_CaloIsoVL);
-  hymod->AddTrigger("HLT_Ele8_CaloIdL_CaloIsoVL_v2",                             kHLT_Ele8_CaloIdL_CaloIsoVL);
-  hymod->AddTrigger("HLT_Ele8_CaloIdL_CaloIsoVL_v3",                             kHLT_Ele8_CaloIdL_CaloIsoVL);
-  hymod->AddTrigger("HLT_Ele8_CaloIdL_CaloIsoVL_v4",                             kHLT_Ele8_CaloIdL_CaloIsoVL);
-  hymod->AddTrigger("HLT_Ele17_SW_L1R_v2",                                       kHLT_Ele17_SW_L1R);
-  hymod->AddTrigger("HLT_Ele17_CaloIdL_CaloIsoVL_v1",                            kHLT_Ele17_CaloIdL_CaloIsoVL);
-  hymod->AddTrigger("HLT_Ele17_CaloIdL_CaloIsoVL_v2",                            kHLT_Ele17_CaloIdL_CaloIsoVL);
-  hymod->AddTrigger("HLT_Ele17_CaloIdL_CaloIsoVL_v3",                            kHLT_Ele17_CaloIdL_CaloIsoVL);
-  hymod->AddTrigger("HLT_Ele17_CaloIdL_CaloIsoVL_v4",                            kHLT_Ele17_CaloIdL_CaloIsoVL);
-  hymod->AddTrigger("HLT_Ele22_SW_L1R_v2",                                       kHLT_Ele22_SW_L1R, 27);
-  hymod->AddTrigger("HLT_Ele27_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_v1",             kHLT_Ele27_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT);
-  hymod->AddTrigger("HLT_Ele27_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_v2",             kHLT_Ele27_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT);
-  hymod->AddTrigger("HLT_Ele27_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_v3",             kHLT_Ele27_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT);  
-  hymod->AddTrigger("HLT_Ele17_CaloIdL_CaloIsoVL_Ele8_CaloIdL_CaloIsoVL_v1",     kHLT_Ele17_CaloIdL_CaloIsoVL_Ele8_CaloIdL_CaloIsoVL);
-  hymod->AddTrigger("HLT_Ele17_CaloIdL_CaloIsoVL_Ele8_CaloIdL_CaloIsoVL_v2",     kHLT_Ele17_CaloIdL_CaloIsoVL_Ele8_CaloIdL_CaloIsoVL);
-  hymod->AddTrigger("HLT_Ele17_CaloIdL_CaloIsoVL_Ele8_CaloIdL_CaloIsoVL_v3",     kHLT_Ele17_CaloIdL_CaloIsoVL_Ele8_CaloIdL_CaloIsoVL);
-  hymod->AddTrigger("HLT_Ele17_CaloIdL_CaloIsoVL_Ele8_CaloIdL_CaloIsoVL_v4",     kHLT_Ele17_CaloIdL_CaloIsoVL_Ele8_CaloIdL_CaloIsoVL);
-  hymod->AddTrigger("HLT_Ele17_CaloIdVT_CaloIsoVT_TrkIdT_TrkIsoVT_SC8_Mass30_v1",kHLT_Ele17_CaloIdVT_CaloIsoVT_TrkIdT_TrkIsoVT_SC8_Mass30);
-  hymod->AddTrigger("HLT_Ele17_CaloIdVT_CaloIsoVT_TrkIdT_TrkIsoVT_SC8_Mass30_v2",kHLT_Ele17_CaloIdVT_CaloIsoVT_TrkIdT_TrkIsoVT_SC8_Mass30);
-  hymod->AddTrigger("HLT_Ele17_CaloIdVT_CaloIsoVT_TrkIdT_TrkIsoVT_SC8_Mass30_v3",kHLT_Ele17_CaloIdVT_CaloIsoVT_TrkIdT_TrkIsoVT_SC8_Mass30);
-  hymod->AddTrigger("HLT_Ele17_CaloIdVT_CaloIsoVT_TrkIdT_TrkIsoVT_SC8_Mass30_v4",kHLT_Ele17_CaloIdVT_CaloIsoVT_TrkIdT_TrkIsoVT_SC8_Mass30);
-  hymod->AddTrigger("HLT_Ele17_CaloIdT_TrkIdVL_CaloIsoVL_TrkIsoVL_Ele8_CaloIdT_TrkIdVL_CaloIsoVL_TrkIsoVL_v2",kHLT_Ele17_CaloIdT_TrkIdVL_CaloIsoVL_TrkIsoVL_Ele8_CaloIdT_TrkIdVL_CaloIsoVL_TrkIsoVL);
-  hymod->AddTrigger("HLT_Ele17_CaloIdT_TrkIdVL_CaloIsoVL_TrkIsoVL_Ele8_CaloIdT_TrkIdVL_CaloIsoVL_TrkIsoVL_v3",kHLT_Ele17_CaloIdT_TrkIdVL_CaloIsoVL_TrkIsoVL_Ele8_CaloIdT_TrkIdVL_CaloIsoVL_TrkIsoVL);
-  hymod->AddTrigger("HLT_Photon20_CaloIdVT_IsoT_Ele8_CaloIdL_CaloIsoVL_v1",      kHLT_Photon20_CaloIdVT_IsoT_Ele8_CaloIdL_CaloIsoVL);
-  hymod->AddTrigger("HLT_Photon20_CaloIdVT_IsoT_Ele8_CaloIdL_CaloIsoVL_v2",      kHLT_Photon20_CaloIdVT_IsoT_Ele8_CaloIdL_CaloIsoVL);
-  hymod->AddTrigger("HLT_Photon20_CaloIdVT_IsoT_Ele8_CaloIdL_CaloIsoVL_v3",      kHLT_Photon20_CaloIdVT_IsoT_Ele8_CaloIdL_CaloIsoVL);
-  hymod->AddTrigger("HLT_Photon20_CaloIdVT_IsoT_Ele8_CaloIdL_CaloIsoVL_v4",      kHLT_Photon20_CaloIdVT_IsoT_Ele8_CaloIdL_CaloIsoVL);
+  // Jet corrections
+  assert(getenv("src") != NULL);
+  TString path(getenv("src"));
+  path += "/MitPhysics/data/";
 
-  hymod->AddTrigger("HLT_DoubleMu5_v1", kHLT_DoubleMu5, 7);
-  hymod->AddTrigger("HLT_DoubleMu7_v1", kHLT_DoubleMu7);
-  hymod->AddTrigger("HLT_DoubleMu7_v2", kHLT_DoubleMu7);
-  hymod->AddTrigger("HLT_Mu13_Mu8_v2",  kHLT_Mu13_Mu8);
-  hymod->AddTrigger("HLT_Mu5_Jet50U_v3",kHLT_Mu5_Jet50U);
-  hymod->AddTrigger("HLT_Mu8_Jet40_v2", kHLT_Mu8_Jet40);
-  hymod->AddTrigger("HLT_Mu8_Jet40_v3", kHLT_Mu8_Jet40);
-  hymod->AddTrigger("HLT_Mu8_Jet40_v4", kHLT_Mu8_Jet40);
-  hymod->AddTrigger("HLT_Mu8_Jet40_v5", kHLT_Mu8_Jet40);
+  hymod->AddJetCorr(path   + "START42_V12_AK5PF_L1FastJet.txt");
+  hymod->AddJetCorr(path   + "START42_V12_AK5PF_L2Relative.txt");
+  hymod->AddJetCorr(path   + "START42_V12_AK5PF_L3Absolute.txt");
+  if(isData)		      				  
+    hymod->AddJetCorr(path + "START42_V12_AK5PF_L2L3Residual.txt");
 
-  hymod->AddTrigger("HLT_Ele8_CaloIdL_CaloIsoVL_Jet40_v1",kHLT_Ele8_CaloIdL_CaloIsoVL_Jet40);
-  hymod->AddTrigger("HLT_Ele8_CaloIdL_CaloIsoVL_Jet40_v2",kHLT_Ele8_CaloIdL_CaloIsoVL_Jet40);
-  hymod->AddTrigger("HLT_Ele8_CaloIdL_CaloIsoVL_Jet40_v3",kHLT_Ele8_CaloIdL_CaloIsoVL_Jet40);
-  hymod->AddTrigger("HLT_Ele8_CaloIdL_CaloIsoVL_Jet40_v4",kHLT_Ele8_CaloIdL_CaloIsoVL_Jet40);
+  if(TString(json).Length() > 0)
+    hymod->AddJSON(json);
   
-  hymod->AddTrigger("HLT_Mu17_Ele8_CaloIdL_v1",         kHLT_Mu17_Ele8_CaloIdL, 0,  "hltL1Mu3EG5L3Filtered17"    , kHLT_Mu17_Ele8_CaloIdL, "hltL1NonIsoHLTNonIsoMu17Ele8PixelMatchFilter",   kHLT_Mu17_Ele8_CaloIdL);
-  hymod->AddTrigger("HLT_Mu17_Ele8_CaloIdL_v2",         kHLT_Mu17_Ele8_CaloIdL, 0,  "hltL1Mu3EG5L3Filtered17"    , kHLT_Mu17_Ele8_CaloIdL, "hltL1NonIsoHLTNonIsoMu17Ele8PixelMatchFilter",   kHLT_Mu17_Ele8_CaloIdL);
-  hymod->AddTrigger("HLT_Mu17_Ele8_CaloIdL_v3",         kHLT_Mu17_Ele8_CaloIdL, 0,  "hltL1MuOpenEG5L3Filtered17" , kHLT_Mu17_Ele8_CaloIdL, "hltL1NonIsoHLTNonIsoMu17Ele8PixelMatchFilter",   kHLT_Mu17_Ele8_CaloIdL);
-  hymod->AddTrigger("HLT_Mu17_Ele8_CaloIdL_v4",         kHLT_Mu17_Ele8_CaloIdL, 0,  "hltL1MuOpenEG5L3Filtered17" , kHLT_Mu17_Ele8_CaloIdL, "hltL1NonIsoHLTNonIsoMu17Ele8PixelMatchFilter",   kHLT_Mu17_Ele8_CaloIdL);
-  hymod->AddTrigger("HLT_Mu8_Ele17_CaloIdL_v1",         kHLT_Mu8_Ele17_CaloIdL, 0,  "hltL1Mu3EG5L3Filtered8"     , kHLT_Mu8_Ele17_CaloIdL, "hltL1NonIsoHLTNonIsoMu8Ele17PixelMatchFilter",   kHLT_Mu8_Ele17_CaloIdL);
-  hymod->AddTrigger("HLT_Mu8_Ele17_CaloIdL_v2",         kHLT_Mu8_Ele17_CaloIdL, 0,  "hltL1Mu3EG5L3Filtered8"     , kHLT_Mu8_Ele17_CaloIdL, "hltL1NonIsoHLTNonIsoMu8Ele17PixelMatchFilter",   kHLT_Mu8_Ele17_CaloIdL);
-  hymod->AddTrigger("HLT_Mu8_Ele17_CaloIdL_v3",         kHLT_Mu8_Ele17_CaloIdL, 0,  "hltL1MuOpenEG5L3Filtered8"  , kHLT_Mu8_Ele17_CaloIdL, "hltL1NonIsoHLTNonIsoMu8Ele17PixelMatchFilter",   kHLT_Mu8_Ele17_CaloIdL);
-  hymod->AddTrigger("HLT_Mu8_Ele17_CaloIdL_v4",         kHLT_Mu8_Ele17_CaloIdL, 0,  "hltL1MuOpenEG5L3Filtered8"  ,	kHLT_Mu8_Ele17_CaloIdL, "hltL1NonIsoHLTNonIsoMu8Ele17PixelMatchFilter",   kHLT_Mu8_Ele17_CaloIdL);
-
-//   hymod->AddTrigger("HLT_Mu8_Ele8_v1",                  kHLT_Mu8_Ele8);
-//   hymod->AddTrigger("HLT_Mu11_Ele8_v1",                 kHLT_Mu11_Ele8);
-  hymod->AddTrigger("HLT_Mu8_Photon20_CaloIdVT_IsoT_v1",kHLT_Mu8_Photon20_CaloIdVT_IsoT);
-  hymod->AddTrigger("HLT_Mu8_Photon20_CaloIdVT_IsoT_v2",kHLT_Mu8_Photon20_CaloIdVT_IsoT);
-  hymod->AddTrigger("HLT_Mu8_Photon20_CaloIdVT_IsoT_v3",kHLT_Mu8_Photon20_CaloIdVT_IsoT);
-  hymod->AddTrigger("HLT_Mu8_Photon20_CaloIdVT_IsoT_v4",kHLT_Mu8_Photon20_CaloIdVT_IsoT);
-  //----------------------------------------------------------------------------------------
-  // si:
   //
-  //Main EMu Triggers
-//   mymod->AddTrigger("HLT_Mu17_Ele8_CaloIdL_v1",               kHLT_Mu17_Ele8_CaloIdL, kHLTObject_Mu17, "hltL1Mu3EG5L3Filtered17",     kHLTObject_Ele8_CaloIdL, "hltL1NonIsoHLTNonIsoMu17Ele8PixelMatchFilter"  );
-//   mymod->AddTrigger("HLT_Mu17_Ele8_CaloIdL_v2",               kHLT_Mu17_Ele8_CaloIdL, kHLTObject_Mu17, "hltL1Mu3EG5L3Filtered17",     kHLTObject_Ele8_CaloIdL, "hltL1NonIsoHLTNonIsoMu17Ele8PixelMatchFilter");
-//   mymod->AddTrigger("HLT_Mu17_Ele8_CaloIdL_v3",               kHLT_Mu17_Ele8_CaloIdL, kHLTObject_Mu17, "hltL1MuOpenEG5L3Filtered17",  kHLTObject_Ele8_CaloIdL, "hltL1NonIsoHLTNonIsoMu17Ele8PixelMatchFilter");
-//   mymod->AddTrigger("HLT_Mu17_Ele8_CaloIdL_v4",               kHLT_Mu17_Ele8_CaloIdL, kHLTObject_Mu17, "hltL1MuOpenEG5L3Filtered17",  kHLTObject_Ele8_CaloIdL, "hltL1NonIsoHLTNonIsoMu17Ele8PixelMatchFilter");
-//   mymod->AddTrigger("HLT_Mu8_Ele17_CaloIdL_v1",               kHLT_Mu8_Ele17_CaloIdL,  kHLTObject_Mu8, "hltL1Mu3EG5L3Filtered8",      kHLTObject_Ele17_CaloIdL, "hltL1NonIsoHLTNonIsoMu8Ele17PixelMatchFilter" );
-//   mymod->AddTrigger("HLT_Mu8_Ele17_CaloIdL_v2",               kHLT_Mu8_Ele17_CaloIdL,  kHLTObject_Mu8, "hltL1Mu3EG5L3Filtered8",      kHLTObject_Ele17_CaloIdL, "hltL1NonIsoHLTNonIsoMu8Ele17PixelMatchFilter");
-//   mymod->AddTrigger("HLT_Mu8_Ele17_CaloIdL_v3",               kHLT_Mu8_Ele17_CaloIdL,  kHLTObject_Mu8, "hltL1MuOpenEG5L3Filtered8",   kHLTObject_Ele17_CaloIdL, "hltL1NonIsoHLTNonIsoMu8Ele17PixelMatchFilter");
-//   mymod->AddTrigger("HLT_Mu8_Ele17_CaloIdL_v4",               kHLT_Mu8_Ele17_CaloIdL,  kHLTObject_Mu8, "hltL1MuOpenEG5L3Filtered8",   kHLTObject_Ele17_CaloIdL, "hltL1NonIsoHLTNonIsoMu8Ele17PixelMatchFilter");
+  // MuEG
+  // 
+  hymod->AddTrigger("HLT_Mu17_Ele8_CaloIdL_v1",kHLT_Mu17_Ele8_CaloIdL,"hltL1Mu3EG5L3Filtered17",kHLT_Mu17_Ele8_CaloIdL_MuObj,0,"hltL1NonIsoHLTNonIsoMu17Ele8PixelMatchFilter",kHLT_Mu17_Ele8_CaloIdL_EGObj,0);
+  hymod->AddTrigger("HLT_Mu17_Ele8_CaloIdL_v2",kHLT_Mu17_Ele8_CaloIdL,"hltL1Mu3EG5L3Filtered17",kHLT_Mu17_Ele8_CaloIdL_MuObj,0,"hltL1NonIsoHLTNonIsoMu17Ele8PixelMatchFilter",kHLT_Mu17_Ele8_CaloIdL_EGObj,0);
+  hymod->AddTrigger("HLT_Mu17_Ele8_CaloIdL_v3",kHLT_Mu17_Ele8_CaloIdL,"hltL1MuOpenEG5L3Filtered17",kHLT_Mu17_Ele8_CaloIdL_MuObj,0,"hltL1NonIsoHLTNonIsoMu17Ele8PixelMatchFilter",kHLT_Mu17_Ele8_CaloIdL_EGObj,0);
+  hymod->AddTrigger("HLT_Mu17_Ele8_CaloIdL_v4",kHLT_Mu17_Ele8_CaloIdL,"hltL1MuOpenEG5L3Filtered17",kHLT_Mu17_Ele8_CaloIdL_MuObj,0,"hltL1NonIsoHLTNonIsoMu17Ele8PixelMatchFilter",kHLT_Mu17_Ele8_CaloIdL_EGObj,0);
+  hymod->AddTrigger("HLT_Mu17_Ele8_CaloIdL_v5",kHLT_Mu17_Ele8_CaloIdL,"hltL1MuOpenEG5L3Filtered17",kHLT_Mu17_Ele8_CaloIdL_MuObj,0,"hltL1NonIsoHLTNonIsoMu17Ele8PixelMatchFilter",kHLT_Mu17_Ele8_CaloIdL_EGObj,0);
+  hymod->AddTrigger("HLT_Mu17_Ele8_CaloIdL_v6",kHLT_Mu17_Ele8_CaloIdL,"hltL1MuOpenEG5L3Filtered17",kHLT_Mu17_Ele8_CaloIdL_MuObj,0,"hltL1NonIsoHLTNonIsoMu17Ele8PixelMatchFilter",kHLT_Mu17_Ele8_CaloIdL_EGObj,0);
+  hymod->AddTrigger("HLT_Mu8_Ele17_CaloIdL_v1",kHLT_Mu8_Ele17_CaloIdL,"hltL1Mu3EG5L3Filtered8",kHLT_Mu8_Ele17_CaloIdL_MuObj,0,"hltL1NonIsoHLTNonIsoMu8Ele17PixelMatchFilter",kHLT_Mu8_Ele17_CaloIdL_EGObj,0);
+  hymod->AddTrigger("HLT_Mu8_Ele17_CaloIdL_v2",kHLT_Mu8_Ele17_CaloIdL,"hltL1Mu3EG5L3Filtered8",kHLT_Mu8_Ele17_CaloIdL_MuObj,0,"hltL1NonIsoHLTNonIsoMu8Ele17PixelMatchFilter",kHLT_Mu8_Ele17_CaloIdL_EGObj,0);
+  hymod->AddTrigger("HLT_Mu8_Ele17_CaloIdL_v3",kHLT_Mu8_Ele17_CaloIdL,"hltL1MuOpenEG5L3Filtered8",kHLT_Mu8_Ele17_CaloIdL_MuObj,0,"hltL1NonIsoHLTNonIsoMu8Ele17PixelMatchFilter",kHLT_Mu8_Ele17_CaloIdL_EGObj,0);
+  hymod->AddTrigger("HLT_Mu8_Ele17_CaloIdL_v4",kHLT_Mu8_Ele17_CaloIdL,"hltL1MuOpenEG5L3Filtered8",kHLT_Mu8_Ele17_CaloIdL_MuObj,0,"hltL1NonIsoHLTNonIsoMu8Ele17PixelMatchFilter",kHLT_Mu8_Ele17_CaloIdL_EGObj,0);
+  hymod->AddTrigger("HLT_Mu8_Ele17_CaloIdL_v5",kHLT_Mu8_Ele17_CaloIdL,"hltL1MuOpenEG5L3Filtered8",kHLT_Mu8_Ele17_CaloIdL_MuObj,0,"hltL1NonIsoHLTNonIsoMu8Ele17PixelMatchFilter",kHLT_Mu8_Ele17_CaloIdL_EGObj,0);
+  hymod->AddTrigger("HLT_Mu8_Ele17_CaloIdL_v6",kHLT_Mu8_Ele17_CaloIdL,"hltL1MuOpenEG5L3Filtered8",kHLT_Mu8_Ele17_CaloIdL_MuObj,0,"hltL1NonIsoHLTNonIsoMu8Ele17PixelMatchFilter",kHLT_Mu8_Ele17_CaloIdL_EGObj,0);
+  hymod->AddTrigger("HLT_Mu8_Photon20_CaloIdVT_IsoT_v2",kHLT_Mu8_Photon20_CaloIdVT_IsoT,"hltSingleMu8EG5L3Filtered8",kHLT_Mu8_Photon20_CaloIdVT_IsoT_MuObj,0,"hltPhoton20CaloIdVTIsoTMu8TrackIsoFilter",kHLT_Mu8_Photon20_CaloIdVT_IsoT_EGObj,0);
+  hymod->AddTrigger("HLT_Mu8_Photon20_CaloIdVT_IsoT_v3",kHLT_Mu8_Photon20_CaloIdVT_IsoT,"hltSingleMu8EG5L3Filtered8",kHLT_Mu8_Photon20_CaloIdVT_IsoT_MuObj,0,"hltPhoton20CaloIdVTIsoTMu8TrackIsoFilter",kHLT_Mu8_Photon20_CaloIdVT_IsoT_EGObj,0);
+  hymod->AddTrigger("HLT_Mu8_Photon20_CaloIdVT_IsoT_v4",kHLT_Mu8_Photon20_CaloIdVT_IsoT,"hltSingleMu8EG5L3Filtered8",kHLT_Mu8_Photon20_CaloIdVT_IsoT_MuObj,0,"hltPhoton20CaloIdVTIsoTMu8TrackIsoFilter",kHLT_Mu8_Photon20_CaloIdVT_IsoT_EGObj,0);
+  hymod->AddTrigger("HLT_Mu8_Photon20_CaloIdVT_IsoT_v5",kHLT_Mu8_Photon20_CaloIdVT_IsoT,"hltSingleMu8EG5L3Filtered8",kHLT_Mu8_Photon20_CaloIdVT_IsoT_MuObj,0,"hltPhoton20CaloIdVTIsoTMu8TrackIsoFilter",kHLT_Mu8_Photon20_CaloIdVT_IsoT_EGObj,0);
+  hymod->AddTrigger("HLT_Mu8_Photon20_CaloIdVT_IsoT_v6",kHLT_Mu8_Photon20_CaloIdVT_IsoT,"hltSingleMu8EG5L3Filtered8",kHLT_Mu8_Photon20_CaloIdVT_IsoT_MuObj,0,"hltPhoton20CaloIdVTIsoTMu8TrackIsoFilter",kHLT_Mu8_Photon20_CaloIdVT_IsoT_EGObj,0);
+  hymod->AddTrigger("HLT_Mu15_Photon20_CaloIdL_v2",kHLT_Mu15_Photon20_CaloIdL,"hltL1Mu3EG5L3Filtered15",kHLT_Mu15_Photon20_CaloIdL_MuObj,0,"hltMu15Photon20CaloIdLHEFilter",kHLT_Mu15_Photon20_CaloIdL_EGObj,0);
+  hymod->AddTrigger("HLT_Mu15_Photon20_CaloIdL_v3",kHLT_Mu15_Photon20_CaloIdL,"hltL1Mu3EG5L3Filtered15",kHLT_Mu15_Photon20_CaloIdL_MuObj,0,"hltMu15Photon20CaloIdLHEFilter",kHLT_Mu15_Photon20_CaloIdL_EGObj,0);
+  hymod->AddTrigger("HLT_Mu15_Photon20_CaloIdL_v4",kHLT_Mu15_Photon20_CaloIdL,"hltL1MuOpenEG5L3Filtered15",kHLT_Mu15_Photon20_CaloIdL_MuObj,0,"hltMu15Photon20CaloIdLHEFilter",kHLT_Mu15_Photon20_CaloIdL_EGObj,0);
+  hymod->AddTrigger("HLT_Mu15_Photon20_CaloIdL_v5",kHLT_Mu15_Photon20_CaloIdL,"hltL1MuOpenEG5L3Filtered15",kHLT_Mu15_Photon20_CaloIdL_MuObj,0,"hltMu15Photon20CaloIdLHEFilter",kHLT_Mu15_Photon20_CaloIdL_EGObj,0);
+  hymod->AddTrigger("HLT_Mu15_Photon20_CaloIdL_v6",kHLT_Mu15_Photon20_CaloIdL,"hltL1MuOpenEG5L3Filtered15",kHLT_Mu15_Photon20_CaloIdL_MuObj,0,"hltMu15Photon20CaloIdLHEFilter",kHLT_Mu15_Photon20_CaloIdL_EGObj,0);
+  hymod->AddTrigger("HLT_Mu15_Photon20_CaloIdL_v7",kHLT_Mu15_Photon20_CaloIdL,"hltL1MuOpenEG5L3Filtered15",kHLT_Mu15_Photon20_CaloIdL_MuObj,0,"hltMu15Photon20CaloIdLHEFilter",kHLT_Mu15_Photon20_CaloIdL_EGObj,0);
 
-  hymod->AddTrigger("HLT_Jet15U_v3", kHLT_Jet15U);
-  hymod->AddTrigger("HLT_Jet30U_v3", kHLT_Jet30U);
-  hymod->AddTrigger("HLT_Jet30_v1",  kHLT_Jet30);
-  hymod->AddTrigger("HLT_Jet30_v2",  kHLT_Jet30);
-  hymod->AddTrigger("HLT_Jet30_v2",  kHLT_Jet30);
-  hymod->AddTrigger("HLT_DiJetAve15U_v3",kHLT_DiJetAve15U);
-  hymod->AddTrigger("HLT_DiJetAve30U_v3",kHLT_DiJetAve30U);
-  hymod->AddTrigger("HLT_DiJetAve30U_v4",kHLT_DiJetAve30U);
-  
-  hymod->AddTrigger("HLT_Photon30_Cleaned_L1R_v1",  kHLT_Photon30_Cleaned_L1R);
-  hymod->AddTrigger("HLT_Photon30_CaloIdVL_IsoL_v1",kHLT_Photon30_CaloIdVL_IsoL);
-  hymod->AddTrigger("HLT_Photon30_CaloIdVL_IsoL_v2",kHLT_Photon30_CaloIdVL_IsoL);
-  hymod->AddTrigger("HLT_Photon30_CaloIdVL_IsoL_v3",kHLT_Photon30_CaloIdVL_IsoL);
-  hymod->AddTrigger("HLT_Photon30_CaloIdVL_IsoL_v4",kHLT_Photon30_CaloIdVL_IsoL);
-  hymod->AddTrigger("HLT_Photon50_Cleaned_L1R_v1",  kHLT_Photon50_Cleaned_L1R);
-  hymod->AddTrigger("HLT_Photon50_CaloIdVL_IsoL_v1",kHLT_Photon50_CaloIdVL_IsoL);
-  hymod->AddTrigger("HLT_Photon50_CaloIdVL_IsoL_v2",kHLT_Photon50_CaloIdVL_IsoL);
-  hymod->AddTrigger("HLT_Photon50_CaloIdVL_IsoL_v3",kHLT_Photon50_CaloIdVL_IsoL);
-          
-  hymod->AddTrigger("HLT_DoubleMu0_Quarkonium_v1",  kHLT_DoubleMu0_Quarkonium);
-  hymod->AddTrigger("HLT_DoubleMu3_Quarkonium_v1",  kHLT_DoubleMu3_Quarkonium);
-  hymod->AddTrigger("HLT_DoubleMu3_Quarkonium_v2",  kHLT_DoubleMu3_Quarkonium);
-  hymod->AddTrigger("HLT_DoubleMu3_Jpsi_v1",        kHLT_DoubleMu3_Jpsi);
-  hymod->AddTrigger("HLT_DoubleMu3_Jpsi_v2",        kHLT_DoubleMu3_Jpsi);
-  hymod->AddTrigger("HLT_Dimuon0_Barrel_Upsilon_v1",kHLT_Dimuon0_Barrel_Upsilon);
-  hymod->AddTrigger("HLT_Dimuon6p5_Barrel_Jpsi_v1", kHLT_Dimuon6p5_Barrel_Jpsi);
-  hymod->AddTrigger("HLT_Dimuon6p5_Jpsi_v1",        kHLT_Dimuon6p5_Jpsi);
+  //
+  // DoubleMu
+  //
+  hymod->AddTrigger("HLT_DoubleMu7_v1",kHLT_DoubleMu7,"hltDiMuonL3PreFiltered7",kHLT_DoubleMu7_MuObj); 
+  hymod->AddTrigger("HLT_DoubleMu7_v2",kHLT_DoubleMu7,"hltDiMuonL3PreFiltered7",kHLT_DoubleMu7_MuObj);
+  hymod->AddTrigger("HLT_Mu13_Mu8_v2",kHLT_Mu13_Mu8,"hltSingleMu13L3Filtered13",kHLT_Mu13_Mu8_Mu1Obj,0,"hltDiMuonL3PreFiltered8",kHLT_Mu13_Mu8_Mu2Obj,0);
+  hymod->AddTrigger("HLT_Mu13_Mu8_v3",kHLT_Mu13_Mu8,"hltSingleMu13L3Filtered13",kHLT_Mu13_Mu8_Mu1Obj,0,"hltDiMuonL3PreFiltered8",kHLT_Mu13_Mu8_Mu2Obj,0);
+  hymod->AddTrigger("HLT_Mu13_Mu8_v4",kHLT_Mu13_Mu8,"hltSingleMu13L3Filtered13",kHLT_Mu13_Mu8_Mu1Obj,0,"hltDiMuonL3PreFiltered8",kHLT_Mu13_Mu8_Mu2Obj,0);  
+  hymod->AddTrigger("HLT_Mu17_Mu8_v2",kHLT_Mu17_Mu8,"hltSingleMu13L3Filtered17",kHLT_Mu17_Mu8_Mu1Obj,0,"hltDiMuonL3PreFiltered8",kHLT_Mu17_Mu8_Mu2Obj,0);
+  hymod->AddTrigger("HLT_Mu17_Mu8_v3",kHLT_Mu17_Mu8,"hltSingleMu13L3Filtered17",kHLT_Mu17_Mu8_Mu1Obj,0,"hltDiMuonL3PreFiltered8",kHLT_Mu17_Mu8_Mu2Obj,0);
+  hymod->AddTrigger("HLT_Mu17_Mu8_v4",kHLT_Mu17_Mu8,"hltSingleMu13L3Filtered17",kHLT_Mu17_Mu8_Mu1Obj,0,"hltDiMuonL3PreFiltered8",kHLT_Mu17_Mu8_Mu2Obj,0);
+  hymod->AddTrigger("HLT_Mu8_Jet40_v2",kHLT_Mu8_Jet40,"hltL3Mu8Jet20L3Filtered8",kHLT_Mu8_Jet40_MuObj,0,"hltJet40",kHLT_Mu8_Jet40_JetObj,0);
+  hymod->AddTrigger("HLT_Mu8_Jet40_v3",kHLT_Mu8_Jet40,"hltL3Mu8Jet20L3Filtered8",kHLT_Mu8_Jet40_MuObj,0,"hltJet40",kHLT_Mu8_Jet40_JetObj,0);
+  hymod->AddTrigger("HLT_Mu8_Jet40_v4",kHLT_Mu8_Jet40,"hltL3Mu8Jet20L3Filtered8",kHLT_Mu8_Jet40_MuObj,0,"hltJet40",kHLT_Mu8_Jet40_JetObj,0);
+  hymod->AddTrigger("HLT_Mu8_Jet40_v5",kHLT_Mu8_Jet40,"hltL3Mu8Jet20L3Filtered8",kHLT_Mu8_Jet40_MuObj,0,"hltJet40",kHLT_Mu8_Jet40_JetObj,0);
+  hymod->AddTrigger("HLT_Mu8_Jet40_v6",kHLT_Mu8_Jet40,"hltL3Mu8Jet20L3Filtered8",kHLT_Mu8_Jet40_MuObj,0,"hltJet40",kHLT_Mu8_Jet40_JetObj,0);
+  hymod->AddTrigger("HLT_Mu8_Jet40_v7",kHLT_Mu8_Jet40,"hltL3Mu8Jet20L3Filtered8",kHLT_Mu8_Jet40_MuObj,0,"hltJet40",kHLT_Mu8_Jet40_JetObj,0);
+
+  //
+  // SingleMu
+  //
+  hymod->AddTrigger("HLT_Mu8_v1",kHLT_Mu8,"hltSingleMu8L3Filtered8",kHLT_Mu8_MuObj);
+  hymod->AddTrigger("HLT_Mu8_v2",kHLT_Mu8,"hltSingleMu8L3Filtered8",kHLT_Mu8_MuObj);
+  hymod->AddTrigger("HLT_Mu8_v3",kHLT_Mu8,"hltSingleMu8L3Filtered8",kHLT_Mu8_MuObj);
+  hymod->AddTrigger("HLT_Mu8_v4",kHLT_Mu8,"hltSingleMu8L3Filtered8",kHLT_Mu8_MuObj);
+  hymod->AddTrigger("HLT_Mu8_v5",kHLT_Mu8,"hltSingleMu8L3Filtered8",kHLT_Mu8_MuObj);
+  hymod->AddTrigger("HLT_Mu9",kHLT_Mu9,"",kHLT_Mu9_MuObj,15);
+  hymod->AddTrigger("HLT_Mu12_v1",kHLT_Mu12,"hltSingleMu12L3Filtered12",kHLT_Mu12_MuObj);
+  hymod->AddTrigger("HLT_Mu12_v2",kHLT_Mu12,"hltSingleMu12L3Filtered12",kHLT_Mu12_MuObj);
+  hymod->AddTrigger("HLT_Mu12_v3",kHLT_Mu12,"hltSingleMu12L3Filtered12",kHLT_Mu12_MuObj);
+  hymod->AddTrigger("HLT_Mu12_v4",kHLT_Mu12,"hltSingleMu12L3Filtered12",kHLT_Mu12_MuObj);
+  hymod->AddTrigger("HLT_Mu12_v5",kHLT_Mu12,"hltSingleMu12L3Filtered12",kHLT_Mu12_MuObj);
+  hymod->AddTrigger("HLT_Mu15_v1",kHLT_Mu15,"",kHLT_Mu15_MuObj);
+  hymod->AddTrigger("HLT_Mu15_v2",kHLT_Mu15,"hltL3Muon15",kHLT_Mu15_MuObj);
+  hymod->AddTrigger("HLT_Mu15_v3",kHLT_Mu15,"hltSingleMu15L3Filtered15",kHLT_Mu15_MuObj);
+  hymod->AddTrigger("HLT_Mu15_v4",kHLT_Mu15,"hltSingleMu15L3Filtered15",kHLT_Mu15_MuObj);
+  hymod->AddTrigger("HLT_Mu15_v5",kHLT_Mu15,"hltSingleMu15L3Filtered15",kHLT_Mu15_MuObj);
+  hymod->AddTrigger("HLT_Mu15_v6",kHLT_Mu15,"hltSingleMu15L3Filtered15",kHLT_Mu15_MuObj);
+  hymod->AddTrigger("HLT_Mu24_v1",kHLT_Mu24,"hltSingleMu24L3Filtered24",kHLT_Mu24_MuObj);
+  hymod->AddTrigger("HLT_Mu24_v2",kHLT_Mu24,"hltSingleMu24L3Filtered24",kHLT_Mu24_MuObj);
+  hymod->AddTrigger("HLT_Mu24_v3",kHLT_Mu24,"hltSingleMu24L3Filtered24",kHLT_Mu24_MuObj);
+  hymod->AddTrigger("HLT_Mu24_v4",kHLT_Mu24,"hltSingleMu24L3Filtered24",kHLT_Mu24_MuObj);
+  hymod->AddTrigger("HLT_Mu24_v5",kHLT_Mu24,"hltSingleMu24L3Filtered24",kHLT_Mu24_MuObj);
+  hymod->AddTrigger("HLT_Mu30_v1",kHLT_Mu30,"hltSingleMu30L3Filtered30",kHLT_Mu30_MuObj);
+  hymod->AddTrigger("HLT_Mu30_v2",kHLT_Mu30,"hltSingleMu30L3Filtered30",kHLT_Mu30_MuObj);
+  hymod->AddTrigger("HLT_Mu30_v3",kHLT_Mu30,"hltSingleMu30L3Filtered30",kHLT_Mu30_MuObj);
+  hymod->AddTrigger("HLT_Mu30_v4",kHLT_Mu30,"hltSingleMu30L3Filtered30",kHLT_Mu30_MuObj);
+  hymod->AddTrigger("HLT_Mu30_v5",kHLT_Mu30,"hltSingleMu30L3Filtered30",kHLT_Mu30_MuObj);
+  hymod->AddTrigger("HLT_IsoMu17_v5",kHLT_IsoMu17,"hltSingleMuIsoL3IsoFiltered17",kHLT_IsoMu17_MuObj);
+  hymod->AddTrigger("HLT_IsoMu17_v6",kHLT_IsoMu17,"hltSingleMuIsoL3IsoFiltered17",kHLT_IsoMu17_MuObj);
+  hymod->AddTrigger("HLT_IsoMu17_v8",kHLT_IsoMu17,"hltSingleMuIsoL3IsoFiltered17",kHLT_IsoMu17_MuObj);
+  hymod->AddTrigger("HLT_IsoMu24_v1",kHLT_IsoMu24,"hltSingleMuIsoL3IsoFiltered24",kHLT_IsoMu24_MuObj);
+  hymod->AddTrigger("HLT_IsoMu24_v2",kHLT_IsoMu24,"hltSingleMuIsoL3IsoFiltered24",kHLT_IsoMu24_MuObj);
+  hymod->AddTrigger("HLT_IsoMu24_v4",kHLT_IsoMu24,"hltSingleMuIsoL3IsoFiltered24",kHLT_IsoMu24_MuObj);
+  hymod->AddTrigger("HLT_IsoMu24_v5",kHLT_IsoMu24,"hltSingleMuIsoL3IsoFiltered24",kHLT_IsoMu24_MuObj);
+  hymod->AddTrigger("HLT_IsoMu24_v6",kHLT_IsoMu24,"hltSingleMuIsoL3IsoFiltered24",kHLT_IsoMu24_MuObj);
+  hymod->AddTrigger("HLT_IsoMu24_v7",kHLT_IsoMu24,"hltSingleMuIsoL3IsoFiltered24",kHLT_IsoMu24_MuObj);
+
+  //
+  // DoubleElectron
+  //
+  hymod->AddTrigger("HLT_Ele17_CaloIdL_CaloIsoVL_Ele8_CaloIdL_CaloIsoVL_v1",kHLT_Ele17_CaloIdL_CaloIsoVL_Ele8_CaloIdL_CaloIsoVL,"hltEle17CaloIdLCaloIsoVLPixelMatchFilter",kHLT_Ele17_CaloIdL_CaloIsoVL_Ele8_CaloIdL_CaloIsoVL_Ele1Obj,0,"hltEle17CaloIdIsoEle8CaloIdIsoPixelMatchDoubleFilter",kHLT_Ele17_CaloIdL_CaloIsoVL_Ele8_CaloIdL_CaloIsoVL_Ele2Obj,0);
+  hymod->AddTrigger("HLT_Ele17_CaloIdL_CaloIsoVL_Ele8_CaloIdL_CaloIsoVL_v2",kHLT_Ele17_CaloIdL_CaloIsoVL_Ele8_CaloIdL_CaloIsoVL,"hltEle17CaloIdLCaloIsoVLPixelMatchFilter",kHLT_Ele17_CaloIdL_CaloIsoVL_Ele8_CaloIdL_CaloIsoVL_Ele1Obj,0,"hltEle17CaloIdIsoEle8CaloIdIsoPixelMatchDoubleFilter",kHLT_Ele17_CaloIdL_CaloIsoVL_Ele8_CaloIdL_CaloIsoVL_Ele2Obj,0);
+  hymod->AddTrigger("HLT_Ele17_CaloIdL_CaloIsoVL_Ele8_CaloIdL_CaloIsoVL_v3",kHLT_Ele17_CaloIdL_CaloIsoVL_Ele8_CaloIdL_CaloIsoVL,"hltEle17CaloIdLCaloIsoVLPixelMatchFilter",kHLT_Ele17_CaloIdL_CaloIsoVL_Ele8_CaloIdL_CaloIsoVL_Ele1Obj,0,"hltEle17CaloIdIsoEle8CaloIdIsoPixelMatchDoubleFilter",kHLT_Ele17_CaloIdL_CaloIsoVL_Ele8_CaloIdL_CaloIsoVL_Ele2Obj,0);
+  hymod->AddTrigger("HLT_Ele17_CaloIdL_CaloIsoVL_Ele8_CaloIdL_CaloIsoVL_v4",kHLT_Ele17_CaloIdL_CaloIsoVL_Ele8_CaloIdL_CaloIsoVL,"hltEle17CaloIdLCaloIsoVLPixelMatchFilter",kHLT_Ele17_CaloIdL_CaloIsoVL_Ele8_CaloIdL_CaloIsoVL_Ele1Obj,0,"hltEle17CaloIdIsoEle8CaloIdIsoPixelMatchDoubleFilter",kHLT_Ele17_CaloIdL_CaloIsoVL_Ele8_CaloIdL_CaloIsoVL_Ele2Obj,0);
+  hymod->AddTrigger("HLT_Ele17_CaloIdL_CaloIsoVL_Ele8_CaloIdL_CaloIsoVL_v5",kHLT_Ele17_CaloIdL_CaloIsoVL_Ele8_CaloIdL_CaloIsoVL,"hltEle17CaloIdLCaloIsoVLPixelMatchFilter",kHLT_Ele17_CaloIdL_CaloIsoVL_Ele8_CaloIdL_CaloIsoVL_Ele1Obj,0,"hltEle17CaloIdIsoEle8CaloIdIsoPixelMatchDoubleFilter",kHLT_Ele17_CaloIdL_CaloIsoVL_Ele8_CaloIdL_CaloIsoVL_Ele2Obj,0);
+  hymod->AddTrigger("HLT_Ele17_CaloIdL_CaloIsoVL_Ele8_CaloIdL_CaloIsoVL_v6",kHLT_Ele17_CaloIdL_CaloIsoVL_Ele8_CaloIdL_CaloIsoVL,"hltEle17CaloIdLCaloIsoVLPixelMatchFilter",kHLT_Ele17_CaloIdL_CaloIsoVL_Ele8_CaloIdL_CaloIsoVL_Ele1Obj,0,"hltEle17CaloIdIsoEle8CaloIdIsoPixelMatchDoubleFilter",kHLT_Ele17_CaloIdL_CaloIsoVL_Ele8_CaloIdL_CaloIsoVL_Ele2Obj,0);
+  hymod->AddTrigger("HLT_Ele17_CaloIdT_TrkIdVL_CaloIsoVL_TrkIsoVL_Ele8_CaloIdT_TrkIdVL_CaloIsoVL_TrkIsoVL_v2",kHLT_Ele17_CaloIdT_TrkIdVL_CaloIsoVL_TrkIsoVL_Ele8_CaloIdT_TrkIdVL_CaloIsoVL_TrkIsoVL,"hltEle17TightIdLooseIsoEle8TightIdLooseIsoTrackIsolFilter",kHLT_Ele17_CaloIdT_TrkIdVL_CaloIsoVL_TrkIsoVL_Ele8_CaloIdT_TrkIdVL_CaloIsoVL_TrkIsoVL_Ele1Obj,0,"hltEle17TightIdLooseIsoEle8TightIdLooseIsoTrackIsolDoubleFilter",kHLT_Ele17_CaloIdT_TrkIdVL_CaloIsoVL_TrkIsoVL_Ele8_CaloIdT_TrkIdVL_CaloIsoVL_TrkIsoVL_Ele2Obj,0);
+  hymod->AddTrigger("HLT_Ele17_CaloIdT_TrkIdVL_CaloIsoVL_TrkIsoVL_Ele8_CaloIdT_TrkIdVL_CaloIsoVL_TrkIsoVL_v3",kHLT_Ele17_CaloIdT_TrkIdVL_CaloIsoVL_TrkIsoVL_Ele8_CaloIdT_TrkIdVL_CaloIsoVL_TrkIsoVL,"hltEle17TightIdLooseIsoEle8TightIdLooseIsoTrackIsolFilter",kHLT_Ele17_CaloIdT_TrkIdVL_CaloIsoVL_TrkIsoVL_Ele8_CaloIdT_TrkIdVL_CaloIsoVL_TrkIsoVL_Ele1Obj,0,"hltEle17TightIdLooseIsoEle8TightIdLooseIsoTrackIsolDoubleFilter",kHLT_Ele17_CaloIdT_TrkIdVL_CaloIsoVL_TrkIsoVL_Ele8_CaloIdT_TrkIdVL_CaloIsoVL_TrkIsoVL_Ele2Obj,0);
+  hymod->AddTrigger("HLT_Ele17_CaloIdT_TrkIdVL_CaloIsoVL_TrkIsoVL_Ele8_CaloIdT_TrkIdVL_CaloIsoVL_TrkIsoVL_v4",kHLT_Ele17_CaloIdT_TrkIdVL_CaloIsoVL_TrkIsoVL_Ele8_CaloIdT_TrkIdVL_CaloIsoVL_TrkIsoVL,"hltEle17TightIdLooseIsoEle8TightIdLooseIsoTrackIsolFilter",kHLT_Ele17_CaloIdT_TrkIdVL_CaloIsoVL_TrkIsoVL_Ele8_CaloIdT_TrkIdVL_CaloIsoVL_TrkIsoVL_Ele1Obj,0,"hltEle17TightIdLooseIsoEle8TightIdLooseIsoTrackIsolDoubleFilter",kHLT_Ele17_CaloIdT_TrkIdVL_CaloIsoVL_TrkIsoVL_Ele8_CaloIdT_TrkIdVL_CaloIsoVL_TrkIsoVL_Ele2Obj,0);
+  hymod->AddTrigger("HLT_Ele17_CaloIdT_TrkIdVL_CaloIsoVL_TrkIsoVL_Ele8_CaloIdT_TrkIdVL_CaloIsoVL_TrkIsoVL_v5",kHLT_Ele17_CaloIdT_TrkIdVL_CaloIsoVL_TrkIsoVL_Ele8_CaloIdT_TrkIdVL_CaloIsoVL_TrkIsoVL,"hltEle17TightIdLooseIsoEle8TightIdLooseIsoTrackIsolFilter",kHLT_Ele17_CaloIdT_TrkIdVL_CaloIsoVL_TrkIsoVL_Ele8_CaloIdT_TrkIdVL_CaloIsoVL_TrkIsoVL_Ele1Obj,0,"hltEle17TightIdLooseIsoEle8TightIdLooseIsoTrackIsolDoubleFilter",kHLT_Ele17_CaloIdT_TrkIdVL_CaloIsoVL_TrkIsoVL_Ele8_CaloIdT_TrkIdVL_CaloIsoVL_TrkIsoVL_Ele2Obj,0);
+  hymod->AddTrigger("HLT_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_v5",kHLT_Ele17_CaloIdT_TrkIdVL_CaloIsoVL_TrkIsoVL_Ele8_CaloIdT_TrkIdVL_CaloIsoVL_TrkIsoVL,"hltEle17TightIdLooseIsoEle8TightIdLooseIsoTrackIsolFilter",kHLT_Ele17_CaloIdT_TrkIdVL_CaloIsoVL_TrkIsoVL_Ele8_CaloIdT_TrkIdVL_CaloIsoVL_TrkIsoVL_Ele1Obj,0,"hltEle17TightIdLooseIsoEle8TightIdLooseIsoTrackIsolDoubleFilter",kHLT_Ele17_CaloIdT_TrkIdVL_CaloIsoVL_TrkIsoVL_Ele8_CaloIdT_TrkIdVL_CaloIsoVL_TrkIsoVL_Ele2Obj,0);
+  hymod->AddTrigger("HLT_Ele17_CaloIdVT_CaloIsoVT_TrkIdT_TrkIsoVT_SC8_Mass30_v1",kHLT_Ele17_CaloIdVT_CaloIsoVT_TrkIdT_TrkIsoVT_SC8_Mass30,"hltEle17CaloIdVTCaloIsoVTTrkIdTTrkIsoVTSC8TrackIsolFilter",kHLT_Ele17_CaloIdVT_CaloIsoVT_TrkIdT_TrkIsoVT_SC8_Mass30_EleObj,0,"hltEle17CaloIdVTCaloIsoVTTrkIdTTrkIsoVTSC8PMMassFilter",kHLT_Ele17_CaloIdVT_CaloIsoVT_TrkIdT_TrkIsoVT_SC8_Mass30_SCObj,0);
+  hymod->AddTrigger("HLT_Ele17_CaloIdVT_CaloIsoVT_TrkIdT_TrkIsoVT_SC8_Mass30_v2",kHLT_Ele17_CaloIdVT_CaloIsoVT_TrkIdT_TrkIsoVT_SC8_Mass30,"hltEle17CaloIdVTCaloIsoVTTrkIdTTrkIsoVTSC8TrackIsolFilter",kHLT_Ele17_CaloIdVT_CaloIsoVT_TrkIdT_TrkIsoVT_SC8_Mass30_EleObj,0,"hltEle17CaloIdVTCaloIsoVTTrkIdTTrkIsoVTSC8PMMassFilter",kHLT_Ele17_CaloIdVT_CaloIsoVT_TrkIdT_TrkIsoVT_SC8_Mass30_SCObj,0);
+  hymod->AddTrigger("HLT_Ele17_CaloIdVT_CaloIsoVT_TrkIdT_TrkIsoVT_SC8_Mass30_v3",kHLT_Ele17_CaloIdVT_CaloIsoVT_TrkIdT_TrkIsoVT_SC8_Mass30,"hltEle17CaloIdVTCaloIsoVTTrkIdTTrkIsoVTSC8TrackIsolFilter",kHLT_Ele17_CaloIdVT_CaloIsoVT_TrkIdT_TrkIsoVT_SC8_Mass30_EleObj,0,"hltEle17CaloIdVTCaloIsoVTTrkIdTTrkIsoVTSC8PMMassFilter",kHLT_Ele17_CaloIdVT_CaloIsoVT_TrkIdT_TrkIsoVT_SC8_Mass30_SCObj,0);
+  hymod->AddTrigger("HLT_Ele17_CaloIdVT_CaloIsoVT_TrkIdT_TrkIsoVT_SC8_Mass30_v4",kHLT_Ele17_CaloIdVT_CaloIsoVT_TrkIdT_TrkIsoVT_SC8_Mass30,"hltEle17CaloIdVTCaloIsoVTTrkIdTTrkIsoVTSC8TrackIsolFilter",kHLT_Ele17_CaloIdVT_CaloIsoVT_TrkIdT_TrkIsoVT_SC8_Mass30_EleObj,0,"hltEle17CaloIdVTCaloIsoVTTrkIdTTrkIsoVTSC8PMMassFilter",kHLT_Ele17_CaloIdVT_CaloIsoVT_TrkIdT_TrkIsoVT_SC8_Mass30_SCObj,0);
+  hymod->AddTrigger("HLT_Ele17_CaloIdVT_CaloIsoVT_TrkIdT_TrkIsoVT_SC8_Mass30_v5",kHLT_Ele17_CaloIdVT_CaloIsoVT_TrkIdT_TrkIsoVT_SC8_Mass30,"hltEle17CaloIdVTCaloIsoVTTrkIdTTrkIsoVTSC8TrackIsolFilter",kHLT_Ele17_CaloIdVT_CaloIsoVT_TrkIdT_TrkIsoVT_SC8_Mass30_EleObj,0,"hltEle17CaloIdVTCaloIsoVTTrkIdTTrkIsoVTSC8PMMassFilter",kHLT_Ele17_CaloIdVT_CaloIsoVT_TrkIdT_TrkIsoVT_SC8_Mass30_SCObj,0);
+  hymod->AddTrigger("HLT_Ele17_CaloIdVT_CaloIsoVT_TrkIdT_TrkIsoVT_SC8_Mass30_v6",kHLT_Ele17_CaloIdVT_CaloIsoVT_TrkIdT_TrkIsoVT_SC8_Mass30,"hltEle17CaloIdVTCaloIsoVTTrkIdTTrkIsoVTSC8TrackIsolFilter",kHLT_Ele17_CaloIdVT_CaloIsoVT_TrkIdT_TrkIsoVT_SC8_Mass30_EleObj,0,"hltEle17CaloIdVTCaloIsoVTTrkIdTTrkIsoVTSC8PMMassFilter",kHLT_Ele17_CaloIdVT_CaloIsoVT_TrkIdT_TrkIsoVT_SC8_Mass30_SCObj,0);
+  hymod->AddTrigger("HLT_Ele17_CaloIdVT_CaloIsoVT_TrkIdT_TrkIsoVT_Ele8_Mass30_v2",kHLT_Ele17_CaloIdVT_CaloIsoVT_TrkIdT_TrkIsoVT_Ele8_Mass30,"hltEle17CaloIdVTCaloIsoVTTrkIdTTrkIsoVTEle8TrackIsolFilter",kHLT_Ele17_CaloIdVT_CaloIsoVT_TrkIdT_TrkIsoVT_Ele8_Mass30_Ele1Obj,0,"hltEle17CaloIdVTCaloIsoVTTrkIdTTrkIsoVTEle8PMMassFilter",kHLT_Ele17_CaloIdVT_CaloIsoVT_TrkIdT_TrkIsoVT_Ele8_Mass30_Ele2Obj,0);
+  hymod->AddTrigger("HLT_Ele17_CaloIdVT_CaloIsoVT_TrkIdT_TrkIsoVT_Ele8_Mass30_v3",kHLT_Ele17_CaloIdVT_CaloIsoVT_TrkIdT_TrkIsoVT_Ele8_Mass30,"hltEle17CaloIdVTCaloIsoVTTrkIdTTrkIsoVTEle8TrackIsolFilter",kHLT_Ele17_CaloIdVT_CaloIsoVT_TrkIdT_TrkIsoVT_Ele8_Mass30_Ele1Obj,0,"hltEle17CaloIdVTCaloIsoVTTrkIdTTrkIsoVTEle8PMMassFilter",kHLT_Ele17_CaloIdVT_CaloIsoVT_TrkIdT_TrkIsoVT_Ele8_Mass30_Ele2Obj,0);
+  hymod->AddTrigger("HLT_Ele17_CaloIdVT_CaloIsoVT_TrkIdT_TrkIsoVT_Ele8_Mass30_v4",kHLT_Ele17_CaloIdVT_CaloIsoVT_TrkIdT_TrkIsoVT_Ele8_Mass30,"hltEle17CaloIdVTCaloIsoVTTrkIdTTrkIsoVTEle8TrackIsolFilter",kHLT_Ele17_CaloIdVT_CaloIsoVT_TrkIdT_TrkIsoVT_Ele8_Mass30_Ele1Obj,0,"hltEle17CaloIdVTCaloIsoVTTrkIdTTrkIsoVTEle8PMMassFilter",kHLT_Ele17_CaloIdVT_CaloIsoVT_TrkIdT_TrkIsoVT_Ele8_Mass30_Ele2Obj,0);
+  hymod->AddTrigger("HLT_Ele32_CaloIdL_CaloIsoVL_SC17_v1",kHLT_Ele32_CaloIdL_CaloIsoVL_SC17,"hltEle32CaloIdLCaloIsoVLSC17PixelMatchFilter",kHLT_Ele32_CaloIdL_CaloIsoVL_SC17_EleObj,0,"hltEle32CaloIdLCaloIsoVLSC17HEDoubleFilter",kHLT_Ele32_CaloIdL_CaloIsoVL_SC17_SCObj,0);
+  hymod->AddTrigger("HLT_Ele32_CaloIdL_CaloIsoVL_SC17_v2",kHLT_Ele32_CaloIdL_CaloIsoVL_SC17,"hltEle32CaloIdLCaloIsoVLSC17PixelMatchFilter",kHLT_Ele32_CaloIdL_CaloIsoVL_SC17_EleObj,0,"hltEle32CaloIdLCaloIsoVLSC17HEDoubleFilter",kHLT_Ele32_CaloIdL_CaloIsoVL_SC17_SCObj,0);
+  hymod->AddTrigger("HLT_Ele32_CaloIdL_CaloIsoVL_SC17_v3",kHLT_Ele32_CaloIdL_CaloIsoVL_SC17,"hltEle32CaloIdLCaloIsoVLSC17PixelMatchFilter",kHLT_Ele32_CaloIdL_CaloIsoVL_SC17_EleObj,0,"hltEle32CaloIdLCaloIsoVLSC17HEDoubleFilter",kHLT_Ele32_CaloIdL_CaloIsoVL_SC17_SCObj,0);
+  hymod->AddTrigger("HLT_Ele32_CaloIdT_CaloIsoT_TrkIdT_TrkIsoT_SC17_v1",kHLT_Ele32_CaloIdT_CaloIsoT_TrkIdT_TrkIsoT_SC17,"hltEle32CaloIdTCaloIsoTTrkIdTTrkIsoTSC17TrackIsolFilter",kHLT_Ele32_CaloIdT_CaloIsoT_TrkIdT_TrkIsoT_SC17_EleObj,0,"hltEle32CaloIdTCaloIsoTTrkIdTTrkIsoTSC17HEDoubleFilter",kHLT_Ele32_CaloIdT_CaloIsoT_TrkIdT_TrkIsoT_SC17_SCObj,0);
+  hymod->AddTrigger("HLT_Ele32_CaloIdT_CaloIsoT_TrkIdT_TrkIsoT_SC17_v2",kHLT_Ele32_CaloIdT_CaloIsoT_TrkIdT_TrkIsoT_SC17,"hltEle32CaloIdTCaloIsoTTrkIdTTrkIsoTSC17TrackIsolFilter",kHLT_Ele32_CaloIdT_CaloIsoT_TrkIdT_TrkIsoT_SC17_EleObj,0,"hltEle32CaloIdTCaloIsoTTrkIdTTrkIsoTSC17HEDoubleFilter",kHLT_Ele32_CaloIdT_CaloIsoT_TrkIdT_TrkIsoT_SC17_SCObj,0);
+  hymod->AddTrigger("HLT_Ele32_CaloIdT_CaloIsoT_TrkIdT_TrkIsoT_SC17_v3",kHLT_Ele32_CaloIdT_CaloIsoT_TrkIdT_TrkIsoT_SC17,"hltEle32CaloIdTCaloIsoTTrkIdTTrkIsoTSC17TrackIsolFilter",kHLT_Ele32_CaloIdT_CaloIsoT_TrkIdT_TrkIsoT_SC17_EleObj,0,"hltEle32CaloIdTCaloIsoTTrkIdTTrkIsoTSC17HEDoubleFilter",kHLT_Ele32_CaloIdT_CaloIsoT_TrkIdT_TrkIsoT_SC17_SCObj,0);
+  hymod->AddTrigger("HLT_Ele8_v1",kHLT_Ele8,"hltEle8PixelMatchFilter",kHLT_Ele8_EleObj);
+  hymod->AddTrigger("HLT_Ele8_v2",kHLT_Ele8,"hltEle8PixelMatchFilter",kHLT_Ele8_EleObj);
+  hymod->AddTrigger("HLT_Ele8_v3",kHLT_Ele8,"hltEle8PixelMatchFilter",kHLT_Ele8_EleObj);
+  hymod->AddTrigger("HLT_Ele8_v4",kHLT_Ele8,"hltEle8PixelMatchFilter",kHLT_Ele8_EleObj);
+  hymod->AddTrigger("HLT_Ele8_v5",kHLT_Ele8,"hltEle8PixelMatchFilter",kHLT_Ele8_EleObj);
+  hymod->AddTrigger("HLT_Ele8_v6",kHLT_Ele8,"hltEle8PixelMatchFilter",kHLT_Ele8_EleObj);
+  hymod->AddTrigger("HLT_Ele8_CaloIdL_TrkIdVL_v1",kHLT_Ele8_CaloIdL_TrkIdVL,"hltEle8CaloIdLTrkIdVLDphiFilter",kHLT_Ele8_CaloIdL_TrkIdVL_EleObj);
+  hymod->AddTrigger("HLT_Ele8_CaloIdL_TrkIdVL_v2",kHLT_Ele8_CaloIdL_TrkIdVL,"hltEle8CaloIdLTrkIdVLDphiFilter",kHLT_Ele8_CaloIdL_TrkIdVL_EleObj);
+  hymod->AddTrigger("HLT_Ele8_CaloIdL_TrkIdVL_v3",kHLT_Ele8_CaloIdL_TrkIdVL,"hltEle8CaloIdLTrkIdVLDphiFilter",kHLT_Ele8_CaloIdL_TrkIdVL_EleObj);
+  hymod->AddTrigger("HLT_Ele8_CaloIdL_TrkIdVL_v4",kHLT_Ele8_CaloIdL_TrkIdVL,"hltEle8CaloIdLTrkIdVLDphiFilter",kHLT_Ele8_CaloIdL_TrkIdVL_EleObj);
+  hymod->AddTrigger("HLT_Ele8_CaloIdL_TrkIdVL_v5",kHLT_Ele8_CaloIdL_TrkIdVL,"hltEle8CaloIdLTrkIdVLDphiFilter",kHLT_Ele8_CaloIdL_TrkIdVL_EleObj);
+  hymod->AddTrigger("HLT_Ele8_CaloIdL_TrkIdVL_v6",kHLT_Ele8_CaloIdL_TrkIdVL,"hltEle8CaloIdLTrkIdVLDphiFilter",kHLT_Ele8_CaloIdL_TrkIdVL_EleObj);
+  hymod->AddTrigger("HLT_Ele8_CaloIdL_CaloIsoVL_v1",kHLT_Ele8_CaloIdL_CaloIsoVL,"hltEle8CaloIdLCaloIsoVLPixelMatchFilter",kHLT_Ele8_CaloIdL_CaloIsoVL_EleObj);
+  hymod->AddTrigger("HLT_Ele8_CaloIdL_CaloIsoVL_v2",kHLT_Ele8_CaloIdL_CaloIsoVL,"hltEle8CaloIdLCaloIsoVLPixelMatchFilter",kHLT_Ele8_CaloIdL_CaloIsoVL_EleObj);
+  hymod->AddTrigger("HLT_Ele8_CaloIdL_CaloIsoVL_v3",kHLT_Ele8_CaloIdL_CaloIsoVL,"hltEle8CaloIdLCaloIsoVLPixelMatchFilter",kHLT_Ele8_CaloIdL_CaloIsoVL_EleObj);
+  hymod->AddTrigger("HLT_Ele8_CaloIdL_CaloIsoVL_v4",kHLT_Ele8_CaloIdL_CaloIsoVL,"hltEle8CaloIdLCaloIsoVLPixelMatchFilter",kHLT_Ele8_CaloIdL_CaloIsoVL_EleObj);
+  hymod->AddTrigger("HLT_Ele8_CaloIdL_CaloIsoVL_v5",kHLT_Ele8_CaloIdL_CaloIsoVL,"hltEle8CaloIdLCaloIsoVLPixelMatchFilter",kHLT_Ele8_CaloIdL_CaloIsoVL_EleObj);
+  hymod->AddTrigger("HLT_Ele8_CaloIdL_CaloIsoVL_v5",kHLT_Ele8_CaloIdL_CaloIsoVL,"hltEle8CaloIdLCaloIsoVLPixelMatchFilter",kHLT_Ele8_CaloIdL_CaloIsoVL_EleObj);
+  hymod->AddTrigger("HLT_Ele8_CaloIdT_TrkIdVL_CaloIsoVL_TrkIsoVL_v3",kHLT_Ele8_CaloIdT_TrkIdVL_CaloIsoVL_TrkIsoVL,"hltEle8TightIdLooseIsoTrackIsolFilter",kHLT_Ele8_CaloIdT_TrkIdVL_CaloIsoVL_TrkIsoVL_EleObj);
+  hymod->AddTrigger("HLT_Ele8_CaloIdT_TrkIdVL_CaloIsoVL_TrkIsoVL_v4",kHLT_Ele8_CaloIdT_TrkIdVL_CaloIsoVL_TrkIsoVL,"hltEle8TightIdLooseIsoTrackIsolFilter",kHLT_Ele8_CaloIdT_TrkIdVL_CaloIsoVL_TrkIsoVL_EleObj);
+  hymod->AddTrigger("HLT_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_v4",kHLT_Ele8_CaloIdT_TrkIdVL_CaloIsoVL_TrkIsoVL,"hltEle8TightIdLooseIsoTrackIsolFilter",kHLT_Ele8_CaloIdT_TrkIdVL_CaloIsoVL_TrkIsoVL_EleObj);
+  hymod->AddTrigger("HLT_Ele17_CaloIdL_CaloIsoVL_v1",kHLT_Ele17_CaloIdL_CaloIsoVL,"hltEle17CaloIdLCaloIsoVLPixelMatchFilter",kHLT_Ele17_CaloIdL_CaloIsoVL_EleObj);
+  hymod->AddTrigger("HLT_Ele17_CaloIdL_CaloIsoVL_v2",kHLT_Ele17_CaloIdL_CaloIsoVL,"hltEle17CaloIdLCaloIsoVLPixelMatchFilter",kHLT_Ele17_CaloIdL_CaloIsoVL_EleObj);
+  hymod->AddTrigger("HLT_Ele17_CaloIdL_CaloIsoVL_v3",kHLT_Ele17_CaloIdL_CaloIsoVL,"hltEle17CaloIdLCaloIsoVLPixelMatchFilter",kHLT_Ele17_CaloIdL_CaloIsoVL_EleObj);
+  hymod->AddTrigger("HLT_Ele17_CaloIdL_CaloIsoVL_v4",kHLT_Ele17_CaloIdL_CaloIsoVL,"hltEle17CaloIdLCaloIsoVLPixelMatchFilter",kHLT_Ele17_CaloIdL_CaloIsoVL_EleObj);
+  hymod->AddTrigger("HLT_Ele17_CaloIdL_CaloIsoVL_v5",kHLT_Ele17_CaloIdL_CaloIsoVL,"hltEle17CaloIdLCaloIsoVLPixelMatchFilter",kHLT_Ele17_CaloIdL_CaloIsoVL_EleObj);
+  hymod->AddTrigger("HLT_Ele17_CaloIdL_CaloIsoVL_v6",kHLT_Ele17_CaloIdL_CaloIsoVL,"hltEle17CaloIdLCaloIsoVLPixelMatchFilter",kHLT_Ele17_CaloIdL_CaloIsoVL_EleObj);
+  hymod->AddTrigger("HLT_Ele8_CaloIdL_CaloIsoVL_Jet40_v1",kHLT_Ele8_CaloIdL_CaloIsoVL_Jet40,"hltEle8CaloIdLCaloIsoVLPixelMatchFilter",kHLT_Ele8_CaloIdL_CaloIsoVL_Jet40_EleObj,0,"hltJet40Ele8CaloIdLCaloIsoVLRemoved",kHLT_Ele8_CaloIdL_CaloIsoVL_Jet40_JetObj,0);
+  hymod->AddTrigger("HLT_Ele8_CaloIdL_CaloIsoVL_Jet40_v2",kHLT_Ele8_CaloIdL_CaloIsoVL_Jet40,"hltEle8CaloIdLCaloIsoVLPixelMatchFilter",kHLT_Ele8_CaloIdL_CaloIsoVL_Jet40_EleObj,0,"hltJet40Ele8CaloIdLCaloIsoVLRemoved",kHLT_Ele8_CaloIdL_CaloIsoVL_Jet40_JetObj,0);
+  hymod->AddTrigger("HLT_Ele8_CaloIdL_CaloIsoVL_Jet40_v3",kHLT_Ele8_CaloIdL_CaloIsoVL_Jet40,"hltEle8CaloIdLCaloIsoVLPixelMatchFilter",kHLT_Ele8_CaloIdL_CaloIsoVL_Jet40_EleObj,0,"hltJet40Ele8CaloIdLCaloIsoVLRemoved",kHLT_Ele8_CaloIdL_CaloIsoVL_Jet40_JetObj,0);
+  hymod->AddTrigger("HLT_Ele8_CaloIdL_CaloIsoVL_Jet40_v4",kHLT_Ele8_CaloIdL_CaloIsoVL_Jet40,"hltEle8CaloIdLCaloIsoVLPixelMatchFilter",kHLT_Ele8_CaloIdL_CaloIsoVL_Jet40_EleObj,0,"hltJet40Ele8CaloIdLCaloIsoVLRemoved",kHLT_Ele8_CaloIdL_CaloIsoVL_Jet40_JetObj,0);
+  hymod->AddTrigger("HLT_Ele8_CaloIdL_CaloIsoVL_Jet40_v5",kHLT_Ele8_CaloIdL_CaloIsoVL_Jet40,"hltEle8CaloIdLCaloIsoVLPixelMatchFilter",kHLT_Ele8_CaloIdL_CaloIsoVL_Jet40_EleObj,0,"hltJet40Ele8CaloIdLCaloIsoVLRemoved",kHLT_Ele8_CaloIdL_CaloIsoVL_Jet40_JetObj,0);
+  hymod->AddTrigger("HLT_Ele8_CaloIdL_CaloIsoVL_Jet40_v6",kHLT_Ele8_CaloIdL_CaloIsoVL_Jet40,"hltEle8CaloIdLCaloIsoVLPixelMatchFilter",kHLT_Ele8_CaloIdL_CaloIsoVL_Jet40_EleObj,0,"hltJet40Ele8CaloIdLCaloIsoVLRemoved",kHLT_Ele8_CaloIdL_CaloIsoVL_Jet40_JetObj,0);
+  hymod->AddTrigger("HLT_Photon20_CaloIdVT_IsoT_Ele8_CaloIdL_CaloIsoVL_v1",kHLT_Photon20_CaloIdVT_IsoT_Ele8_CaloIdL_CaloIsoVL,"hltPhoton20CaloIdVTIsoTTrackIsoFilter",kHLT_Photon20_CaloIdVT_IsoT_Ele8_CaloIdL_CaloIsoVL_PhoObj,0,"hltEle8CaloIdLCaloIsoVLNoL1SeedPixelMatchFilter",kHLT_Photon20_CaloIdVT_IsoT_Ele8_CaloIdL_CaloIsoVL_EleObj,0);
+  hymod->AddTrigger("HLT_Photon20_CaloIdVT_IsoT_Ele8_CaloIdL_CaloIsoVL_v2",kHLT_Photon20_CaloIdVT_IsoT_Ele8_CaloIdL_CaloIsoVL,"hltPhoton20CaloIdVTIsoTTrackIsoFilter",kHLT_Photon20_CaloIdVT_IsoT_Ele8_CaloIdL_CaloIsoVL_PhoObj,0,"hltEle8CaloIdLCaloIsoVLNoL1SeedPixelMatchFilter",kHLT_Photon20_CaloIdVT_IsoT_Ele8_CaloIdL_CaloIsoVL_EleObj,0);
+  hymod->AddTrigger("HLT_Photon20_CaloIdVT_IsoT_Ele8_CaloIdL_CaloIsoVL_v3",kHLT_Photon20_CaloIdVT_IsoT_Ele8_CaloIdL_CaloIsoVL,"hltPhoton20CaloIdVTIsoTTrackIsoFilter",kHLT_Photon20_CaloIdVT_IsoT_Ele8_CaloIdL_CaloIsoVL_PhoObj,0,"hltEle8CaloIdLCaloIsoVLNoL1SeedPixelMatchFilter",kHLT_Photon20_CaloIdVT_IsoT_Ele8_CaloIdL_CaloIsoVL_EleObj,0);
+  hymod->AddTrigger("HLT_Photon20_CaloIdVT_IsoT_Ele8_CaloIdL_CaloIsoVL_v4",kHLT_Photon20_CaloIdVT_IsoT_Ele8_CaloIdL_CaloIsoVL,"hltPhoton20CaloIdVTIsoTTrackIsoFilter",kHLT_Photon20_CaloIdVT_IsoT_Ele8_CaloIdL_CaloIsoVL_PhoObj,0,"hltEle8CaloIdLCaloIsoVLNoL1SeedPixelMatchFilter",kHLT_Photon20_CaloIdVT_IsoT_Ele8_CaloIdL_CaloIsoVL_EleObj,0);
+  hymod->AddTrigger("HLT_Photon20_CaloIdVT_IsoT_Ele8_CaloIdL_CaloIsoVL_v5",kHLT_Photon20_CaloIdVT_IsoT_Ele8_CaloIdL_CaloIsoVL,"hltPhoton20CaloIdVTIsoTTrackIsoFilter",kHLT_Photon20_CaloIdVT_IsoT_Ele8_CaloIdL_CaloIsoVL_PhoObj,0,"hltEle8CaloIdLCaloIsoVLNoL1SeedPixelMatchFilter",kHLT_Photon20_CaloIdVT_IsoT_Ele8_CaloIdL_CaloIsoVL_EleObj,0);
+  hymod->AddTrigger("HLT_Photon20_CaloIdVT_IsoT_Ele8_CaloIdL_CaloIsoVL_v6",kHLT_Photon20_CaloIdVT_IsoT_Ele8_CaloIdL_CaloIsoVL,"hltPhoton20CaloIdVTIsoTTrackIsoFilter",kHLT_Photon20_CaloIdVT_IsoT_Ele8_CaloIdL_CaloIsoVL_PhoObj,0,"hltEle8CaloIdLCaloIsoVLNoL1SeedPixelMatchFilter",kHLT_Photon20_CaloIdVT_IsoT_Ele8_CaloIdL_CaloIsoVL_EleObj,0);
+
+  //
+  // SingleElectron
+  //
+  hymod->AddTrigger("HLT_Ele27_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_v1",kHLT_Ele27_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT,"hltEle27CaloIdTCaloIsoTTrkIdTTrkIsoTTrackIsoFilter",kHLT_Ele27_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_EleObj);
+  hymod->AddTrigger("HLT_Ele27_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_v2",kHLT_Ele27_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT,"hltEle27CaloIdTCaloIsoTTrkIdTTrkIsoTTrackIsoFilter",kHLT_Ele27_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_EleObj);
+  hymod->AddTrigger("HLT_Ele27_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_v3",kHLT_Ele27_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT,"hltEle27CaloIdTCaloIsoTTrkIdTTrkIsoTTrackIsoFilter",kHLT_Ele27_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_EleObj);
+  hymod->AddTrigger("HLT_Ele32_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_v1",kHLT_Ele32_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT,"hltEle32CaloIdTCaloIsoTTrkIdTTrkIsoTTrackIsoFilter",kHLT_Ele32_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_EleObj);
+  hymod->AddTrigger("HLT_Ele32_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_v2",kHLT_Ele32_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT,"hltEle32CaloIdTCaloIsoTTrkIdTTrkIsoTTrackIsoFilter",kHLT_Ele32_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_EleObj);
+  hymod->AddTrigger("HLT_Ele32_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_v3",kHLT_Ele32_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT,"hltEle32CaloIdVTCaloIsoTTrkIdTTrkIsoTTrackIsoFilter",kHLT_Ele32_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_EleObj);
+
   
   hymod->SetPrintHLT(kFALSE); // print HLT table at start of analysis?
   

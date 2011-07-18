@@ -1,0 +1,6 @@
+# <file> <JSON>
+#==============
+#/tmp/dkralph/htt-41/r11a-del-pr-v1_ntuple.root /home/dkralph/json/Cert_160404-163869_7TeV_PromptReco_Collisions11_JSON.txt
+#/tmp/dkralph/htt/r11a-del-pr-v2_ntuple.root /home/dkralph/json/Cert_160404-163869_7TeV_PromptReco_Collisions11_JSON.txt
+/tmp/dkralph/htt/r11a-del-m10-v1_ntuple.root /home/dkralph/json/Cert_160404-167151_7TeV_PromptReco_Collisions11_JSON.txt
+/tmp/dkralph/htt/r11a-del-pr-v4_ntuple.root  /home/dkralph/json/Cert_160404-167151_7TeV_PromptReco_Collisions11_JSON.txt

@@ -9,10 +9,11 @@
 config=hypha.config
 if [ "` hostname | grep '\.mit\.edu'`" ]; then
     catalog=/home/cmsprod/catalog
+    outputdir=/scratch/$USER/htt
 else
     catalog=/home/mitprod/catalog
+    outputdir=/data/blue/$USER/htt
 fi
-outputdir=/scratch/$USER/htt
 
 if [ ! "$CMSSW_BASE" ] || [ ! "$MIT_VERS" ]; then
   echo "-------> error: define cms environment."

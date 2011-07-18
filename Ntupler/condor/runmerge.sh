@@ -1,17 +1,24 @@
 #!/bin/bash
 
 config=hypha.config
-ntupledir=/scratch/$USER/htt
+if [ "` hostname | grep '\.mit\.edu'`" ]; then
+    ntupledir=/scratch/$USER/htt
+else
+    ntupledir=/data/blue/$USER/htt
+fi
 
 for dataset in `cat $config | grep -v ^# | tr -s ' ' | cut -d' ' -f 1`; do
-  if [ -s $ntupledir/${dataset}_ntuple.root ]; then
-    echo "!!--->merged file ${dataset}_ntuple.root already exists."
+  if [ -s $ntupledir/${dataset}_ntuple.root ] || [ -s $ntupledir/${dataset}_ntuple.json ]; then
+    echo "!!--->merged files ${dataset}_ntuple.{root,json} already exists."
   else
     echo "merging..."
-    echo $ntupledir/${dataset}_ntuple.root   > merge.txt
+    echo $ntupledir/${dataset}_ntuple.root    > merge.txt
     ls $ntupledir/${dataset}_????_ntuple.root >>merge.txt
     eval `scramv1 runtime -sh`
-    root -b -q ../macros/MergeNtuples.C+\(\"merge.txt\"\)
+    root -b -l -q ../macros/MergeNtuples.C+\(\"merge.txt\"\)
+    if [ "`echo $dataset | grep 'r11\|r10'`" ]; then
+	./mergeJSON.sh merge.txt
+    fi
     rm merge.txt
   fi
 done

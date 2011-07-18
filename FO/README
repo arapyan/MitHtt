@@ -1,0 +1,20 @@
+-see run.sh
+
+-selectEleFO.C selects fakeable objects from a double electron ntuple and writes them
+   to a flat ntuple in the specified directory (see data_smu.fo)
+
+-computeFakeRate.C reads this flat ntuple and computes the fake rate as a function of
+    pt and eta, and makes plots and and a root file with graphs in the output directory.
+    Configured with elefr.input, with format:
+          output dir
+	  %
+	  output root file
+	  %
+	  ...
+	  binnings
+	  ...
+
+-predictFakesMuEle.C reads the fake rates from this root file and applies them to
+    a mueg ntuple, and writes an ntuple that can be read by plotEmu.C, so I move
+    this ntuple to the selection directory along with the selections from selectEmu.C
+    Input files and json are just listed at the top of predictFakseMuEle.C
