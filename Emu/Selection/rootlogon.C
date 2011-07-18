@@ -1,6 +1,7 @@
 {  
   if(gSystem->Getenv("CMSSW_VERSION")) {
-    TString rfitpath("/server/02a/cmsprod/cmssoft/slc5_amd64_gcc434/lcg/roofit/5.28.00a-cms3/include/");
+    TString rfitpath("/afs/cern.ch/cms/sw/$SCRAM_ARCH/lcg/roofit/5.26.00-cms5/include");
+    // TString rfitpath("/server/02a/cmsprod/cmssoft/slc5_amd64_gcc434/lcg/roofit/5.28.00a-cms3/include/");
     TString path = gSystem->GetIncludePath();
     path += "-I. -I$ROOTSYS/src -I";
     path += rfitpath;
@@ -15,7 +16,7 @@
     gROOT->Macro("$CMSSW_BASE/src/Common/CPlot.cc+");
     gROOT->Macro("$CMSSW_BASE/src/Common/MitStyleRemix.cc+");
     gSystem->Load("$CMSSW_BASE/lib/$SCRAM_ARCH/libMitHttNtupler.so");  
-    gSystem->Load("$CMSSW_BASE/lib/$SCRAM_ARCH/libMitPhysicsFakeMods.so");  
+    // gSystem->Load("$CMSSW_BASE/lib/$SCRAM_ARCH/libMitPhysicsFakeMods.so");  
   }
   // else {
   //   cout << "initializing with hardcoded CMSSW_BASE: " << endl;

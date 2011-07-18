@@ -381,3 +381,69 @@ htt120mssm &  $     37.607 \pm  1.12$ & $ 36.000 \pm  1.10$ & $ 31.292 \pm  1.02
    vbf_125     1.764 +/-  0.051     1.577 +/-  0.048     1.005 +/-  0.038     0.089 +/-  0.010     0.020 +/-  0.005
    vbf_135     1.898 +/-  0.054     1.689 +/-  0.051     1.111 +/-  0.041     0.103 +/-  0.011     0.028 +/-  0.006
    vbf_145     2.176 +/-  0.091     1.975 +/-  0.087     1.350 +/-  0.072     0.101 +/-  0.016     0.038 +/-  0.012
+
+
+
+#----------------------------------------------------------------------------------------
+processing data:
+        /tmp/dkralph/htt/r11a-mueg-m10-v1_emu_skim.root...      1068.00 +/- 32.68   
+    Yields for data:       1068.00
+
+processing zmm:
+        /tmp/dkralph/htt/p11-zmmm20-v1g1-pu_ntuple.root...         4.36 +/- 1.03    
+        /tmp/dkralph/htt/p11-zmm1020-v1g1-pu_ntuple.root...        0.00 +/- 0.00    
+    Yields for 0.19/fb:      4.36
+
+processing ewk:
+        /tmp/dkralph/htt/p11-stop-v1g1-pu_ntuple.root...           0.05 +/- 0.02    
+        /tmp/dkralph/htt/p11-ttop-v1g1-pu_ntuple.root...           0.88 +/- 0.33    
+        /tmp/dkralph/htt/p11-wtop-v1g1-pu_ntuple.root...          26.93 +/- 0.40    
+        /tmp/dkralph/htt/p11-vvj-v1g1-pu_ntuple.root...           73.68 +/- 0.35    
+        /tmp/dkralph/htt/p11-ggww-v1g1-pu_ntuple.root...           3.07 +/- 0.04    
+        /tmp/dkralph/htt/p11-wz-v1g1-pu_ntuple.root...             6.95 +/- 0.13    
+        /tmp/dkralph/htt/p11-zz-v1g1-pu_ntuple.root...             1.46 +/- 0.03    
+    Yields for 0.19/fb:    113.02
+
+processing ttbar:
+        /tmp/dkralph/htt/p11-ttj-v1g1-pu_ntuple.root...          383.46 +/- 3.82    
+    Yields for 0.19/fb:    383.46
+
+processing ztt:
+        /tmp/dkralph/htt/p11-zttm20-v1g1-pu_ntuple.root...       456.03 +/- 10.09   
+        /tmp/dkralph/htt/p11-ztt1020-v1g1-pu_ntuple.root...        0.00 +/- 0.00    
+    Yields for 0.19/fb:    456.03
+
+processing htt_mssm_120:
+        /tmp/dkralph/htt/s11-h120tt-ggh-v1g1-pu_ntuple.root...    13.65 +/- 0.51    
+        /tmp/dkralph/htt/s11-h120tt-bbh-v1g1-pu_ntuple.root...    20.13 +/- 0.68    
+    Yields for 0.19/fb:     33.78
+
+processing htt_sm_120:
+        /tmp/dkralph/htt/s11-h120tt-gf-v1g1-pu_ntuple.root...      1.44 +/- 0.05    
+        /tmp/dkralph/htt/s11-h120tt-vbf-v1g1-pu_ntuple.root...     0.16 +/- 0.00    
+    Yields for 0.19/fb:      1.61
+
+
+ <-> Output saved in /scratch/dkralph/htt/selections/full/
+
+#----------------------------------------------------------------------------------------
+# pt 10:
+processing ztt:
+        /tmp/dkralph/htt/p11-zttm20-v1g1-pu_ntuple.root...       656.46 +/- 12.05   
+           ---> selected events with z mass < 50:        21 (out of         1994719)
+        /tmp/dkralph/htt/p11-ztt1020-v1g1-pu_ntuple.root...        0.32 +/- 0.32    
+           ---> selected events with z mass < 50:         1 (out of         1579500)
+    Yields for 0.19/fb:    656.78
+
+processing htt_mssm_120:
+        /tmp/dkralph/htt/s11-h120tt-ggh-v1g1-pu_ntuple.root...    18.33 +/- 0.58    
+        /tmp/dkralph/htt/s11-h120tt-bbh-v1g1-pu_ntuple.root...    26.39 +/- 0.78    
+    Yields for 0.19/fb:     44.72
+
+processing htt_sm_120:
+        /tmp/dkralph/htt/s11-h120tt-gf-v1g1-pu_ntuple.root...      1.92 +/- 0.06    
+        /tmp/dkralph/htt/s11-h120tt-vbf-v1g1-pu_ntuple.root...     0.21 +/- 0.01    
+    Yields for 0.19/fb:      2.13
+
+
+ <-> Output saved in /scratch/dkralph/htt/selections/pt10/
