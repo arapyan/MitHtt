@@ -1,0 +1,18 @@
+-see run.sh
+-selectee and plotee work just the same as in emu -- except all plotee does that we care about
+      is output a flat ntuple with the variables we need to do the energy scale.
+
+-fit.conf configures the actual fit for the mass, which is done by escalefit.C
+  -format: input ntuple
+           %
+           output dir
+	   %
+	   etabins      deltaeta        etamin
+
+-run escalefit.C on data and zee MC
+-this creates root files in the specified directory with the MC and data scales
+    and resolutions.
+-EScale.hh reads these root files (you have to tell it which directory to get them from) and
+     applies the corrections with the pt(Double_t eta) function;
+-testCorrection.C reads the flat ntuples and corrections from the directory you give, and
+     applies the corrections to the MC, and writes some plots
