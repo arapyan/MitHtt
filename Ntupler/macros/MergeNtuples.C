@@ -43,6 +43,7 @@ void MergeNtuples(const TString input)
   }
   cout << "Merging..." << endl;
   chain.Merge(outfilename,"fast");
+  std::cout << "Merged events: " << chain.GetEntries() << endl;
   std::cout << outfilename << " created!" << std::endl;
   
   gBenchmark->Show("MergeNtuples");

@@ -13,26 +13,28 @@
 #include <string>
 
 // define structures to read in ntuple
-#include "HiggsAna/Ntupler/interface/HiggsAnaDefs.hh"
-#include "HiggsAna/Ntupler/interface/TGenInfo.hh"
-#include "HiggsAna/Ntupler/interface/TEventInfo.hh"
-#include "HiggsAna/Ntupler/interface/TMuon.hh"
-#include "HiggsAna/Ntupler/interface/TElectron.hh"
-#include "HiggsAna/Ntupler/interface/TPhoton.hh"
-#include "HiggsAna/Ntupler/interface/TJet.hh"
-#include "HiggsAna/Ntupler/interface/TVertex.hh"
+#include "MitHtt/Ntupler/interface/HiggsAnaDefs.hh"
+#include "MitHtt/Ntupler/interface/TGenInfo.hh"
+#include "MitHtt/Ntupler/interface/TEventInfo.hh"
+#include "MitHtt/Ntupler/interface/TMuon.hh"
+#include "MitHtt/Ntupler/interface/TElectron.hh"
+#include "MitHtt/Ntupler/interface/TPhoton.hh"
+#include "MitHtt/Ntupler/interface/TJet.hh"
+#include "MitHtt/Ntupler/interface/TVertex.hh"
 
 // lumi section selection with JSON files
 #include "MitAna/DataCont/interface/RunLumiRangeMap.h"
 #endif
 
-//#define _USEGEN_
 
 
 // Main macro function
 //--------------------------------------------------------------------------------------------------
 void SkimNtuples(const TString input = "skim.input") 
 {
+  
+#define _USEGEN_
+
   gBenchmark->Start("SkimNtuples");
   
   TString outfilename;          // output of skimming 
@@ -125,7 +127,7 @@ void SkimNtuples(const TString input = "skim.input")
             
       Bool_t keep = kFALSE;
       //if(gen->id==EGenType::kWW) {
-      if((electronArr->GetEntriesFast() + muonArr->GetEntriesFast())>1) {
+      if((electronArr->GetEntriesFast() > 0) && (muonArr->GetEntriesFast() > 0)) {
       //if(muonArr->GetEntriesFast()>0) {
         keep = kTRUE;
       }

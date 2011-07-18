@@ -20,6 +20,7 @@
 #include "MitAna/DataTree/interface/StableData.h"
 #include "MitCommon/MathTools/interface/MathUtils.h"
 #include "MitPhysics/Utils/interface/ElectronTools.h"
+#include "JetMETCorrections/Objects/interface/JetCorrectionsRecord.h"
 #include "CondFormats/JetMETObjects/interface/JetCorrectorParameters.h"
 #include <TTree.h>
 #include <TFile.h>
@@ -39,16 +40,15 @@ HyphaMod::HyphaMod(const char *name, const char *title):
   fMCEvtInfoName (Names::gkMCEvtInfoBrn),
   fMuonName      (Names::gkMuonBrn),
   fElectronName  (Names::gkElectronBrn),
-  fPrimVtxName   ("DAPrimaryVertexes"),
+  fPrimVtxName   (Names::gkPVBrn),
   fBeamSpotName  (Names::gkBeamSpotBrn),
   fPFJetName     (Names::gkPFJetBrn),
   fPhotonName    (Names::gkPhotonBrn),
   fTrigMaskName  (Names::gkHltBitBrn),
-  fTCMetName     ("TCMet"),
   fPFMetName     ("PFMet"),
   fConversionName(Names::gkMvfConversionBrn),
-  fPileupName    ("PileupInfo"),
-  fPUEnergyDensityName("Rho"),
+  fPileupName    (Names::gkPileupInfoBrn),
+  fPUEnergyDensityName(Names::gkPileupEnergyDensityBrn),
   fPFCandidateName(Names::gkPFCandidatesBrn),
   fParticles     (0),
   fMCEvtInfo     (0),
@@ -59,7 +59,6 @@ HyphaMod::HyphaMod(const char *name, const char *title):
   fPFJets        (0),
   fPhotons       (0),  
   fTrigMask      (0),
-  fTCMet         (0),
   fPFMet         (0),
   fConversions   (0),
   fPileup        (0),
@@ -84,7 +83,8 @@ HyphaMod::HyphaMod(const char *name, const char *title):
   fMaxAbsZ       (24),
   fMaxRho        (2),
   fEventTree     (0),
-  fJetCorrector  (0)
+  fJetCorrector  (0),
+  fJetUnc       (0)
 {
   // Constructor
   
@@ -123,7 +123,6 @@ void HyphaMod::SlaveBegin()
   ReqBranch(fBeamSpotName,        fBeamSpot);
   ReqBranch(fPFJetName,           fPFJets);
   ReqBranch(fTrigMaskName,        fTrigMask);
-  ReqBranch(fTCMetName,           fTCMet);
   ReqBranch(fPFMetName,           fPFMet);
   ReqBranch(fPhotonName,          fPhotons);
   ReqBranch(fConversionName,      fConversions);
@@ -159,23 +158,45 @@ void HyphaMod::SlaveBegin()
   fEventTree->Branch("PFJet",   &fPFJetArr);
   fEventTree->Branch("Photon",  &fPhotonArr);
   fEventTree->Branch("PV",      &fPVArr);
+
+  // fTauTree = new TTree("Taus","Taus");
+  // fTauTree->Branch("tau1",&fTau1);
+  // fTauTree->Branch("tau2",&fTau2);
   
   //
   // Set up jet corrections for PF jets
   //
-  assert(getenv("src") != NULL);
-  string path(getenv("src"));
-  path += "/MitPhysics/data/";
-
   std::vector<JetCorrectorParameters> correctionParameters;
-  correctionParameters.push_back(JetCorrectorParameters(   (path+"START38_V13_AK5PF_L2Relative.txt").c_str()));
-  correctionParameters.push_back(JetCorrectorParameters(   (path+"START38_V13_AK5PF_L3Absolute.txt").c_str()));
-  if(fIsData)
-    correctionParameters.push_back(JetCorrectorParameters( (path+"START38_V13_AK5PF_L2L3Residual.txt").c_str()));
+  for(UInt_t icorr=0; icorr<fJetCorrParsv.size(); icorr++)
+    correctionParameters.push_back(JetCorrectorParameters(fJetCorrParsv[icorr].Data()));
     
-  //initialize jet corrector class 
+  // initialize jet corrector class
   fJetCorrector = new FactorizedJetCorrector(correctionParameters);
+
+  // initialize jet uncertainties
+  JetCorrectorParameters param(string("/home/dkralph/cms/cmssw/022/CMSSW_4_2_4_patch1/src/MitPhysics/data/START42_V12_AK5PF_Uncertainty.txt"));
+  fJetUnc = new JetCorrectionUncertainty(param);
+
+  // setup selecting with JSON file, if necessary
+  fhasJSON = fJSONv.size() > 0;
+  for(UInt_t i=0; i<fJSONv.size(); i++) {
+    frlrm.AddJSONFile(fJSONv[i].Data());
+  }
+
+  fLastRunLumi = RunLumiRangeMap::RunLumiPairType(0,0);
 }
+
+// instantiate the jec uncertainty object param are the jet corrector parameters
+// that you usually get form the jes correction file (in analogy to the factorized jet corrector)
+// scaledJet in this case was a reco::Jet, you just multiply the p4 I guess
+// scaledJet.scaleEnergy( 1+jetMet);
+
+
+// The JetUncertainties class itself:
+// http://cmssw.cvs.cern.ch/cgi-bin/cmssw.cgi/CMSSW/CondFormats/JetMETObjects/interface/JetCorrectionUncertainty.h?revision=1.5&view=markup
+
+
+
 
 //--------------------------------------------------------------------------------------------------
 void HyphaMod::SlaveTerminate()
@@ -195,6 +216,14 @@ void HyphaMod::SlaveTerminate()
   delete fPVArr;
   
   delete fJetCorrector;
+  delete fJetUnc;
+
+  //
+  // dump json file
+  //
+  TString jsonfname = fOutputName.ReplaceAll("root","json");
+  if(fIsData)
+    fRunLumiSet.DumpJSONFile(jsonfname.Data());
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -216,6 +245,12 @@ void HyphaMod::EndRun()
 //--------------------------------------------------------------------------------------------------
 void HyphaMod::Process()
 {
+  RunLumiRangeMap::RunLumiPairType rl(GetEventHeader()->RunNum(), GetEventHeader()->LumiSec());
+  if(fhasJSON && !frlrm.HasRunLumi(rl)) return;  // not certified run? Skip to next event...
+  if(rl!=fLastRunLumi) {
+    fLastRunLumi = rl;
+    fRunLumiSet.Add(rl);
+  }
 
   //
   // Load branches
@@ -228,7 +263,6 @@ void HyphaMod::Process()
   LoadBranch(fBeamSpotName);
   LoadBranch(fPFJetName);
   LoadBranch(fTrigMaskName);
-  LoadBranch(fTCMetName);
   LoadBranch(fPFMetName); 
   LoadBranch(fPhotonName);
   LoadBranch(fConversionName);
@@ -251,7 +285,7 @@ void HyphaMod::Process()
   // Get HLT info. Trigger objects can be matched by name to the corresponding trigger that passed.
   // note: TriggerName::Id() is bambu numbering scheme, fTriggerIdsv[itrig] is kevin's
   //
-  UInt_t trigbits=0;
+  ULong_t trigbits=0;
   if(HasHLTInfo()) {
     const TriggerTable *hltTable = GetHLTTable();
     assert(hltTable);
@@ -354,7 +388,6 @@ void HyphaMod::Process()
     FillElectron(ele);  // fill electron data object
   }
   
-  
   //
   // Loop through jets
   //
@@ -362,20 +395,20 @@ void HyphaMod::Process()
   for(UInt_t i=0; i<fPFJets->GetEntries(); ++i) {
     const PFJet *jet = fPFJets->At(i);
 
-    assert(0);
     const FourVectorM rawMom = jet->RawMom();
+
     fJetCorrector->setJetEta(rawMom.Eta());
     fJetCorrector->setJetPt(rawMom.Pt());
     fJetCorrector->setJetPhi(rawMom.Phi());
     fJetCorrector->setJetE(rawMom.E());
-    fJetCorrector->setJetEMF(-99.0);
+    fJetCorrector->setRho(fPUEnergyDensity->At(0)->RhoHighEta());
+    fJetCorrector->setJetA(jet->JetArea());
+    fJetCorrector->setJetEMF(-99.0);     
     
     // keep all jets above specified threshold (after energy correction)
     // and all jets with valid b-tag value (Track Counting High Efficiency method default is -100)
-    Double_t rho     = fPUEnergyDensity->At(0)->RhoHighEta();
-    Double_t jetArea = jet->JetArea();
     Double_t correction = fJetCorrector->getCorrection();
-    Double_t pt = (rawMom.Pt()-rho*jetArea)*correction;
+    Double_t pt = rawMom.Pt()*correction;
     if(pt > fJetPtMin || (jet->TrackCountingHighEffBJetTagsDisc() != -100)) {
 
       if(jet->E()==0) continue;
@@ -402,16 +435,12 @@ void HyphaMod::Process()
   //
   // Compute MET
   //
-  TLorentzVector tcmet; tcmet.SetPxPyPzE(fTCMet->At(0)->Mex(),fTCMet->At(0)->Mey(),0,0);
   TLorentzVector pfmet; pfmet.SetPxPyPzE(fPFMet->At(0)->Mex(),fPFMet->At(0)->Mey(),0,0);
   Double_t trkMetx=0, trkMety=0, trkSumET=0;
-  Double_t trkneuMetx=0, trkneuMety=0, trkneuSumET=0;  
    
   assert(fPFCandidates);
   for(UInt_t i=0; i<fPFCandidates->GetEntries(); ++i) {
     const Double_t trkDzCut  = 0.1;
-    const Double_t neuEtaCut = 3;
-    const Double_t neuPtCut  = 2;
     
     const PFCandidate *pfcand = fPFCandidates->At(i);
     if( (pfcand->HasTrackerTrk() && (fabs(pfcand->TrackerTrk()->DzCorrected(fVertex))<trkDzCut)) ||
@@ -420,28 +449,25 @@ void HyphaMod::Process()
       trkMetx  -= pfcand->Px();
       trkMety  -= pfcand->Py();
       trkSumET += pfcand->Pt();
-      trkneuMetx  -= pfcand->Px();
-      trkneuMety  -= pfcand->Py();
-      trkneuSumET += pfcand->Pt();
-    }
-    
-    if((pfcand->PFType()==PFCandidate::eNeutralHadron || pfcand->PFType()==PFCandidate::eGamma) && 
-       (fabs(pfcand->Eta())<neuEtaCut) && (pfcand->Pt()>neuPtCut)) {
-      trkneuMetx  -= pfcand->Px();
-      trkneuMety  -= pfcand->Py();
-      trkneuSumET += pfcand->Pt();
     }
   }
-  TLorentzVector trkmet;    trkmet.SetPxPyPzE(trkMetx,trkMety,0,0);
-  TLorentzVector trkneumet; trkneumet.SetPxPyPzE(trkneuMetx,trkneuMety,0,0);
-        
+  TLorentzVector trkmet; trkmet.SetPxPyPzE(trkMetx,trkMety,0,0);
+
+  Int_t npu = -1;
+  if(!fIsData) {
+    for(UInt_t i=0;i<fPileup->GetEntries();i++) {
+      if(fPileup->At(i)->GetBunchCrossing() == 0)
+	npu = fPileup->At(i)->GetPU_NumInteractions();
+    }
+    assert(npu>=0);
+  }  
   //
   // Fill event info tree
   //    
   fEventInfo.runNum       = GetEventHeader()->RunNum();
   fEventInfo.evtNum       = GetEventHeader()->EvtNum();
   fEventInfo.lumiSec      = GetEventHeader()->LumiSec();
-  fEventInfo.nPU          = fIsData ? 0 : fPileup->At(0)->GetPU_NumInteractions();
+  fEventInfo.nPU          = fIsData ? 0 : npu;
   fEventInfo.triggerBits  = trigbits;
   fEventInfo.pvx          = fVertex.X();
   fEventInfo.pvy          = fVertex.Y();
@@ -449,18 +475,12 @@ void HyphaMod::Process()
   fEventInfo.bsx          = bsx;
   fEventInfo.bsy          = bsy;
   fEventInfo.bsz          = bsz;
-  fEventInfo.tcMET        = tcmet.Pt();
-  fEventInfo.tcMETphi     = tcmet.Phi();
-  fEventInfo.tcSumET      = fTCMet->At(0)->SumEt();
   fEventInfo.pfMET        = pfmet.Pt();
   fEventInfo.pfMETphi     = pfmet.Phi();
   fEventInfo.pfSumET      = fPFMet->At(0)->SumEt();
   fEventInfo.trkMET       = trkmet.Pt();
   fEventInfo.trkMETphi    = trkmet.Phi();
   fEventInfo.trkSumET     = trkSumET;
-  fEventInfo.trkneuMET    = trkneumet.Pt();
-  fEventInfo.trkneuMETphi = trkneumet.Phi();
-  fEventInfo.trkneuSumET  = trkneuSumET;
   fEventInfo.rho          = fPUEnergyDensity->At(0)->RhoHighEta();
   fEventInfo.hasGoodPV    = hasGoodPV;
   
@@ -615,14 +635,23 @@ void HyphaMod::FillJet(const PFJet *jet)
   fJetCorrector->setJetPt(rawMom.Pt());
   fJetCorrector->setJetPhi(rawMom.Phi());
   fJetCorrector->setJetE(rawMom.E());
+  fJetCorrector->setRho(fPUEnergyDensity->At(0)->RhoHighEta());
+  fJetCorrector->setJetA(jet->JetArea());
   fJetCorrector->setJetEMF(-99.0);
-  
-  Double_t rho     = fPUEnergyDensity->At(0)->RhoHighEta();
-  Double_t jetArea = jet->JetArea();
-  pPFJet->pt   = (rawMom.Pt()-rho*jetArea)*(fJetCorrector->getCorrection());
+
+  fJetUnc->setJetPt(rawMom.Pt());
+  fJetUnc->setJetEta(rawMom.Eta());
+  // this is an up shift, down shift have false as argument
+  Float_t hierr  = fJetUnc->getUncertainty(true);
+  // fJetUnc->setJetPt(rawMom.Pt());
+  // fJetUnc->setJetEta(rawMom.Eta());
+  // Float_t lowerr = fJetUnc->getUncertainty(false);
+
+  pPFJet->pt   = (rawMom.Pt())*(fJetCorrector->getCorrection());
   pPFJet->eta  = rawMom.Eta();
   pPFJet->phi  = rawMom.Phi();
   pPFJet->mass = jet->Mass();
+  pPFJet->unc  = hierr;
   pPFJet->area = jet->JetArea();
   
   pPFJet->tche = jet->TrackCountingHighEffBJetTagsDisc();
@@ -681,10 +710,11 @@ void HyphaMod::FillPV(const Vertex *pv)
     pVertex->sumPt += pv->Trk(itrk)->Pt();				   
 }
       
+      
 //--------------------------------------------------------------------------------------------------
-UInt_t HyphaMod::MatchHLT(const Double_t eta, const Double_t phi)
+ULong_t HyphaMod::MatchHLT(const Double_t eta, const Double_t phi)
 {
-  UInt_t bits = 0;
+  ULong_t bits = 0;
   
   const Double_t hltMatchR = 0.2;
   
@@ -693,39 +723,48 @@ UInt_t HyphaMod::MatchHLT(const Double_t eta, const Double_t phi)
     assert(hltTable);
     for(UInt_t itrig=0; itrig<fTriggerNamesv.size(); itrig++) {
       const TriggerName *trigname = hltTable->Get(fTriggerNamesv[itrig].Data());
-      if(!trigname) continue; // if trigger absent from this run
+      if(!trigname) continue;
       
       const TList *list = GetHLTObjectsTable()->GetList(fTriggerNamesv[itrig].Data());
-      if(!list) continue; // if there aren't any trigger objects for this trigger
+      if(!list) continue;
       TIter iter(list->MakeIterator());
       const TriggerObject *to = dynamic_cast<const TriggerObject*>(iter.Next()); 
-    
-      while(to) {         
-        if(to->IsHLT()) {
-          Bool_t match = kTRUE;
-
-	  // if we have defined extra objects (for cross triggers), match their module names
-	  // note: only matching module name for mueg cross triggers at the moment
-	  if(fFirstTriggerObjectIdsv[itrig] != 0                                       && 
-	     TString(to->ModuleName())      != fFirstTriggerObjectModuleNamesv[itrig]  &&
-	     TString(to->ModuleName())      != fSecondTriggerObjectModuleNamesv[itrig]    )    match=kFALSE;
-
-	  if(to->Pt() < fTriggerMinPtv[itrig])                           match=kFALSE;  // minimum pT threshold on trigger object
-	  if(MathUtils::DeltaR(phi,eta,to->Phi(),to->Eta()) > hltMatchR) match=kFALSE;  // eta-phi matching
-
-	  // set appropriate bits
-	  if(match) bits |= fTriggerIdsv[itrig];
-	}
-	to = dynamic_cast<const TriggerObject*>(iter.Next());
+   
+      while(to) {             
+        if(to->IsHLT()) {          
+	  
+	  if(fTriggerObjNames1v[itrig].Length()>0 && fTriggerObjNames1v[itrig].CompareTo(to->ModuleName())==0) {
+	    Bool_t match = kTRUE;
+	    if(to->Pt() < fTriggerObjMinPt1v[itrig])                       match=kFALSE;  // minimum pT threshold on trigger object
+	    if(MathUtils::DeltaR(phi,eta,to->Phi(),to->Eta()) > hltMatchR) match=kFALSE;  // eta-phi matching
+	    if(match) bits |= fTriggerObjIds1v[itrig];
+	  }
+	  
+	  if(fTriggerObjNames2v[itrig].Length()>0 && fTriggerObjNames2v[itrig].CompareTo(to->ModuleName())==0) {
+	    Bool_t match = kTRUE;
+	    if(to->Pt() < fTriggerObjMinPt2v[itrig])                       match=kFALSE;  // minimum pT threshold on trigger object
+	    if(MathUtils::DeltaR(phi,eta,to->Phi(),to->Eta()) > hltMatchR) match=kFALSE;  // eta-phi matching
+	    if(match) bits |= fTriggerObjIds2v[itrig];
+	  }
+	  
+	  if(fTriggerObjNames1v[itrig].Length()==0 && fTriggerObjNames2v[itrig].Length()==0) {
+	    Bool_t match = kTRUE;
+	    if(to->Pt() < fTriggerObjMinPt1v[itrig])                       match=kFALSE;  // minimum pT threshold on trigger object
+	    if(MathUtils::DeltaR(phi,eta,to->Phi(),to->Eta()) > hltMatchR) match=kFALSE;  // eta-phi matching
+	    if(match) bits |= fTriggerObjIds1v[itrig];
+          }
+        } 
+        to = dynamic_cast<const TriggerObject*>(iter.Next());
       }    
     }
   }
+  
   return bits;
 }
 
-UInt_t HyphaMod::MatchHLT(const Double_t pt, const Double_t eta, const Double_t phi)
+ULong_t HyphaMod::MatchHLT(const Double_t pt, const Double_t eta, const Double_t phi)
 {
-  UInt_t bits = 0;
+  ULong_t bits = 0;
   
   const Double_t hltMatchR = 0.2;
   const Double_t hltMatchPtFrac = 1;
@@ -744,22 +783,32 @@ UInt_t HyphaMod::MatchHLT(const Double_t pt, const Double_t eta, const Double_t 
     
       while(to) {         
         if(to->IsHLT()) {
-          Bool_t match = kTRUE;
-
-	  // if we have defined extra objects (for cross triggers), match their module names
-	  // note: only matching module name for mueg cross triggers at the moment
-	  if(fFirstTriggerObjectIdsv[itrig] != 0                                       && 
-	     TString(to->ModuleName())      != fFirstTriggerObjectModuleNamesv[itrig]  &&
-	     TString(to->ModuleName())      != fSecondTriggerObjectModuleNamesv[itrig]    )    match=kFALSE;
-
-	  if(to->Pt() < fTriggerMinPtv[itrig])                           match=kFALSE;  // minimum pT threshold on trigger object
-	  if(MathUtils::DeltaR(phi,eta,to->Phi(),to->Eta()) > hltMatchR) match=kFALSE;  // eta-phi matching
-	  if(fabs(pt - to->Pt())>hltMatchPtFrac*(to->Pt()))              match=kFALSE;  // pT matching
-
-	  // set appropriate bits
-	  if(match) bits |= fTriggerIdsv[itrig];
-	}
-	to = dynamic_cast<const TriggerObject*>(iter.Next());
+	  
+	  if(fTriggerObjNames1v[itrig].Length()>0 && fTriggerObjNames1v[itrig].CompareTo(to->ModuleName())==0) {
+	    Bool_t match = kTRUE;
+	    if(to->Pt() < fTriggerObjMinPt1v[itrig])                       match=kFALSE;  // minimum pT threshold on trigger object
+	    if(MathUtils::DeltaR(phi,eta,to->Phi(),to->Eta()) > hltMatchR) match=kFALSE;  // eta-phi matching
+	    if(fabs(pt - to->Pt())>hltMatchPtFrac*(to->Pt()))              match=kFALSE;  // pT matching
+	    if(match) bits |= fTriggerObjIds1v[itrig];
+	  }
+	  
+	  if(fTriggerObjNames2v[itrig].Length()>0 && fTriggerObjNames2v[itrig].CompareTo(to->ModuleName())==0) {
+	    Bool_t match = kTRUE;
+	    if(to->Pt() < fTriggerObjMinPt2v[itrig])                       match=kFALSE;  // minimum pT threshold on trigger object
+	    if(MathUtils::DeltaR(phi,eta,to->Phi(),to->Eta()) > hltMatchR) match=kFALSE;  // eta-phi matching
+	    if(fabs(pt - to->Pt())>hltMatchPtFrac*(to->Pt()))              match=kFALSE;  // pT matching
+	    if(match) bits |= fTriggerObjIds2v[itrig];
+	  }
+	  
+	  if(fTriggerObjNames1v[itrig].Length()==0 && fTriggerObjNames2v[itrig].Length()==0) {
+	    Bool_t match = kTRUE;
+	    if(to->Pt() < fTriggerObjMinPt1v[itrig])                       match=kFALSE;  // minimum pT threshold on trigger object
+	    if(MathUtils::DeltaR(phi,eta,to->Phi(),to->Eta()) > hltMatchR) match=kFALSE;  // eta-phi matching
+	    if(fabs(pt - to->Pt())>hltMatchPtFrac*(to->Pt()))              match=kFALSE;  // pT matching
+	    if(match) bits |= fTriggerObjIds1v[itrig];
+          }
+        }
+        to = dynamic_cast<const TriggerObject*>(iter.Next());
       }    
     }
   }
@@ -894,7 +943,7 @@ void HyphaMod::FillGenH()
   assert(fParticles);
   assert(fMCEvtInfo);
  
-  const MCParticle *boson=0, *dau1=0, *dau2=0;
+  const MCParticle *boson=0, *dau1=0, *dau2=0, *tau1=0, *tau2=0;
   
   Int_t id1=0, id2=0;
 
@@ -911,6 +960,9 @@ void HyphaMod::FillGenH()
 	  while(tau->HasDaughter(tau->PdgId(),kTRUE) && (tau->Status()!=1))
 	    tau = tau->FindDaughter(tau->PdgId(),kTRUE);	  
 
+	  if(tau->PdgId()>0) tau1 = tau;
+	  if(tau->PdgId()<0) tau2 = tau;
+	  
           // Loop through daughters and look for leptons  
           for(UInt_t j=0; j<tau->NDaughters(); j++) {
             const MCParticle *d = tau->Daughter(j);
@@ -929,7 +981,7 @@ void HyphaMod::FillGenH()
 	      if(d->PdgId()>0) dau1 = d;
               if(d->PdgId()<0) dau2 = d;
             }
-	    if(abs(d->PdgId())>16) { // hadronic tau
+	    if(abs(d->PdgId())>16 || abs(d->PdgId())<7) { // hadronic tau
 	      if(tau->PdgId()>0) {
 		dau1 = d;
 		id1 = EGenType::kTauHadr;
@@ -938,7 +990,7 @@ void HyphaMod::FillGenH()
 		id2 = EGenType::kTauHadr;
 	      }
 	    }
-          }	  
+          }
 	}	
       }      		      
     }                            
@@ -957,8 +1009,8 @@ void HyphaMod::FillGenH()
   }
   
   assert(dau1);
-  assert(dau2);  
-    
+  assert(dau2);
+
   FourVectorM vDilep = dau1->Mom() + dau2->Mom();
   
   fGenInfo.pid_1  = fMCEvtInfo->Id1();
@@ -986,6 +1038,14 @@ void HyphaMod::FillGenH()
   fGenInfo.decx   = boson->DecayVertex().X();
   fGenInfo.decy   = boson->DecayVertex().Y(); 
   fGenInfo.decz   = boson->DecayVertex().Z();
+
+  // Bool_t filltau = (tau1!=0) && (tau2!=0);
+  // if(filltau) {
+  //   fTau1.SetPtEtaPhiM(tau1->Pt(),tau1->Eta(),tau1->Phi(),tau1->Mass());
+  //   fTau2.SetPtEtaPhiM(tau2->Pt(),tau2->Eta(),tau2->Phi(),tau2->Mass());
+  //   fTauTree->Fill();
+  // }
+    
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -994,7 +1054,7 @@ void HyphaMod::FillGenZ()
   assert(fParticles);
   assert(fMCEvtInfo);
   
-  const MCParticle *boson=0, *dau1=0, *dau2=0;
+  const MCParticle *boson=0, *dau1=0, *dau2=0, *tau1=0, *tau2=0;
   
   Int_t id1=0, id2=0;
   
@@ -1006,10 +1066,18 @@ void HyphaMod::FillGenZ()
 
       // Loop through daughters and look for leptons  
       for(UInt_t j=0; j<boson->NDaughters(); j++) {
+        const MCParticle *tau = boson->Daughter(j);
+	if(abs(tau->PdgId())==15) {
+          while(tau->HasDaughter(tau->PdgId(),kTRUE) && (tau->Status()!=1))
+            tau = tau->FindDaughter(tau->PdgId(),kTRUE);
+	  if(tau->PdgId()>0) tau1 = tau;
+	  if(tau->PdgId()<0) tau2 = tau;
+	}
+	
         const MCParticle *d = boson->Daughter(j);
         if((abs(d->PdgId())==11) || (abs(d->PdgId())==13) || (abs(d->PdgId())==15)) {
           
-          // traverse down daughter muon tree
+          // traverse down daughter lepton tree
           while(d->HasDaughter(d->PdgId(),kTRUE) && (d->Status()!=1))
             d = d->FindDaughter(d->PdgId(),kTRUE);	  
 
@@ -1035,8 +1103,8 @@ void HyphaMod::FillGenZ()
 	  
 	  if(d->PdgId()>0) dau1 = d;
           if(d->PdgId()<0) dau2 = d;
-        }  
-      }		      
+        }
+      }
     }                            
   }
   
@@ -1071,6 +1139,14 @@ void HyphaMod::FillGenZ()
   fGenInfo.decx   = boson->DecayVertex().X();
   fGenInfo.decy   = boson->DecayVertex().Y(); 
   fGenInfo.decz   = boson->DecayVertex().Z();
+
+  // Bool_t filltau= (tau1!=0) && (tau2!=0);
+  // if(filltau) {
+  //   fTau1.SetPtEtaPhiM(tau1->Pt(),tau1->Eta(),tau1->Phi(),tau1->Mass());
+  //   fTau2.SetPtEtaPhiM(tau2->Pt(),tau2->Eta(),tau2->Phi(),tau2->Mass());
+  //   fTauTree->Fill();
+  // }
+
 }
 
 //--------------------------------------------------------------------------------------------------
