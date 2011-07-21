@@ -129,6 +129,7 @@ void predictFakesMuEle(const TString frname,     // fake rate data file
   TClonesArray *jetArr      = new TClonesArray("mithep::TJet");
   TClonesArray *pvArr       = new TClonesArray("mithep::TVertex");
   
+
   //
   // loop over data samples
   //
@@ -158,11 +159,8 @@ void predictFakesMuEle(const TString frname,     // fake rate data file
    
     Double_t weight=1;
 
-    Double_t counter[30];         for(Int_t i=0; i<30; i++) { counter[i] = 0; }
-   
     // perform fakeable objects extrapolation
     for(UInt_t ientry=0; ientry<eventTree->GetEntries(); ientry++) {
-      
       infoBr->GetEntry(ientry);
 
       // check for certified runs
@@ -192,7 +190,7 @@ void predictFakesMuEle(const TString frname,     // fake rate data file
       for(Int_t i=0; i<muonArr->GetEntriesFast(); i++) {
         const mithep::TMuon* muon = (mithep::TMuon*)((*muonArr)[i]);
         	
-	Bool_t trigmatch = muon->hltMatchBits & (kHLT_Mu17_Ele8_CaloIdL_MuObj | kHLT_Mu8_Ele17_CaloIdL_MuObj);
+	// Bool_t trigmatch = muon->hltMatchBits & (kHLT_Mu17_Ele8_CaloIdL_MuObj | kHLT_Mu8_Ele17_CaloIdL_MuObj);
 	// if(!trigmatch)            continue; // seems to be broken
 
 	if(muon->pt < kMuonPt2Min)    continue;
@@ -216,7 +214,7 @@ void predictFakesMuEle(const TString frname,     // fake rate data file
 	if(fabs(electron->eta) > 2.5)         continue;
 	//if(!(electron->isEcalDriven)) continue;
 	
-	Bool_t trigmatch = electron->hltMatchBits & (kHLT_Mu17_Ele8_CaloIdL_EGObj | kHLT_Mu8_Ele17_CaloIdL_EGObj);
+	// Bool_t trigmatch = electron->hltMatchBits & (kHLT_Mu17_Ele8_CaloIdL_EGObj | kHLT_Mu8_Ele17_CaloIdL_EGObj);
 	// if(!trigmatch)                          continue;
 	// if(!(electron->hltMatchBits & trigger)) continue;
 	// if((info->triggerBits & kHLT_Mu8_Ele17_CaloIdL) && electron->pt < 20.0 ) continue;
@@ -232,10 +230,11 @@ void predictFakesMuEle(const TString frname,     // fake rate data file
 	  rateErrhv.push_back(fr.getErrHigh(fabs(electron->eta),fopt));
 	}
       }
-          
+
       // Tight+Loose
       if(tightv.size()==1) {
-      // if((tightv.size() + ntightele)==1) {
+	// if((tightv.size() + ntightele)==1) {
+
 	if((tightv.size() + ntightele)!=1) continue;
 
 	const mithep::TMuon* mu = tightv[0];
@@ -243,8 +242,6 @@ void predictFakesMuEle(const TString frname,     // fake rate data file
 	for(UInt_t i=0; i<loosev.size(); i++) {
 	  const mithep::TElectron* ele = loosev[i];
 
-          if(mu->q == ele->q) continue;                    
-	  	  
 	  if(mu->pt<kMuonPt1Min  && ele->pt<kElePt1Min) continue;
 
 	  // if((info->triggerBits & kHLT_Mu8_Ele17_CaloIdL) && ele->pt < 20.0 )                     continue;
@@ -255,7 +252,9 @@ void predictFakesMuEle(const TString frname,     // fake rate data file
 	  else if(ele->pt < 20) {
 	    if(!(info->triggerBits & kHLT_Mu17_Ele8_CaloIdL)) continue; // if failed trig2
 	  }
-	  
+
+          if(mu->q == ele->q) continue;                    
+
 	  TLorentzVector lep1, lep2, dilep;  // lepton 4-vectors
 	  Int_t finalState=-1;	           // final state type
 
@@ -393,12 +392,13 @@ void predictFakesMuEle(const TString frname,     // fake rate data file
 	*/	  
         }
       }      
-    }    
+    }
     delete infile;
     infile=0, eventTree=0;
   }
   outFile->Write();
   outFile->Close();
+
   delete outFile;
   
   delete info;

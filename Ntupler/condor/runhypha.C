@@ -23,7 +23,7 @@ using namespace mithep;
  *
  * Example usage:
  *   root -b -l -q runhypha.C+\(\"0000\",\"r11a-del-pr-v4\",\"t2mit/filefi/022\",\"/home/cmsprod/catalog\",1,0,100,1\)
- *   root -b -l -q runhypha.C+\(\"0000\",\"s11-h100tt-gf-v1g1-pu\",\"local/filefi/022\",\"/home/cmsprod/catalog\",0,1,10,0\)
+ *   root -b -l -q runhypha.C+\(\"0000\",\"s11-h100tt-gf-v1g1-pu\",\"t2mit/filefi/022\",\"/home/cmsprod/catalog\",0,1,10,0\)
  *   root -b -l -q runhypha.C+\(\"0000\",\"r11a-mueg-m10-v1\",\"local/filefi/021\",\"/home/cmsprod/catalog\",1,0,-1,1\)
  *   root -b -l -q runhypha.C+\(\"0000\",\"r11a-mueg-m10-v1\",\"local/filefi/021\",\"/home/cmsprod/catalog\",1,0,100,1,\"foo.json\"\)|grep -v '^\*'         
  * Output file name has standard format: <dataset>_<fileset>_ntuple.root
