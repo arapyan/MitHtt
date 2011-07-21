@@ -1,7 +1,0 @@
-#020 p11-ttj-v1g1-pu                  t#bar{t}		           157.5          1.0   -1.0     ~
-#020 p11-zmmm20-v1g1-pu                 zmm                        1666.0          1.0   -1.0     ~
-#020 p11-zeem20-v1g1-pu                 zee                        1666.0          1.0   -1.0     ~
-020 p11-zttm20-v1g1-pu                 ztt                        1666.0          1.0   -1.0     ~
-#020 p11-bbhtt120-v1g1-pu            bbhtt120                      35.6            1.0   -1.0     ~
-#020 p11-gghtt120-v1g1-pu            gghtt120                      21.5	          1.0   -1.0     ~
-#020 p11-qcdmu15-v1g1-pu             qcdmu15                       84679.3         1.0   -1.0     ~
