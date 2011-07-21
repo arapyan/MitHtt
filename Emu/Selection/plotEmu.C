@@ -111,6 +111,9 @@ void plotEmu(const TString  conf,         // input file
   
   enum { kMuMu, kEleEle, kEleMu, kMuEle };  // final state type
 
+  const Double_t kssFakeWgt = 1.312; // 595.8/454;    // ratio of fake-rate fakes to same-sign fakes
+                                     // careful: this is hardcoded in selectEmu.C
+
   //
   // scale factors for each category
   //
@@ -234,7 +237,7 @@ void plotEmu(const TString  conf,         // input file
     sprintf(hname,"hJetPt2_%i",isam);  hJetPt2v.push_back(new TH1F(hname,"",30,0,300));     hJetPt2v[isam]->Sumw2();
     sprintf(hname,"hJetEta2_%i",isam); hJetEta2v.push_back(new TH1F(hname,"",20,-5,5));     hJetEta2v[isam]->Sumw2();
     sprintf(hname,"hJetDPhi_%i",isam); hJetDPhiv.push_back(new TH1F(hname,"",30,0,180));    hJetDPhiv[isam]->Sumw2();
-    sprintf(hname,"hMjj_%i",isam);     hMjjv.push_back(new TH1F(hname,"",50,200,1200));     hMjjv[isam]->Sumw2();
+    sprintf(hname,"hMjj_%i",isam);     hMjjv.push_back(new TH1F(hname,"",50,0,1000));       hMjjv[isam]->Sumw2();
     sprintf(hname,"hDEta_%i",isam);    hDEtav.push_back(new TH1F(hname,"",20,0,8));         hDEtav[isam]->Sumw2();
     sprintf(hname,"hEtaProd_%i",isam); hEtaProdv.push_back(new TH1F(hname,"",30,-7.5,7.5)); hEtaProdv[isam]->Sumw2();
     sprintf(hname,"hBJetPt_%i",isam);  hBJetPtv.push_back(new TH1F(hname,"",30,0,150));     hBJetPtv[isam]->Sumw2();
@@ -330,15 +333,15 @@ void plotEmu(const TString  conf,         // input file
 	wgt = data.weight*lumi;
       if(isam==ifake) {
 	if(snamev[isam].Contains("ss-fakes")) { // same-sign fakes must have weight 1, but normalize them to fake-rate fakes
-	  if(lumi<500) {       // 190/pb
-	    wgt = data.weight*(97.5/86.);    // pt10	      // wgt = data.weight*(63.6/52.); // pt15
-	  }
-	  else if(lumi<1000) { // 865/pb
-	    wgt = data.weight*(447.8/343.);  // pt10     /// pt15: 	      wgt = data.weight*(283.8/192.);
-	  }
-	  else {              // 1084-1149/pb
-	    wgt = data.weight*(595.8/454.);  // pt10
-	  }
+	  // if(lumi<500) {       // 190/pb
+	  //   wgt = data.weight*(97.5/86.);    // pt10	      // wgt = data.weight*(63.6/52.); // pt15
+	  // }
+	  // else if(lumi<1000) { // 865/pb
+	  //   wgt = data.weight*(447.8/343.);  // pt10     /// pt15: 	      wgt = data.weight*(283.8/192.);
+	  // }
+	  // else {              // 1084-1149/pb
+	  wgt = data.weight*(kssFakeWgt);  // pt10
+	  // }
 	}
 	else // fake-rate fakes have their weight stored in the ntuple
 	  wgt = data.weight;
@@ -493,7 +496,7 @@ void plotEmu(const TString  conf,         // input file
   for(UInt_t isam=1; isam<samplev.size(); isam++) {
     if(snamev[isam].Contains("_mssm_") || snamev[isam].Contains("_sm_")) continue;
     if(isam==izmm) continue;
-    plotMet.AddToStack(hMetv[isam],samplev[isam]->label,samplev[isam]->color,1,1,2);
+    plotMet.AddToStack(hMetv[isam],samplev[isam]->label,samplev[isam]->color,1,1,3);
   }
   if(lumi>0) plotMet.AddTextBox(0.6,0.55,0.9,0.4,0,1,-1,3,lumitext[0],lumitext[1],lumitext[2]);
   plotMet.SetLegend(0.7,0.65,0.9,0.9);
@@ -519,7 +522,7 @@ void plotEmu(const TString  conf,         // input file
   for(UInt_t isam=1; isam<samplev.size(); isam++) {
     if(snamev[isam].Contains("_mssm_") || snamev[isam].Contains("_sm_")) continue;
     if(isam==izmm) continue;
-    plotMetRaw.AddToStack(hMetv[isam],samplev[isam]->label,samplev[isam]->color,1,1,2);
+    plotMetRaw.AddToStack(hMetv[isam],samplev[isam]->label,samplev[isam]->color,1,1,3);
   }
   plotMetRaw.AddHist1D(hTmpMetStack,"#bf{un-corrected}","hist",kRed);
   if(lumi>0) plotMetRaw.AddTextBox(0.6,0.55,0.9,0.4,0,1,-1,3,lumitext[0],lumitext[1],lumitext[2]);
@@ -534,7 +537,7 @@ void plotEmu(const TString  conf,         // input file
   for(UInt_t isam=1; isam<samplev.size(); isam++) {
     if(snamev[isam].Contains("_mssm_") || snamev[isam].Contains("_sm_")) continue;
     if(isam==izmm) continue;
-    plotProjMet.AddToStack(hProjMetv[isam],samplev[isam]->label,samplev[isam]->color,1,1,2);
+    plotProjMet.AddToStack(hProjMetv[isam],samplev[isam]->label,samplev[isam]->color,1,1,3);
   }
   if(lumi>0) plotProjMet.AddTextBox(0.21,0.75,0.51,0.9,0,1,-1,3,lumitext[0],lumitext[1],lumitext[2]);
   plotProjMet.SetLegend(0.7,0.65,0.9,0.9);
@@ -547,7 +550,7 @@ void plotEmu(const TString  conf,         // input file
   for(UInt_t isam=1; isam<samplev.size(); isam++) {
     if(snamev[isam].Contains("_mssm_") || snamev[isam].Contains("_sm_")) continue;
     if(isam==izmm) continue;
-    plotProjVis.AddToStack(hProjVisv[isam],samplev[isam]->label,samplev[isam]->color,1,1,2);
+    plotProjVis.AddToStack(hProjVisv[isam],samplev[isam]->label,samplev[isam]->color,1,1,3);
   }
   if(lumi>0) plotProjVis.AddTextBox(0.6,0.55,0.9,0.4,0,1,-1,3,lumitext[0],lumitext[1],lumitext[2]);
   plotProjVis.SetLegend(0.7,0.65,0.9,0.9);
@@ -560,7 +563,7 @@ void plotEmu(const TString  conf,         // input file
   for(UInt_t isam=1; isam<samplev.size(); isam++) {
     if(snamev[isam].Contains("_mssm_") || snamev[isam].Contains("_sm_")) continue;
     if(isam==izmm) continue;
-    plotProjVis2.AddToStack(hProjVis2v[isam],samplev[isam]->label,samplev[isam]->color,1,1,2);
+    plotProjVis2.AddToStack(hProjVis2v[isam],samplev[isam]->label,samplev[isam]->color,1,1,3);
   }
   if(lumi>0) plotProjVis2.AddTextBox(0.6,0.55,0.9,0.4,0,1,-1,3,lumitext[0],lumitext[1],lumitext[2]);
   plotProjVis2.SetLegend(0.7,0.65,0.9,0.9);
@@ -573,7 +576,7 @@ void plotEmu(const TString  conf,         // input file
   for(UInt_t isam=1; isam<samplev.size(); isam++) {
     if(snamev[isam].Contains("_mssm_") || snamev[isam].Contains("_sm_")) continue;
     if(isam==izmm) continue;
-    plotProjVar.AddToStack(hProjVarv[isam],samplev[isam]->label,samplev[isam]->color,1,1,2);
+    plotProjVar.AddToStack(hProjVarv[isam],samplev[isam]->label,samplev[isam]->color,1,1,3);
   }
   if(lumi>0) plotProjVar.AddTextBox(0.21,0.75,0.51,0.9,0,1,-1,3,lumitext[0],lumitext[1],lumitext[2]);
   plotProjVar.SetLegend(0.21,0.45,0.41,0.7);
@@ -600,7 +603,7 @@ void plotEmu(const TString  conf,         // input file
   for(UInt_t isam=1; isam<samplev.size(); isam++) {
     if(isam==izmm) continue;
     if(snamev[isam].Contains("_mssm_") || snamev[isam].Contains("_sm_")) continue;
-    plotRawProjVar.AddToStack(hProjVarv[isam],samplev[isam]->label,samplev[isam]->color,1,1,2);
+    plotRawProjVar.AddToStack(hProjVarv[isam],samplev[isam]->label,samplev[isam]->color,1,1,3);
   }
   plotRawProjVar.AddHist1D(hTmpStack,"#bf{un-corrected}","hist",kRed);
   if(lumi>0) plotRawProjVar.AddTextBox(0.21,0.75,0.51,0.9,0,1,-1,3,lumitext[0],lumitext[1],lumitext[2]);
@@ -614,7 +617,7 @@ void plotEmu(const TString  conf,         // input file
   for(UInt_t isam=1; isam<samplev.size(); isam++) {
     if(snamev[isam].Contains("_mssm_") || snamev[isam].Contains("_sm_")) continue;
     if(isam==izmm) continue;
-    plotNjets.AddToStack(hNjetsv[isam],samplev[isam]->label,samplev[isam]->color,1,1,2);
+    plotNjets.AddToStack(hNjetsv[isam],samplev[isam]->label,samplev[isam]->color,1,1,3);
   }
   if(lumi>0) plotNjets.AddTextBox(0.6,0.55,0.9,0.4,0,1,-1,3,lumitext[0],lumitext[1],lumitext[2]);
   plotNjets.SetYRange(0,1.5*(plotNjets.GetStack()->GetMaximum()));
@@ -628,7 +631,7 @@ void plotEmu(const TString  conf,         // input file
   for(UInt_t isam=1; isam<samplev.size(); isam++) {
     if(snamev[isam].Contains("_mssm_") || snamev[isam].Contains("_sm_")) continue;
     if(isam==izmm) continue;
-    plotNbjets.AddToStack(hNbjetsv[isam],samplev[isam]->label,samplev[isam]->color,1,1,2);
+    plotNbjets.AddToStack(hNbjetsv[isam],samplev[isam]->label,samplev[isam]->color,1,1,3);
   }
   if(lumi>0) plotNbjets.AddTextBox(0.6,0.55,0.9,0.4,0,1,-1,3,lumitext[0],lumitext[1],lumitext[2]);
   plotNbjets.SetLegend(0.7,0.65,0.9,0.9);
@@ -641,7 +644,7 @@ void plotEmu(const TString  conf,         // input file
   for(UInt_t isam=1; isam<samplev.size(); isam++) {
     if(snamev[isam].Contains("_mssm_") || snamev[isam].Contains("_sm_")) continue;
     if(isam==izmm) continue;
-    plotBdiscr.AddToStack(hBdiscrv[isam],samplev[isam]->label,samplev[isam]->color,1,1,2);
+    plotBdiscr.AddToStack(hBdiscrv[isam],samplev[isam]->label,samplev[isam]->color,1,1,3);
   }
   if(lumi>0) plotBdiscr.AddTextBox(0.6,0.55,0.9,0.4,0,1,-1,3,lumitext[0],lumitext[1],lumitext[2]);
   plotBdiscr.SetLegend(0.7,0.65,0.9,0.9);
@@ -654,7 +657,7 @@ void plotEmu(const TString  conf,         // input file
   for(UInt_t isam=1; isam<samplev.size(); isam++) {
     if(snamev[isam].Contains("_mssm_") || snamev[isam].Contains("_sm_")) continue;
     if(isam==izmm) continue;
-    plotDPhi.AddToStack(hDPhiv[isam],samplev[isam]->label,samplev[isam]->color,1,1,2);
+    plotDPhi.AddToStack(hDPhiv[isam],samplev[isam]->label,samplev[isam]->color,1,1,3);
   }
   if(lumi>0) plotDPhi.AddTextBox(0.21,0.75,0.51,0.9,0,1,-1,3,lumitext[0],lumitext[1],lumitext[2]);
   plotDPhi.TransLegend(-0.15,0);
@@ -669,7 +672,7 @@ void plotEmu(const TString  conf,         // input file
   for(UInt_t isam=1; isam<samplev.size(); isam++) {
     if(snamev[isam].Contains("_mssm_") || snamev[isam].Contains("_sm_")) continue;
     if(isam==izmm) continue;
-    plotMt.AddToStack(hMtv[isam],samplev[isam]->label,samplev[isam]->color,1,1,2);
+    plotMt.AddToStack(hMtv[isam],samplev[isam]->label,samplev[isam]->color,1,1,3);
   }
   if(lumi>0) plotMt.AddTextBox(0.6,0.55,0.9,0.4,0,1,-1,3,lumitext[0],lumitext[1],lumitext[2]);
   plotMt.SetLegend(0.7,0.65,0.9,0.9);
@@ -682,7 +685,7 @@ void plotEmu(const TString  conf,         // input file
   for(UInt_t isam=1; isam<samplev.size(); isam++) {
     if(snamev[isam].Contains("_mssm_") || snamev[isam].Contains("_sm_")) continue;
     if(isam==izmm) continue;
-    plotPt.AddToStack(hPtv[isam],samplev[isam]->label,samplev[isam]->color,1,1,2);
+    plotPt.AddToStack(hPtv[isam],samplev[isam]->label,samplev[isam]->color,1,1,3);
   }
   if(lumi>0) plotPt.AddTextBox(0.6,0.55,0.9,0.4,0,1,-1,3,lumitext[0],lumitext[1],lumitext[2]);
   plotPt.SetLegend(0.7,0.65,0.9,0.9);
@@ -695,7 +698,7 @@ void plotEmu(const TString  conf,         // input file
   for(UInt_t isam=1; isam<samplev.size(); isam++) {
     if(snamev[isam].Contains("_mssm_") || snamev[isam].Contains("_sm_")) continue;
     if(isam==izmm) continue;
-    plotLepDEta.AddToStack(hLepDEtav[isam],samplev[isam]->label,samplev[isam]->color,1,1,2);
+    plotLepDEta.AddToStack(hLepDEtav[isam],samplev[isam]->label,samplev[isam]->color,1,1,3);
   }
   if(lumi>0) plotLepDEta.AddTextBox(0.6,0.55,0.9,0.4,0,1,-1,3,lumitext[0],lumitext[1],lumitext[2]);
   plotLepDEta.SetLegend(0.7,0.65,0.9,0.9);
@@ -709,7 +712,7 @@ void plotEmu(const TString  conf,         // input file
   for(UInt_t isam=1; isam<samplev.size(); isam++) {
     if(snamev[isam].Contains("_mssm_") || snamev[isam].Contains("_sm_")) continue;
     if(isam==izmm) continue;
-    plotMetDPhi.AddToStack(hMetDPhiv[isam],samplev[isam]->label,samplev[isam]->color,1,1,2);
+    plotMetDPhi.AddToStack(hMetDPhiv[isam],samplev[isam]->label,samplev[isam]->color,1,1,3);
   }
   if(lumi>0) plotMetDPhi.AddTextBox(0.21,0.75,0.51,0.9,0,1,-1,3,lumitext[0],lumitext[1],lumitext[2]);
   plotMetDPhi.SetLegend(0.21,0.45,0.41,0.7);
@@ -722,7 +725,7 @@ void plotEmu(const TString  conf,         // input file
   for(UInt_t isam=1; isam<samplev.size(); isam++) {
     if(snamev[isam].Contains("_mssm_") || snamev[isam].Contains("_sm_")) continue;
     if(isam==izmm) continue;
-    plotPt1.AddToStack(hPt1v[isam],samplev[isam]->label,samplev[isam]->color,1,1,2);
+    plotPt1.AddToStack(hPt1v[isam],samplev[isam]->label,samplev[isam]->color,1,1,3);
   }
   if(lumi>0) plotPt1.AddTextBox(0.6,0.55,0.9,0.4,0,1,-1,3,lumitext[0],lumitext[1],lumitext[2]);
   plotPt1.SetLegend(0.7,0.65,0.9,0.9);
@@ -735,7 +738,7 @@ void plotEmu(const TString  conf,         // input file
   for(UInt_t isam=1; isam<samplev.size(); isam++) {
     if(snamev[isam].Contains("_mssm_") || snamev[isam].Contains("_sm_")) continue;
     if(isam==izmm) continue;
-    plotEta1.AddToStack(hEta1v[isam],samplev[isam]->label,samplev[isam]->color,1,1,2);
+    plotEta1.AddToStack(hEta1v[isam],samplev[isam]->label,samplev[isam]->color,1,1,3);
   }
   if(lumi>0) plotEta1.AddTextBox(0.21,0.75,0.51,0.9,0,1,-1,3,lumitext[0],lumitext[1],lumitext[2]);
   plotEta1.SetYRange(0,2.0*(plotEta1.GetStack()->GetMaximum()));
@@ -749,7 +752,7 @@ void plotEmu(const TString  conf,         // input file
   for(UInt_t isam=1; isam<samplev.size(); isam++) {
     if(snamev[isam].Contains("_mssm_") || snamev[isam].Contains("_sm_")) continue;
     if(isam==izmm) continue;
-    plotPhi1.AddToStack(hPhi1v[isam],samplev[isam]->label,samplev[isam]->color,1,1,2);
+    plotPhi1.AddToStack(hPhi1v[isam],samplev[isam]->label,samplev[isam]->color,1,1,3);
   }
   if(lumi>0) plotPhi1.AddTextBox(0.21,0.75,0.51,0.9,0,1,-1,3,lumitext[0],lumitext[1],lumitext[2]);
   plotPhi1.SetYRange(0,2.6*(plotPhi1.GetStack()->GetMaximum()));
@@ -763,7 +766,7 @@ void plotEmu(const TString  conf,         // input file
   for(UInt_t isam=1; isam<samplev.size(); isam++) {
     if(snamev[isam].Contains("_mssm_") || snamev[isam].Contains("_sm_")) continue;
     if(isam==izmm) continue;
-    plotPt2.AddToStack(hPt2v[isam],samplev[isam]->label,samplev[isam]->color,1,1,2);
+    plotPt2.AddToStack(hPt2v[isam],samplev[isam]->label,samplev[isam]->color,1,1,3);
   }
   if(lumi>0) plotPt2.AddTextBox(0.6,0.55,0.9,0.4,0,1,-1,3,lumitext[0],lumitext[1],lumitext[2]);
   plotPt2.SetLegend(0.7,0.65,0.9,0.9);
@@ -776,7 +779,7 @@ void plotEmu(const TString  conf,         // input file
   for(UInt_t isam=1; isam<samplev.size(); isam++) {
     if(snamev[isam].Contains("_mssm_") || snamev[isam].Contains("_sm_")) continue;
     if(isam==izmm) continue;
-    plotEta2.AddToStack(hEta2v[isam],samplev[isam]->label,samplev[isam]->color,1,1,2);
+    plotEta2.AddToStack(hEta2v[isam],samplev[isam]->label,samplev[isam]->color,1,1,3);
   }
   if(lumi>0) plotEta2.AddTextBox(0.21,0.75,0.51,0.9,0,1,-1,3,lumitext[0],lumitext[1],lumitext[2]);
   plotEta2.SetYRange(0,2.0*(plotEta2.GetStack()->GetMaximum()));
@@ -790,7 +793,7 @@ void plotEmu(const TString  conf,         // input file
   for(UInt_t isam=1; isam<samplev.size(); isam++) {
     if(snamev[isam].Contains("_mssm_") || snamev[isam].Contains("_sm_")) continue;
     if(isam==izmm) continue;
-    plotPhi2.AddToStack(hPhi2v[isam],samplev[isam]->label,samplev[isam]->color,1,1,2);
+    plotPhi2.AddToStack(hPhi2v[isam],samplev[isam]->label,samplev[isam]->color,1,1,3);
   }
   if(lumi>0) plotPhi2.AddTextBox(0.21,0.75,0.51,0.9,0,1,-1,3,lumitext[0],lumitext[1],lumitext[2]);
   plotPhi2.SetYRange(0,2.6*(plotPhi2.GetStack()->GetMaximum()));
@@ -805,7 +808,7 @@ void plotEmu(const TString  conf,         // input file
   for(UInt_t isam=1; isam<samplev.size(); isam++) {
     if(snamev[isam].Contains("_mssm_") || snamev[isam].Contains("_sm_")) continue;
     if(isam==izmm) continue;
-    plotPtMu.AddToStack(hPtMuv[isam],samplev[isam]->label,samplev[isam]->color,1,1,2);
+    plotPtMu.AddToStack(hPtMuv[isam],samplev[isam]->label,samplev[isam]->color,1,1,3);
   }
   if(lumi>0) plotPtMu.AddTextBox(0.6,0.55,0.9,0.4,0,1,-1,3,lumitext[0],lumitext[1],lumitext[2]);
   plotPtMu.SetLegend(0.7,0.65,0.9,0.9);
@@ -818,7 +821,7 @@ void plotEmu(const TString  conf,         // input file
   for(UInt_t isam=1; isam<samplev.size(); isam++) {
     if(snamev[isam].Contains("_mssm_") || snamev[isam].Contains("_sm_")) continue;
     if(isam==izmm) continue;
-    plotEtaMu.AddToStack(hEtaMuv[isam],samplev[isam]->label,samplev[isam]->color,1,1,2);
+    plotEtaMu.AddToStack(hEtaMuv[isam],samplev[isam]->label,samplev[isam]->color,1,1,3);
   }
   if(lumi>0) plotEtaMu.AddTextBox(0.21,0.75,0.51,0.9,0,1,-1,3,lumitext[0],lumitext[1],lumitext[2]);
   plotEtaMu.SetYRange(0,2.0*(plotEtaMu.GetStack()->GetMaximum()));
@@ -832,7 +835,7 @@ void plotEmu(const TString  conf,         // input file
   for(UInt_t isam=1; isam<samplev.size(); isam++) {
     if(snamev[isam].Contains("_mssm_") || snamev[isam].Contains("_sm_")) continue;
     if(isam==izmm) continue;
-    plotPhiMu.AddToStack(hPhiMuv[isam],samplev[isam]->label,samplev[isam]->color,1,1,2);
+    plotPhiMu.AddToStack(hPhiMuv[isam],samplev[isam]->label,samplev[isam]->color,1,1,3);
   }
   if(lumi>0) plotPhiMu.AddTextBox(0.21,0.75,0.51,0.9,0,1,-1,3,lumitext[0],lumitext[1],lumitext[2]);
   plotPhiMu.SetYRange(0,2.6*(plotPhiMu.GetStack()->GetMaximum()));
@@ -846,7 +849,7 @@ void plotEmu(const TString  conf,         // input file
   for(UInt_t isam=1; isam<samplev.size(); isam++) {
     if(snamev[isam].Contains("_mssm_") || snamev[isam].Contains("_sm_")) continue;
     if(isam==izmm) continue;
-    plotPtEle.AddToStack(hPtElev[isam],samplev[isam]->label,samplev[isam]->color,1,1,2);
+    plotPtEle.AddToStack(hPtElev[isam],samplev[isam]->label,samplev[isam]->color,1,1,3);
   }
   if(lumi>0) plotPtEle.AddTextBox(0.6,0.55,0.9,0.4,0,1,-1,3,lumitext[0],lumitext[1],lumitext[2]);
   plotPtEle.SetLegend(0.7,0.65,0.9,0.9);
@@ -859,7 +862,7 @@ void plotEmu(const TString  conf,         // input file
   for(UInt_t isam=1; isam<samplev.size(); isam++) {
     if(snamev[isam].Contains("_mssm_") || snamev[isam].Contains("_sm_")) continue;
     if(isam==izmm) continue;
-    plotEtaEle.AddToStack(hEtaElev[isam],samplev[isam]->label,samplev[isam]->color,1,1,2);
+    plotEtaEle.AddToStack(hEtaElev[isam],samplev[isam]->label,samplev[isam]->color,1,1,3);
   }
   if(lumi>0) plotEtaEle.AddTextBox(0.21,0.75,0.51,0.9,0,1,-1,3,lumitext[0],lumitext[1],lumitext[2]);
   plotEtaEle.SetYRange(0,2.0*(plotEtaEle.GetStack()->GetMaximum()));
@@ -873,7 +876,7 @@ void plotEmu(const TString  conf,         // input file
   for(UInt_t isam=1; isam<samplev.size(); isam++) {
     if(snamev[isam].Contains("_mssm_") || snamev[isam].Contains("_sm_")) continue;
     if(isam==izmm) continue;
-    plotPhiEle.AddToStack(hPhiElev[isam],samplev[isam]->label,samplev[isam]->color,1,1,2);
+    plotPhiEle.AddToStack(hPhiElev[isam],samplev[isam]->label,samplev[isam]->color,1,1,3);
   }
   if(lumi>0) plotPhiEle.AddTextBox(0.21,0.75,0.51,0.9,0,1,-1,3,lumitext[0],lumitext[1],lumitext[2]);
   plotPhiEle.SetYRange(0,2.6*(plotPhiEle.GetStack()->GetMaximum()));
@@ -887,7 +890,7 @@ void plotEmu(const TString  conf,         // input file
   for(UInt_t isam=1; isam<samplev.size(); isam++) {
     if(snamev[isam].Contains("_mssm_") || snamev[isam].Contains("_sm_")) continue;
     if(isam==izmm) continue;
-    plotJetPt1.AddToStack(hJetPt1v[isam],samplev[isam]->label,samplev[isam]->color,1,1,2);
+    plotJetPt1.AddToStack(hJetPt1v[isam],samplev[isam]->label,samplev[isam]->color,1,1,3);
   }
   if(lumi>0) plotJetPt1.AddTextBox(0.6,0.55,0.9,0.4,0,1,-1,3,lumitext[0],lumitext[1],lumitext[2]);
   plotJetPt1.SetLegend(0.7,0.65,0.9,0.9);
@@ -900,7 +903,7 @@ void plotEmu(const TString  conf,         // input file
   for(UInt_t isam=1; isam<samplev.size(); isam++) {
     if(snamev[isam].Contains("_mssm_") || snamev[isam].Contains("_sm_")) continue;
     if(isam==izmm) continue;
-    plotJetPt2.AddToStack(hJetPt2v[isam],samplev[isam]->label,samplev[isam]->color,1,1,2);
+    plotJetPt2.AddToStack(hJetPt2v[isam],samplev[isam]->label,samplev[isam]->color,1,1,3);
   }
   if(lumi>0) plotJetPt2.AddTextBox(0.6,0.55,0.9,0.4,0,1,-1,3,lumitext[0],lumitext[1],lumitext[2]);
   plotJetPt2.SetLegend(0.7,0.65,0.9,0.9);
@@ -913,7 +916,7 @@ void plotEmu(const TString  conf,         // input file
   for(UInt_t isam=1; isam<samplev.size(); isam++) {
     if(snamev[isam].Contains("_mssm_") || snamev[isam].Contains("_sm_")) continue;
     if(isam==izmm) continue;
-    plotJetEta1.AddToStack(hJetEta1v[isam],samplev[isam]->label,samplev[isam]->color,1,1,2);
+    plotJetEta1.AddToStack(hJetEta1v[isam],samplev[isam]->label,samplev[isam]->color,1,1,3);
   }
   if(lumi>0) plotJetEta1.AddTextBox(0.21,0.75,0.51,0.9,0,1,-1,3,lumitext[0],lumitext[1],lumitext[2]);
   plotJetEta1.SetLegend(0.7,0.65,0.9,0.9);
@@ -927,7 +930,7 @@ void plotEmu(const TString  conf,         // input file
   for(UInt_t isam=1; isam<samplev.size(); isam++) {
     if(snamev[isam].Contains("_mssm_") || snamev[isam].Contains("_sm_")) continue;
     if(isam==izmm) continue;
-    plotJetEta2.AddToStack(hJetEta2v[isam],samplev[isam]->label,samplev[isam]->color,1,1,2);
+    plotJetEta2.AddToStack(hJetEta2v[isam],samplev[isam]->label,samplev[isam]->color,1,1,3);
   }
   if(lumi>0) plotJetEta2.AddTextBox(0.21,0.75,0.51,0.9,0,1,-1,3,lumitext[0],lumitext[1],lumitext[2]);
   plotJetEta2.SetLegend(0.7,0.65,0.9,0.9);
@@ -941,7 +944,7 @@ void plotEmu(const TString  conf,         // input file
   for(UInt_t isam=1; isam<samplev.size(); isam++) {
     if(snamev[isam].Contains("_mssm_") || snamev[isam].Contains("_sm_")) continue;
     if(isam==izmm) continue;
-    plotJetDPhi.AddToStack(hJetDPhiv[isam],samplev[isam]->label,samplev[isam]->color,1,1,2);
+    plotJetDPhi.AddToStack(hJetDPhiv[isam],samplev[isam]->label,samplev[isam]->color,1,1,3);
   }
   if(lumi>0) plotJetDPhi.AddTextBox(0.21,0.75,0.51,0.9,0,1,-1,3,lumitext[0],lumitext[1],lumitext[2]);
   plotJetDPhi.SetLegend(0.21,0.45,0.41,0.7);
@@ -954,7 +957,7 @@ void plotEmu(const TString  conf,         // input file
   for(UInt_t isam=1; isam<samplev.size(); isam++) {
     if(snamev[isam].Contains("_mssm_") || snamev[isam].Contains("_sm_")) continue;
     if(isam==izmm) continue;
-    plotMjj.AddToStack(hMjjv[isam],samplev[isam]->label,samplev[isam]->color,1,1,2);
+    plotMjj.AddToStack(hMjjv[isam],samplev[isam]->label,samplev[isam]->color,1,1,3);
   }
   if(lumi>0) plotMjj.AddTextBox(0.6,0.55,0.9,0.4,0,1,-1,3,lumitext[0],lumitext[1],lumitext[2]);
   plotMjj.SetLegend(0.7,0.65,0.9,0.9);
@@ -967,7 +970,7 @@ void plotEmu(const TString  conf,         // input file
   for(UInt_t isam=1; isam<samplev.size(); isam++) {
     if(snamev[isam].Contains("_mssm_") || snamev[isam].Contains("_sm_")) continue;
     if(isam==izmm) continue;
-    plotDEta.AddToStack(hDEtav[isam],samplev[isam]->label,samplev[isam]->color,1,1,2);
+    plotDEta.AddToStack(hDEtav[isam],samplev[isam]->label,samplev[isam]->color,1,1,3);
   }
   if(lumi>0) plotDEta.AddTextBox(0.6,0.55,0.9,0.4,0,1,-1,3,lumitext[0],lumitext[1],lumitext[2]);
   plotDEta.SetLegend(0.7,0.65,0.9,0.9);
@@ -980,7 +983,7 @@ void plotEmu(const TString  conf,         // input file
   for(UInt_t isam=1; isam<samplev.size(); isam++) {
     if(snamev[isam].Contains("_mssm_") || snamev[isam].Contains("_sm_")) continue;
     if(isam==izmm) continue;
-    plotEtaProd.AddToStack(hEtaProdv[isam],samplev[isam]->label,samplev[isam]->color,1,1,2);
+    plotEtaProd.AddToStack(hEtaProdv[isam],samplev[isam]->label,samplev[isam]->color,1,1,3);
   }
   if(lumi>0) plotEtaProd.AddTextBox(0.21,0.75,0.51,0.9,0,1,-1,3,lumitext[0],lumitext[1],lumitext[2]);
   plotEtaProd.SetLegend(0.7,0.65,0.9,0.9);
@@ -993,7 +996,7 @@ void plotEmu(const TString  conf,         // input file
   for(UInt_t isam=1; isam<samplev.size(); isam++) {
     if(snamev[isam].Contains("_mssm_") || snamev[isam].Contains("_sm_")) continue;
     if(isam==izmm) continue;
-    plotBJetPt.AddToStack(hBJetPtv[isam],samplev[isam]->label,samplev[isam]->color,1,1,2);
+    plotBJetPt.AddToStack(hBJetPtv[isam],samplev[isam]->label,samplev[isam]->color,1,1,3);
   }
   if(lumi>0) plotBJetPt.AddTextBox(0.21,0.75,0.51,0.9,0,1,-1,3,lumitext[0],lumitext[1],lumitext[2]);
   plotBJetPt.SetYRange(0,2.0*(plotBJetPt.GetStack()->GetMaximum()));
@@ -1007,7 +1010,7 @@ void plotEmu(const TString  conf,         // input file
   for(UInt_t isam=1; isam<samplev.size(); isam++) {
     if(snamev[isam].Contains("_mssm_") || snamev[isam].Contains("_sm_")) continue;
     if(isam==izmm) continue;
-    plotBJetEta.AddToStack(hBJetEtav[isam],samplev[isam]->label,samplev[isam]->color,1,1,2);
+    plotBJetEta.AddToStack(hBJetEtav[isam],samplev[isam]->label,samplev[isam]->color,1,1,3);
   }
   if(lumi>0) plotBJetEta.AddTextBox(0.21,0.75,0.51,0.9,0,1,-1,3,lumitext[0],lumitext[1],lumitext[2]);
   plotBJetEta.SetYRange(0,2.0*(plotBJetEta.GetStack()->GetMaximum()));
@@ -1021,7 +1024,7 @@ void plotEmu(const TString  conf,         // input file
   for(UInt_t isam=1; isam<samplev.size(); isam++) {
     if(snamev[isam].Contains("_mssm_") || snamev[isam].Contains("_sm_")) continue;
     if(isam==izmm) continue;
-    plotBJetPhi.AddToStack(hBJetPhiv[isam],samplev[isam]->label,samplev[isam]->color,1,1,2);
+    plotBJetPhi.AddToStack(hBJetPhiv[isam],samplev[isam]->label,samplev[isam]->color,1,1,3);
   }
   if(lumi>0) plotBJetPhi.AddTextBox(0.21,0.75,0.51,0.9,0,1,-1,3,lumitext[0],lumitext[1],lumitext[2]);
   plotBJetPhi.SetYRange(0,2.1*(plotBJetPhi.GetStack()->GetMaximum()));
@@ -1033,7 +1036,7 @@ void plotEmu(const TString  conf,         // input file
   for(UInt_t isam=1; isam<samplev.size(); isam++) {
     if(snamev[isam].Contains("_mssm_") || snamev[isam].Contains("_sm_")) continue;
     if(isam==izmm) continue;
-    plotNPV.AddToStack(hNPVv[isam],samplev[isam]->label,samplev[isam]->color,1,1,2);
+    plotNPV.AddToStack(hNPVv[isam],samplev[isam]->label,samplev[isam]->color,1,1,3);
   }
   if(hasData) { plotNPV.AddHist1D(hNPVv[0],samplev[0]->label,"E"); }
   if(lumi>0) plotNPV.AddTextBox(0.6,0.55,0.9,0.4,0,1,-1,3,lumitext[0],lumitext[1],lumitext[2]);
@@ -1045,7 +1048,7 @@ void plotEmu(const TString  conf,         // input file
   for(UInt_t isam=1; isam<samplev.size(); isam++) {
     if(snamev[isam].Contains("_mssm_") || snamev[isam].Contains("_sm_")) continue;
     if(isam==izmm) continue;
-    plotNPVraw.AddToStack(hNPVrawv[isam],samplev[isam]->label,samplev[isam]->color,1,1,2);
+    plotNPVraw.AddToStack(hNPVrawv[isam],samplev[isam]->label,samplev[isam]->color,1,1,3);
   }
   if(hasData) { plotNPVraw.AddHist1D(hNPVrawv[0],samplev[0]->label,"E"); }
   if(lumi>0) plotNPVraw.AddTextBox(0.6,0.55,0.9,0.4,0,1,-1,3,lumitext[0],lumitext[1],lumitext[2]);
@@ -1059,9 +1062,9 @@ void plotEmu(const TString  conf,         // input file
   for(UInt_t isam=1; isam<samplev.size(); isam++) {
     if(isam==izmm) continue;
     if(snamev[isam].Contains("htt_gg")) plotMass.AddToStack(hMassv[isam],"",samplev[isam]->color,0,1,2);
-    else if(snamev[isam].Contains("htt_bb")) plotMass.AddToStack(hMassv[isam],samplev[isam]->label,samplev[isam]->color,1,1,2);
+    else if(snamev[isam].Contains("htt_bb")) plotMass.AddToStack(hMassv[isam],samplev[isam]->label,samplev[isam]->color,1,1,3);
     else if(snamev[isam].Contains("_mssm_") || snamev[isam].Contains("_sm_")) continue;
-    else plotMass.AddToStack(hMassv[isam],samplev[isam]->label,samplev[isam]->color,1,1,2);
+    else plotMass.AddToStack(hMassv[isam],samplev[isam]->label,samplev[isam]->color,1,1,3);
   }
   if(lumi>0) plotMass.AddTextBox(0.55,0.75,0.85,0.895,0,1,-1,3,lumitext[0],lumitext[1],lumitext[2]); //(0.6,0.754,0.93,0.9);
   // plotMass.AddTextBox("#bf{m_{A}=120, tan#beta=20}",0.737,0.537,0.897,0.637,0);
@@ -1075,7 +1078,7 @@ void plotEmu(const TString  conf,         // input file
   for(UInt_t isam=1; isam<samplev.size(); isam++) {
     if(isam==izmm) continue;
     if(snamev[isam].Contains("_mssm_") || snamev[isam].Contains("_sm_")) continue;
-    plotMassHigh.AddToStack(hMassHighv[isam],samplev[isam]->label,samplev[isam]->color,1,1,2);
+    plotMassHigh.AddToStack(hMassHighv[isam],samplev[isam]->label,samplev[isam]->color,1,1,3);
   }
   plotMassHigh.TransLegend(0.1,0);
   plotMassHigh.SetLogy();
@@ -1098,9 +1101,9 @@ void plotEmu(const TString  conf,         // input file
   for(UInt_t isam=1; isam<samplev.size(); isam++) {
     if(isam==izmm) continue;
     if(snamev[isam].Contains("htt_gg")) plotMass_i.AddToStack(hMass_iv[isam],"",samplev[isam]->color,0,1,2);
-    else if(snamev[isam].Contains("htt_bb")) plotMass_i.AddToStack(hMass_iv[isam],samplev[isam]->label,samplev[isam]->color,1,1,2);
+    else if(snamev[isam].Contains("htt_bb")) plotMass_i.AddToStack(hMass_iv[isam],samplev[isam]->label,samplev[isam]->color,1,1,3);
     else if(snamev[isam].Contains("_mssm_") || snamev[isam].Contains("_sm_")) continue;
-    else plotMass_i.AddToStack(hMass_iv[isam],samplev[isam]->label,samplev[isam]->color,1,1,2);
+    else plotMass_i.AddToStack(hMass_iv[isam],samplev[isam]->label,samplev[isam]->color,1,1,3);
   }
   plotMass_i.SetLegend(0.55,0.4,0.9,0.65);
   if(lumi>0) plotMass_i.AddTextBox(0.55,0.75,0.85,0.895,0,1,-1,3,lumitext[0],lumitext[1],lumitext[2]); //(0.6,0.754,0.93,0.9);
@@ -1120,14 +1123,14 @@ void plotEmu(const TString  conf,         // input file
     if(isam==izmm) continue;
     if(snamev[isam].Contains("htt_gf")) {
       hMass_novbfv[isam]->Scale(10.);
-      plotMass_novbf.AddToStack(hMass_novbfv[isam],"#bf{(10x)}"+samplev[isam]->label,samplev[isam]->color,1,1,2);
+      plotMass_novbf.AddToStack(hMass_novbfv[isam],"#bf{(10x)}"+samplev[isam]->label,samplev[isam]->color,1,1,3);
     }
     else if(snamev[isam].Contains("htt_vbf")) {
       hMass_novbfv[isam]->Scale(10.);
       plotMass_novbf.AddToStack(hMass_novbfv[isam],"",samplev[isam]->color,0,1,2);
     }
     else if(snamev[isam].Contains("_mssm_") || snamev[isam].Contains("_sm_")) continue;
-    else plotMass_novbf.AddToStack(hMass_novbfv[isam],samplev[isam]->label,samplev[isam]->color,1,1,2);
+    else plotMass_novbf.AddToStack(hMass_novbfv[isam],samplev[isam]->label,samplev[isam]->color,1,1,3);
   }
   plotMass_novbf.SetLegend(0.7,0.65,0.9,0.9);
   if(lumi>0) plotMass_novbf.AddTextBox(0.55,0.75,0.85,0.895,0,1,-1,3,lumitext[0],lumitext[1],lumitext[2]); //(0.6,0.754,0.93,0.9);
@@ -1147,14 +1150,14 @@ void plotEmu(const TString  conf,         // input file
     if(isam==izmm) continue;
     if(snamev[isam].Contains("htt_gf")) {
       hMass_vbfv[isam]->Scale(10.);
-      plotMass_vbf.AddToStack(hMass_vbfv[isam],"#bf{(10x)}"+samplev[isam]->label,samplev[isam]->color,1,1,2);
+      plotMass_vbf.AddToStack(hMass_vbfv[isam],"#bf{(10x)}"+samplev[isam]->label,samplev[isam]->color,1,1,3);
     }
     else if(snamev[isam].Contains("htt_vbf")) {
       hMass_vbfv[isam]->Scale(10.);
       plotMass_vbf.AddToStack(hMass_vbfv[isam],"",samplev[isam]->color,0,1,2);
     }
     else if(snamev[isam].Contains("_mssm_") || snamev[isam].Contains("_sm_")) continue;
-    else plotMass_vbf.AddToStack(hMass_vbfv[isam],samplev[isam]->label,samplev[isam]->color,1,1,2);
+    else plotMass_vbf.AddToStack(hMass_vbfv[isam],samplev[isam]->label,samplev[isam]->color,1,1,3);
   }
   plotMass_vbf.SetYRange(0,2.1*(plotMass_vbf.GetStack()->GetMaximum()));
   plotMass_vbf.SetLegend(0.7,0.65,0.9,0.9);
@@ -1174,9 +1177,9 @@ void plotEmu(const TString  conf,         // input file
   for(UInt_t isam=1; isam<samplev.size(); isam++) {
     if(isam==izmm) continue;
     if(snamev[isam].Contains("htt_gg")) plotMass_nob.AddToStack(hMass_nobv[isam],"",samplev[isam]->color,0,1,2);
-    else if(snamev[isam].Contains("htt_bb")) plotMass_nob.AddToStack(hMass_nobv[isam],samplev[isam]->label,samplev[isam]->color,1,1,2);
+    else if(snamev[isam].Contains("htt_bb")) plotMass_nob.AddToStack(hMass_nobv[isam],samplev[isam]->label,samplev[isam]->color,1,1,3);
     else if(snamev[isam].Contains("_mssm_") || snamev[isam].Contains("_sm_")) continue;
-    else plotMass_nob.AddToStack(hMass_nobv[isam],samplev[isam]->label,samplev[isam]->color,1,1,2);
+    else plotMass_nob.AddToStack(hMass_nobv[isam],samplev[isam]->label,samplev[isam]->color,1,1,3);
   }
   plotMass_nob.SetLegend(0.7,0.65,0.9,0.9);
   if(lumi>0) plotMass_nob.AddTextBox(0.55,0.75,0.85,0.895,0,1,-1,3,lumitext[0],lumitext[1],lumitext[2]); //(0.6,0.754,0.93,0.9);
@@ -1195,9 +1198,9 @@ void plotEmu(const TString  conf,         // input file
   for(UInt_t isam=1; isam<samplev.size(); isam++) {
     if(isam==izmm) continue;
     if(snamev[isam].Contains("htt_gg")) plotMass_b.AddToStack(hMass_bv[isam],"",samplev[isam]->color,0,1,2);
-    else if(snamev[isam].Contains("htt_bb")) plotMass_b.AddToStack(hMass_bv[isam],samplev[isam]->label,samplev[isam]->color,1,1,2);
+    else if(snamev[isam].Contains("htt_bb")) plotMass_b.AddToStack(hMass_bv[isam],samplev[isam]->label,samplev[isam]->color,1,1,3);
     else if(snamev[isam].Contains("_mssm_") || snamev[isam].Contains("_sm_")) continue;
-    else plotMass_b.AddToStack(hMass_bv[isam],samplev[isam]->label,samplev[isam]->color,1,1,2);
+    else plotMass_b.AddToStack(hMass_bv[isam],samplev[isam]->label,samplev[isam]->color,1,1,3);
   }
   plotMass_b.SetYRange(0,1.6*(plotMass_b.GetStack()->GetMaximum()));
   plotMass_b.SetLegend(0.7,0.65,0.9,0.9);

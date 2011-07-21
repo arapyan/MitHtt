@@ -15,3 +15,9 @@ just run selectEmu.C by itself to start with.
 3) ./run.sh
 4) change run.sh to run plotEmu.C with the arguments you want.
 5) ./run.sh
+
+
+Same-sign fakes:
+
+Run on data only, with the name 'data' changed to 'ss-fakes' in emu.conf, and change
+the == to != for the charges.

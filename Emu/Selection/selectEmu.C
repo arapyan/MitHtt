@@ -1,3 +1,5 @@
+//          mistag                         scale factor
+// TCHEM  0.0175 \pm .0003 \pm .0038      1.21 \pm .02 \pm .17
 #if !defined(__CINT__) || defined(__MAKECINT__)
 #include <TROOT.h>                  // access to gROOT, entry point to ROOT system
 #include <TSystem.h>                // interface to OS
@@ -30,17 +32,6 @@
 #include "MitHtt/Ntupler/interface/TElectron.hh"
 #include "MitHtt/Ntupler/interface/TJet.hh"   
 #include "MitHtt/Ntupler/interface/TVertex.hh"   
-#define BYTETOBINARYPATTERN "%d%d%d%d%d%d%d%d"
-#define BYTETOBINARY(byte)  \
-  (byte & 0x80 ? 1 : 0),    \
-  (byte & 0x40 ? 1 : 0),    \
-  (byte & 0x20 ? 1 : 0),    \
-  (byte & 0x10 ? 1 : 0),    \
-  (byte & 0x08 ? 1 : 0),    \
-  (byte & 0x04 ? 1 : 0),    \
-  (byte & 0x02 ? 1 : 0),    \
-  (byte & 0x01 ? 1 : 0)
-//printf("Leading text "BYTETOBINARYPATTERN"\n", BYTETOBINARY(byte));
 
 #include "MitHtt/Utils/RecoilCorrector.hh"
 #include "MitHtt/Emu/EScale/EScale.hh"
@@ -89,7 +80,6 @@ Double_t kfValue(const Double_t pt, const TH1F* hKF);
 
 // Initialize npu weights
 vector<Double_t> generate_flat10_weights(TString datafname, TString mcfname);
-vector<double> generate_flat10_weights_old(TString datafname); // official version from twiki (wrong)
 
 // lepton id eff.
 Double_t eleIDscale(const mithep::TElectron *ele);
@@ -103,9 +93,6 @@ Double_t muTrigEff(const mithep::TMuon *mu);
 
 // get number of entries in unskimmed tree (hard-coded to look in /scratch)
 Double_t unskimmedEntries(TString skimname);
-
-// print UInt_t in base-2 
-void printtrig(UInt_t ktrig);
 
 //=== MAIN MACRO =================================================================================================
 
@@ -199,19 +186,19 @@ void selectEmu(const TString conf,         // input file
 
   Bool_t doNpuRwgt = kTRUE;
   // write out png's to see how the npu distrib looks
-  Bool_t checkNpuHists = kTRUE;
+  Bool_t checkNpuHists = kFALSE;
   // make hists for future reweights
   Bool_t makeNpuHists  = kFALSE;
 
-  // Set up NNLO-NNLL k-factor reweighting (if necessary)
+  // Set up NNLO-NNLL k-factor reweighting (if necessary) [ not implemented ]
   TH1F *hKFactors = (doKFactors) ? kfInit(kfdata) : 0;
 
-  // set up trigger efficiency corrections (old method)
-  TriggerEfficiency TEff;
+  // // set up trigger efficiency corrections (old method)
+  // TriggerEfficiency TEff;
 
-  // set up energy scale/smearing
-  UInt_t escale = kCenter; // enums defined in EScale.hh
-  EScale scaler;           // note: arguments to this constructor are input files. defaults exist
+  // // set up energy scale/smearing
+  // UInt_t escale = kCenter; // enums defined in EScale.hh
+  // EScale scaler("data/data-EnergyScale.root","data/mc-EnergyScale.root");
 
   //
   // Access samples and fill histograms
@@ -260,6 +247,8 @@ void selectEmu(const TString conf,         // input file
     outtree.Branch("rawprojvar",&rawprojvar);
     outtree.Branch("npuWgt",&npuWgt);
 
+    // Double_t counter[30]; for(Int_t i=0; i<30; i++) { counter[i] = 0; }
+    
     //
     // loop through files
     //
@@ -345,12 +334,13 @@ void selectEmu(const TString conf,         // input file
       samp->weightv.push_back(weight);
 
       // counters
-      Double_t nsel[3], nselvar[3]; for(Int_t i=0; i<3; i++)  { nsel[i]    = nselvar[i] = 0; } // events in thsi file
-      Double_t counter[30];         for(Int_t i=0; i<30; i++) { counter[i] = 0; }
+      Double_t nsel[3], nselvar[3]; for(Int_t i=0; i<3; i++)  { nsel[i]    = nselvar[i] = 0; } // events in this file
       Double_t nlowmass=0; // low mass z events (below 50)
 
       // loop over events
       for(UInt_t ientry=0; ientry<eventTree->GetEntries(); ientry++) {
+	// Bool_t  boocount[30]; for(Int_t i=0; i<30; i++) { boocount[i] = kFALSE; }
+
         infoBr->GetEntry(ientry);
 
 	if(!isdata && (doNpuRwgt || makeNpuHists)) {
@@ -367,19 +357,19 @@ void selectEmu(const TString conf,         // input file
 	if(isvvj && (gen->id != EGenType::kWW)) continue;
 
 	// skip non-tau events in madgraph sample
-	if(ismadz  && (fabs(gen->id_1)<3 || fabs(gen->id_1)>6)) continue;
+	if(ismadz && (fabs(gen->id_1)<3 || fabs(gen->id_1)>6)) continue;
 
-	counter[0]+=weight;
+	// boocount[0]=kTRUE;
 
         mithep::RunLumiRangeMap::RunLumiPairType rl(info->runNum, info->lumiSec);
         if(hasJSON && !rlrm.HasRunLumi(rl)) continue;  // not certified run? Skip to next event...
 
-	counter[1]+=weight;
+	// boocount[1]=kTRUE;
 
 	ULong_t trigger =  kHLT_Mu8_Ele17_CaloIdL | kHLT_Mu17_Ele8_CaloIdL;
 	if(hasTrigs) if(!(info->triggerBits & trigger)) continue;  // no trigger accept? Skip to next event...
 
-	counter[2]+=weight;
+	// boocount[2]=kTRUE;
 
         // No good primary vertex? Skip to next event...
         if(!info->hasGoodPV) continue;
@@ -445,8 +435,8 @@ void selectEmu(const TString conf,         // input file
         Int_t finalState=-1;	           // final state type
 
 	//----------------------------------------------------------------------------------------
-	if(goodMuonsv.size()>0)     counter[3]+=weight;
-	if(goodElectronsv.size()>0) counter[4]+=weight;
+	// if(goodMuonsv.size()>0)     boocount[3]=kTRUE;
+	// if(goodElectronsv.size()>0) boocount[4]=kTRUE;
 
 	if(goodMuonsv.size()<1 || goodElectronsv.size()<1) continue;
 
@@ -468,7 +458,7 @@ void selectEmu(const TString conf,         // input file
 
 	if(mu->q == ele->q) continue; // skip same-sign events
 
-	counter[5]+=weight;
+	// boocount[5]=kTRUE;;
 
 	if(mu->pt > ele->pt) {
 	  lep1.SetPtEtaPhiM(mu->pt,  mu->eta,  mu->phi,  0.105658369);
@@ -548,7 +538,7 @@ void selectEmu(const TString conf,         // input file
 	metv.SetPtEtaPhi(met,0,metphi); // corrected met
 	projMet  =  metv.Dot(bisector);
 
-	if(0.85*projVis-projMet < 25) counter[6]+=weight;
+	// if(0.85*projVis-projMet < 25) boocount[6]=kTRUE;
 
 	// //----------------------------------------------------------------------------------------
 
@@ -621,6 +611,10 @@ void selectEmu(const TString conf,         // input file
 	// passing events in whole sample 
         nSelEvents[0] += weight*kf*npuWgt*trigeff*idscale;
 
+	// for(Int_t i=0; i<30; i++) {
+	//   if(boocount[i]) counter[i]+=weight*kf*npuWgt*trigeff*idscale;
+	// }
+
         data.runNum  = info->runNum;
         data.evtNum  = info->evtNum;
         data.lumiSec = info->lumiSec;
@@ -661,13 +655,6 @@ void selectEmu(const TString conf,         // input file
       printf("%8.2f +/- %-8.2f\n",nsel[0],sqrt(nselvar[0]));
       if(nlowmass > 0) printf("           ---> selected events with z mass < 50:  %10.3f (out of %15.3f)\n",nlowmass,nsel[0]);
 
-      // write out cutflow
-      FILE *fcut = fopen(outputDir+"/cutflow.txt","a");
-      fprintf(fcut,"\n%45s%20.2f%20.2f%20.2f%20.2f%20.2f%20.2f%20.2f\n",
-	      basename.Data(),counter[0],counter[1],
-	      counter[2],counter[3],counter[4],counter[5],counter[6]);
-      fclose(fcut);
-
       if(!isdata && (doNpuRwgt || makeNpuHists)) {
 	hpu    ->Scale(1./    hpu->Integral(0,    hpu->GetNbinsX()+1));
 	hpuRwgt->Scale(1./hpuRwgt->Integral(0,hpuRwgt->GetNbinsX()+1));
@@ -706,6 +693,16 @@ void selectEmu(const TString conf,         // input file
     }
     outfile.Write();
     outfile.Close();
+
+    // // write out cutflow
+    // FILE *fcut = fopen(outputDir+"/cutflow.txt","a");
+    // cout << (outputDir+"/cutflow.txt").Data() << endl;
+    // Double_t kssFakeWgt = 1;
+    // if(snamev[isam].Contains("ss-fakes")) kssFakeWgt = 1.312;
+    // fprintf(fcut,"%45s%20.2f%20.2f%20.2f%20.2f%20.2f%20.2f%20.2f\n",
+    // 	    snamev[isam].Data(),kssFakeWgt*counter[0],kssFakeWgt*counter[1],
+    // 	    kssFakeWgt*counter[2],kssFakeWgt*counter[3],kssFakeWgt*counter[4],kssFakeWgt*counter[5],kssFakeWgt*counter[6]);
+    // fclose(fcut);
 
     if(samp->typev.size()>0 && samp->typev[0]==eMC)
       printf("    Yields for %1.2f/fb:",lumi/1000.);
@@ -824,38 +821,6 @@ vector<Double_t> generate_flat10_weights(TString datafname, TString mcfname){
   }
 
   return result;
-}
-//----------------------------------------------------------------------------------------
-vector<double> generate_flat10_weights_old(TString datafname){
-
-  TH1D *data_npu_estimated=0;
-  TFile *infile = TFile::Open(datafname);
-  infile->GetObject("pileup",data_npu_estimated); assert(data_npu_estimated);
-  data_npu_estimated->SetDirectory(0);
-  infile->Close();
-
-  // see SimGeneral/MixingModule/python/mix_E7TeV_FlatDist10_2011EarlyData_inTimeOnly_cfi.py; copy and paste from there:
-  const double npu_probs[25] = {0.0698146584, 0.0698146584, 0.0698146584,0.0698146584,0.0698146584,0.0698146584,0.0698146584,0.0698146584,0.0698146584,0.0698146584,0.0698146584 /* <-- 10*/,
-				0.0630151648,0.0526654164,0.0402754482,0.0292988928,0.0194384503,0.0122016783,0.007207042,0.004003637,0.0020278322,
-				0.0010739954,0.0004595759,0.0002229748,0.0001028162,4.58337152809607E-05 /* <-- 24 */};
-  vector<double> result(25);
-
-  double s = 0.0;
-  for(int npu=0; npu<25; ++npu){
-    double npu_estimated = data_npu_estimated->GetBinContent(data_npu_estimated->GetXaxis()->FindBin(npu));                              
-    result[npu] = npu_estimated / npu_probs[npu];
-    s += npu_estimated;
-  }
-  // normalize weights such that the total sum of weights over thw whole sample is 1.0, i.e., sum_i  result[i] * npu_probs[i] should be 1.0 (!)
-  for(int npu=0; npu<25; ++npu){
-    result[npu] /= s;
-  }
-  for(int npu=0; npu<25; ++npu){
-    printf("%10.5f\n",result[npu]);
-  }assert(0);
-  
-  return result;
-  
 }
 //----------------------------------------------------------------------------------------
 Double_t muIDscale(const mithep::TMuon *mu)
@@ -978,10 +943,4 @@ Double_t unskimmedEntries(TString skimname)
   unskimmed.Close();
 
   return entries;
-}
-//----------------------------------------------------------------------------------------
-void printtrig(UInt_t ktrig)
-{
-  printf("  "BYTETOBINARYPATTERN""BYTETOBINARYPATTERN""BYTETOBINARYPATTERN"",
-	 BYTETOBINARY(ktrig>>8),BYTETOBINARY(ktrig>>16),BYTETOBINARY(ktrig>>24));
 }
