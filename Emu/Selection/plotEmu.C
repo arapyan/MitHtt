@@ -100,12 +100,13 @@ void plotEmu(const TString  conf,         // input file
   ifs.close();
 
   // get indices of fakes and zmm, so we can add them together later
-  UInt_t ifake=9999, izmm=9999;
+  UInt_t ifake=9999, izmm=9999, iztt=9999;
   for(UInt_t isam=0; isam<snamev.size(); isam++) {
     if(snamev[isam].Contains("fakes")) ifake = isam;
     if(snamev[isam].Contains("zmm"))   izmm  = isam;
+    if(snamev[isam].Contains("ztt"))   iztt = isam;
   }
-  if(ifake>snamev.size() || izmm>snamev.size()) { cout << "error -- ifake: " << ifake << " izmm: " << izmm << endl << endl; return; }
+  if(ifake>snamev.size() || izmm>snamev.size() || iztt>snamev.size()) { cout << "error -- ifake: " << ifake << " izmm: " << izmm << " iztt: " << iztt << endl << endl; return; }
 
   CPlot::sOutDir = outputDir + TString("/plots");
   
@@ -115,7 +116,7 @@ void plotEmu(const TString  conf,         // input file
                                      // careful: this is hardcoded in selectEmu.C
 
   //
-  // scale factors for each category
+  // scale factors for each category in Z->tautau
   //
   const Double_t kCat_novbf = 0.999;
   const Double_t kCat_vbf   = 1.401;
@@ -432,36 +433,41 @@ void plotEmu(const TString  conf,         // input file
 
       // no vbf
       if((data.njets < 2) || (data.njets == 2 && !vbfcuts)) {
-      	hMass_novbfv[isam]   ->Fill(data.mass,   (isam==0) ? wgt : kCat_novbf*wgt);      
-      	hMassL_novbfv[isam]  ->Fill(data.mass,   (isam==0) ? wgt : kCat_novbf*wgt);      
-      	nSel_novbfv[isam]     += (isam==0) ? wgt : kCat_novbf*wgt;
-      	nSelVar_novbfv[isam]  += (isam==0) ? wgt : kCat_novbf*wgt*kCat_novbf*wgt;
+      	hMass_novbfv[isam]    ->Fill(data.mass, (isam==iztt) ? kCat_novbf*wgt                : wgt);      
+      	hMassL_novbfv[isam]   ->Fill(data.mass, (isam==iztt) ? kCat_novbf*wgt                : wgt);      
+      	nSel_novbfv[isam]     +=                (isam==iztt) ? kCat_novbf*wgt                : wgt;
+      	nSelVar_novbfv[isam]  +=                (isam==iztt) ? kCat_novbf*wgt*kCat_novbf*wgt : wgt*wgt;
       }
       // vbf
       if(data.njets==2 && vbfcuts) {
-      	hMass_vbfv[isam]   ->Fill(data.mass,   (isam==0) ? wgt : kCat_vbf*wgt);      
-      	hMassL_vbfv[isam]  ->Fill(data.mass,   (isam==0) ? wgt : kCat_vbf*wgt);      
-      	nSel_vbfv[isam]     += (isam==0) ? wgt : kCat_vbf*wgt;
-      	nSelVar_vbfv[isam]  += (isam==0) ? wgt : kCat_vbf*wgt*kCat_vbf*wgt;
+      	hMass_vbfv[isam]    ->Fill(data.mass, (isam==iztt) ? kCat_vbf*wgt              : wgt);      
+      	hMassL_vbfv[isam]   ->Fill(data.mass, (isam==iztt) ? kCat_vbf*wgt              : wgt);      
+      	nSel_vbfv[isam]     +=                (isam==iztt) ? kCat_vbf*wgt              : wgt;
+      	nSelVar_vbfv[isam]  +=                (isam==iztt) ? kCat_vbf*wgt*kCat_vbf*wgt : wgt*wgt;
       }
       Double_t bscale;
+      Double_t fac;
       // no b-tag
       if(data.njets<=1 && data.nbjets==0) {
-	if(expB) bscale = kExpB_nob;
-	else     bscale = kUnB_nob;
-	hMass_nobv[isam]   ->Fill(data.mass,   (isam==0) ? wgt : bscale*kCat_nob*wgt);      
-	hMassL_nobv[isam]  ->Fill(data.mass,   (isam==0) ? wgt : bscale*kCat_nob*wgt);      
-	nSel_nobv[isam]     += (isam==0) ? wgt : bscale*kCat_nob*wgt;
-	nSelVar_nobv[isam]  += (isam==0) ? wgt : bscale*kCat_nob*wgt*kCat_nob*wgt;
+	if(expB)         bscale = kExpB_nob;
+	else             bscale = kUnB_nob;
+	if(isam==iztt)   fac = bscale*kCat_nob;
+	else             fac = bscale;
+	hMass_nobv[isam]    ->Fill(data.mass, (isam==0) ? wgt     : fac*wgt);      
+	hMassL_nobv[isam]   ->Fill(data.mass, (isam==0) ? wgt     : fac*wgt);      
+	nSel_nobv[isam]     +=                (isam==0) ? wgt     : fac*wgt;
+	nSelVar_nobv[isam]  +=                (isam==0) ? wgt*wgt : fac*wgt*fac*wgt;
       }
       // b-tag
       if(data.njets<=1 && data.nbjets>0) {
-	if(expB) bscale = kExpB_b;
-	else     bscale = kUnB_b;
-	hMass_bv[isam]   ->Fill(data.mass,   (isam==0) ? wgt : bscale*kCat_b*wgt);      
-	hMassL_bv[isam]  ->Fill(data.mass,   (isam==0) ? wgt : bscale*kCat_b*wgt);      
-	nSel_bv[isam]     += (isam==0) ? wgt : bscale*kCat_b*wgt;
-	nSelVar_bv[isam]  += (isam==0) ? wgt : bscale*kCat_b*wgt*kCat_b*wgt;
+	if(expB)         bscale = kExpB_b;
+	else             bscale = kUnB_b;
+	if(isam==iztt)   fac = bscale*kCat_b;
+	else             fac = bscale;
+	hMass_bv[isam]    ->Fill(data.mass, (isam==0) ? wgt     : fac*wgt);      
+	hMassL_bv[isam]   ->Fill(data.mass, (isam==0) ? wgt     : fac*wgt);      
+	nSel_bv[isam]     +=                (isam==0) ? wgt     : fac*wgt;
+	nSelVar_bv[isam]  +=                (isam==0) ? wgt*wgt : fac*wgt*fac*wgt;
       }
     }
     delete infile;
