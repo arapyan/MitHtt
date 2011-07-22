@@ -1,7 +1,7 @@
 #include "mssm_xs_tools.h"
 
 /**
-   \class   plot_xsec plot_xsec.C "MitHtt/tools/plot_xsec.c"
+   \class   plot_xsec plot_xsec.C "MitHtt/macros/plot_xsec.c"
 
    \brief   macro to create the cross section for Higgs production as function of mA/mH
 
@@ -10,7 +10,7 @@
 
     + mssm_xs_tools.h
     + mssm_xs_tools.C
-    + out.mhmax_7.root
+    + out.mhmax_7.root (expected in sub-directory MitHtt/macros/root)
 
    You can download these from the following web page: 
 
@@ -44,7 +44,7 @@ int
 plot_xsec()
 {
   mssm_xs_tools mssm;
-  mssm.SetInput("out.mhmax_7.root"); //mssm.help();
+  mssm.SetInput("root/out.mhmax_7.root"); //mssm.help();
 
   /// SM Higgs boson
   TGraph* smHiggs = new TGraph();
@@ -132,10 +132,6 @@ plot_xsec()
     std::cout << "mass[GeV]: " << mass  << std::endl;
     std::cout << "xsec[pb ]: " << mssm.Give_Xsec_ggFA(mass, tanB)/1000. << std::endl;
     std::cout << "BR       : " << mssm.Give_BR_A_tautau(mass, tanB) << std::endl;
-
-    std::cout << "<<<<<<<<<<<<<<<<<<<<<," << std::endl;
-    std::cout << "BR mumu" << mssm.Give_BR_A_mumu(mass, tanB) << std::endl;
-    std::cout << "<<<<<<<<<<<<<<<<<<<<<," << std::endl;
   } 
 
 
