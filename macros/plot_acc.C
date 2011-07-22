@@ -1,11 +1,16 @@
-#include "mssm_xs_tools.h"
-
 /**
-   \class   plot_xsec plot_xsec.C "MitHtt/tools/plot_xsec.c"
+   \class   plot_acc plot_acc.C "MitHtt/macros/plot_acc.c"
 
-   \brief   macro to create the cross section for Higgs production as function of mA/mH
+   \brief   macro to create the acceptance plots for the Inclusive Selection as descriobed in AN-11-153
 
-   
+   macro to creat the acceptance plots as function of mA/mH after the Inclusive Selection as desribed 
+   in AN-11-153 (v20). The acceptances have been gathered from the analyses. Run this macro in root in
+   the following way:
+
+   root -l
+   .x plot_acc.C
+
+   A plot will be created that can be safed manually. 
 */
 
 int

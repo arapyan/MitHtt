@@ -1,3 +1,19 @@
+/**
+   \class   plot_acc_b plot_acc_b.C "MitHtt/macros/plot_acc_b.c"
+
+   \brief   macro to create the acceptance plots for the B-Tag Category as descriobed in AN-11-153
+
+   macro to creat the acceptance plots as function of mA/mH after the B-Tag Category as desribed in 
+   AN-11-153 (v20). The acceptances have been gathered from the analyses. Run this macro in root in
+   the following way:
+
+   root -l
+   .x plot_acc_b.C
+
+   A plot will be created that can be safed manually. Note that the low statistics curves are replaced 
+   by simple polinomial fits.
+*/
+
 int
 plot_acc_b()
 {

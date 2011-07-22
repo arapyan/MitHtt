@@ -1,3 +1,18 @@
+/**
+   \class   plot_acc_novbf plot_acc_novbf.C "MitHtt/macros/plot_acc_novbf.c"
+
+   \brief   macro to create the acceptance plots for the Non-VBF Category as descriobed in AN-11-153
+
+   macro to creat the acceptance plots as function of mA/mH after the Non VBF Category as desribed in 
+   AN-11-153 (v20). The acceptances have been gathered from the analyses. Run this macro in root in
+   the following way:
+
+   root -l
+   .x plot_acc_b.C
+
+   A plot will be created that can be safed manually. 
+*/
+
 int
 plot_acc_novbf()
 {
