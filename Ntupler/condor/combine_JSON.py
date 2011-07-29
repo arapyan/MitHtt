@@ -1,5 +1,12 @@
 #!/usr/bin/env python
 
+# example: I want to combine a.json and b.json, and then apply the good run list good.json to the 
+# combination of the two.
+#
+# ./combine_JSON.py -r or  -a a.json    -b b.json      -o total.json
+# ./combine_JSON.py -r and -a good.json -b total.json  -o  good.json
+# 
+
 import sys,ConfigParser,os,string,commands,time
 from optparse import OptionParser
 import json
