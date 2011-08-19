@@ -36,7 +36,7 @@
    culation. To run the macro do the following:
 
    root -l 
-   .L MitStyle.cc++
+   .L HttStyle.cc++
    .L emuAfterFit_novbf.C++ 
    emuAfterFit_b()
 
@@ -62,19 +62,19 @@ TH1F* refill(TH1F* hin)
 // rescale histograms according to fit
 void rescale(TH1F* hin, unsigned int idx)
 {
-  double lumi                = 1.0090; // +0.15 * 1.06
-  double CMS_eff_e           = 1.0336; // +1.68 * 1.02
-  double CMS_eff_m           = 1.0094; // +0.47 * 1.02 
-  double CMS_scale_j         = 1.0000; // nan
-  double CMS_htt_zttNorm     = 1.0318; // +1.06 * 1.03
-  double CMS_htt_ttbarNorm   = 0.9350; // -0.65 * 1.10
-  double CMS_htt_DiBosonNorm = 0.7840; // -0.72 * 1.30
-  double CMS_hww_fakes_em    = 0.9370; // -0.21 * 1.30
-  double pdf_gg              = 1.0561; // +1.87 * 1.03
-  double pdf_qqbar           = 1.0561; // +1.87 * 1.03
-  double QCDScale_qqHin      = 1.2244; // +1.87 * 1.12
-  double QCDScale_ggH        = 1.0654; // +1.87 * 1.035
-  double ueps                = 0.9252; // +1.87 * 1.04
+  double lumi                = 1.0013; // +0.03 * 1.045
+  double CMS_eff_e           = 0.9496; // -2.52 * 1.02
+  double CMS_eff_m           = 1.0446; // +2.23 * 1.02 
+  double CMS_scale_j         = 1.0000; // +0.78 * 1.00
+  double CMS_htt_zttNorm     = 0.9974; // -0.08 * 1.033
+  double CMS_htt_ttbarNorm   = 1.0120; // +0.12 * 1.10
+  double CMS_htt_DiBosonNorm = 0.7780; // -0.74 * 1.30
+  double CMS_hww_fakes_em    = 1.2250; // +0.75 * 1.30
+  double pdf_gg              = 1.0000; //  0.00 * 1.03
+  double pdf_qqbar           = 1.0000; //  0.00 * 1.03
+  double QCDScale_ggHin      = 1.0000; //  0.00 * 1.12
+  double QCDScale_qqH        = 1.0000; //  0.00 * 1.035
+  double ueps                = 1.0000; //  0.00 * 1.04
 
 
   switch(idx){
@@ -87,9 +87,9 @@ void rescale(TH1F* hin, unsigned int idx)
   case 4: // Fakes
     hin->Scale(CMS_eff_e*CMS_eff_m*CMS_scale_j*CMS_hww_fakes_em); break;
   case 5: // ggH
-    hin->Scale(lumi*CMS_eff_e*CMS_eff_m*CMS_scale_j*pdf_gg*QCDScale_ggH*ueps); break;
+    hin->Scale(lumi*CMS_eff_e*CMS_eff_m*CMS_scale_j*pdf_gg*QCDScale_ggHin*ueps); break;
   case 6: // qqH
-    hin->Scale(lumi*CMS_eff_e*CMS_eff_m*CMS_scale_j*pdf_qqbar*QCDScale_qqHin*ueps); break;
+    hin->Scale(lumi*CMS_eff_e*CMS_eff_m*CMS_scale_j*pdf_qqbar*QCDScale_qqH*ueps); break;
   default :
     std::cout << "error histograms not known?!?" << std::endl;
   }
@@ -147,10 +147,10 @@ emuAfterFit_novbf(bool scaled = true, bool log = true)
   if(log){
     canv->SetLogy(1);
     data->SetMinimum(0.5);
-    data->SetMaximum(5000.);
+    data->SetMaximum(8000.);
   }
   else{
-    data->SetMaximum(1500.);
+    data->SetMaximum(2000.);
   }
   data->Draw("e");
 

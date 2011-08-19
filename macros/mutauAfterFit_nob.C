@@ -36,7 +36,7 @@
    culation. To run the macro do the following:
 
    root -l 
-   .L MitStyle.cc++
+   .L HttStyle.cc++
    .L mutauAfterFit_nob.C++ 
    mutauAfterFit_b()
 
@@ -62,21 +62,21 @@ TH1F* refill(TH1F* hin)
 // rescale histograms according to fit
 void rescale(TH1F* hin, unsigned int idx)
 {
-  double lumi                  = 0.9934; // -0.11 * 1.06
-  double CMS_eff_m             = 0.9993; // -0.07 * 1.01
-  double CMS_eff_t             = 1.0216; // +0.36 * 1.06 
-  double CMS_scale_j           = 0.9756; // -1.22 * 1.02
-  double CMS_eff_b             = 0.9926; // -0.07 * 0.894
-  double CMS_fake_b            = 1.4774; // +3.41 * 0.86
-  double CMS_htt_zttNorm       = 1.0123; // +0.41 * 1.03
-  double CMS_htt_ttbarNorm     = 0.9625; // -0.31 * 1.121
-  double CMS_htt_DiBosonNorm   = 0.4800; // -0.52 * 2.00
-  double CMS_htt_QCDNorm       = 1.1806; // +3.01 * 1.06
-  double CMS_htt_QCDSyst       = 1.0897; // +4.72 * 1.019
-  double CMS_htt_WNorm         = 0.7315; // -0.57 * 0.529
-  double CMS_htt_WSyst         = 0.9830; // -0.27 * 1.063
-  double CMS_htt_ZJFake        = 0.3662; // -5.03 * 1.126
-  double CMS_htt_ZLFake        = 1.3654; // +1.40 * 1.261
+  double lumi                  = 0.9946; // -0.12 * 1.045
+  double CMS_eff_m             = 0.9901; // -0.99 * 1.01
+  double CMS_eff_t             = 1.0090; // +0.15 * 1.06 
+  double CMS_scale_j           = 1.0525; // -1.75 * 0.97
+  double CMS_eff_b             = 0.9226; // +0.73 * 0.894
+  double CMS_fake_b            = 0.9298; // +0.54 * 0.87
+  double CMS_htt_zttNorm       = 1.0099; // +0.30 * 1.033
+  double CMS_htt_ttbarNorm     = 1.0789; // +0.68 * 1.116
+  double CMS_htt_DiBosonNorm   = 0.0000; // -1.31 * 2.00
+  double CMS_htt_QCDNorm       = 1.0032; // +0.21 * 1.015
+  double CMS_htt_QCDSyst       = 1.0061; // +0.32 * 1.019
+  double CMS_htt_WNorm         = 1.0005; // +0.05 * 1.01
+  double CMS_htt_WSyst         = 1.0167; // +0.27 * 1.062
+  double CMS_htt_ZJFake        = 0.9833; // -0.25 * 1.119
+  double CMS_htt_ZLFake        = 1.2150; // +0.83 * 1.259
 
   switch(idx){
   case 1: //ZTT 
@@ -183,10 +183,10 @@ mutauAfterFit_nob(bool scaled = true, bool log = true)
   if(log){
     canv->SetLogy(1);
     data->SetMinimum(5.0);
-    data->SetMaximum(10000.);
+    data->SetMaximum(20000.);
   }
   else{
-    data->SetMaximum(4500.);
+    data->SetMaximum(8000.);
   }
   data->SetNdivisions(505);
   data->Draw("e");

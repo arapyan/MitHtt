@@ -36,7 +36,7 @@
    culation. To run the macro do the following:
 
    root -l 
-   .L MitStyle.cc++
+   .L HttStyle.cc++
    .L mutauAfterFit_b.C++ 
    mutauAfterFit_b()
 
@@ -60,20 +60,20 @@ TH1F* refill(TH1F* hin)
 // rescale histograms according to fit
 void rescale(TH1F* hin, unsigned int idx)
 {
-  double lumi                  = 0.9934; // -0.11 * 1.06
-  double CMS_eff_m             = 0.9993; // -0.07 * 1.01
-  double CMS_eff_t             = 1.0216; // +0.36 * 1.06 
-  double CMS_scale_j           = 0.9756; // -1.22 * 1.02
-  double CMS_eff_b             = 0.9926; // -0.07 * 1.106
-  double CMS_fake_b            = 1.4774; // +3.41 * 1.14
-  double CMS_htt_zttNorm       = 1.0123; // +0.41 * 1.03
-  double CMS_htt_ttbarNorm     = 0.9656; // -0.31 * 1.111
-  double CMS_htt_DiBosonNorm   = 0.4800; // -0.52 * 2.00
-  double CMS_htt_QCDNorm       = 1.0762; // +1.27 * 1.06
-  double CMS_htt_QCDSyst       = 1.0897; // +4.72 * 1.019
-  double CMS_htt_WNorm         = 1.3622; // +5.03 * 1.072
-  double CMS_htt_ZJFake        = 1.6438; // +5.03 * 1.128
-  double CMS_htt_ZLFake        = 2.3128; // +5.03 * 1.261
+  double lumi                  = 0.9946; // -0.12 * 1.045
+  double CMS_eff_m             = 0.9901; // -0.99 * 1.01
+  double CMS_eff_t             = 1.0090; // +0.15 * 1.06 
+  double CMS_scale_j           = 0.8250; // -1.75 * 1.10
+  double CMS_eff_b             = 1.0774; // +0.73 * 1.106
+  double CMS_fake_b            = 1.0702; // +0.54 * 1.13
+  double CMS_htt_zttNorm       = 1.0099; // +0.30 * 1.033
+  double CMS_htt_ttbarNorm     = 1.0327; // +0.68 * 1.109
+  double CMS_htt_DiBosonNorm   = 0.0000; // -1.31 * 2.00
+  double CMS_htt_QCDNorm       = 1.0243; // +0.27 * 1.09
+  double CMS_htt_QCDSyst       = 1.0061; // +0.32 * 1.019
+  double CMS_htt_WNorm         = 1.0098; // +0.14 * 1.070
+  double CMS_htt_ZJFake        = 1.0024; // +0.02 * 1.120
+  double CMS_htt_ZLFake        = 0.9819; // -0.07 * 1.259
 
   switch(idx){
   case 1: //ZTT 
@@ -148,7 +148,7 @@ mutauAfterFit_b(bool scaled = true)
   TCanvas *canv = MakeCanvas("canv", "histograms", 600, 600);
 
   canv->cd();
-  data->SetMaximum(75.);
+  data->SetMaximum(100.);
   data->SetNdivisions(505);
   data->Draw("e");
 

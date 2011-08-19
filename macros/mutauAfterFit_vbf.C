@@ -36,7 +36,7 @@
    culation. To run the macro do the following:
 
    root -l 
-   .L MitStyle.cc++
+   .L HttStyle.cc++
    .L mutauAfterFit_vbf.C++ 
    mutauAfterFit_vbf()
 
@@ -60,23 +60,23 @@ TH1F* refill(TH1F* hin)
 // rescale histograms according to fit
 void rescale(TH1F* hin, unsigned int idx)
 {
-  double lumi                  = 1.0090; // +0.15 * 1.06
-  double CMS_eff_m             = 1.0047; // +0.47 * 1.01
-  double CMS_eff_t             = 0.9550; // -0.75 * 1.06 
-  double CMS_scale_j           = 0.9696; // -0.76 * 1.04
-  double CMS_htt_zttNorm       = 1.0318; // +1.06 * 1.03
-  double CMS_htt_ttbarNorm     = 0.8265; // -0.65 * 1.267
-  double CMS_htt_DiBosonNorm   = 0.2800; // -0.72 * 2.00
-  double CMS_htt_QCDNorm       = 1.0450; // +0.75 * 1.06
-  double CMS_htt_QCDSyst       = 1.0220; // +1.16 * 1.019
-  double CMS_htt_WNorm         = 1.7295; // +1.93 * 1.378
-  double CMS_htt_ZJFake        = 2.7914; // +4.57 * 1.392
-  double CMS_htt_ZLFake        = 1.8426; // +1.86 * 1.453
-  double pdf_gg                = 1.0561; // +1.87 * 1.03
-  double pdf_qqbar             = 1.0561; // +1.87 * 1.03
-  double QCDScale_qqH          = 1.2244; // +1.87 * 1.12
-  double QCDScale_ggH          = 1.0654; // +1.87 * 1.035
-  double ueps                  = 1.0748; // +1.87 * 1.04
+  double lumi                  = 1.0013; // +0.03 * 1.045
+  double CMS_eff_m             = 1.0223; // +2.23 * 1.01
+  double CMS_eff_t             = 0.9598; // -0.67 * 1.06 
+  double CMS_scale_j           = 1.3900; // +0.78 * 1.50
+  double CMS_htt_zttNorm       = 0.9974; // -0.08 * 1.033
+  double CMS_htt_ttbarNorm     = 1.0283; // +0.12 * 1.236
+  double CMS_htt_DiBosonNorm   = 0.2600; // -0.74 * 2.00
+  double CMS_htt_QCDNorm       = 1.0286; // +0.13 * 1.22
+  double CMS_htt_QCDSyst       = 0.9770; // -1.21 * 1.019
+  double CMS_htt_WNorm         = 1.0195; // +0.21 * 1.195
+  double CMS_htt_ZJFake        = 1.0044; // +0.02 * 1.218
+  double CMS_htt_ZLFake        = 0.9968; // -0.01 * 1.316
+  double pdf_gg                = 1.0000; //  0.00 * 1.03
+  double pdf_qqbar             = 1.0000; //  0.00 * 1.03
+  double QCDScale_qqH          = 1.0000; //  0.00 * 1.12
+  double QCDScale_ggH          = 1.0000; //  0.00 * 1.035
+  double ueps                  = 1.0000; //  0.00 * 1.04
 
   switch(idx){
   case 1: //ZTT 
@@ -150,7 +150,7 @@ mutauAfterFit_vbf(bool scaled = true)
   TCanvas *canv = MakeCanvas("canv", "histograms", 600, 600);
 
   canv->cd();
-  data->SetMaximum(10.);
+  data->SetMaximum(25.);
   data->SetNdivisions(505);
   data->Draw("e");
 

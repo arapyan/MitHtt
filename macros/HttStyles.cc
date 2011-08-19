@@ -194,7 +194,7 @@ void CMSPrelim(const char* channel, double lowX, double lowY)
   lumi->SetTextSize ( 0.04 );
   lumi->SetTextColor(    1 );
   lumi->SetTextFont (   62 );
-  lumi->AddText("1.1 fb^{-1}  #sqrt{s}=7 TeV");
+  lumi->AddText("1.6 fb^{-1}  #sqrt{s}=7 TeV");
   lumi->Draw();
 
   TPaveText* chan     = new TPaveText(lowX, lowY     , lowX+0.5, lowY+0.04, "NDC");

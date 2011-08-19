@@ -36,7 +36,7 @@
    culation. To run the macro do the following:
 
    root -l 
-   .L MitStyle.cc++
+   .L HttStyle.cc++
    .L etauAfterFit_novbf.C++ 
    etauAfterFit_b()
 
@@ -62,24 +62,24 @@ TH1F* refill(TH1F* hin)
 // rescale histograms according to fit
 void rescale(TH1F* hin, unsigned int idx)
 {
-  double lumi                  = 1.0090; // +0.15 * 1.06
-  double CMS_eff_e             = 1.0336; // +1.68 * 1.02
-  double CMS_eff_t             = 0.9550; // -0.75 * 1.06 
-  double CMS_scale_j           = 0.9696; // -0.76 * 0.96
-  double CMS_htt_zttNorm       = 1.0318; // +1.06 * 1.03
-  double CMS_htt_ttbarNorm     = 0.9318; // -0.65 * 1.105
-  double CMS_htt_DiBosonNorm   = 0.2800; // -0.72 * 2.00
-  double CMS_htt_QCDNorm       = 1.0384; // +0.64 * 1.06
-  double CMS_htt_QCDSyst       = 1.0545; // +1.16 * 1.047
-  double CMS_htt_WNorm         = 1.0438; // +0.08 * 0.548
-  double CMS_htt_WSyst         = 1.0258; // +0.43 * 1.06
-  double CMS_htt_ZJFake        = 1.0348; // +0.30 * 1.116
-  double CMS_htt_ZLFake        = 1.1209; // +1.57 * 1.077
-  double pdf_gg                = 1.0561; // +1.87 * 1.03
-  double pdf_qqbar             = 1.0561; // +1.87 * 1.03
-  double QCDScale_qqH          = 1.2244; // +1.87 * 1.12
-  double QCDScale_ggH          = 1.0654; // +1.87 * 1.035
-  double ueps                  = 1.0748; // +1.87 * 0.96
+  double lumi                  = 1.0013; // +0.03 * 1.045
+  double CMS_eff_e             = 0.9496; // -2.52 * 1.02
+  double CMS_eff_t             = 0.9598; // -0.67 * 1.06 
+  double CMS_scale_j           = 0.9844; // +0.78 * 0.98
+  double CMS_htt_zttNorm       = 0.9974; // -0.08 * 1.033
+  double CMS_htt_ttbarNorm     = 1.0125; // +0.12 * 1.104
+  double CMS_htt_DiBosonNorm   = 0.2600; // -0.74 * 2.00
+  double CMS_htt_QCDNorm       = 0.9899; // -0.77 * 1.013
+  double CMS_htt_QCDSyst       = 0.9431; // -1.21 * 1.047
+  double CMS_htt_WNorm         = 1.0018; // +0.12 * 0.015
+  double CMS_htt_WSyst         = 1.0318; // +0.53 * 1.06
+  double CMS_htt_ZJFake        = 0.9492; // -0.45 * 1.113
+  double CMS_htt_ZLFake        = 0.9362; // -0.84 * 1.076
+  double pdf_gg                = 1.0000; //  0.00* 1.03
+  double pdf_qqbar             = 1.0000; //  0.00 * 1.03
+  double QCDScale_ggH          = 1.0000; //  0.00 * 1.12
+  double QCDScale_qqH          = 1.0000; //  0.00 * 1.035
+  double ueps                  = 1.0000; //  0.00 * 0.96
 
   switch(idx){
   case 1: //ZTT 
@@ -167,10 +167,10 @@ etauAfterFit_novbf(bool scaled = true, bool log = true)
   if(log){
     canv->SetLogy(1);
     data->SetMinimum(5.0);
-    data->SetMaximum(500000.);
+    data->SetMaximum(5000000.);
   }
   else{
-    data->SetMaximum(4000.);
+    data->SetMaximum(8000.);
   }
   data->SetNdivisions(505);
   data->Draw("e");

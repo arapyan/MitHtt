@@ -36,7 +36,7 @@
    culation. To run the macro do the following:
 
    root -l 
-   .L MitStyle.cc++
+   .L HttStyle.cc++
    .L etauAfterFit_vbf.C++ 
    etauAfterFit_vbf()
 
@@ -60,23 +60,23 @@ TH1F* refill(TH1F* hin)
 // rescale histograms according to fit
 void rescale(TH1F* hin, unsigned int idx)
 {
-  double lumi                  = 1.0090; // +0.15 * 1.06
-  double CMS_eff_e             = 1.0336; // +1.68 * 1.02
-  double CMS_eff_t             = 0.9550; // -0.75 * 1.06 
-  double CMS_scale_j           = 0.9696; // -0.76 * 1.04
-  double CMS_htt_zttNorm       = 1.0318; // +1.06 * 1.03
-  double CMS_htt_ttbarNorm     = 0.6711; // -0.65 * 1.506
-  double CMS_htt_DiBosonNorm   = 0.2800; // -0.72 * 2.00
-  double CMS_htt_QCDNorm       = 1.0126; // +0.21 * 1.06
-  double CMS_htt_QCDSyst       = 1.0545; // +1.16 * 1.047
-  double CMS_htt_WNorm         = 1.5557; // +1.47 * 1.378
-  double CMS_htt_ZJFake        = 1.4979; // +1.28 * 1.389
-  double CMS_htt_ZLFake        = 1.5950; // +1.57 * 1.379
-  double pdf_gg                = 1.0561; // +1.87 * 1.03
-  double pdf_qqbar             = 1.0561; // +1.87 * 1.03
-  double QCDScale_qqH          = 1.2244; // +1.87 * 1.12
-  double QCDScale_ggH          = 1.0654; // +1.87 * 1.035
-  double ueps                  = 1.0748; // +1.87 * 1.04
+  double lumi                  = 1.0013; // +0.03 * 1.045
+  double CMS_eff_e             = 0.9496; // -2.52 * 1.02
+  double CMS_eff_t             = 0.9330; // -0.67 * 1.10 
+  double CMS_scale_j           = 1.0312; // +0.78 * 1.04
+  double CMS_htt_zttNorm       = 0.9974; // -0.08 * 1.033
+  double CMS_htt_ttbarNorm     = 1.0602; // +0.12 * 1.502
+  double CMS_htt_DiBosonNorm   = 0.2600; // -0.74 * 2.00
+  double CMS_htt_QCDNorm       = 1.4640; // +0.80 * 1.22
+  double CMS_htt_QCDSyst       = 0.9431; // -1.21 * 1.047
+  double CMS_htt_WNorm         = 1.0451; // +0.23 * 1.196
+  double CMS_htt_ZJFake        = 1.0022; // +0.01 * 1.215
+  double CMS_htt_ZLFake        = 0.9881; // -0.06 * 1.198
+  double pdf_gg                = 1.0000; //  0.00 * 1.03
+  double pdf_qqbar             = 1.0000; //  0.00 * 1.03
+  double QCDScale_ggH          = 1.0000; //  0.00 * 1.12
+  double QCDScale_qqH          = 1.0000; //  0.00 * 1.04
+  double ueps                  = 1.0000; //  0.00 * 1.04
 
   switch(idx){
   case 1: //ZTT 

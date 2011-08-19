@@ -36,7 +36,7 @@
    culation. To run the macro do the following:
 
    root -l 
-   .L MitStyle.cc++
+   .L HttStyle.cc++
    .L etauAfterFit_nob.C++ 
    etauAfterFit_b()
 
@@ -62,21 +62,21 @@ TH1F* refill(TH1F* hin)
 // rescale histograms according to fit
 void rescale(TH1F* hin, unsigned int idx)
 {
-  double lumi                  = 0.9934; // -0.11 * 1.06
-  double CMS_eff_e             = 1.1006; // +5.03 * 1.02
-  double CMS_eff_t             = 1.0216; // +0.36 * 1.06 
-  double CMS_scale_j           = 0.9756; // -1.22 * 1.02
-  double CMS_eff_b             = 0.9926; // -0.07 * 0.894
-  double CMS_fake_b            = 1.4774; // +3.41 * 0.86
-  double CMS_htt_zttNorm       = 1.0123; // +0.41 * 1.03
-  double CMS_htt_ttbarNorm     = 0.9557; // -0.31 * 1.143
-  double CMS_htt_DiBosonNorm   = 0.4800; // -0.52 * 2.00
-  double CMS_htt_QCDNorm       = 0.9436; // -0.94 * 1.06
-  double CMS_htt_QCDSyst       = 0.9756; // -0.52 * 1.047
-  double CMS_htt_WNorm         = 1.7435; // +1.62 * 0.541
-  double CMS_htt_WSyst         = 1.0737; // +1.10 * 1.067
-  double CMS_htt_ZJFake        = 0.4115; // -5.03 * 1.117
-  double CMS_htt_ZLFake        = 1.2456; // +3.19 * 1.077
+  double lumi                  = 0.9946; // -0.12 * 1.045
+  double CMS_eff_e             = 1.0392; // +1.96 * 1.02
+  double CMS_eff_t             = 1.0090; // +0.15 * 1.06 
+  double CMS_scale_j           = 1.0700; // -1.75 * 0.96
+  double CMS_eff_b             = 0.9226; // +0.73 * 0.894
+  double CMS_fake_b            = 0.9244; // +0.54 * 0.86
+  double CMS_htt_zttNorm       = 1.0099; // +0.30 * 1.033
+  double CMS_htt_ttbarNorm     = 1.0768; // +0.68 * 1.133
+  double CMS_htt_DiBosonNorm   = 0.0000; // -1.31 * 2.00
+  double CMS_htt_QCDNorm       = 1.0062; // +0.31 * 1.02
+  double CMS_htt_QCDSyst       = 1.0517; // +1.10 * 1.047
+  double CMS_htt_WNorm         = 0.9962; // -0.29 * 1.013
+  double CMS_htt_WSyst         = 0.9103; // -1.38 * 1.065
+  double CMS_htt_ZJFake        = 0.9845; // -0.13 * 1.119
+  double CMS_htt_ZLFake        = 1.0866; // +1.14 * 1.076
 
   switch(idx){
   case 1: //ZTT 
@@ -186,7 +186,7 @@ etauAfterFit_nob(bool scaled = true, bool log = true)
     data->SetMaximum(50000.);
   }
   else{
-    data->SetMaximum(2500.);
+    data->SetMaximum(6000.);
   }
   data->SetNdivisions(505);
   data->Draw("e");

@@ -36,7 +36,7 @@
    culation. To run the macro do the following:
 
    root -l 
-   .L MitStyle.cc++
+   .L HttStyle.cc++
    .L emuAfterFit_nob.C++ 
    emuAfterFit_b()
 
@@ -62,29 +62,30 @@ TH1F* refill(TH1F* hin)
 // rescale histograms according to fit
 void rescale(TH1F* hin, unsigned int idx)
 {
-  double lumi                  = 0.9934; // -0.11 * 1.06
-  double CMS_eff_e             = 1.1006; // +5.03 * 1.02
-  double CMS_eff_m             = 0.9986; // -0.07 * 1.02 
-  double CMS_scale_j           = 1.0000; // nan
-  double CMS_eff_b             = 1.0000; // nan
-  double CMS_htt_zttNorm       = 1.0123; // +0.41 * 1.03
-  double CMS_htt_ttbarNorm     = 0.9690; // -0.31 * 1.10
-  double CMS_htt_DiBosonNorm   = 0.8440; // -0.52 * 1.30
-  double CMS_hww_fakes_em      = 0.4480; // -1.84 * 1.30
+  double lumi                  = 0.9946; // -0.12 * 1.045
+  double CMS_eff_e             = 1.0392; // +1.96 * 1.02
+  double CMS_eff_m             = 0.9802; // -0.99 * 1.02 
+  double CMS_scale_j           = 1.0000; // -1.75 * 1.00
+  double CMS_eff_b             = 0.9927; // +0.73 * 0.99 (anti correlation)
+  double CMS_fake_b            = 0.9946; // +0.54 * 0.99 (anti correlation)
+  double CMS_htt_zttNorm       = 1.0099; // +0.30 * 1.033
+  double CMS_htt_ttbarNorm     = 1.0680; // +0.68 * 1.10
+  double CMS_htt_DiBosonNorm   = 0.6070; // -1.31 * 1.30
+  double CMS_hww_fakes_em      = 1.0480; // +0.16 * 1.30
 
   switch(idx){
   case 1: //Ztt 
-    hin->Scale(CMS_eff_e*CMS_eff_m*CMS_eff_b*CMS_scale_j*CMS_htt_zttNorm); break;
+    hin->Scale(CMS_eff_e*CMS_eff_m*CMS_eff_b*CMS_fake_b*CMS_scale_j*CMS_htt_zttNorm); break;
   case 2: // ttbar
-    hin->Scale(CMS_eff_e*CMS_eff_m*CMS_eff_b*CMS_scale_j*CMS_htt_ttbarNorm); break;
+    hin->Scale(CMS_eff_e*CMS_eff_m*CMS_eff_b*CMS_fake_b*CMS_scale_j*CMS_htt_ttbarNorm); break;
   case 3: // EWK
-    hin->Scale(lumi*CMS_eff_e*CMS_eff_m*CMS_eff_b*CMS_scale_j*CMS_htt_DiBosonNorm); break;
+    hin->Scale(lumi*CMS_eff_e*CMS_eff_m*CMS_eff_b*CMS_fake_b*CMS_scale_j*CMS_htt_DiBosonNorm); break;
   case 4: // Fakes
-    hin->Scale(CMS_eff_e*CMS_eff_m*CMS_eff_b*CMS_scale_j*CMS_hww_fakes_em); break;
+    hin->Scale(CMS_eff_e*CMS_eff_m*CMS_eff_b*CMS_fake_b*CMS_scale_j*CMS_hww_fakes_em); break;
   case 5: // ggH
-    hin->Scale(lumi*CMS_eff_e*CMS_eff_m*CMS_eff_b*CMS_scale_j); break;
+    hin->Scale(lumi*CMS_eff_e*CMS_eff_m*CMS_eff_b*CMS_fake_b*CMS_scale_j); break;
   case 6: // bbH
-    hin->Scale(lumi*CMS_eff_e*CMS_eff_m*CMS_eff_b*CMS_scale_j); break;
+    hin->Scale(lumi*CMS_eff_e*CMS_eff_m*CMS_eff_b*CMS_fake_b*CMS_scale_j); break;
   default :
     std::cout << "error histograms not known?!?" << std::endl;
   }
@@ -145,7 +146,7 @@ emuAfterFit_nob(bool scaled = true, bool log = true)
     data->SetMaximum(5000.);
   }
   else{
-    data->SetMaximum(1500.);
+    data->SetMaximum(2000.);
   }
   data->Draw("e");
 
