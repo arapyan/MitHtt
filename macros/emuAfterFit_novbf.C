@@ -62,34 +62,22 @@ TH1F* refill(TH1F* hin)
 // rescale histograms according to fit
 void rescale(TH1F* hin, unsigned int idx)
 {
-  double lumi                = 1.0013; // +0.03 * 1.045
-  double CMS_eff_e           = 0.9496; // -2.52 * 1.02
-  double CMS_eff_m           = 1.0446; // +2.23 * 1.02 
-  double CMS_scale_j         = 1.0000; // +0.78 * 1.00
-  double CMS_htt_zttNorm     = 0.9974; // -0.08 * 1.033
-  double CMS_htt_ttbarNorm   = 1.0120; // +0.12 * 1.10
-  double CMS_htt_DiBosonNorm = 0.7780; // -0.74 * 1.30
-  double CMS_hww_fakes_em    = 1.2250; // +0.75 * 1.30
-  double pdf_gg              = 1.0000; //  0.00 * 1.03
-  double pdf_qqbar           = 1.0000; //  0.00 * 1.03
-  double QCDScale_ggHin      = 1.0000; //  0.00 * 1.12
-  double QCDScale_qqH        = 1.0000; //  0.00 * 1.035
-  double ueps                = 1.0000; //  0.00 * 1.04
-
+    gStyle->SetLineStyleString(11,"20 10");
 
   switch(idx){
   case 1: //Ztt 
-    hin->Scale(CMS_eff_e*CMS_eff_m*CMS_scale_j*CMS_htt_zttNorm); break;
+std::cout<< "scaling by 1.008149"<<std::endl;hin->Scale(1.008149); break; 
   case 2: // ttbar
-    hin->Scale(CMS_eff_e*CMS_eff_m*CMS_scale_j*CMS_htt_ttbarNorm); break;
+std::cout<< "scaling by 0.978979"<<std::endl;hin->Scale(0.978979); break; 
   case 3: // EWK
-    hin->Scale(lumi*CMS_eff_e*CMS_eff_m*CMS_scale_j*CMS_htt_DiBosonNorm); break;
+std::cout<< "scaling by 0.724234"<<std::endl;hin->Scale(0.724234); break; 
   case 4: // Fakes
-    hin->Scale(CMS_eff_e*CMS_eff_m*CMS_scale_j*CMS_hww_fakes_em); break;
+std::cout<< "scaling by 1.114699"<<std::endl;hin->Scale(1.114699); break; 
   case 5: // ggH
-    hin->Scale(lumi*CMS_eff_e*CMS_eff_m*CMS_scale_j*pdf_gg*QCDScale_ggHin*ueps); break;
+std::cout<< "scaling by 0.992102"<<std::endl;hin->Scale(0.992102); break; 
   case 6: // qqH
-    hin->Scale(lumi*CMS_eff_e*CMS_eff_m*CMS_scale_j*pdf_qqbar*QCDScale_qqH*ueps); break;
+std::cout<< "scaling by 0.992102"<<std::endl;hin->Scale(0.992102); break; 
+
   default :
     std::cout << "error histograms not known?!?" << std::endl;
   }

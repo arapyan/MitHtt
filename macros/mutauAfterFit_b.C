@@ -60,40 +60,27 @@ TH1F* refill(TH1F* hin)
 // rescale histograms according to fit
 void rescale(TH1F* hin, unsigned int idx)
 {
-  double lumi                  = 0.9946; // -0.12 * 1.045
-  double CMS_eff_m             = 0.9901; // -0.99 * 1.01
-  double CMS_eff_t             = 1.0090; // +0.15 * 1.06 
-  double CMS_scale_j           = 0.8250; // -1.75 * 1.10
-  double CMS_eff_b             = 1.0774; // +0.73 * 1.106
-  double CMS_fake_b            = 1.0702; // +0.54 * 1.13
-  double CMS_htt_zttNorm       = 1.0099; // +0.30 * 1.033
-  double CMS_htt_ttbarNorm     = 1.0327; // +0.68 * 1.109
-  double CMS_htt_DiBosonNorm   = 0.0000; // -1.31 * 2.00
-  double CMS_htt_QCDNorm       = 1.0243; // +0.27 * 1.09
-  double CMS_htt_QCDSyst       = 1.0061; // +0.32 * 1.019
-  double CMS_htt_WNorm         = 1.0098; // +0.14 * 1.070
-  double CMS_htt_ZJFake        = 1.0024; // +0.02 * 1.120
-  double CMS_htt_ZLFake        = 0.9819; // -0.07 * 1.259
-
+  gStyle->SetLineStyleString(11,"20 10");
   switch(idx){
   case 1: //ZTT 
-    hin->Scale(CMS_eff_m*CMS_eff_t*CMS_htt_zttNorm); break;
+std::cout<< "scaling by 0.976210"<<std::endl;hin->Scale(0.976210); break; 
   case 2: // QCD
-    hin->Scale(CMS_htt_QCDNorm*CMS_htt_QCDSyst); break;
+std::cout<< "scaling by 1.013870"<<std::endl;hin->Scale(1.013870); break; 
   case 3: // W
-    hin->Scale(CMS_htt_WNorm); break;
+std::cout<< "scaling by 1.026700"<<std::endl;hin->Scale(1.026700); break; 
   case 4: // ZJ
-    hin->Scale(CMS_eff_m*CMS_htt_zttNorm*CMS_htt_ZJFake); break;
+std::cout<< "scaling by 1.020567"<<std::endl;hin->Scale(1.020567); break; 
   case 5: // ZL
-    hin->Scale(CMS_eff_m*CMS_htt_zttNorm*CMS_htt_ZLFake); break;
+std::cout<< "scaling by 0.997785"<<std::endl;hin->Scale(0.997785); break; 
   case 6: // TT
-    hin->Scale(CMS_eff_t*CMS_eff_m*CMS_htt_ttbarNorm*CMS_eff_b); break;
+std::cout<< "scaling by 1.058823"<<std::endl;hin->Scale(1.058823); break; 
   case 7: // VV
-    hin->Scale(CMS_eff_t*CMS_eff_m*CMS_htt_DiBosonNorm); break;
+std::cout<< "scaling by 0.000000"<<std::endl;hin->Scale(0.000000); break; 
   case 8: // ggH
-    hin->Scale(lumi*CMS_eff_t*CMS_eff_m*CMS_scale_j*CMS_fake_b); break;
+std::cout<< "scaling by 0.989374"<<std::endl;hin->Scale(0.989374); break; 
   case 9: // bbH
-    hin->Scale(lumi*CMS_eff_t*CMS_eff_m*CMS_scale_j*CMS_eff_b); break;
+std::cout<< "scaling by 1.049770"<<std::endl;hin->Scale(1.049770); break; 
+ 
   default :
     std::cout << "error histograms not known?!?" << std::endl;
   }

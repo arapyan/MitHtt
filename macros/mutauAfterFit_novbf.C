@@ -62,44 +62,27 @@ TH1F* refill(TH1F* hin)
 // rescale histograms according to fit
 void rescale(TH1F* hin, unsigned int idx)
 {
-  double lumi                  = 1.0013; // +0.03 * 1.045
-  double CMS_eff_m             = 1.0223; // +2.23 * 1.01
-  double CMS_eff_t             = 0.9598; // -0.67 * 1.06 
-  double CMS_scale_j           = 0.9922; // +0.78 * 0.99
-  double CMS_htt_zttNorm       = 0.9974; // -0.08 * 1.033
-  double CMS_htt_ttbarNorm     = 1.0122; // +0.12 * 1.102
-  double CMS_htt_DiBosonNorm   = 0.2600; // -0.74 * 2.00
-  double CMS_htt_QCDNorm       = 1.0690; // +1.15 * 1.06
-  double CMS_htt_QCDSyst       = 0.9310; // -1.21 * 1.019
-  double CMS_htt_WNorm         = 1.0015; // +0.15 * 1.01
-  double CMS_htt_WSyst         = 1.0583; // +0.94 * 1.062
-  double CMS_htt_ZJFake        = 1.0250; // +0.21 * 1.119
-  double CMS_htt_ZLFake        = 1.0696; // +0.27 * 1.258
-  double pdf_gg                = 1.0000; //  0.00 * 1.03
-  double pdf_qqbar             = 1.0000; //  0.00 * 1.03
-  double QCDScale_qqH          = 1.0000; //  0.00 * 1.12
-  double QCDScale_ggH          = 1.0000; //  0.00 * 1.035
-  double ueps                  = 0.; //  0.00 * 0.96
-
+  gStyle->SetLineStyleString(11,"20 10");
   switch(idx){
   case 1: //ZTT 
-    hin->Scale(CMS_eff_m*CMS_eff_t*CMS_htt_zttNorm*CMS_scale_j); break;
+std::cout<< "scaling by 1.016955"<<std::endl;hin->Scale(1.016955); break; 
   case 2: // QCD
-    hin->Scale(CMS_htt_QCDNorm*CMS_htt_QCDSyst); break;
+std::cout<< "scaling by 1.003610"<<std::endl;hin->Scale(1.003610); break; 
   case 3: // W
-    hin->Scale(CMS_htt_WNorm*CMS_htt_WSyst*CMS_scale_j); break;
+std::cout<< "scaling by 1.091140"<<std::endl;hin->Scale(1.091140); break; 
   case 4: // ZJ
-    hin->Scale(CMS_eff_m*CMS_htt_zttNorm*CMS_htt_ZJFake*CMS_scale_j); break;
+std::cout<< "scaling by 1.022326"<<std::endl;hin->Scale(1.022326); break; 
   case 5: // ZL
-    hin->Scale(CMS_eff_m*CMS_htt_zttNorm*CMS_htt_ZLFake*CMS_scale_j); break;
+std::cout<< "scaling by 1.199388"<<std::endl;hin->Scale(1.199388); break; 
   case 6: // TT
-    hin->Scale(CMS_eff_t*CMS_eff_m*CMS_htt_ttbarNorm*CMS_scale_j); break;
+std::cout<< "scaling by 0.987148"<<std::endl;hin->Scale(0.987148); break; 
   case 7: // VV
-    hin->Scale(CMS_eff_t*CMS_eff_m*CMS_htt_DiBosonNorm*CMS_scale_j); break;
+std::cout<< "scaling by 0.100666"<<std::endl;hin->Scale(0.100666); break; 
   case 8: // ggH
-    hin->Scale(lumi*CMS_eff_t*CMS_eff_m*CMS_scale_j*pdf_gg*QCDScale_ggH*ueps); break;
-  case 9: // qqH
-    hin->Scale(lumi*CMS_eff_t*CMS_eff_m*CMS_scale_j*pdf_qqbar*QCDScale_qqH*ueps); break;
+std::cout<< "scaling by 1.000768"<<std::endl;hin->Scale(1.000768); break; 
+  case 9: // bbH
+std::cout<< "scaling by 1.000768"<<std::endl;hin->Scale(1.000768); break; 
+
   default :
     std::cout << "error histograms not known?!?" << std::endl;
   }

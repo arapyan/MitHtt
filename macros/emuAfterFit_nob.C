@@ -62,30 +62,20 @@ TH1F* refill(TH1F* hin)
 // rescale histograms according to fit
 void rescale(TH1F* hin, unsigned int idx)
 {
-  double lumi                  = 0.9946; // -0.12 * 1.045
-  double CMS_eff_e             = 1.0392; // +1.96 * 1.02
-  double CMS_eff_m             = 0.9802; // -0.99 * 1.02 
-  double CMS_scale_j           = 1.0000; // -1.75 * 1.00
-  double CMS_eff_b             = 0.9927; // +0.73 * 0.99 (anti correlation)
-  double CMS_fake_b            = 0.9946; // +0.54 * 0.99 (anti correlation)
-  double CMS_htt_zttNorm       = 1.0099; // +0.30 * 1.033
-  double CMS_htt_ttbarNorm     = 1.0680; // +0.68 * 1.10
-  double CMS_htt_DiBosonNorm   = 0.6070; // -1.31 * 1.30
-  double CMS_hww_fakes_em      = 1.0480; // +0.16 * 1.30
-
+  gStyle->SetLineStyleString(11,"20 10");
   switch(idx){
   case 1: //Ztt 
-    hin->Scale(CMS_eff_e*CMS_eff_m*CMS_eff_b*CMS_fake_b*CMS_scale_j*CMS_htt_zttNorm); break;
+std::cout<< "scaling by 1.012809"<<std::endl;hin->Scale(1.012809); break; 
   case 2: // ttbar
-    hin->Scale(CMS_eff_e*CMS_eff_m*CMS_eff_b*CMS_fake_b*CMS_scale_j*CMS_htt_ttbarNorm); break;
+std::cout<< "scaling by 1.050910"<<std::endl;hin->Scale(1.050910); break; 
   case 3: // EWK
-    hin->Scale(lumi*CMS_eff_e*CMS_eff_m*CMS_eff_b*CMS_fake_b*CMS_scale_j*CMS_htt_DiBosonNorm); break;
+std::cout<< "scaling by 0.639813"<<std::endl;hin->Scale(0.639813); break; 
   case 4: // Fakes
-    hin->Scale(CMS_eff_e*CMS_eff_m*CMS_eff_b*CMS_fake_b*CMS_scale_j*CMS_hww_fakes_em); break;
+std::cout<< "scaling by 1.049911"<<std::endl;hin->Scale(1.049911); break; 
   case 5: // ggH
-    hin->Scale(lumi*CMS_eff_e*CMS_eff_m*CMS_eff_b*CMS_fake_b*CMS_scale_j); break;
+std::cout<< "scaling by 0.990422"<<std::endl;hin->Scale(0.990422); break; 
   case 6: // bbH
-    hin->Scale(lumi*CMS_eff_e*CMS_eff_m*CMS_eff_b*CMS_fake_b*CMS_scale_j); break;
+std::cout<< "scaling by 0.990422"<<std::endl;hin->Scale(0.990422); break; 
   default :
     std::cout << "error histograms not known?!?" << std::endl;
   }
