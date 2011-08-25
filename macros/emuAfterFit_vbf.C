@@ -64,17 +64,17 @@ void rescale(TH1F* hin, unsigned int idx)
 
   switch(idx){
   case 1: //Ztt 
-std::cout<< "scaling by 0.961886"<<std::endl;hin->Scale(0.961886); break; 
+std::cout<<"Ztt scaling by 0.961886"<<std::endl;hin->Scale(0.961886);std::cout<<hin->GetName()<<"Scaled Integral is "<<hin->Integral()<< std::endl; break; 
   case 2: // ttbar
-std::cout<< "scaling by 0.951176"<<std::endl;hin->Scale(0.951176); break; 
+std::cout<<"ttbar scaling by 0.951176"<<std::endl;hin->Scale(0.951176);std::cout<<hin->GetName()<<"Scaled Integral is "<<hin->Integral()<< std::endl; break; 
   case 3: // EWK
-std::cout<< "scaling by 0.703666"<<std::endl;hin->Scale(0.703666); break; 
+std::cout<<"EWK scaling by 0.703666"<<std::endl;hin->Scale(0.703666);std::cout<<hin->GetName()<<"Scaled Integral is "<<hin->Integral()<< std::endl; break; 
   case 4: // Fakes
-std::cout<< "scaling by 1.083042"<<std::endl;hin->Scale(1.083042); break; 
+std::cout<<"Fakes scaling by 1.083042"<<std::endl;hin->Scale(1.083042);std::cout<<hin->GetName()<<"Scaled Integral is "<<hin->Integral()<< std::endl; break; 
   case 5: // ggH
-std::cout<< "scaling by 0.963926"<<std::endl;hin->Scale(0.963926); break; 
+std::cout<<"Higgs_gf_sm_120 scaling by 0.963926"<<std::endl;hin->Scale(0.963926);std::cout<<hin->GetName()<<"Scaled Integral is "<<hin->Integral()<< std::endl; break; 
   case 6: // qqH
-std::cout<< "scaling by 0.963926"<<std::endl;hin->Scale(0.963926); break; 
+std::cout<<"Higgs_vbf_sm_120 scaling by 0.963926"<<std::endl;hin->Scale(0.963926);std::cout<<hin->GetName()<<"Scaled Integral is "<<hin->Integral()<< std::endl; break; 
   default :
     std::cout << "error histograms not known?!?" << std::endl;
   }
@@ -98,8 +98,8 @@ emuAfterFit_vbf(bool scaled = true)
   TH1F* EWK   =  refill((TH1F*)exampleFile->Get("emu_vbf/EWK"  ))            ; InitHist(EWK  , "", "", kRed    + 2, 1001);
   TH1F* ttbar =  refill((TH1F*)exampleFile->Get("emu_vbf/ttbar"))            ; InitHist(ttbar, "", "", kBlue   - 8, 1001);
   TH1F* Ztt   =  refill((TH1F*)exampleFile->Get("emu_vbf/Ztt"  ))            ; InitHist(Ztt  , "", "", kOrange - 4, 1001);
-  TH1F* ggH   =  refill((TH1F*)exampleFile->Get("emu_vbf/Higgs_gf_sm_120"  )); InitSignal(ggH); ggH->Scale(10*16.63*0.071);
-  TH1F* qqH   =  refill((TH1F*)exampleFile->Get("emu_vbf/Higgs_vbf_sm_120" )); InitSignal(qqH); qqH->Scale(10*1.269*0.071);
+  TH1F* ggH   =  refill((TH1F*)exampleFile->Get("emu_vbf/Higgs_gf_sm_120"  )); InitSignal(ggH); ggH->Scale(10*1);
+  TH1F* qqH   =  refill((TH1F*)exampleFile->Get("emu_vbf/Higgs_vbf_sm_120" )); InitSignal(qqH); qqH->Scale(10*1);
 
   if(scaled){
     rescale(Fakes, 4); 

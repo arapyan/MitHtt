@@ -65,23 +65,23 @@ void rescale(TH1F* hin, unsigned int idx)
   gStyle->SetLineStyleString(11,"20 10");
   switch(idx){
   case 1: //ZTT 
-std::cout<< "scaling by 1.016955"<<std::endl;hin->Scale(1.016955); break; 
+std::cout<<"ZTT scaling by 1.016955"<<std::endl;hin->Scale(1.016955);std::cout<<hin->GetName()<<"Scaled Integral is "<<hin->Integral()<< std::endl; break; 
   case 2: // QCD
-std::cout<< "scaling by 1.003610"<<std::endl;hin->Scale(1.003610); break; 
+std::cout<<"QCD scaling by 1.003610"<<std::endl;hin->Scale(1.003610);std::cout<<hin->GetName()<<"Scaled Integral is "<<hin->Integral()<< std::endl; break; 
   case 3: // W
-std::cout<< "scaling by 1.091140"<<std::endl;hin->Scale(1.091140); break; 
+std::cout<<"W scaling by 1.091140"<<std::endl;hin->Scale(1.091140);std::cout<<hin->GetName()<<"Scaled Integral is "<<hin->Integral()<< std::endl; break; 
   case 4: // ZJ
-std::cout<< "scaling by 1.022326"<<std::endl;hin->Scale(1.022326); break; 
+std::cout<<"ZJ scaling by 1.022326"<<std::endl;hin->Scale(1.022326);std::cout<<hin->GetName()<<"Scaled Integral is "<<hin->Integral()<< std::endl; break; 
   case 5: // ZL
-std::cout<< "scaling by 1.199388"<<std::endl;hin->Scale(1.199388); break; 
+std::cout<<"ZL scaling by 1.199388"<<std::endl;hin->Scale(1.199388);std::cout<<hin->GetName()<<"Scaled Integral is "<<hin->Integral()<< std::endl; break; 
   case 6: // TT
-std::cout<< "scaling by 0.987148"<<std::endl;hin->Scale(0.987148); break; 
+std::cout<<"TT scaling by 0.987148"<<std::endl;hin->Scale(0.987148);std::cout<<hin->GetName()<<"Scaled Integral is "<<hin->Integral()<< std::endl; break; 
   case 7: // VV
-std::cout<< "scaling by 0.100666"<<std::endl;hin->Scale(0.100666); break; 
+std::cout<<"VV scaling by 0.100666"<<std::endl;hin->Scale(0.100666);std::cout<<hin->GetName()<<"Scaled Integral is "<<hin->Integral()<< std::endl; break; 
   case 8: // ggH
-std::cout<< "scaling by 1.000768"<<std::endl;hin->Scale(1.000768); break; 
+std::cout<<"SM120 scaling by 1.000768"<<std::endl;hin->Scale(1.000768);std::cout<<hin->GetName()<<"Scaled Integral is "<<hin->Integral()<< std::endl; break; 
   case 9: // bbH
-std::cout<< "scaling by 1.000768"<<std::endl;hin->Scale(1.000768); break; 
+std::cout<<"VBF120 scaling by 1.000768"<<std::endl;hin->Scale(1.000768);std::cout<<hin->GetName()<<"Scaled Integral is "<<hin->Integral()<< std::endl; break; 
 
   default :
     std::cout << "error histograms not known?!?" << std::endl;
@@ -109,8 +109,8 @@ mutauAfterFit_novbf(bool scaled = true, bool log = true)
   TH1F* EWK   =  refill((TH1F*)exampleFile->Get("muTau_SM0/VV" ))              ; InitHist(EWK  , "", "", kRed    + 2, 1001);
   TH1F* ttbar =  refill((TH1F*)exampleFile->Get("muTau_SM0/TT" ))              ; InitHist(ttbar, "", "", kBlue   - 8, 1001);
   TH1F* Ztt   =  refill((TH1F*)exampleFile->Get("muTau_SM0/ZTT"))              ; InitHist(Ztt  , "", "", kOrange - 4, 1001);
-  TH1F* ggH   =  refill((TH1F*)exampleFile->Get("muTau_SM0/SM120" ))           ; InitSignal(ggH); ggH ->Scale(10*16.63*0.071);
-  TH1F* qqH   =  refill((TH1F*)exampleFile->Get("muTau_SM0/VBF120"))           ; InitSignal(qqH); qqH ->Scale(10*1.269*0.071);
+  TH1F* ggH   =  refill((TH1F*)exampleFile->Get("muTau_SM0/SM120" ))           ; InitSignal(ggH); ggH ->Scale(10*1);
+  TH1F* qqH   =  refill((TH1F*)exampleFile->Get("muTau_SM0/VBF120"))           ; InitSignal(qqH); qqH ->Scale(10*1);
  
   if(scaled){
     rescale(Fakes, 2); 
