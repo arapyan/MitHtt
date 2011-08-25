@@ -98,8 +98,8 @@ emuAfterFit_vbf(bool scaled = true)
   TH1F* EWK   =  refill((TH1F*)exampleFile->Get("emu_vbf/EWK"  ))            ; InitHist(EWK  , "", "", kRed    + 2, 1001);
   TH1F* ttbar =  refill((TH1F*)exampleFile->Get("emu_vbf/ttbar"))            ; InitHist(ttbar, "", "", kBlue   - 8, 1001);
   TH1F* Ztt   =  refill((TH1F*)exampleFile->Get("emu_vbf/Ztt"  ))            ; InitHist(Ztt  , "", "", kOrange - 4, 1001);
-  TH1F* ggH   =  refill((TH1F*)exampleFile->Get("emu_vbf/Higgs_gf_sm_120"  )); InitSignal(ggH); ggH->Scale(10*16.63*0.071);
-  TH1F* qqH   =  refill((TH1F*)exampleFile->Get("emu_vbf/Higgs_vbf_sm_120" )); InitSignal(qqH); qqH->Scale(10*1.269*0.071);
+  TH1F* ggH   =  refill((TH1F*)exampleFile->Get("emu_vbf/Higgs_gf_sm_120"  )); InitSignal(ggH); ggH->Scale(10*1);
+  TH1F* qqH   =  refill((TH1F*)exampleFile->Get("emu_vbf/Higgs_vbf_sm_120" )); InitSignal(qqH); qqH->Scale(10*1);
 
   if(scaled){
     rescale(Fakes, 4); 
