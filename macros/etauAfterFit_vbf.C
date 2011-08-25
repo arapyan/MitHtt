@@ -107,8 +107,8 @@ etauAfterFit_vbf(bool scaled = true)
   TH1F* EWK   =  refill((TH1F*)exampleFile->Get("eleTau_SM2/VV" ))              ; InitHist(EWK  , "", "", kRed    + 2, 1001);
   TH1F* ttbar =  refill((TH1F*)exampleFile->Get("eleTau_SM2/TT" ))              ; InitHist(ttbar, "", "", kBlue   - 8, 1001);
   TH1F* Ztt   =  refill((TH1F*)exampleFile->Get("eleTau_SM2/ZTT"))              ; InitHist(Ztt  , "", "", kOrange - 4, 1001);
-  TH1F* ggH   =  refill((TH1F*)exampleFile->Get("eleTau_SM2/SM120" ))           ; InitSignal(ggH); ggH ->Scale(10*16.63*0.071*0.055/ggH ->Integral());
-  TH1F* qqH   =  refill((TH1F*)exampleFile->Get("eleTau_SM2/VBF120"))           ; InitSignal(qqH); qqH ->Scale(10*1.269*0.071*0.136/qqH ->Integral());
+  TH1F* ggH   =  refill((TH1F*)exampleFile->Get("eleTau_SM2/SM120" ))           ; InitSignal(ggH); ggH ->Scale(10*16.63*0.071);
+  TH1F* qqH   =  refill((TH1F*)exampleFile->Get("eleTau_SM2/VBF120"))           ; InitSignal(qqH); qqH ->Scale(10*1.269*0.071);
 
   if(scaled){
     rescale(Fakes, 2); 

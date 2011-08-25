@@ -107,8 +107,8 @@ mutauAfterFit_b(bool scaled = true)
   TH1F* EWK   =  refill((TH1F*)exampleFile->Get("muTau_B/VV" ))              ; InitHist(EWK  , "", "", kRed    + 2, 1001); 
   TH1F* ttbar =  refill((TH1F*)exampleFile->Get("muTau_B/TT" ))              ; InitHist(ttbar, "", "", kBlue   - 8, 1001); 
   TH1F* Ztt   =  refill((TH1F*)exampleFile->Get("muTau_B/ZTT"))              ; InitHist(Ztt  , "", "", kOrange - 4, 1001); 
-  TH1F* ggH   =  refill((TH1F*)exampleFile->Get("muTau_B/GGH120" ))          ; InitSignal(ggH); ggH->Scale(43.1834*0.114107*0.083/ggH->Integral());
-  TH1F* bbH   =  refill((TH1F*)exampleFile->Get("muTau_B/BBH120" ))          ; InitSignal(bbH); bbH->Scale(66.7725*0.114107*2.282/bbH->Integral()); 
+  TH1F* ggH   =  refill((TH1F*)exampleFile->Get("muTau_B/GGH120" ))          ; InitSignal(ggH); ggH->Scale(43.1834*0.114107);
+  TH1F* bbH   =  refill((TH1F*)exampleFile->Get("muTau_B/BBH120" ))          ; InitSignal(bbH); bbH->Scale(66.7725*0.114107); 
 
   if(scaled){
     rescale(Fakes, 2); 

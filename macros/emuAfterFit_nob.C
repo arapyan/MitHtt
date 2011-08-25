@@ -99,8 +99,8 @@ emuAfterFit_nob(bool scaled = true, bool log = true)
   TH1F* EWK   =  refill((TH1F*)exampleFile->Get("emu_nob/EWK"  ))            ; InitHist(EWK  , "", "", kRed    + 2, 1001);
   TH1F* ttbar =  refill((TH1F*)exampleFile->Get("emu_nob/ttbar"))            ; InitHist(ttbar, "", "", kBlue   - 8, 1001);
   TH1F* Ztt   =  refill((TH1F*)exampleFile->Get("emu_nob/Ztt"  ))            ; InitHist(Ztt  , "", "", kOrange - 4, 1001);
-  TH1F* ggH   =  refill((TH1F*)exampleFile->Get("emu_nob/Higgs_gg_mssm_120")); InitSignal(ggH); ggH->Scale(43.1834*0.114107*2.9351/ggH->Integral());
-  TH1F* bbH   =  refill((TH1F*)exampleFile->Get("emu_nob/Higgs_bb_mssm_120")); InitSignal(bbH); bbH->Scale(66.7725*0.114107*6.0323/bbH->Integral());
+  TH1F* ggH   =  refill((TH1F*)exampleFile->Get("emu_nob/Higgs_gg_mssm_120")); InitSignal(ggH); ggH->Scale(43.1834*0.114107);
+  TH1F* bbH   =  refill((TH1F*)exampleFile->Get("emu_nob/Higgs_bb_mssm_120")); InitSignal(bbH); bbH->Scale(66.7725*0.114107);
 
   if(scaled){
     rescale(Fakes, 4); 
