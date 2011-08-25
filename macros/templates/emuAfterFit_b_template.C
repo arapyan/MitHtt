@@ -98,8 +98,8 @@ emuAfterFit_b(bool scaled = true)
   TH1F* EWK   =  refill((TH1F*)exampleFile->Get("emu_b/EWK"  ))            ; InitHist(EWK  , "", "", kRed    + 2, 1001); 
   TH1F* ttbar =  refill((TH1F*)exampleFile->Get("emu_b/ttbar"))            ; InitHist(ttbar, "", "", kBlue   - 8, 1001); 
   TH1F* Ztt   =  refill((TH1F*)exampleFile->Get("emu_b/Ztt"  ))            ; InitHist(Ztt  , "", "", kOrange - 4, 1001); 
-  TH1F* ggH   =  refill((TH1F*)exampleFile->Get("emu_b/Higgs_gg_mssm_120")); InitSignal(ggH); ggH->Scale(43.1834*0.114107*0.0401/ggH->Integral()); 
-  TH1F* bbH   =  refill((TH1F*)exampleFile->Get("emu_b/Higgs_bb_mssm_120")); InitSignal(bbH); bbH->Scale(66.7725*0.114107*0.8067/bbH->Integral()); 
+  TH1F* ggH   =  refill((TH1F*)exampleFile->Get("emu_b/Higgs_gg_mssm_120")); InitSignal(ggH); ggH->Scale(43.1834*0.114107); 
+  TH1F* bbH   =  refill((TH1F*)exampleFile->Get("emu_b/Higgs_bb_mssm_120")); InitSignal(bbH); bbH->Scale(66.7725*0.114107); 
 
   if(scaled){
     rescale(Fakes, 4); 

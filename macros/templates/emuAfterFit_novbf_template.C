@@ -101,8 +101,8 @@ emuAfterFit_novbf(bool scaled = true, bool log = true)
   TH1F* EWK   =  refill((TH1F*)exampleFile->Get("emu_novbf/EWK"  ))            ; InitHist(EWK  , "", "", kRed    + 2, 1001);
   TH1F* ttbar =  refill((TH1F*)exampleFile->Get("emu_novbf/ttbar"))            ; InitHist(ttbar, "", "", kBlue   - 8, 1001);
   TH1F* Ztt   =  refill((TH1F*)exampleFile->Get("emu_novbf/Ztt"  ))            ; InitHist(Ztt  , "", "", kOrange - 4, 1001);
-  TH1F* ggH   =  refill((TH1F*)exampleFile->Get("emu_novbf/Higgs_gf_sm_120"  )); InitSignal(ggH); ggH->Scale(10*16.63*0.071*10.2558/ggH->Integral());
-  TH1F* qqH   =  refill((TH1F*)exampleFile->Get("emu_novbf/Higgs_vbf_sm_120" )); InitSignal(qqH); qqH->Scale(10*1.269*0.071* 0.8178/qqH->Integral());
+  TH1F* ggH   =  refill((TH1F*)exampleFile->Get("emu_novbf/Higgs_gf_sm_120"  )); InitSignal(ggH); ggH->Scale(10*16.63*0.071);
+  TH1F* qqH   =  refill((TH1F*)exampleFile->Get("emu_novbf/Higgs_vbf_sm_120" )); InitSignal(qqH); qqH->Scale(10*1.269*0.071);
 
   if(scaled){
     rescale(Fakes, 4); 

@@ -116,11 +116,11 @@ etauAfterFit_nob(bool scaled = true, bool log = true)
   TH1F* EWK   =  refill((TH1F*)exampleFile->Get("eleTau_NoB/VV" ))              ; InitHist(EWK  , "", "", kRed    + 2, 1001); 
   TH1F* ttbar =  refill((TH1F*)exampleFile->Get("eleTau_NoB/TT" ))              ; InitHist(ttbar, "", "", kBlue   - 8, 1001); 
   TH1F* Ztt   =  refill((TH1F*)exampleFile->Get("eleTau_NoB/ZTT"  ))            ; InitHist(Ztt  , "", "", kOrange - 4, 1001); 
-  TH1F* ggH1  =  refill((TH1F*)exampleFile->Get("eleTau_NoB/GGHNoJet120"))      ; InitSignal(ggH1); ggH1->Scale(43.1834*0.114107*2.343/ggH1->Integral());
-  TH1F* ggH   =  refill((TH1F*)exampleFile->Get("eleTau_NoB/GGHJet120"  ))      ; InitSignal(ggH ); ggH ->Scale(43.1834*0.114107*2.382/ggH ->Integral()); 
-  TH1F* bbH1  =  refill((TH1F*)exampleFile->Get("eleTau_NoB/BBHNoJet120"))      ; InitSignal(bbH1); bbH1->Scale(66.7725*0.114107*5.125/bbH1->Integral()); 
-  TH1F* bbH2  =  refill((TH1F*)exampleFile->Get("eleTau_NoB/BBHJet120"  ))      ; InitSignal(bbH2); bbH2->Scale(66.7725*0.114107*1.544/bbH2->Integral()); 
-  TH1F* bbH   =  refill((TH1F*)exampleFile->Get("eleTau_NoB/BBHBJet120" ))      ; InitSignal(bbH ); bbH ->Scale(66.7725*0.114107*1.366/bbH ->Integral()); 
+  TH1F* ggH1  =  refill((TH1F*)exampleFile->Get("eleTau_NoB/GGHNoJet120"))      ; InitSignal(ggH1); ggH1->Scale(43.1834*0.114107);
+  TH1F* ggH   =  refill((TH1F*)exampleFile->Get("eleTau_NoB/GGHJet120"  ))      ; InitSignal(ggH ); ggH ->Scale(43.1834*0.114107); 
+  TH1F* bbH1  =  refill((TH1F*)exampleFile->Get("eleTau_NoB/BBHNoJet120"))      ; InitSignal(bbH1); bbH1->Scale(66.7725*0.114107); 
+  TH1F* bbH2  =  refill((TH1F*)exampleFile->Get("eleTau_NoB/BBHJet120"  ))      ; InitSignal(bbH2); bbH2->Scale(66.7725*0.114107); 
+  TH1F* bbH   =  refill((TH1F*)exampleFile->Get("eleTau_NoB/BBHBJet120" ))      ; InitSignal(bbH ); bbH ->Scale(66.7725*0.114107); 
 
   if(scaled){
     rescale(Fakes, 2); 
