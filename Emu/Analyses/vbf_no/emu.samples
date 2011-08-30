@@ -1,0 +1,19 @@
+$ data_obs 1 @#bf{Data}
+/scratch/zhynes/htt/selections/0812/ntuples/data_select.root 10000 
+$ Higgs_gf_sm_120 603 @#bf{gg#rightarrow H#rightarrow#tau#tau (m_{H}=120)}
+/scratch/zhynes/htt/selections/0812/ntuples/htt_gf_sm_120_select.root 10000 
+$ Higgs_vbf_sm_120 603 @#bf{qq#rightarrow H#rightarrow#tau#tau (m_{H}=120)}
+/scratch/zhynes/htt/selections/0812/ntuples/htt_vbf_sm_120_select.root 10000 
+$ Higgs_vtth_sm_120 603 @#bf{qq#rightarrow H#rightarrow#tau#tau (m_{H}=120)}
+/scratch/zhynes/htt/selections/0812/ntuples/htt_vtth_sm_120_select.root 10000 
+$ Ztt 796 @#bf{Z#rightarrow#tau#tau}
+/scratch/zhynes/htt/selections/0812/ntuples/ztt-mad_select.root 10000 
+$ ttbar 592 @#bf{t#bar{t}}
+/scratch/zhynes/htt/selections/0812/ntuples/ttbar_select.root 10000 
+$ EWK 634 @#bf{EWK}
+/scratch/zhynes/htt/selections/0812/ntuples/ewk_select.root 10000 
+$ zmm 606 @#bf{Fakes}
+/scratch/zhynes/htt/selections/0812/ntuples/zmm_select.root 10000 
+$ Fakes 606 @#bf{Fakes}
+/scratch/zhynes/htt/selections/0812/ntuples/ss-fakes_select.root 10000 
+

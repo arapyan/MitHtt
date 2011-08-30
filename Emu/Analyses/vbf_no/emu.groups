@@ -1,0 +1,15 @@
+$ mc_group ttbar,EWK,Fakes,zmm,Ztt,Higgs_gf_sm_120,Higgs_vbf_sm_120,Higgs_vtth_sm_120
+
+$ data_group data
+$ signal_group Higgs_gf_sm_120,Higgs_vbf_sm_120,Higgs_vtth_sm_120
+$ background_group Fakes,zmm,Ztt,EWK,ttbar
+
+$ mc_nf_group Higgs_gf_sm_120,Higgs_vbf_sm_120,Higgs_vtth_sm_120,Ztt,EWK,ttbar,zmm
+$ fakes_group Fakes
+
+$ no_combo_fakes Ztt,EWK,ttbar
+$ combo_fakes zmm,Fakes
+
+$ b_group ttbar
+$ unb_group Higgs_gf_sm_120,Higgs_vbf_sm_120,Higgs_vtth_sm_120,Ztt,EWK,Fakes,zmm
+
