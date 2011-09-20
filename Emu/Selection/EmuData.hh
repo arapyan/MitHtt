@@ -17,6 +17,9 @@ struct EmuData
   Float_t jpt2, jeta2, jphi2;       // sub-leading jet kinematics
   Float_t bjpt, bjeta, bjphi;       // leading b-jet kinematics
   Float_t mjj;                      // dijet mass
+  Float_t svfmass;                  // svfit mass
+  Float_t svflpt1, svfleta1, svflphi1; // lepton 1 kinematics
+  Float_t svflpt2, svfleta2, svflphi2; // lepton 2 kinematics
   Float_t weight;                   // event weight per 1/pb
   Int_t   state;                    // dilepton final state: mm, ee, em, me
 };
