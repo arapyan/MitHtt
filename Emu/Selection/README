@@ -2,8 +2,9 @@ Instructions for running on Ntuples:
 
 selectEmu.C reads the ntuples and does lepton, jet id and computes variables. Since this takes
 about five minutes, it then writes another ntuple (in my case to
-/scratch/dkralph/htt/selections/<selection-name>/ntuples) to be read by the plotting macro
+/home/vdutta/htt/selections/<selection-name>/ntuples) to be read by the plotting macro
 plotEmu.C, which also does some selection.
+
 
 Steps:
 
@@ -21,3 +22,15 @@ Same-sign fakes:
 
 Run on data only, with the name 'data' changed to 'ss-fakes' in emu.conf, and change
 the == to != for the charges.
+
+
+SUSY'11 results:
+
+- Event yields here:
+http://t3serv001.mit.edu/~vdutta/susy11/plots/yields.txt
+
+- Links to plots:
+http://t3serv001.mit.edu/~vdutta/susy11/plots.html
+
+- Limit input file:
+/home/vdutta/htt/selections/susy11/plots/limit-inputs.root
