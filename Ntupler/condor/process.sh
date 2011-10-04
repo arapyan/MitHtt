@@ -1,14 +1,14 @@
 #!/bin/bash
 # note: cannot give this two versions of the same dataset
-config=hypha.config
+config=htt.config
 if [ "` hostname | grep '\.mit\.edu'`" ]; then
     catalog=/home/cmsprod/catalog
-    outputDir=/scratch/$USER/htt
+    outputDir=/scratch/$USER/htt/nojetid
 else
     catalog=/home/mitprod/catalog
-    outputDir=/data/blue/$USER/htt
+    outputDir=/data/blue/$USER/htt/nojetid
 fi
-runMacro=runhypha.C
+runMacro=runHttNtupler.C
 mkdir -p $outputDir
 
 for dataset in `cat $config | grep -v ^# | tr -s ' ' | cut -d' ' -f 1`

@@ -110,9 +110,8 @@ void runhypha(
 
 
   // Jet corrections
-  assert(getenv("src") != NULL);
-  TString path(getenv("src"));
-  path += "/MitPhysics/data/";
+  TString path("/home/vdutta/cms/cmssw/023/CMSSW_4_2_4_patch1");
+  path += "/src/MitPhysics/data/";
 
   hymod->AddJetCorr(path   + "START42_V12_AK5PF_L1FastJet.txt");
   hymod->AddJetCorr(path   + "START42_V12_AK5PF_L2Relative.txt");
@@ -155,12 +154,17 @@ void runhypha(
   //
   hymod->AddTrigger("HLT_DoubleMu7_v1",kHLT_DoubleMu7,"hltDiMuonL3PreFiltered7",kHLT_DoubleMu7_MuObj); 
   hymod->AddTrigger("HLT_DoubleMu7_v2",kHLT_DoubleMu7,"hltDiMuonL3PreFiltered7",kHLT_DoubleMu7_MuObj);
+  hymod->AddTrigger("HLT_DoubleMu7_v3",kHLT_DoubleMu7,"hltDiMuonL3PreFiltered7",kHLT_DoubleMu7_MuObj);
+  hymod->AddTrigger("HLT_Mu13_Mu8_v1",kHLT_Mu13_Mu8,"hltSingleMu13L3Filtered13",kHLT_Mu13_Mu8_Mu1Obj,0,"hltDiMuonL3PreFiltered8",kHLT_Mu13_Mu8_Mu2Obj,0);
   hymod->AddTrigger("HLT_Mu13_Mu8_v2",kHLT_Mu13_Mu8,"hltSingleMu13L3Filtered13",kHLT_Mu13_Mu8_Mu1Obj,0,"hltDiMuonL3PreFiltered8",kHLT_Mu13_Mu8_Mu2Obj,0);
   hymod->AddTrigger("HLT_Mu13_Mu8_v3",kHLT_Mu13_Mu8,"hltSingleMu13L3Filtered13",kHLT_Mu13_Mu8_Mu1Obj,0,"hltDiMuonL3PreFiltered8",kHLT_Mu13_Mu8_Mu2Obj,0);
   hymod->AddTrigger("HLT_Mu13_Mu8_v4",kHLT_Mu13_Mu8,"hltSingleMu13L3Filtered13",kHLT_Mu13_Mu8_Mu1Obj,0,"hltDiMuonL3PreFiltered8",kHLT_Mu13_Mu8_Mu2Obj,0);  
+  hymod->AddTrigger("HLT_Mu13_Mu8_v6",kHLT_Mu13_Mu8,"hltSingleMu13L3Filtered13",kHLT_Mu13_Mu8_Mu1Obj,0,"hltDiMuonL3PreFiltered8",kHLT_Mu13_Mu8_Mu2Obj,0);
+  hymod->AddTrigger("HLT_Mu17_Mu8_v1",kHLT_Mu17_Mu8,"hltSingleMu13L3Filtered17",kHLT_Mu17_Mu8_Mu1Obj,0,"hltDiMuonL3PreFiltered8",kHLT_Mu17_Mu8_Mu2Obj,0);
   hymod->AddTrigger("HLT_Mu17_Mu8_v2",kHLT_Mu17_Mu8,"hltSingleMu13L3Filtered17",kHLT_Mu17_Mu8_Mu1Obj,0,"hltDiMuonL3PreFiltered8",kHLT_Mu17_Mu8_Mu2Obj,0);
   hymod->AddTrigger("HLT_Mu17_Mu8_v3",kHLT_Mu17_Mu8,"hltSingleMu13L3Filtered17",kHLT_Mu17_Mu8_Mu1Obj,0,"hltDiMuonL3PreFiltered8",kHLT_Mu17_Mu8_Mu2Obj,0);
   hymod->AddTrigger("HLT_Mu17_Mu8_v4",kHLT_Mu17_Mu8,"hltSingleMu13L3Filtered17",kHLT_Mu17_Mu8_Mu1Obj,0,"hltDiMuonL3PreFiltered8",kHLT_Mu17_Mu8_Mu2Obj,0);
+  hymod->AddTrigger("HLT_Mu17_Mu8_v6",kHLT_Mu17_Mu8,"hltSingleMu13L3Filtered17",kHLT_Mu17_Mu8_Mu1Obj,0,"hltDiMuonL3PreFiltered8",kHLT_Mu17_Mu8_Mu2Obj,0);
   hymod->AddTrigger("HLT_Mu8_Jet40_v2",kHLT_Mu8_Jet40,"hltL3Mu8Jet20L3Filtered8",kHLT_Mu8_Jet40_MuObj,0,"hltJet40",kHLT_Mu8_Jet40_JetObj,0);
   hymod->AddTrigger("HLT_Mu8_Jet40_v3",kHLT_Mu8_Jet40,"hltL3Mu8Jet20L3Filtered8",kHLT_Mu8_Jet40_MuObj,0,"hltJet40",kHLT_Mu8_Jet40_JetObj,0);
   hymod->AddTrigger("HLT_Mu8_Jet40_v4",kHLT_Mu8_Jet40,"hltL3Mu8Jet20L3Filtered8",kHLT_Mu8_Jet40_MuObj,0,"hltJet40",kHLT_Mu8_Jet40_JetObj,0);
@@ -207,6 +211,8 @@ void runhypha(
   hymod->AddTrigger("HLT_IsoMu24_v5",kHLT_IsoMu24,"hltSingleMuIsoL3IsoFiltered24",kHLT_IsoMu24_MuObj);
   hymod->AddTrigger("HLT_IsoMu24_v6",kHLT_IsoMu24,"hltSingleMuIsoL3IsoFiltered24",kHLT_IsoMu24_MuObj);
   hymod->AddTrigger("HLT_IsoMu24_v7",kHLT_IsoMu24,"hltSingleMuIsoL3IsoFiltered24",kHLT_IsoMu24_MuObj);
+  hymod->AddTrigger("HLT_IsoMu24_v8",kHLT_IsoMu24,"hltSingleMuIsoL3IsoFiltered24",kHLT_IsoMu24_MuObj);
+
 
   //
   // DoubleElectron
@@ -288,7 +294,7 @@ void runhypha(
   hymod->AddTrigger("HLT_Ele32_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_v3",kHLT_Ele32_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT,"hltEle32CaloIdVTCaloIsoTTrkIdTTrkIsoTTrackIsoFilter",kHLT_Ele32_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_EleObj);
 
   
-  hymod->SetPrintHLT(kFALSE); // print HLT table at start of analysis?
+  hymod->SetPrintHLT(kTRUE); // print HLT table at start of analysis?
   
   ana->AddSuperModule(hymod); 
     

@@ -87,7 +87,7 @@ when_to_transfer_output = ON_EXIT
 Queue
 EOF
 
-  condor_submit submit.cmd >& /dev/null;
+  condor_submit submit.cmd; # >& /dev/null;
   rm submit.cmd
 done
 
@@ -95,6 +95,6 @@ rm rootlogon.C
 rm $runMacro  
 rm $soFile    
 
-exit 0
+#exit 0
 
 #+AccountingGroup        = "research.dkralph"

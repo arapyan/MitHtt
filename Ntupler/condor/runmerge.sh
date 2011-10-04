@@ -1,10 +1,10 @@
 #!/bin/bash
 
-config=hypha.config
+config=htt.config
 if [ "` hostname | grep '\.mit\.edu'`" ]; then
-    ntupledir=/scratch/$USER/htt
+    ntupledir=/scratch/$USER/htt/nojetid
 else
-    ntupledir=/data/blue/$USER/htt
+    ntupledir=/data/blue/$USER/htt/nojetid
 fi
 
 for dataset in `cat $config | grep -v ^# | tr -s ' ' | cut -d' ' -f 1`; do

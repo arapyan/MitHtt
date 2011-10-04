@@ -21,6 +21,7 @@
 #include "MitHtt/Ntupler/interface/TPhoton.hh"
 #include "MitHtt/Ntupler/interface/TJet.hh"
 #include "MitHtt/Ntupler/interface/TVertex.hh"
+#include "MitHtt/Ntupler/interface/TSVFit.hh"
 
 // lumi section selection with JSON files
 #include "MitAna/DataCont/interface/RunLumiRangeMap.h"
@@ -33,7 +34,7 @@
 void SkimNtuples(const TString input = "skim.input") 
 {
   
-#define _USEGEN_
+//#define _USEGEN_
 
   gBenchmark->Start("SkimNtuples");
   
@@ -73,6 +74,7 @@ void SkimNtuples(const TString input = "skim.input")
   TClonesArray *pfJetArr    = new TClonesArray("mithep::TJet");
   TClonesArray *photonArr   = new TClonesArray("mithep::TPhoton");
   TClonesArray *pvArr       = new TClonesArray("mithep::TVertex");
+  TClonesArray *svfitArr    = new TClonesArray("mithep::TSVFit");
   
   UInt_t nInputEvts = 0;
   UInt_t nPassEvts  = 0;
@@ -92,6 +94,7 @@ void SkimNtuples(const TString input = "skim.input")
   outEventTree->Branch("PFJet",    &pfJetArr);
   outEventTree->Branch("Photon",   &photonArr);
   outEventTree->Branch("PV",       &pvArr);
+  outEventTree->Branch("SVFit",    &svfitArr);
 
   for(UInt_t ifile=0; ifile<infilenames.size(); ifile++) {
     cout << "Skimming " << infilenames[ifile] << "..." << endl;
@@ -111,6 +114,8 @@ void SkimNtuples(const TString input = "skim.input")
     eventTree->SetBranchAddress("PFJet",    &pfJetArr);      TBranch *pfJetBr    = eventTree->GetBranch("PFJet");
     eventTree->SetBranchAddress("Photon",   &photonArr);     TBranch *photonBr   = eventTree->GetBranch("Photon");
     eventTree->SetBranchAddress("PV",       &pvArr);         TBranch *pvBr       = eventTree->GetBranch("PV");
+    eventTree->SetBranchAddress("SVFit",    &svfitArr);      TBranch *svfitBr    = eventTree->GetBranch("SVFit");
+
     
     for(UInt_t ientry=0; ientry<eventTree->GetEntries(); ientry++) { 
       infoBr->GetEntry(ientry);
@@ -122,13 +127,14 @@ void SkimNtuples(const TString input = "skim.input")
       pfJetArr->Clear();    pfJetBr->GetEntry(ientry);
       photonArr->Clear();   photonBr->GetEntry(ientry);
       pvArr->Clear();       pvBr->GetEntry(ientry);
+      svfitArr->Clear();    svfitBr->GetEntry(ientry);
       
       nInputEvts++;
             
       Bool_t keep = kFALSE;
       //if(gen->id==EGenType::kWW) {
       if((electronArr->GetEntriesFast() > 0) && (muonArr->GetEntriesFast() > 0)) {
-      //if(muonArr->GetEntriesFast()>0) {
+      //if(muonArr->GetEntriesFast()>1) {
         keep = kTRUE;
       }
       
@@ -151,6 +157,7 @@ void SkimNtuples(const TString input = "skim.input")
   delete pfJetArr;
   delete photonArr;
   delete pvArr;
+  delete svfitArr;
     
   std::cout << outfilename << " created!" << std::endl;
   std::cout << " >>> Events processed: " << nInputEvts << std::endl;

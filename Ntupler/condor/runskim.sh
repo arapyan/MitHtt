@@ -1,7 +1,7 @@
 #!/bin/bash
 
 skimname=emu
-config=hypha.config
+config=htt.config
 if [ "` hostname | grep '\.mit\.edu'`" ]; then
     ntupledir=/scratch/$USER/htt
 else
