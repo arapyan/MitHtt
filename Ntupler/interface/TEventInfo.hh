@@ -15,7 +15,7 @@ namespace mithep
       UInt_t  evtNum; 			             // event number in data
       UInt_t  lumiSec;			             // lumi section
       UInt_t  nPU;                                   // number of reconstructed pile up vertices in event (MC only)
-      UInt_t  triggerBits;		             // HLT trigger bits 
+      ULong64_t  triggerBits;		             // HLT trigger bits 
       Float_t pvx, pvy, pvz;		             // best primary vertex
       Float_t bsx, bsy, bsz;		             // beamspot
       Float_t pfMET, pfMETphi, pfSumET;	             // particle flow MET

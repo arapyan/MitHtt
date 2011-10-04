@@ -29,7 +29,7 @@ namespace mithep
       UInt_t  nPixHits;	              // number of pixel hits
       UInt_t  nSeg;  	              // number of muon segments
       UInt_t  nMatch;                 // number of muon chambers matched to segments
-      UInt_t  hltMatchBits;           // bits for matching with HLT primitives 
+      ULong64_t  hltMatchBits;           // bits for matching with HLT primitives 
       UInt_t  trkID;                  // tracker track ID
 
     ClassDef(TMuon,1)

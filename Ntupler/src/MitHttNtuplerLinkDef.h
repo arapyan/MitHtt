@@ -9,6 +9,7 @@
 #include "MitHtt/Ntupler/interface/TJet.hh"
 #include "MitHtt/Ntupler/interface/TPhoton.hh"
 #include "MitHtt/Ntupler/interface/TVertex.hh"
+#include "MitHtt/Ntupler/interface/TSVFit.hh"
 #include "MitHtt/Ntupler/interface/TMuonLite.hh"
 #endif
 
@@ -29,5 +30,6 @@
 #pragma link C++ class mithep::TJet+;
 #pragma link C++ class mithep::TPhoton+;
 #pragma link C++ class mithep::TVertex+;
+#pragma link C++ class mithep::TSVFit+;
 #pragma link C++ class mithep::TMuonLite+;
 #endif

@@ -8,6 +8,7 @@
 #include "MitAna/DataTree/interface/PileupEnergyDensityFwd.h"
 #include "MitAna/DataTree/interface/BaseVertex.h"
 #include "MitAna/DataTree/interface/TriggerMask.h"
+#include "MitAna/DataTree/interface/NSVFitFwd.h"
 #include "MitAna/DataCont/interface/RunLumiRangeMap.h"
 #include "MitAna/DataCont/interface/RunLumiSet.h"
 #include "CondFormats/JetMETObjects/interface/FactorizedJetCorrector.h"
@@ -23,6 +24,7 @@
 #include "TJet.hh"
 #include "TPhoton.hh"
 #include "TVertex.hh"
+#include "TSVFit.hh"
 
 #include <vector>
 
@@ -60,9 +62,9 @@ namespace mithep
       void SetMaxRho(const Double_t rho)        { fMaxRho = rho; }
       void SetPrintHLT(const Bool_t flag)       { fPrintTable = flag; }
       
-      void AddTrigger(const char* name, const ULong_t id,
-                      const char* objName1="", const ULong_t objId1=0, const Double_t minPt1=0,
-		      const char* objName2="", const ULong_t objId2=0, const Double_t minPt2=0) {
+      void AddTrigger(const char* name, const ULong64_t id,
+                      const char* objName1="", const ULong64_t objId1=0, const Double_t minPt1=0,
+		      const char* objName2="", const ULong64_t objId2=0, const Double_t minPt2=0) {
         fTriggerNamesv.push_back(name);
 	fTriggerIdsv.push_back(id);
 	
@@ -103,6 +105,9 @@ namespace mithep
       void FillGenW();
       void FillGenWW();
       
+      // Fill SVFit info
+      void FillSVFit(const NSVFit *nsvfit);
+
       // Fill muon data object
       void FillMuon(const Muon *mu);
       
@@ -119,8 +124,8 @@ namespace mithep
       void FillPV(const Vertex *pv);
       
       // Match muon to HLT primitive
-      ULong_t MatchHLT(const Double_t eta, const Double_t phi);
-      ULong_t MatchHLT(const Double_t pt, const Double_t eta, const Double_t phi);
+      ULong64_t MatchHLT(const Double_t eta, const Double_t phi);
+      ULong64_t MatchHLT(const Double_t pt, const Double_t eta, const Double_t phi);
       
       // Check for conversion with MVF
       Bool_t IsConversion(const Electron *ele);
@@ -141,6 +146,7 @@ namespace mithep
       TString                       fPFJetName;            // particle flow jet collection name
       TString                       fPhotonName;           // photon collection name
       TString                       fTrigMaskName;         // trigger mask name
+      TString                       fNSVFitEmuName;        // NSVFit collection name
       TString                       fPFMetName;            // particle flow MET collection name
       TString                       fConversionName;       // conversion collection name
       TString                       fPileupName;           // pile-up info name
@@ -156,6 +162,7 @@ namespace mithep
       const PFJetCol               *fPFJets;          // particle flow jet collection handle
       const PhotonCol              *fPhotons;         // photon collection handle
       const TriggerMask            *fTrigMask;        // trigger mask handle
+      const NSVFitCol              *fNSVFitEmu;       // NSVFit handle
       const PFMetCol               *fPFMet;           // particle flow MET handle
       const DecayParticleCol       *fConversions;     // conversion collection handle
       const PileupInfoCol          *fPileup;          // pile-up info handle
@@ -195,16 +202,17 @@ namespace mithep
       TClonesArray           *fPFJetArr;        // particle flow jet array
       TClonesArray           *fPhotonArr;       // photon array
       TClonesArray           *fPVArr;           // valid primary vertex array
+      TClonesArray           *fSVFitArr;        // SVFit array
       
       vector<TString>         fTriggerNamesv;       // names of triggers we're interested in 
-      vector<ULong_t>         fTriggerIdsv;         // corresponding ETriggerBit value
+      vector<ULong64_t>         fTriggerIdsv;         // corresponding ETriggerBit value
 
       vector<TString>         fTriggerObjNames1v;
-      vector<ULong_t>         fTriggerObjIds1v;
+      vector<ULong64_t>         fTriggerObjIds1v;
       vector<Double_t>        fTriggerObjMinPt1v;
 
       vector<TString>         fTriggerObjNames2v;
-      vector<ULong_t>         fTriggerObjIds2v;
+      vector<ULong64_t>         fTriggerObjIds2v;
       vector<Double_t>        fTriggerObjMinPt2v;
       
       vector<TString>         fJetCorrParsv;

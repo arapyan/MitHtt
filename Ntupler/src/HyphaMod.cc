@@ -20,6 +20,7 @@
 #include "MitAna/DataTree/interface/StableData.h"
 #include "MitCommon/MathTools/interface/MathUtils.h"
 #include "MitPhysics/Utils/interface/ElectronTools.h"
+#include "MitAna/DataTree/interface/NSVFitCol.h"
 #include "JetMETCorrections/Objects/interface/JetCorrectionsRecord.h"
 #include "CondFormats/JetMETObjects/interface/JetCorrectorParameters.h"
 #include <TTree.h>
@@ -45,6 +46,7 @@ HyphaMod::HyphaMod(const char *name, const char *title):
   fPFJetName     (Names::gkPFJetBrn),
   fPhotonName    (Names::gkPhotonBrn),
   fTrigMaskName  (Names::gkHltBitBrn),
+  fNSVFitEmuName (Names::gkNSVFitEMuBrn),
   fPFMetName     ("PFMet"),
   fConversionName(Names::gkMvfConversionBrn),
   fPileupName    (Names::gkPileupInfoBrn),
@@ -59,6 +61,7 @@ HyphaMod::HyphaMod(const char *name, const char *title):
   fPFJets        (0),
   fPhotons       (0),  
   fTrigMask      (0),
+  fNSVFitEmu     (0),
   fPFMet         (0),
   fConversions   (0),
   fPileup        (0),
@@ -96,6 +99,7 @@ HyphaMod::HyphaMod(const char *name, const char *title):
   TJet::Class()->IgnoreTObjectStreamer();
   TPhoton::Class()->IgnoreTObjectStreamer();
   TVertex::Class()->IgnoreTObjectStreamer();
+  TSVFit::Class()->IgnoreTObjectStreamer();
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -123,6 +127,7 @@ void HyphaMod::SlaveBegin()
   ReqBranch(fBeamSpotName,        fBeamSpot);
   ReqBranch(fPFJetName,           fPFJets);
   ReqBranch(fTrigMaskName,        fTrigMask);
+  ReqBranch(fNSVFitEmuName,       fNSVFitEmu);
   ReqBranch(fPFMetName,           fPFMet);
   ReqBranch(fPhotonName,          fPhotons);
   ReqBranch(fConversionName,      fConversions);
@@ -138,6 +143,7 @@ void HyphaMod::SlaveBegin()
   fPFJetArr    = new TClonesArray("mithep::TJet");	assert(fPFJetArr);
   fPhotonArr   = new TClonesArray("mithep::TPhoton");	assert(fPhotonArr);
   fPVArr       = new TClonesArray("mithep::TVertex");	assert(fPVArr);
+  fSVFitArr    = new TClonesArray("mithep::TSVFit");    assert(fSVFitArr);
   
   //
   // Create output file
@@ -158,6 +164,7 @@ void HyphaMod::SlaveBegin()
   fEventTree->Branch("PFJet",   &fPFJetArr);
   fEventTree->Branch("Photon",  &fPhotonArr);
   fEventTree->Branch("PV",      &fPVArr);
+  fEventTree->Branch("SVFit",   &fSVFitArr);
 
   // fTauTree = new TTree("Taus","Taus");
   // fTauTree->Branch("tau1",&fTau1);
@@ -214,6 +221,7 @@ void HyphaMod::SlaveTerminate()
   delete fPFJetArr;
   delete fPhotonArr;
   delete fPVArr;
+  delete fSVFitArr;
   
   delete fJetCorrector;
   delete fJetUnc;
@@ -263,6 +271,7 @@ void HyphaMod::Process()
   LoadBranch(fBeamSpotName);
   LoadBranch(fPFJetName);
   LoadBranch(fTrigMaskName);
+  LoadBranch(fNSVFitEmuName);
   LoadBranch(fPFMetName); 
   LoadBranch(fPhotonName);
   LoadBranch(fConversionName);
@@ -280,12 +289,14 @@ void HyphaMod::Process()
     if(fUseGen==3) FillGenW();
     if(fUseGen==4) FillGenWW();
   }
-  
+
+
+ 
   //
   // Get HLT info. Trigger objects can be matched by name to the corresponding trigger that passed.
   // note: TriggerName::Id() is bambu numbering scheme, fTriggerIdsv[itrig] is kevin's
   //
-  ULong_t trigbits=0;
+  ULong64_t trigbits=0;
   if(HasHLTInfo()) {
     const TriggerTable *hltTable = GetHLTTable();
     assert(hltTable);
@@ -306,6 +317,7 @@ void HyphaMod::Process()
   fPFJetArr->Clear();
   fPhotonArr->Clear();
   fPVArr->Clear();
+  fSVFitArr->Clear();
 
 
   //
@@ -346,7 +358,14 @@ void HyphaMod::Process()
   if(!bestPV) bestPV = fPrimVerts->At(0);
   fVertex.SetPosition(bestPV->X(),bestPV->Y(),bestPV->Z());
   fVertex.SetErrors(bestPV->XErr(),bestPV->YErr(),bestPV->ZErr());
-  
+ 
+  assert(fNSVFitEmu);
+  for(UInt_t i=0; i<fNSVFitEmu->GetEntries(); ++i) {
+    const NSVFit *nsvfit = fNSVFitEmu->At(i);
+    if(nsvfit->IsValid()) { FillSVFit(nsvfit); }
+  }
+
+ 
 
   //
   // Loop through muons (and general tracks if desired).
@@ -412,12 +431,12 @@ void HyphaMod::Process()
     if(pt > fJetPtMin || (jet->TrackCountingHighEffBJetTagsDisc() != -100)) {
 
       if(jet->E()==0) continue;
-      if(jet->ChargedHadronEnergy()/jet->E()  <=  0)	continue;  //   'chargedHadronEnergyFraction > 0.0 &'	  
-      if(jet->NeutralHadronEnergy()/jet->E()   >  0.99)	continue;  //	'neutralHadronEnergyFraction < 0.99 &'	  
-      if(jet->ChargedEmEnergy()/jet->E()       >  0.99)	continue;  //	'chargedEmEnergyFraction < 0.99 &'	  
-      if(jet->NeutralEmEnergy()/jet->E()       >  0.99)	continue;  //	'neutralEmEnergyFraction < 0.99 &'	  
-      if(jet->ChargedMultiplicity()           ==  0)	continue;  //	'chargedMultiplicity > 0 &'		  
-      if(jet->NConstituents()                  <  2)	continue;  //	'nConstituents > 1'
+      //if(jet->ChargedHadronEnergy()/jet->E()  <=  0)	continue;  //   'chargedHadronEnergyFraction > 0.0 &'	  
+      //if(jet->NeutralHadronEnergy()/jet->E()   >  0.99)	continue;  //	'neutralHadronEnergyFraction < 0.99 &'	  
+      //if(jet->ChargedEmEnergy()/jet->E()       >  0.99)	continue;  //	'chargedEmEnergyFraction < 0.99 &'	  
+      //if(jet->NeutralEmEnergy()/jet->E()       >  0.99)	continue;  //	'neutralEmEnergyFraction < 0.99 &'	  
+      //if(jet->ChargedMultiplicity()           ==  0)	continue;  //	'chargedMultiplicity > 0 &'		  
+      //if(jet->NConstituents()                  <  2)	continue;  //	'nConstituents > 1'
 
       FillJet(jet);
     }
@@ -460,7 +479,9 @@ void HyphaMod::Process()
 	npu = fPileup->At(i)->GetPU_NumInteractions();
     }
     assert(npu>=0);
-  }  
+  } 
+
+ 
   //
   // Fill event info tree
   //    
@@ -483,6 +504,7 @@ void HyphaMod::Process()
   fEventInfo.trkSumET     = trkSumET;
   fEventInfo.rho          = fPUEnergyDensity->At(0)->RhoHighEta();
   fEventInfo.hasGoodPV    = hasGoodPV;
+
   
   // Fill the tree
   fEventTree->Fill();
@@ -712,9 +734,9 @@ void HyphaMod::FillPV(const Vertex *pv)
       
       
 //--------------------------------------------------------------------------------------------------
-ULong_t HyphaMod::MatchHLT(const Double_t eta, const Double_t phi)
+ULong64_t HyphaMod::MatchHLT(const Double_t eta, const Double_t phi)
 {
-  ULong_t bits = 0;
+  ULong64_t bits = 0;
   
   const Double_t hltMatchR = 0.2;
   
@@ -762,9 +784,9 @@ ULong_t HyphaMod::MatchHLT(const Double_t eta, const Double_t phi)
   return bits;
 }
 
-ULong_t HyphaMod::MatchHLT(const Double_t pt, const Double_t eta, const Double_t phi)
+ULong64_t HyphaMod::MatchHLT(const Double_t pt, const Double_t eta, const Double_t phi)
 {
-  ULong_t bits = 0;
+  ULong64_t bits = 0;
   
   const Double_t hltMatchR = 0.2;
   const Double_t hltMatchPtFrac = 1;
@@ -1369,4 +1391,25 @@ void HyphaMod::FillGenWW()
   fGenInfo.decx   = boson ? boson->DecayVertex().X() : -999;
   fGenInfo.decy   = boson ? boson->DecayVertex().Y() : -999; 
   fGenInfo.decz   = boson ? boson->DecayVertex().Z() : -999;
+}
+
+//--------------------------------------------------------------------------------------------------
+void HyphaMod::FillSVFit(const NSVFit *nsvfit) 
+{
+  TClonesArray &rSVFitArr = *fSVFitArr;
+  assert(rSVFitArr.GetEntries() < rSVFitArr.GetSize());
+  const Int_t index = rSVFitArr.GetEntries();
+  new(rSVFitArr[index]) TSVFit();
+  TSVFit *pSVFit = (TSVFit*)rSVFitArr[index];
+  
+  pSVFit->isValid = nsvfit->IsValid();
+  pSVFit->mass    = nsvfit->Mass();
+  pSVFit->massErrUp = nsvfit->MassErrUp();
+  pSVFit->massErrDown = nsvfit->MassErrDown();
+  pSVFit->massMean = nsvfit->MassMean();
+  pSVFit->massMedian = nsvfit->MassMedian();
+  pSVFit->massMaximum = nsvfit->MassMaximum();
+  pSVFit->massMaxInterpol = nsvfit->MassMaxInterpol();
+  pSVFit->daughter1 = nsvfit->Daughter(0);
+  pSVFit->daughter2 = nsvfit->Daughter(1);
 }

@@ -29,7 +29,7 @@ namespace mithep
       Float_t partnerDist;         // distance in x-y plane to nearest conversion partner track
       Int_t   q;                   // charge
       UInt_t  nExpHitsInner;       // number of hits expected before first hit
-      UInt_t  hltMatchBits;        // bits for matching with HLT primitives	       
+      ULong64_t  hltMatchBits;        // bits for matching with HLT primitives	       
       UInt_t  scID;                // supercluster ID (for matching to photon superclusters)
       UInt_t  trkID;               // tracker track ID (for matching to muons)
       Bool_t  isEcalDriven;        // is ECAL seeded electron?

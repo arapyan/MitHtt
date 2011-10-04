@@ -17,7 +17,7 @@ namespace mithep
       Float_t tche;                // TrackCountingHighEfficiency b-tag discriminator
       Float_t tchp;                // TrackCountingHighPurity b-tag discriminator
       Int_t   mcFlavor;            // PDG ID of matched parton flavor
-      UInt_t  hltMatchBits;        // bits from matching with HLT primitives
+      ULong64_t  hltMatchBits;        // bits from matching with HLT primitives
 
     ClassDef(TJet,2)
   };
