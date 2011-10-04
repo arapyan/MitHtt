@@ -22,6 +22,7 @@
 #include "MitHtt/Ntupler/interface/TElectron.hh"
 #include "MitHtt/Ntupler/interface/TJet.hh"
 #include "MitHtt/Ntupler/interface/TVertex.hh"
+#include "MitHtt/Ntupler/interface/TSVFit.hh"
 
 // lumi section selection with JSON files
 #include "MitAna/DataCont/interface/RunLumiRangeMap.h"
@@ -50,11 +51,17 @@ void predictFakesMuEle(const TString frname,     // fake rate data file
   vector<TString> datatypev;
   vector<TString> jsonv;
 
-  fnamev.push_back("/tmp/dkralph/htt/r11a-mueg-m10-v1_emu_skim.root"); datatypev.push_back(eMuEl);
-  jsonv.push_back("/home/dkralph/json/Cert_160404-163869_7TeV_May10ReReco_Collisions11_JSON_v2.txt");
+  fnamev.push_back("/scratch/vdutta/htt/r11a-mueg-m10-v1_emu_skim.root"); datatypev.push_back(eMuEl);
+  jsonv.push_back("/home/vdutta/cms/root/json/Cert_160404-163869_7TeV_May10ReReco_Collisions11_JSON_v2.txt");
 
-  fnamev.push_back("/tmp/dkralph/htt/r11a-mueg-pr-v4_emu_skim.root");  datatypev.push_back(eMuEl);
-  jsonv.push_back("/home/dkralph/json/Cert_160404-167913_7TeV_PromptReco_Collisions11_JSON.txt");
+  fnamev.push_back("/scratch/vdutta/htt/r11a-mueg-pr-v4_emu_skim.root");  datatypev.push_back(eMuEl);
+  jsonv.push_back("/home/vdutta/cms/root/json/Cert_160404-167913_7TeV_PromptReco_Collisions11_JSON.txt");
+
+  //fnamev.push_back("/scratch/vdutta/htt/lp/r11a-mueg-a05-v1_ntuple.root");  datatypev.push_back(eMuEl);
+  //jsonv.push_back("/home/vdutta/cms/root/json/Cert_160404-172802_7TeV_PromptReco_Collisions11_JSON_v2.txt");
+
+  //fnamev.push_back("/scratch/vdutta/htt/lp/r11a-mueg-pr-v6_ntuple.root");  datatypev.push_back(eMuEl);
+  //jsonv.push_back("/home/vdutta/cms/root/json/Cert_160404-172802_7TeV_PromptReco_Collisions11_JSON_v2.txt");
 
   const Double_t kMuonPt1Min = 20;
   const Double_t kMuonPt2Min = 10;
@@ -97,7 +104,7 @@ void predictFakesMuEle(const TString frname,     // fake rate data file
   // Set up output ntuple file for the sample
   //
   gSystem->mkdir(outputDir,kTRUE);
-  TString outName = outputDir + TString("/") + TString("fakes-new_select.root");
+  TString outName = outputDir + TString("/") + TString("fakes-eps_select.root");
   TFile *outFile = new TFile(outName,"RECREATE");
   TTree outtree("Events","Events");
 
@@ -108,7 +115,7 @@ void predictFakesMuEle(const TString frname,     // fake rate data file
   TArrayF btagArray; btagArray.Set(kMaxPt20Jets); // array to hold b-tag values for pt-20 jets
   Float_t varl,varh;
   outtree.Branch("Events",&data.runNum,
-		 "runNum/i:evtNum:lumiSec:nPV:njets:nbjets:met/F:metphi:mass:dphi:mt:pt:phi:pmet:pvis:lpt1:leta1:lphi1:lpt2:leta2:lphi2:jpt1:jeta1:jphi1:jpt2:jeta2:jphi2:bjpt:bjeta:bjphi:mjj:weight:state/I");
+		 "runNum/i:evtNum:lumiSec:nPV:njets:nbjets:met/F:metphi:mass:scaledmass:dphi:mt:pt:phi:pmet:pvis:lpt1:leta1:lphi1:lpt2:leta2:lphi2:jpt1:jeta1:jphi1:jpt2:jeta2:jphi2:bjpt:bjeta:bjphi:mjj:svfmass:svflpt1:svfleta1:svflphi1:svflpt2:svfleta2:svflphi2:weight:state/I");
 
   // extra branches
   outtree.Branch("npt20jets",&npt20jets);
@@ -128,8 +135,8 @@ void predictFakesMuEle(const TString frname,     // fake rate data file
   TClonesArray *electronArr = new TClonesArray("mithep::TElectron");
   TClonesArray *jetArr      = new TClonesArray("mithep::TJet");
   TClonesArray *pvArr       = new TClonesArray("mithep::TVertex");
+  TClonesArray *svfitArr    = new TClonesArray("mithep::TSVFit");
   
-
   //
   // loop over data samples
   //
@@ -156,11 +163,15 @@ void predictFakesMuEle(const TString frname,     // fake rate data file
     eventTree->SetBranchAddress("Electron",&electronArr); TBranch *electronBr = eventTree->GetBranch("Electron");
     eventTree->SetBranchAddress("PFJet",   &jetArr);      TBranch *jetBr      = eventTree->GetBranch("PFJet");
     eventTree->SetBranchAddress("PV",      &pvArr);       TBranch *pvBr       = eventTree->GetBranch("PV");
+    eventTree->SetBranchAddress("SVFit",    &svfitArr);    TBranch *svfitBr    = eventTree->GetBranch("SVFit");
    
     Double_t weight=1;
 
+    Double_t counter[30];         for(Int_t i=0; i<30; i++) { counter[i] = 0; }
+   
     // perform fakeable objects extrapolation
     for(UInt_t ientry=0; ientry<eventTree->GetEntries(); ientry++) {
+      
       infoBr->GetEntry(ientry);
 
       // check for certified runs
@@ -168,8 +179,9 @@ void predictFakesMuEle(const TString frname,     // fake rate data file
       if(hasJSON && !rlrm.HasRunLumi(rl)) continue;  
       
       // trigger requirement
-      UInt_t trigger = 0;
+      ULong_t trigger = 0;
       if(datatypev[ifile] == eMuEl) trigger = kHLT_Mu17_Ele8_CaloIdL | kHLT_Mu8_Ele17_CaloIdL;
+//      if(datatypev[ifile] == eMuEl) trigger = kHLT_Mu17_Ele8_CaloIdL | kHLT_Mu8_Ele17_CaloIdL | kHLT_Mu8_Ele17_CaloIdT_CaloIsoVL;
       else {cout << "data type not defined" << endl; assert(0);}
       if(datatypev[ifile]!=eMC && !(info->triggerBits & trigger)) continue;
                 
@@ -189,14 +201,17 @@ void predictFakesMuEle(const TString frname,     // fake rate data file
       muonBr->GetEntry(ientry);
       for(Int_t i=0; i<muonArr->GetEntriesFast(); i++) {
         const mithep::TMuon* muon = (mithep::TMuon*)((*muonArr)[i]);
-        	
-	// Bool_t trigmatch = muon->hltMatchBits & (kHLT_Mu17_Ele8_CaloIdL_MuObj | kHLT_Mu8_Ele17_CaloIdL_MuObj);
+
+        Bool_t trigmatch = muon->hltMatchBits & (kHLT_Mu17_Ele8_CaloIdL_MuObj | kHLT_Mu8_Ele17_CaloIdL_MuObj);        	
+//	Bool_t trigmatch = muon->hltMatchBits & (kHLT_Mu17_Ele8_CaloIdL_MuObj | kHLT_Mu8_Ele17_CaloIdL_MuObj | kHLT_Mu8_Ele17_CaloIdT_CaloIsoVL_MuObj);
 	// if(!trigmatch)            continue; // seems to be broken
+        if(info->runNum<167000) // trigger matching broken after this run
+          if(!trigmatch)                     continue;
 
 	if(muon->pt < kMuonPt2Min)    continue;
 	if(fabs(muon->eta) > 2.1)     continue;
 	
-	// if((info->triggerBits & kHLT_Mu17_Ele8_CaloIdL) && muon->pt < 20.0 ) continue;
+	//if((info->triggerBits & kHLT_Mu17_Ele8_CaloIdL) && muon->pt < 20.0 ) continue;
 
 	if(passMuonID(muon)) {
 	  tightv.push_back(muon);
@@ -213,11 +228,13 @@ void predictFakesMuEle(const TString frname,     // fake rate data file
 	if(electron->pt        < kElePt2Min)  continue;
 	if(fabs(electron->eta) > 2.5)         continue;
 	//if(!(electron->isEcalDriven)) continue;
-	
-	// Bool_t trigmatch = electron->hltMatchBits & (kHLT_Mu17_Ele8_CaloIdL_EGObj | kHLT_Mu8_Ele17_CaloIdL_EGObj);
-	// if(!trigmatch)                          continue;
+
+        Bool_t trigmatch = electron->hltMatchBits & (kHLT_Mu17_Ele8_CaloIdL_EGObj | kHLT_Mu8_Ele17_CaloIdL_EGObj);	
+//	Bool_t trigmatch = electron->hltMatchBits & (kHLT_Mu17_Ele8_CaloIdL_EGObj | kHLT_Mu8_Ele17_CaloIdL_EGObj | kHLT_Mu8_Ele17_CaloIdT_CaloIsoVL_EGObj);
+        if(info->runNum<167000) // trigger matching broken after this run
+	  if(!trigmatch)                          continue;
 	// if(!(electron->hltMatchBits & trigger)) continue;
-	// if((info->triggerBits & kHLT_Mu8_Ele17_CaloIdL) && electron->pt < 20.0 ) continue;
+	//if((info->triggerBits & (kHLT_Mu8_Ele17_CaloIdL | kHLT_Mu8_Ele17_CaloIdT_CaloIsoVL)) && electron->pt < 20.0 ) continue;
 
 	if(passEleID(electron)) {ntightele++; continue;}
 	
@@ -230,11 +247,10 @@ void predictFakesMuEle(const TString frname,     // fake rate data file
 	  rateErrhv.push_back(fr.getErrHigh(fabs(electron->eta),fopt));
 	}
       }
-
+          
       // Tight+Loose
       if(tightv.size()==1) {
-	// if((tightv.size() + ntightele)==1) {
-
+      // if((tightv.size() + ntightele)==1) {
 	if((tightv.size() + ntightele)!=1) continue;
 
 	const mithep::TMuon* mu = tightv[0];
@@ -242,21 +258,24 @@ void predictFakesMuEle(const TString frname,     // fake rate data file
 	for(UInt_t i=0; i<loosev.size(); i++) {
 	  const mithep::TElectron* ele = loosev[i];
 
+          if(mu->q == ele->q) continue;                    
+	  	  
 	  if(mu->pt<kMuonPt1Min  && ele->pt<kElePt1Min) continue;
 
 	  // if((info->triggerBits & kHLT_Mu8_Ele17_CaloIdL) && ele->pt < 20.0 )                     continue;
 
 	  if(mu->pt < 20) {
-	    if(!(info->triggerBits & kHLT_Mu8_Ele17_CaloIdL)) continue; // if failed trig1
+            if(!(info->triggerBits & kHLT_Mu8_Ele17_CaloIdL)) continue; // if failed trig1
+//	    if(!(info->triggerBits & (kHLT_Mu8_Ele17_CaloIdL | kHLT_Mu8_Ele17_CaloIdT_CaloIsoVL))) continue; // if failed trig1
 	  }
 	  else if(ele->pt < 20) {
 	    if(!(info->triggerBits & kHLT_Mu17_Ele8_CaloIdL)) continue; // if failed trig2
 	  }
-
-          if(mu->q == ele->q) continue;                    
-
+	  
 	  TLorentzVector lep1, lep2, dilep;  // lepton 4-vectors
 	  Int_t finalState=-1;	           // final state type
+          TLorentzVector svflep1, svflep2;  // lepton 4-vectors
+          Double_t svfmass = -999;
 
 	  if(mu->pt > ele->pt) {
 	    lep1.SetPtEtaPhiM(mu->pt,  mu->eta,  mu->phi,  0.105658369);
@@ -269,6 +288,14 @@ void predictFakesMuEle(const TString frname,     // fake rate data file
 
 	  if(ele->pt > mu->pt) finalState=kEleMu; 
 	  else                 finalState=kMuEle;
+
+          // SVFit info
+          svfitArr->Clear();
+          svfitBr->GetEntry(ientry);
+          mithep::TSVFit *svfit = (mithep::TSVFit*)((*svfitArr)[0]);
+          svflep1.SetPtEtaPhiM(svfit->daughter1.Pt(), svfit->daughter1.Eta(), svfit->daughter1.Phi(), svfit->daughter1.M());
+          svflep2.SetPtEtaPhiM(svfit->daughter2.Pt(), svfit->daughter2.Eta(), svfit->daughter2.Phi(), svfit->daughter2.M());
+          svfmass = svfit->mass;
 
 	  // loop through jets      
 	  jetArr->Clear();
@@ -355,6 +382,7 @@ void predictFakesMuEle(const TString frname,     // fake rate data file
 	  data.met     = met;
 	  data.metphi  = metphi;
 	  data.mass    = dilep.M();
+          data.scaledmass = dilep.M();
 	  data.dphi    = toolbox::deltaPhi(lep1.Phi(),lep2.Phi());
 	  data.mt      = sqrt( 2.0 * (dilep.Pt()) * met * (1.0-cos(toolbox::deltaPhi(dilep.Phi(),metphi))) );
 	  data.pt      = dilep.Pt();
@@ -377,6 +405,13 @@ void predictFakesMuEle(const TString frname,     // fake rate data file
 	  data.bjeta   = (bjet) ? bjet->eta : 0;
 	  data.bjphi   = (bjet) ? bjet->phi : 0;
 	  data.mjj     = (njets>1) ? dijet.M() : 0;
+          data.svfmass = svfmass;
+          data.svflpt1 = svflep1.Pt();
+          data.svfleta1= svflep1.Eta();
+          data.svflphi1= svflep1.Phi();
+          data.svflpt2 = svflep2.Pt();
+          data.svfleta2= svflep2.Eta();
+          data.svflphi2= svflep2.Phi();
 	  data.weight  = weight*r;
 	  data.state   = finalState;  	   
 
@@ -392,13 +427,12 @@ void predictFakesMuEle(const TString frname,     // fake rate data file
 	*/	  
         }
       }      
-    }
+    }    
     delete infile;
     infile=0, eventTree=0;
   }
   outFile->Write();
   outFile->Close();
-
   delete outFile;
   
   delete info;
@@ -406,6 +440,7 @@ void predictFakesMuEle(const TString frname,     // fake rate data file
   delete electronArr;
   delete jetArr;
   delete pvArr;
+  delete svfitArr;
 
   // fclose(prs);
   

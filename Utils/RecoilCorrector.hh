@@ -227,7 +227,7 @@ void RecoilCorrector::metDistribution(double &iMet,double &iMPhi,double iGenPt,d
   pSigma2_2*=pCorr2;   
   //Constant Sigma correction
   if(iMetType == 0) {
-    if(iFluc != 0) {pSigma1_1 *= (1 + iFluc*0.08);  pSigma2_1 *= 1 + iFluc*0.08 ;}
+    if(iFluc != 0) pSigma1_1 *= (1 + iFluc*0.08);  pSigma2_1 *= 1 + iFluc*0.08 ;
     //Systematic on Simga variation 0.1 for muons 0.04 for electrons
     pFrac1 = (pMS1-pSigma1_2)/(pSigma1_1-pSigma1_2); //Constant Sigma 
     pFrac2 = (pMS2-pSigma2_2)/(pSigma2_1-pSigma2_2);

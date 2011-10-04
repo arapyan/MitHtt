@@ -13,6 +13,7 @@
 #include <iostream>
 
 Bool_t passMuonID(const mithep::TMuon *muon);
+Bool_t passLooseMuonID(const mithep::TMuon *muon);
 Bool_t passEleID(const mithep::TElectron *electron);
 
 Bool_t isSoftMuon(const mithep::TMuon *muon);
@@ -23,7 +24,6 @@ Bool_t isEleFO(const mithep::TElectron *electron);
 Double_t projectedMET(const Double_t met, const Double_t metPhi, const Double_t lepPhi);
 
 Double_t trigEff(ETriggerBit trig, mithep::TMuon *muon, mithep::TElectron *ele);
-
 
 //=== FUNCTION DEFINITIONS ======================================================================================
 
@@ -60,6 +60,17 @@ Bool_t passMuonID(const mithep::TMuon *muon)
   }
 //*/
 }
+
+//----------------------------------------------------------------------------------------
+Bool_t passLooseMuonID(const mithep::TMuon *muon)
+{
+  return kTRUE;
+
+  // if(muon->nSeg	  <  2)                return kFALSE;
+  // if(!(muon->typeBits & kStandalone))  return kFALSE;
+  // return (muon->trkIso03 < 0.20*muon->pt);
+}
+
 //--------------------------------------------------------------------------------------------------
 Bool_t passEleID(const mithep::TElectron *electron)
 {
@@ -140,27 +151,28 @@ Bool_t isMuonFO(const mithep::TMuon *muon, const Int_t ver)
 {
   if(muon->nTkHits	  < 11)    return kFALSE;
   if(muon->nPixHits	  < 1)     return kFALSE;
+  if(muon->muNchi2	  > 10)    return kFALSE;
+  if(muon->nMatch 	  < 2)     return kFALSE;
+  if(muon->nValidHits	  < 1)     return kFALSE;
   if(muon->ptErr/muon->pt > 0.1)   return kFALSE;
-  if(fabs(muon->dz)       > 0.2)   return kFALSE;
-/*
-if(muon->muNchi2    > 10)        return kFALSE;
-if(muon->nMatch     < 2)         return kFALSE;
-if(muon->nValidHits < 1)         return kFALSE;
-if(!(muon->typeBits & kTracker)) return kFALSE;
-if(!(muon->typeBits & kGlobal))  return kFALSE;
-*/
-  Bool_t isGlobal  = (muon->typeBits & kGlobal) && (muon->muNchi2 < 10) && (muon->nMatch > 1) && (muon->nValidHits > 0);
-  Bool_t isTracker = (muon->typeBits & kTracker) && (muon->qualityBits & kTMLastStationTight);
-  if(!isGlobal && !isTracker) return kFALSE;
+  if(fabs(muon->dz)       > 0.1)   return kFALSE;
+  if(fabs(muon->d0)       > 0.2)   return kFALSE;  
+  if(!(muon->typeBits & kGlobal))  return kFALSE;
+  if(!(muon->typeBits & kTracker)) return kFALSE;
 
-  if(fabs(muon->d0) > 0.1) return kFALSE;
-  
-  if(ver==1) return (muon->pfIso03/muon->pt<1.0);
-  if(ver==2) return (muon->pfIso03/muon->pt<0.4);
+  Double_t iso = (muon->trkIso03 + muon->emIso03 + muon->hadIso03)/muon->pt;
+  if(ver==1) return (iso<1.0);
+  if(ver==2) return (iso<0.4);
   if(ver==3) return (muon->trkIso03/muon->pt<0.2 && muon->emIso03/muon->pt<0.2 && muon->hadIso03/muon->pt<0.2);
   
   return kFALSE;
 }
+
+// //--------------------------------------------------------------------------------------------------
+// Bool_t isEleFO(const mithep::TElectron *electron)
+// {
+//   return kTRUE;
+// }
 
 //--------------------------------------------------------------------------------------------------
 Bool_t isEleFO(const mithep::TElectron *electron)
@@ -177,7 +189,7 @@ Bool_t isEleFO(const mithep::TElectron *electron)
     if(electron->sigiEtaiEta      > 0.01)  return kFALSE;
     if(fabs(electron->deltaPhiIn) > 0.15)  return kFALSE;
     if(fabs(electron->deltaEtaIn) > 0.007) return kFALSE;
-    if(electron->HoverE	          > 0.12)  return kFALSE;
+    if(electron->HoverE           > 0.12)  return kFALSE;
 
     if(electron->trkIso03                         > 0.2*(electron->pt)) return kFALSE;
     if(TMath::Max(electron->emIso03-1,Float_t(0)) > 0.2*(electron->pt)) return kFALSE;
@@ -185,10 +197,10 @@ Bool_t isEleFO(const mithep::TElectron *electron)
         
   } else {
     // endcap
-    if(electron->sigiEtaiEta	  > 0.03)  return kFALSE;
+    if(electron->sigiEtaiEta      > 0.03)  return kFALSE;
     if(fabs(electron->deltaPhiIn) > 0.10)  return kFALSE;
     if(fabs(electron->deltaEtaIn) > 0.009) return kFALSE;
-    if(electron->HoverE	          > 0.10)  return kFALSE;
+    if(electron->HoverE           > 0.10)  return kFALSE;
 
     if(electron->trkIso03 > 0.2*(electron->pt)) return kFALSE;
     if(electron->emIso03  > 0.2*(electron->pt)) return kFALSE;
@@ -208,6 +220,75 @@ Double_t projectedMET(const Double_t met, const Double_t metPhi, const Double_t 
     
   return met*sin(dphi);
 }
+//----------------------------------------------------------------------------------------
+
+Double_t trigEff(ETriggerBit trig, const mithep::TMuon *mu, const mithep::TElectron *ele)
+{
+  Double_t mupt=mu->pt,mueta=mu->eta;
+  Double_t elpt=ele->pt,eleta=ele->eta;
+  Double_t effmu=-1,effel=-1;
+
+  if(trig==kHLT_Mu8_Ele17_CaloIdL) {
+    // eff for mu to pass mu8
+    if     (mueta<-1.5)	effmu = 0.93;
+    else if(mueta<-1.0) {
+      if(mupt<20)       effmu = 0.94;
+      else              effmu = 0.95;
+    }	        
+    else if(mueta<-0.5) {
+      if(mupt<20) 	effmu = 0.94;
+      else      	effmu = 0.96;
+    }	        
+    else if(mueta<0.0) {
+      if(mupt<20) 	effmu = 0.95;
+      else      	effmu = 0.96;
+    }	        
+    else if(mueta<0.5) {
+      if(mupt<20) 	effmu = 0.96;
+      else      	effmu = 0.97;
+    }	        
+    else if(mueta<1.0)	effmu = 0.96;
+    else if(mueta<1.5) {
+      if(mupt<20) 	effmu = 0.93;
+      else    		effmu = 0.95;
+    }
+    else 		effmu = 0.94;
+
+    // eff for ele to pass ele17 | (mu passed mu8)
+    if(eleta<-1.479)            effel = 0.95;
+    else if(fabs(eleta)<=1.479) effel = 0.99;
+    else                        effel = 0.94;
+
+    return effmu*effel;
+  }
+  else if(trig==kHLT_Mu17_Ele8_CaloIdL) {
+    // eff for ele to pass ele8
+    if(elpt<20) 		effel = 0.74;
+    else {
+      if(eleta<0.0) 		effel = 1;
+      else if(eleta<1.479) 	effel = 0.98;
+      else 			effel = 0.90;
+    }
+
+    // eff for mu to pass mu17 | (ele passed ele8)
+    if(mueta<-1.5)      effmu = 0.86;
+    else if(mueta<-1.0) effmu = 0.91;
+    else if(mueta<-0.5) effmu = 0.94;
+    else if(mueta<0.0)  effmu = 0.96;
+    else if(mueta<0.5)  effmu = 0.95;
+    else if(mueta<1.0)  effmu = 0.94;
+    else if(mueta<1.5)  effmu = 0.90;
+    else                effmu = 0.85;
+
+    return effmu*effel;
+  }
+  else {
+    cout << "error! trigger not found." << endl;
+    assert(0);
+    return -1;
+  }
+}
+
 
 using namespace std;
 class TriggerEfficiency
@@ -229,15 +310,11 @@ protected:
 
 void TriggerEfficiency::getEffGraphs(vector<TGraph*> &graphv, vector<float> &etaminv, vector<float> &etamaxv,  const char *subname)
 {
-  if(!getenv("CMSSW_BASE")) {
-    printf("error! TriggerEfficiency called without input files. Define CMSSW_BASE or add by hand.\n");
-    assert(0);
-  }
   TFile *infile = 0;
   if(TString(subname).Contains("Mu"))
-    infile = TFile::Open("$CMSSW_BASE/src/MitHtt/Emu/Selection/data/Trig_Efficiencies_muon.root"); 
+    infile = TFile::Open("data/Trig_Efficiencies_muon.root"); 
   else
-    infile = TFile::Open("$CMSSW_BASE/src/MitHtt/Emu/Selection/data/Trig_Efficiencies_emutrig_electron.root");
+    infile = TFile::Open("data/Trig_Efficiencies_emutrig_electron.root");
   assert(infile);
   TIter next(infile->GetListOfKeys());
   for(UInt_t ikey=0;ikey<fabs(infile->GetNkeys());ikey++) {
@@ -308,19 +385,19 @@ double TriggerEfficiency::trigEff(float pt1, float eta1, float pt2, float eta2, 
     for(UInt_t i=0;i<graphv.size();i++) {
       if(found) break;
       if((etav[ihalf]>etaminv[i] && etav[ihalf]<etamaxv[i]) || etav[ihalf]==etamaxv[i] || etav[ihalf]==etaminv[i]) {
-	// cout << graphv[i]->GetName() << "---> ";
-	// graphv[i]->Print();
+// 	cout << graphv[i]->GetName() << "---> ";
+// 	graphv[i]->Print();
         Double_t *x = graphv[i]->GetX();
         Double_t *y = graphv[i]->GetY();
         for(Int_t ipt=0;ipt<graphv[i]->GetN();ipt++) {
 	  if(ptv[ihalf]<x[ipt]) {
-	    // cout << x[ipt] << " " << y[ipt] << endl;
+// 	    cout << x[ipt] << " " << y[ipt] << endl;
 	    effs.push_back(y[ipt]);
 	    found = kTRUE;
 	    break;
 	  }
 	  if(ipt==graphv[i]->GetN()-1) { // fell throught to the end
-	    // cout << "   pt too large: " << ptv[ihalf] << "  setting eff. to last bin: " << y[ipt] << endl;
+// 	    cout << "   pt too large: " << ptv[ihalf] << "  setting eff. to last bin: " << y[ipt] << endl;
 	    effs.push_back(y[ipt]);
 	    found = kTRUE;
 	  }

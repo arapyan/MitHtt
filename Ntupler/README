@@ -1,36 +1,35 @@
 Instructions for running Ntupler:
 
-It takes the datasets in hypha.config and outputs ntuples for each one in, in my case,
-/scratch/dkralph/htt. The only event selection is a trigger requirement in data (although
+It takes the datasets in htt.config and outputs ntuples for each one in, in my case,
+/scratch/vdutta/htt. The only event selection is a trigger requirement in data (although
 I try to add all triggers, so this isn't really a requirement). The object selections
 are very, very loose.
 
 Steps to run:
 
-1)  export MIT_VERS=020;export MIT_TAG=Mit_020a;cd ~/cms/cmssw/$MIT_VERS/CMSSW_X_X_X/src;
-2)  cp ~dkralph/cms/cmssw/020/CMSSW_4_1_3; source setup.sh; export src=$CMSSW_BASE/src
-3)  compile Ntupler
-4)  test runmacro, of course (probably runhypha.C)
-5)  cd condor
-6)  choose datasets to comment in hypha.config
-7)  ./process.sh
-8)  wait for jobs to finish
-9)  ./checkResults.sh <condor-results-dir>
-10) ./checkRootFiles.sh
-11) ./runMerge.sh
-12) ./clean.sh
+1)  export MIT_VERS=023;cd ~/cms/cmssw/$MIT_VERS/CMSSW_X_X_X/src;
+2)  compile Ntupler
+3)  test runmacro, of course (probably runHttNtupler.C)
+4)  cd condor
+5)  choose datasets to comment in htt.config
+6)  ./process.sh
+7)  wait for jobs to finish
+8)  ./checkResults.sh <condor-results-dir>
+9)  ./checkRootFiles.sh
+10) ./runMerge.sh
+11) ./clean.sh
 
 Explanation:
 
-7) reads lines from hypha.config, then calls submitjobs.sh for each dataset. This then calls runjob.sh
+6) reads lines from htt.config, then calls submitjobs.sh for each dataset. This then calls runjob.sh
 on each fileset. Specify output dir in process.sh
 
-9) greps for many errors in the condor output files.
+8) greps for many errors in the condor output files.
 
-10) checks that all files are present. Not as useful as it was in CP's framework, since now if a job crashes halfway
+9) checks that all files are present. Not as useful as it was in CP's framework, since now if a job crashes halfway
 through you still get half an output file, rather than none.
 
-11) specify output dir here. If a job failed halfway through this will complain, but charge on regardless,
+10) specify output dir here. If a job failed halfway through this will complain, but charge on regardless,
 so if you ignored the errors in (5) you will again be warned here.
 
-12) specify output dir here.
+11) specify output dir here.
