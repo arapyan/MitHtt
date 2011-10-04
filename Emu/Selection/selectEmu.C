@@ -36,7 +36,6 @@
 #include "MitHtt/Ntupler/interface/TSVFit.hh"
 
 #include "MitHtt/Utils/RecoilCorrector.hh"
-#include "MitHtt/Emu/EScale/EScale.hh"
 
 // lumi section selection with JSON files
 #include "MitAna/DataCont/interface/RunLumiRangeMap.h"
