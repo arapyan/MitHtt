@@ -283,9 +283,8 @@ void selectEmu(const TString conf,         // input file
       Bool_t is42mc     = sfname.Contains("s11-");
       Bool_t is41mc     = sfname.Contains("p11-");
       Bool_t hasTrigs   = isdata || is42mc;
-      Bool_t doRho0Rwgt = kTRUE;
       Bool_t doRecoil   = (sfname.Contains("ztt") || sfname.Contains("-zll") || sfname.Contains("zjets")
-	                                         || sfname.Contains("_sm_") || sfname.Contains("_mssm_")) && !doRho0Rwgt;
+	                                         || sfname.Contains("_sm_") || sfname.Contains("_mssm_"));
       Bool_t reallyDoKf = doKFactors && sfname.Contains("-gf-");
       Bool_t ismadz     = sfname.Contains("-zll") || sfname.Contains("-zjets"); // madgraph z samples
       Bool_t ismadzmm   = snamev[isam].Contains("zmm") && (sfname.Contains("-zll") || sfname.Contains("-zjets")); // madgraph z samples
