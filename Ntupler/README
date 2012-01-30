@@ -1,13 +1,11 @@
 Instructions for running Ntupler:
 
-It takes the datasets in htt.config and outputs ntuples for each one in, in my case,
-/scratch/vdutta/htt. The only event selection is a trigger requirement in data (although
-I try to add all triggers, so this isn't really a requirement). The object selections
+It takes the datasets in htt.config and produces "Bacon" ntuples for each one. The only event selection is a trigger requirement in data. The object selections
 are very, very loose.
 
 Steps to run:
 
-1)  export MIT_VERS=023;cd ~/cms/cmssw/$MIT_VERS/CMSSW_X_X_X/src;
+1)  export MIT_VERS=025;cd ~/cms/cmssw/$MIT_VERS/CMSSW_X_X_X/src;
 2)  compile Ntupler
 3)  test runmacro, of course (probably runHttNtupler.C)
 4)  cd condor

@@ -18,8 +18,9 @@ namespace mithep
       Float_t tchp;                // TrackCountingHighPurity b-tag discriminator
       Int_t   mcFlavor;            // PDG ID of matched parton flavor
       ULong64_t  hltMatchBits;        // bits from matching with HLT primitives
+      Int_t   matchedId;           // PDG ID of matched genjet
 
-    ClassDef(TJet,2)
+    ClassDef(TJet,4)
   };
 }
 #endif

@@ -31,8 +31,18 @@ namespace mithep
       UInt_t  nMatch;                 // number of muon chambers matched to segments
       ULong64_t  hltMatchBits;           // bits for matching with HLT primitives 
       UInt_t  trkID;                  // tracker track ID
+      // Mike's PF Isolation
+      Float_t pfIsoCharged;
+      Float_t pfIsoChargedNoZ;
+      Float_t pfIsoNeutral;
+      Float_t pfIsoNeutralNoZ;
+      Float_t pfIsoGamma;
+      Float_t pfIsoGammaNoZ;
+      Float_t puIso;
+      Float_t puIsoNoZ;
 
-    ClassDef(TMuon,1)
+
+    ClassDef(TMuon,3)
   };  
 }
 #endif

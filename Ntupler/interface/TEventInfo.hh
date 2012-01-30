@@ -22,8 +22,9 @@ namespace mithep
       Float_t trkMET, trkMETphi, trkSumET;           // track MET
       Float_t rho;                                   // average energy density for isolation correction
       Bool_t  hasGoodPV;                             // event has a good PV?
+      Float_t embWeight;
 
-    ClassDef(TEventInfo,1)
+    ClassDef(TEventInfo,2)
   };
 }
 #endif

@@ -34,8 +34,22 @@ namespace mithep
       UInt_t  trkID;               // tracker track ID (for matching to muons)
       Bool_t  isEcalDriven;        // is ECAL seeded electron?
       Bool_t  isConv;              // is conversion? (vertexing method)      
+      Float_t p;
+      Float_t ip3d, ip3dSig;
+      Float_t ESeedClusterOverPIn, ESeedClusterOverPOut;
+      Float_t sigiPhiiPhi;
+      Float_t nBrem;
+      // Mike's PF Isolation
+      Float_t pfIsoCharged;
+      Float_t pfIsoChargedNoZ;
+      Float_t pfIsoNeutral;
+      Float_t pfIsoNeutralNoZ;
+      Float_t pfIsoGamma;
+      Float_t pfIsoGammaNoZ;
+      Float_t puIso;
+      Float_t puIsoNoZ;
 
-    ClassDef(TElectron,1)
+    ClassDef(TElectron,3)
   };
 }
 #endif
