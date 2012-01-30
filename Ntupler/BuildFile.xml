@@ -2,6 +2,7 @@
 <use   name="MitAna/DataTree"/>
 <use   name="MitPhysics/Utils"/>
 <use   name="CondFormats/JetMETObjects"/>
+<use   name="RecoMET/METAlgorithms"/>
 <use   root=""/>
 <use   name="lhapdf"/>
 <flags   CXXFLAGS="-g -Wall"/>
