@@ -1,0 +1,49 @@
+# pT, eta, phi, npv, rho, eta-pT, eta-phi
+0 0 0 0 0 1 0
+%
+# pT binning
+10
+15
+20
+25
+30
+35
+50
+80
+7000
+%
+# eta binning
+0
+1.479
+2.5
+%
+# phi binning
+-3.2
+3.2
+%
+# N_PV binning
+0
+3
+6
+9
+12
+15
+18
+21
+24
+27
+30
+33
+%
+# Rho binning
+0
+2
+4
+6
+8
+10
+12
+14
+16
+18
+%
