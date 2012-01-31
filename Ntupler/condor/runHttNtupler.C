@@ -3,7 +3,7 @@
 #include "MitAna/DataUtil/interface/Debug.h"
 #include "MitAna/Catalog/interface/Catalog.h"
 #include "MitAna/TreeMod/interface/Analysis.h"
-#include "MitHtt/Ntupler/interface/HyphaMod.hh"
+#include "MitHtt/Ntupler/interface/HttNtuplerMod.hh"
 #endif
 
 using namespace mithep;
@@ -88,7 +88,7 @@ void runHttNtupler(
   //
   // setup ntupler module
   //
-  HyphaMod *mymod = new HyphaMod;
+  HttNtuplerMod *mymod = new HttNtuplerMod;
   mymod->SetOutputName(output);          // output ntuple file name
   mymod->SetIsData(isData);              // toggle data specific or MC specific procedures
   mymod->SetUseGen(useGen);              // use generator info
