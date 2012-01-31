@@ -3,10 +3,10 @@
 config=htt.config
 if [ "` hostname | grep '\.mit\.edu'`" ]; then
     catalog=/home/cmsprod/catalog
-    outputDir=/scratch/$USER/htt/nojetid
+    outputDir=/scratch/$USER/htt/025
 else
     catalog=/home/mitprod/catalog
-    outputDir=/data/blue/$USER/htt/nojetid
+    outputDir=/data/blue/$USER/htt/025
 fi
 runMacro=runHttNtupler.C
 mkdir -p $outputDir
@@ -28,4 +28,4 @@ do
   sleep 0.5
 done
 
-exit 0
+#exit 0
