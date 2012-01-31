@@ -1,8 +1,6 @@
 #ifndef MITHTT_NTUPLER_METSIGNIFICANCE_HH
 #define MITHTT_NTUPLER_METSIGNIFICANCE_HH
 #include <TVectorD.h>
-#include "RecoMET/METAlgorithms/interface/FixSignAlgoResolutions.h"
-#include "RecoMET/METAlgorithms/interface/SigInputObj.h"
 
 //#include "DataFormats/Candidate/interface/Candidate.h"
 //#include "DataFormats/JetReco/interface/PFJet.h"
@@ -19,6 +17,10 @@
 #include "MitAna/DataTree/interface/PFJetCol.h"
 #include "MitAna/DataTree/interface/PFCandidateCol.h"
 #include "MitAna/DataTree/interface/PFTauCol.h"
+
+#include "RecoMET/METAlgorithms/interface/SigInputObj.h"
+#include "MitHtt/Ntupler/interface/SignAlgoResolutions.h"
+
 
 namespace mithep { 
   class MetSignificance { 
@@ -58,7 +60,7 @@ namespace mithep {
   private:
     double                           fDRLepJetMin;
     double                           fDRCandMin;
-    metsig::FixSignAlgoResolutions   *fMetRes;
+    mithep::SignAlgoResolutions   *fMetRes;
     //std::vector<metsig::SigInputObj> *fSig;
     //const MuonCol                   *fMuons;
     //const ElectronCol               *fElectrons;

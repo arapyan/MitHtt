@@ -155,8 +155,8 @@ void MetSignificance::add(const mithep::Muon *iMuon,std::vector<metsig::SigInput
     lPtE  =              iMuon->TrackerTrk()->PtErr();
     lPhiE = iMuon->Pt()*(iMuon->TrackerTrk()->Phi0Err()); // XXXXX check CV: pt*dphi is indeed correct
   } else {
-    lPtE  = fMetRes->eval(metsig::PFtype3, metsig::ET,  lPt, lPhi, lEta);
-    lPhiE = fMetRes->eval(metsig::PFtype3, metsig::PHI, lPt, lPhi, lEta);
+    lPtE  = fMetRes->eval(mithep::PFtype3, mithep::ET,  lPt, lPhi, lEta);
+    lPhiE = fMetRes->eval(mithep::PFtype3, mithep::PHI, lPt, lPhi, lEta);
   }
   fSig.push_back(metsig::SigInputObj(lParticleType,lPt,lPhi,lPtE,lPhiE));
 }
@@ -164,8 +164,8 @@ void MetSignificance::add(const mithep::Muon *iMuon,std::vector<metsig::SigInput
 void MetSignificance::add(const mithep::Electron *iElectron,std::vector<metsig::SigInputObj> &fSig) { 
   std::string lParticleType = "electron";
   double lPt   = iElectron->Pt(); double lPhi = iElectron->Phi(); double lEta = iElectron->Eta();
-  double lPtE  = fMetRes->eval(metsig::PFtype2, metsig::ET,  lPt,lPhi,lEta);
-  double lPhiE = fMetRes->eval(metsig::PFtype2, metsig::PHI, lPt,lPhi,lEta);
+  double lPtE  = fMetRes->eval(mithep::PFtype2, mithep::ET,  lPt,lPhi,lEta);
+  double lPhiE = fMetRes->eval(mithep::PFtype2, mithep::PHI, lPt,lPhi,lEta);
   fSig.push_back(metsig::SigInputObj(lParticleType,lPt,lPhi,lPtE,lPhiE));
 }
 TMatrixD MetSignificance::getSignificance(const PFJetCol *iJets,const PFCandidateCol *iCands,
@@ -193,7 +193,7 @@ TMatrixD MetSignificance::getSignificance(const PFJetCol *iJets,const PFCandidat
 }
 
 void MetSignificance::loadResolutions() { 
-  fMetRes = new metsig::FixSignAlgoResolutions();
+  fMetRes = new mithep::SignAlgoResolutions();
 }
 //void MetSignificance::setup(const PFJetCol *iJets,const PFCandidateCol *iCands,const PFTauCol *iTaus,
 //			    const MuonCol *iMuons,const ElectronCol *iElectrons) {
