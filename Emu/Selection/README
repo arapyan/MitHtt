@@ -1,18 +1,12 @@
-Instructions for running on Ntuples:
+Instructions for running on Bacon:
 
-selectEmu.C reads the ntuples and does lepton, jet id and computes variables. Since this takes
-about five minutes, it then writes another ntuple (in my case to
-/home/vdutta/htt/selections/<selection-name>/ntuples) to be read by the plotting macro
-plotEmu.C, which also does some selection.
+selectEmu.C reads the (bacon) ntuples and does lepton, jet id and computes variables. It then writes another ntuple (in my case to /build/vdutta/htt/selections/<selection-name>/ntuples) to be read by the plotting macro plotEmu.C, which also does some selection and produces yield tables, plots, an html page with links to all the plots, and a file with input histograms for calculating limits.
 
 
 Steps:
 
-1) Adjust emu.conf to reflect the ntuples which you've made and want to run over and
-your json location. If you like syntax highlighting, don't use the ancient emacs that
-ships with SL5.
-2) change command-line arguments in run.sh to reflect what you want to happen. Probably
-just run selectEmu.C by itself to start with.
+1) Adjust emu.conf to reflect the ntuples which you've made and want to run over and your json location.
+2) change command-line arguments in run.sh to reflect what you want to happen. Probably just run selectEmu.C by itself to start with.
 3) ./run.sh
 4) change run.sh to run plotEmu.C with the arguments you want.
 5) ./run.sh
@@ -20,17 +14,5 @@ just run selectEmu.C by itself to start with.
 
 Same-sign fakes:
 
-Run on data only, with the name 'data' changed to 'ss-fakes' in emu.conf, and change
-the == to != for the charges.
+Run on data only, with the name 'data' changed to 'ss-fakes' in emu.conf.
 
-
-SUSY'11 results:
-
-- Event yields here:
-http://t3serv001.mit.edu/~vdutta/susy11/plots/yields.txt
-
-- Links to plots:
-http://t3serv001.mit.edu/~vdutta/susy11/plots.html
-
-- Limit input file:
-/home/vdutta/htt/selections/susy11/plots/limit-inputs.root

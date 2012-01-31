@@ -1,9 +1,10 @@
 #ifndef LEPTONIDCUTS_HH
 #define LEPTONIDCUTS_HH
 
+#include "MitHtt/Ntupler/interface/HiggsAnaDefs.hh"
 #include "MitHtt/Ntupler/interface/TElectron.hh"
 #include "MitHtt/Ntupler/interface/TMuon.hh"
-#include "Common/MyTools.hh"
+#include "MitHtt/Common/MyTools.hh"
 #include <TFile.h>                  // file handle class
 #include <TGraph.h>
 #include <vector>                   // STL vector class
@@ -12,24 +13,32 @@
 #include <cassert>
 #include <iostream>
 
+
 Bool_t passMuonID(const mithep::TMuon *muon);
 Bool_t passLooseMuonID(const mithep::TMuon *muon);
+Bool_t passMuonIso(const mithep::TMuon *muon);
+Bool_t passMuonIsoPU(const mithep::TMuon *muon);
+Bool_t passMuonIsoPUTauHad(const mithep::TMuon *muon);
+Double_t muonIsoPU(const mithep::TMuon *muon);
 Bool_t passEleID(const mithep::TElectron *electron);
-
+Bool_t passLooseEleID(const mithep::TElectron *electron);
+Bool_t passEleMVAID(const mithep::TElectron *electron, Double_t mvaValue);
+Bool_t passEleIso(const mithep::TElectron *electron);
+Bool_t passEleIsoPU(const mithep::TElectron *electron);
+Bool_t passEleIsoPUTauHad(const mithep::TElectron *electron);
+Double_t eleIsoPU(const mithep::TElectron *electron);
 Bool_t isSoftMuon(const mithep::TMuon *muon);
-
 Bool_t isMuonFO(const mithep::TMuon *muon, const Int_t ver=1);
 Bool_t isEleFO(const mithep::TElectron *electron);
-
 Double_t projectedMET(const Double_t met, const Double_t metPhi, const Double_t lepPhi);
-
-Double_t trigEff(ETriggerBit trig, mithep::TMuon *muon, mithep::TElectron *ele);
 
 //=== FUNCTION DEFINITIONS ======================================================================================
 
 //--------------------------------------------------------------------------------------------------
 Bool_t passMuonID(const mithep::TMuon *muon)
 {
+  if(fabs(muon->eta) > 2.1)        return kFALSE;
+
   if(muon->nTkHits	  < 11)    return kFALSE;
   if(muon->nPixHits	  < 1)     return kFALSE;
   if(muon->muNchi2	  > 10)    return kFALSE;
@@ -40,17 +49,23 @@ Bool_t passMuonID(const mithep::TMuon *muon)
   if(!(muon->typeBits & kGlobal))  return kFALSE;
   if(!(muon->typeBits & kTracker)) return kFALSE;
 
-/*
-  Double_t iso = (muon->trkIso03 + muon->emIso03 + muon->hadIso03)/muon->pt;
-
-  if(muon->pt>20) 
-    return (iso<0.15 && fabs(muon->d0)<0.02);
-  
-  return (iso<0.10 && fabs(muon->d0)<0.01);
-//*/
-//*
   if(fabs(muon->d0)>0.02)         return kFALSE;
 
+  return kTRUE;
+
+}
+//----------------------------------------------------------------------------------------
+Bool_t passLooseMuonID(const mithep::TMuon *muon)
+{
+  return kTRUE;
+
+  // if(muon->nSeg        <  2)                return kFALSE;
+  // if(!(muon->typeBits & kStandalone))  return kFALSE;
+  // return (muon->trkIso03 < 0.20*muon->pt);
+}
+//--------------------------------------------------------------------------------------------------
+Bool_t passMuonIso(const mithep::TMuon *muon)
+{
   if(muon->pt>20) {
     if(fabs(muon->eta)<1.479) return (muon->pfIso03<0.13*(muon->pt));
     else                      return (muon->pfIso03<0.09*(muon->pt));
@@ -58,36 +73,54 @@ Bool_t passMuonID(const mithep::TMuon *muon)
     if(fabs(muon->eta)<1.479) return (muon->pfIso03<0.06*(muon->pt));
     else                      return (muon->pfIso03<0.05*(muon->pt));
   }
-//*/
 }
-
-//----------------------------------------------------------------------------------------
-Bool_t passLooseMuonID(const mithep::TMuon *muon)
+//--------------------------------------------------------------------------------------------------
+Bool_t passMuonIsoPU(const mithep::TMuon *muon)
 {
-  return kTRUE;
+  Double_t chargedIso = muon->pfIsoCharged;
+  Double_t neutralIso = max(muon->pfIsoNeutral + muon->pfIsoGamma - 0.5 * muon->puIsoNoZ, 0.0);
 
-  // if(muon->nSeg	  <  2)                return kFALSE;
-  // if(!(muon->typeBits & kStandalone))  return kFALSE;
-  // return (muon->trkIso03 < 0.20*muon->pt);
+  Double_t totalIso = chargedIso+neutralIso;
+
+  if(fabs(muon->eta)<1.479) return (totalIso<0.15*(muon->pt));
+  else                      return (totalIso<0.10*(muon->pt));
 }
+//--------------------------------------------------------------------------------------------------
+Bool_t passMuonIsoPUTauHad(const mithep::TMuon *muon)
+{
+  Double_t chargedIso = muon->pfIsoCharged;
+  Double_t neutralIso = max(muon->pfIsoNeutral + muon->pfIsoGamma - 0.5 * muon->puIsoNoZ, 0.0);
 
+  Double_t totalIso = chargedIso+neutralIso;
+
+  return (totalIso<0.10*(muon->pt));
+}
+//--------------------------------------------------------------------------------------------------
+Double_t muonIsoPU(const mithep::TMuon *muon)
+{
+  Double_t chargedIso = muon->pfIsoCharged;
+  Double_t neutralIso = max(muon->pfIsoNeutral + muon->pfIsoGamma - 0.5 * muon->puIsoNoZ, 0.0);
+  
+  return chargedIso+neutralIso;
+}
 //--------------------------------------------------------------------------------------------------
 Bool_t passEleID(const mithep::TElectron *electron)
 {
+
+  if(fabs(electron->scEta) > 2.5) return kFALSE;
+
   if(fabs(electron->d0) > 0.02)   return kFALSE;
   if(fabs(electron->dz) > 0.1)    return kFALSE;
   
   // conversion rejection
   if(electron->nExpHitsInner > 0) return kFALSE;
   if(electron->isConv)            return kFALSE;
+
      
-  // barrel/endcap dependent requirments      
+  // barrel/endcap dependent requirements      
   if(fabs(electron->scEta)<1.479) {
-    // barrel
-//    Double_t iso = (electron->trkIso03 + TMath::Max(electron->emIso03-1,Float_t(0)) + electron->hadIso03)/electron->pt;
-//    if(iso > 0.1) return kFALSE;
-    if(electron->pfIso04 > 0.13*(electron->pt)) return kFALSE;
-     
+    //if(electron->pfIso04 > 0.13*(electron->pt)) return kFALSE;
+
     if(electron->pt>20) {
       if(electron->sigiEtaiEta	    > 0.01)  return kFALSE;
       if(fabs(electron->deltaPhiIn) > 0.06)  return kFALSE;
@@ -103,10 +136,7 @@ Bool_t passEleID(const mithep::TElectron *electron)
     }
 
   } else {
-    // endcap
-//    Double_t iso = (electron->trkIso03 + electron->emIso03 + electron->hadIso03)/electron->pt;
-//    if(iso > 0.1) return kFALSE;
-    if(electron->pfIso04 > 0.09*(electron->pt)) return kFALSE;
+    //if(electron->pfIso04 > 0.09*(electron->pt)) return kFALSE;
      
     if(electron->pt>20) {
       if(electron->sigiEtaiEta	    > 0.03)  return kFALSE;
@@ -128,7 +158,167 @@ Bool_t passEleID(const mithep::TElectron *electron)
   
   return kTRUE;
 }
+//--------------------------------------------------------------------------------------------------
+Bool_t passLooseEleID(const mithep::TElectron *electron)
+{
+  if(fabs(electron->d0) > 0.02)   return kFALSE;
+  if(fabs(electron->dz) > 0.1)    return kFALSE;
 
+  // conversion rejection
+  if(electron->nExpHitsInner > 0) return kFALSE;
+  if(electron->isConv)            return kFALSE;
+
+  //Barrel 
+  if (fabs(electron->scEta) < 1.479) {
+    if (! ( (0==0)
+            && electron->sigiEtaiEta < 0.01
+            && fabs(electron->deltaEtaIn) < 0.007
+            && fabs(electron->deltaPhiIn) < 0.15
+            && electron->HoverE < 0.12
+            && (electron->trkIso03) / electron->pt < 0.2
+            && (TMath::Max(electron->emIso03 - 1.0, 0.0)) / electron->pt < 0.20
+            && (electron->hadIso03) / electron->pt < 0.20
+
+          )
+      ) {
+      return kFALSE;
+    }
+  }
+
+  //Endcap
+  else {
+    if (! (  (0==0)
+             && electron->sigiEtaiEta < 0.03
+             && fabs(electron->deltaEtaIn) < 0.009
+             && fabs(electron->deltaPhiIn) < 0.10
+             && electron->HoverE < 0.10
+             && (electron->trkIso03 ) / electron->pt < 0.2
+             && (TMath::Max(electron->emIso03 - 1.0, 0.0)) / electron->pt < 0.20
+             && (electron->hadIso03) / electron->pt < 0.20
+  
+          )
+      ) {
+      return kFALSE;
+    }
+  }
+  return kTRUE; 
+}
+//--------------------------------------------------------------------------------------------------
+Bool_t passEleMVAID(const mithep::TElectron *electron, Double_t mvaValue)
+{
+  if(fabs(electron->d0) > 0.02)   return kFALSE;
+  if(fabs(electron->dz) > 0.1)    return kFALSE;
+
+  // conversion rejection
+  if(electron->nExpHitsInner > 0) return kFALSE;
+  if(electron->isConv)            return kFALSE;
+
+  // preselection
+  // Barrel 
+  if (fabs(electron->scEta) < 1.479) {
+    if (! ( (0==0)
+            && electron->sigiEtaiEta < 0.01
+            && fabs(electron->deltaEtaIn) < 0.007
+            && fabs(electron->deltaPhiIn) < 0.15
+            && electron->HoverE < 0.12
+            && (electron->trkIso03) / electron->pt < 0.2
+            && (TMath::Max(electron->emIso03 - 1.0, 0.0)) / electron->pt < 0.20
+            && (electron->hadIso03) / electron->pt < 0.20
+
+          )
+      ) {
+      return kFALSE;
+    }
+  }
+
+  // Endcap
+  else {
+    if (! (  (0==0)
+             && electron->sigiEtaiEta < 0.03
+             && fabs(electron->deltaEtaIn) < 0.009
+             && fabs(electron->deltaPhiIn) < 0.10
+             && electron->HoverE < 0.10
+             && (electron->trkIso03 ) / electron->pt < 0.2
+             && (TMath::Max(electron->emIso03 - 1.0, 0.0)) / electron->pt < 0.20
+             && (electron->hadIso03) / electron->pt < 0.20
+
+          )
+      ) {
+      return kFALSE;
+    }
+  }
+
+  Int_t subdet = 0;
+  if (fabs(electron->scEta) < 1.0) subdet = 0;
+  else if (fabs(electron->scEta) < 1.479) subdet = 1;
+  else subdet = 2;
+  Int_t ptBin = 0;
+  if (electron->pt > 20.0) ptBin = 1;
+  Int_t MVABin = -1;
+  if (subdet == 0 && ptBin == 0) MVABin = 0;
+  if (subdet == 1 && ptBin == 0) MVABin = 1;
+  if (subdet == 2 && ptBin == 0) MVABin = 2;
+  if (subdet == 0 && ptBin == 1) MVABin = 3;
+  if (subdet == 1 && ptBin == 1) MVABin = 4;
+  if (subdet == 2 && ptBin == 1) MVABin = 5;
+
+  Double_t MVACut = -9999;
+  if (MVABin == 0) MVACut = 0.133;
+  if (MVABin == 1) MVACut = 0.465;
+  if (MVABin == 2) MVACut = 0.518; 
+  if (MVABin == 3) MVACut = 0.942;
+  if (MVABin == 4) MVACut = 0.947;
+  if (MVABin == 5) MVACut = 0.878 ;
+
+  if (mvaValue > MVACut) return kTRUE;
+  return kFALSE;
+}
+//-------------------------------------------------------------------------------------------------
+Bool_t passEleIso(const mithep::TElectron *electron)
+{
+  // barrel/endcap dependent requirments      
+  if(fabs(electron->scEta)<1.479) {
+    if(electron->pfIso04 > 0.13*(electron->pt)) return kFALSE;
+  } else {
+    if(electron->pfIso04 > 0.09*(electron->pt)) return kFALSE;
+  }
+  return kTRUE;
+}
+//-------------------------------------------------------------------------------------------------
+Bool_t passEleIsoPU(const mithep::TElectron *electron)
+{
+  Double_t chargedIso = electron->pfIsoCharged;
+  Double_t neutralIso = max(electron->pfIsoNeutral + electron->pfIsoGamma - 0.5 * electron->puIsoNoZ, 0.0);
+
+  Double_t totalIso = chargedIso+neutralIso;
+
+  // barrel/endcap dependent requirments      
+  if(fabs(electron->scEta)<1.479) {
+    if(totalIso > 0.15*(electron->pt)) return kFALSE;
+  } else {
+    if(totalIso > 0.10*(electron->pt)) return kFALSE;
+  }
+  return kTRUE;
+}
+//-------------------------------------------------------------------------------------------------
+Bool_t passEleIsoPUTauHad(const mithep::TElectron *electron)
+{
+  Double_t chargedIso = electron->pfIsoCharged;
+  Double_t neutralIso = max(electron->pfIsoNeutral + electron->pfIsoGamma - 0.5 * electron->puIsoNoZ, 0.0);
+
+  Double_t totalIso = chargedIso+neutralIso;
+
+  if(totalIso > 0.10*(electron->pt)) return kFALSE;
+  return kTRUE;
+}
+//-------------------------------------------------------------------------------------------------
+Double_t eleIsoPU(const mithep::TElectron *electron)
+{
+  Double_t chargedIso = electron->pfIsoCharged;
+  Double_t neutralIso = max(electron->pfIsoNeutral + electron->pfIsoGamma - 0.5 * electron->puIsoNoZ, 0.0);
+
+  return chargedIso+neutralIso;
+}
 //--------------------------------------------------------------------------------------------------
 Bool_t isSoftMuon(const mithep::TMuon *muon)
 {
@@ -167,13 +357,6 @@ Bool_t isMuonFO(const mithep::TMuon *muon, const Int_t ver)
   
   return kFALSE;
 }
-
-// //--------------------------------------------------------------------------------------------------
-// Bool_t isEleFO(const mithep::TElectron *electron)
-// {
-//   return kTRUE;
-// }
-
 //--------------------------------------------------------------------------------------------------
 Bool_t isEleFO(const mithep::TElectron *electron)
 {
@@ -209,7 +392,6 @@ Bool_t isEleFO(const mithep::TElectron *electron)
     
   return kTRUE;
 }
-
 //--------------------------------------------------------------------------------------------------
 Double_t projectedMET(const Double_t met, const Double_t metPhi, const Double_t lepPhi) 
 {
@@ -220,205 +402,4 @@ Double_t projectedMET(const Double_t met, const Double_t metPhi, const Double_t 
     
   return met*sin(dphi);
 }
-//----------------------------------------------------------------------------------------
-
-Double_t trigEff(ETriggerBit trig, const mithep::TMuon *mu, const mithep::TElectron *ele)
-{
-  Double_t mupt=mu->pt,mueta=mu->eta;
-  Double_t elpt=ele->pt,eleta=ele->eta;
-  Double_t effmu=-1,effel=-1;
-
-  if(trig==kHLT_Mu8_Ele17_CaloIdL) {
-    // eff for mu to pass mu8
-    if     (mueta<-1.5)	effmu = 0.93;
-    else if(mueta<-1.0) {
-      if(mupt<20)       effmu = 0.94;
-      else              effmu = 0.95;
-    }	        
-    else if(mueta<-0.5) {
-      if(mupt<20) 	effmu = 0.94;
-      else      	effmu = 0.96;
-    }	        
-    else if(mueta<0.0) {
-      if(mupt<20) 	effmu = 0.95;
-      else      	effmu = 0.96;
-    }	        
-    else if(mueta<0.5) {
-      if(mupt<20) 	effmu = 0.96;
-      else      	effmu = 0.97;
-    }	        
-    else if(mueta<1.0)	effmu = 0.96;
-    else if(mueta<1.5) {
-      if(mupt<20) 	effmu = 0.93;
-      else    		effmu = 0.95;
-    }
-    else 		effmu = 0.94;
-
-    // eff for ele to pass ele17 | (mu passed mu8)
-    if(eleta<-1.479)            effel = 0.95;
-    else if(fabs(eleta)<=1.479) effel = 0.99;
-    else                        effel = 0.94;
-
-    return effmu*effel;
-  }
-  else if(trig==kHLT_Mu17_Ele8_CaloIdL) {
-    // eff for ele to pass ele8
-    if(elpt<20) 		effel = 0.74;
-    else {
-      if(eleta<0.0) 		effel = 1;
-      else if(eleta<1.479) 	effel = 0.98;
-      else 			effel = 0.90;
-    }
-
-    // eff for mu to pass mu17 | (ele passed ele8)
-    if(mueta<-1.5)      effmu = 0.86;
-    else if(mueta<-1.0) effmu = 0.91;
-    else if(mueta<-0.5) effmu = 0.94;
-    else if(mueta<0.0)  effmu = 0.96;
-    else if(mueta<0.5)  effmu = 0.95;
-    else if(mueta<1.0)  effmu = 0.94;
-    else if(mueta<1.5)  effmu = 0.90;
-    else                effmu = 0.85;
-
-    return effmu*effel;
-  }
-  else {
-    cout << "error! trigger not found." << endl;
-    assert(0);
-    return -1;
-  }
-}
-
-
-using namespace std;
-class TriggerEfficiency
-{
-public:
-  TriggerEfficiency() { initEff(); }
-  double trigEff(float pt1, float eta1, float pt2, float eta2, TString name1, TString name2);
-
-protected:
-  void initEff();
-  void getEffGraphs(vector<TGraph*> &graphv, vector<float> &etaminv, vector<float> &etamaxv,  const char *subname);
-
-  vector<const char*>      subnamev; // names of sub trigger elements
-  vector<vector<TGraph*> > graphvv;  // vector of vector of efficiency graphs
-  vector<vector<float> >   etaminvv; // eta range for each graph
-  vector<vector<float> >   etamaxvv;
-
-};
-
-void TriggerEfficiency::getEffGraphs(vector<TGraph*> &graphv, vector<float> &etaminv, vector<float> &etamaxv,  const char *subname)
-{
-  TFile *infile = 0;
-  if(TString(subname).Contains("Mu"))
-    infile = TFile::Open("data/Trig_Efficiencies_muon.root"); 
-  else
-    infile = TFile::Open("data/Trig_Efficiencies_emutrig_electron.root");
-  assert(infile);
-  TIter next(infile->GetListOfKeys());
-  for(UInt_t ikey=0;ikey<fabs(infile->GetNkeys());ikey++) {
-    string name(next()->GetName());
-    if(name.find(subname)  == string::npos) continue; // wrong subname
-    if(name.find("Pt")     != string::npos) continue;
-    if(name.find("alleta") != string::npos) continue;
-    int ietamin = 15;
-    int ietamax = name.find("to") + 2;
-    string etaminstr(name.substr(ietamin,ietamax-2-ietamin));
-    string etamaxstr(name.substr(ietamax,name.find_last_of("_")-ietamax));
-    stringstream ssetamin(etaminstr);
-    stringstream ssetamax(etamaxstr);
-    float etamin=0,etamax=0;
-    ssetamin >> etamin;
-    ssetamax >> etamax;
-    TGraph *gr=0;
-    infile->GetObject(name.c_str(),gr); assert(gr);
-
-    graphv.push_back(gr);
-    etaminv.push_back(etamin);
-    etamaxv.push_back(etamax);
-  }
-
-  infile->Close();
-  return;
-}
-
-void TriggerEfficiency::initEff()
-{
-  subnamev.push_back("Mu8");
-  subnamev.push_back("Mu15");
-  subnamev.push_back("Ele8");
-  subnamev.push_back("Ele17");
-
-  for(UInt_t isub=0;isub<subnamev.size();isub++) {
-    graphvv.push_back(  *(new vector<TGraph*>));
-    etaminvv.push_back( *(new vector<float>));
-    etamaxvv.push_back( *(new vector<float>));
-    getEffGraphs(graphvv.back(),etaminvv.back(),etamaxvv.back(),subnamev[isub]);
-
-    if(graphvv.back().size() < 5) cout << "error! fewer than five graphs found." << endl;
-  }
-
-  return;
-}  
-
-double TriggerEfficiency::trigEff(float pt1, float eta1, float pt2, float eta2, TString name1, TString name2)
-{
-  vector<float> ptv;   ptv.push_back(pt1);   ptv.push_back(pt2);
-  vector<float> etav; etav.push_back(eta1); etav.push_back(eta2);
-  vector<TString> twosubnamev; twosubnamev.push_back(name1); twosubnamev.push_back(name2);
-
-  vector<Int_t> isubv; isubv.push_back(-1);isubv.push_back(-1); // indices of the subnames we want
-  for(UInt_t isub=0;isub<subnamev.size();isub++) {
-    if(twosubnamev[0]==subnamev[isub])   isubv[0] = isub;
-    if(twosubnamev[1]==subnamev[isub])   isubv[1] = isub;
-  }
-  if(isubv[0]==-1 || isubv[1]==-1) {printf("error! subname not found\n"); return -1;}
-
-  vector<float> effs;
-  
-  for(UInt_t ihalf=0;ihalf<isubv.size();ihalf++) {
-    vector<TGraph*> graphv  =  graphvv[isubv[ihalf]];
-    vector<float>   etaminv = etaminvv[isubv[ihalf]];
-    vector<float>   etamaxv = etamaxvv[isubv[ihalf]];
-    Bool_t found = kFALSE;
-    for(UInt_t i=0;i<graphv.size();i++) {
-      if(found) break;
-      if((etav[ihalf]>etaminv[i] && etav[ihalf]<etamaxv[i]) || etav[ihalf]==etamaxv[i] || etav[ihalf]==etaminv[i]) {
-// 	cout << graphv[i]->GetName() << "---> ";
-// 	graphv[i]->Print();
-        Double_t *x = graphv[i]->GetX();
-        Double_t *y = graphv[i]->GetY();
-        for(Int_t ipt=0;ipt<graphv[i]->GetN();ipt++) {
-	  if(ptv[ihalf]<x[ipt]) {
-// 	    cout << x[ipt] << " " << y[ipt] << endl;
-	    effs.push_back(y[ipt]);
-	    found = kTRUE;
-	    break;
-	  }
-	  if(ipt==graphv[i]->GetN()-1) { // fell throught to the end
-// 	    cout << "   pt too large: " << ptv[ihalf] << "  setting eff. to last bin: " << y[ipt] << endl;
-	    effs.push_back(y[ipt]);
-	    found = kTRUE;
-	  }
-        }
-      }
-    }
-
-    if(!found) {
-      printf("eff. not found! return 0: %s%20.15f%20.15f\n",twosubnamev[ihalf].Data(),ptv[ihalf],etav[ihalf]);
-      return 0;
-    }
-  }
-
-  return effs[0]*effs[1];
-  
-}
-
-// void play() {
-
-//   TriggerEfficiency effic;
-//   cout << endl << effic.trigEff(27,-2.5,188,1.9,"Mu8","Ele17") << endl;
-  
-// }
 #endif
