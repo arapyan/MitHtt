@@ -1,8 +1,9 @@
 <use   name="MitAna/TreeMod"/>
 <use   name="MitAna/DataTree"/>
 <use   name="MitPhysics/Utils"/>
-<use   name="CondFormats/JetMETObjects"/>
 <use   name="RecoMET/METAlgorithms"/>
+<use   name="CondFormats/JetMETObjects"/>
+<use   name="TauAnalysis/CandidateTools"/>
 <use   root=""/>
 <use   name="lhapdf"/>
 <flags   CXXFLAGS="-g -Wall"/>

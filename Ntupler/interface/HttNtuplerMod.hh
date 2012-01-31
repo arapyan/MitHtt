@@ -9,7 +9,6 @@
 #include "MitAna/DataTree/interface/BaseVertex.h"
 #include "MitAna/DataTree/interface/Particle.h"
 #include "MitAna/DataTree/interface/TriggerMask.h"
-#include "MitAna/DataTree/interface/NSVFitFwd.h"
 #include "MitAna/DataTree/interface/EmbedWeightFwd.h"
 #include "MitAna/DataTree/interface/EmbedWeight.h"
 #include "MitAna/DataCont/interface/RunLumiRangeMap.h"
@@ -29,7 +28,8 @@
 #include "TJet.hh"
 #include "TPhoton.hh"
 #include "TVertex.hh"
-#include "TNSVFit.hh"
+
+#include "TSVfit.h"
 
 #include <vector>
 
@@ -111,7 +111,7 @@ namespace mithep
       void FillGenWW();
       
       // Fill SVFit info
-      void FillNSVFit  (TClonesArray *iArr,Particle* iPart0,Particle* iPart1,TMatrixD iMatrix);
+      void FillSVfit  (TClonesArray *iArr,Particle* iPart0,Particle* iPart1,TMatrixD iMatrix);
 
       // Fill muon data object
       void FillMuon(const Muon *mu);
@@ -152,8 +152,6 @@ namespace mithep
                         PFCandidateOArr *pfPileup, PFCandidateOArr *pfNoPileup,
                         Bool_t checkClosestZVertex = kTRUE);
 
-      Bool_t  match(const NSVFit *iFit,Particle *iPart0,Particle *iPart1);
-
       Bool_t looseMuId(const Muon  *iMu);
       Bool_t looseEleId(const Electron *iElectron);
       
@@ -169,7 +167,6 @@ namespace mithep
       TString                       fPFJetName;            // particle flow jet collection name
       TString                       fPhotonName;           // photon collection name
       TString                       fTrigMaskName;         // trigger mask name
-      TString                       fNSVFitEmuName;        // NSVFit collection name
       TString                       fPFMetName;            // particle flow MET collection name
       TString                       fConversionName;       // conversion collection name
       TString                       fPileupName;           // pile-up info name
@@ -187,7 +184,6 @@ namespace mithep
       const PFJetCol               *fPFJets;          // particle flow jet collection handle
       const PhotonCol              *fPhotons;         // photon collection handle
       const TriggerMask            *fTrigMask;        // trigger mask handle
-      const NSVFitCol              *fNSVFitEmu;       // NSVFit handle
       const PFMetCol               *fPFMet;           // particle flow MET handle
       const DecayParticleCol       *fConversions;     // conversion collection handle
       const PileupInfoCol          *fPileup;          // pile-up info handle
@@ -231,7 +227,7 @@ namespace mithep
       TClonesArray           *fPFJetArr;        // particle flow jet array
       TClonesArray           *fPhotonArr;       // photon array
       TClonesArray           *fPVArr;           // valid primary vertex array
-      TClonesArray           *fNSVFitEMuArr;    // SVFit array
+      TClonesArray           *fSVfitEMuArr;     // SVfit array
       
       vector<TString>         fTriggerNamesv;       // names of triggers we're interested in 
       vector<ULong64_t>       fTriggerIdsv;         // corresponding ETriggerBit value

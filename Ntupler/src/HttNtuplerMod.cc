@@ -21,7 +21,6 @@
 #include "MitAna/DataTree/interface/StableData.h"
 #include "MitCommon/MathTools/interface/MathUtils.h"
 #include "MitPhysics/Utils/interface/ElectronTools.h"
-#include "MitAna/DataTree/interface/NSVFitCol.h"
 #include "JetMETCorrections/Objects/interface/JetCorrectionsRecord.h"
 #include "CondFormats/JetMETObjects/interface/JetCorrectorParameters.h"
 #include <TTree.h>
@@ -47,159 +46,138 @@ HttNtuplerMod::HttNtuplerMod(const char *name, const char *title):
   fPFJetName     (Names::gkPFJetBrn),
   fPhotonName    (Names::gkPhotonBrn),
   fTrigMaskName  (Names::gkHltBitBrn),
-  fNSVFitEmuName (Names::gkNSVFitEMuBrn),
   fPFMetName     ("PFMet"),
   fConversionName(Names::gkMvfConversionBrn),
   fPileupName    (Names::gkPileupInfoBrn),
   fPUEnergyDensityName(Names::gkPileupEnergyDensityBrn),
   fPFCandidateName(Names::gkPFCandidatesBrn),
   fEmbedWeightName("EmbedWeight"),
-  fParticles     (0),
-  fMCEvtInfo     (0),
-  fGenJets       (0),
-  fMuons         (0),
-  fElectrons     (0),
-  fPrimVerts     (0),
-  fBeamSpot      (0),
-  fPFJets        (0),
-  fPhotons       (0),  
-  fTrigMask      (0),
-  fNSVFitEmu     (0),
-  fPFMet         (0),
-  fConversions   (0),
-  fPileup        (0),
+  fParticles      (0),
+  fMCEvtInfo      (0),
+  fGenJets        (0),
+  fMuons          (0),
+  fElectrons      (0),
+  fPrimVerts      (0),
+  fBeamSpot       (0),
+  fPFJets         (0),
+  fPhotons        (0),  
+  fTrigMask       (0),
+  fPFMet          (0),
+  fConversions    (0),
+  fPileup         (0),
   fPUEnergyDensity(0),
-  fPFCandidates  (0),
-  fIsData        (0),
-  fUseGen        (0),
-  fPrintTable    (kFALSE),
-  fSkipIfHLTFail (kFALSE),
-  fMuPtMin       (15),
-  fMuPtMax       (1000),
-  fMuEtaMin      (-3),
-  fMuEtaMax      (3),
-  fEleEtMin      (15),
-  fEleEtMax      (1000),
-  fEleEtaMin     (-3),
-  fEleEtaMax     (3),
-  fJetPtMin      (15),
-  fPhotonEtMin   (10),
-  fMinNTracksFit (0),
-  fMinNdof       (4),
-  fMaxAbsZ       (24),
-  fMaxRho        (2),
-  fEventTree     (0),
-  fJetCorrector  (0),
-  fJetUnc       (0)
+  fPFCandidates   (0),
+  fIsData         (0),
+  fUseGen         (0),
+  fPrintTable     (kFALSE),
+  fSkipIfHLTFail  (kFALSE),
+  fMuPtMin        (15),
+  fMuPtMax        (1000),
+  fMuEtaMin       (-3),
+  fMuEtaMax       (3),
+  fEleEtMin       (15),
+  fEleEtMax       (1000),
+  fEleEtaMin      (-3),
+  fEleEtaMax      (3),
+  fJetPtMin       (15),
+  fPhotonEtMin    (10),
+  fMinNTracksFit  (0),
+  fMinNdof        (4),
+  fMaxAbsZ        (24),
+  fMaxRho         (2),
+  fEventTree      (0),
+  fJetCorrector   (0),
+  fJetUnc         (0)
 {
-  // Constructor
-  
-  // Don't write TObject part of the objects
+  // don't write TObject part of the objects
   TEventInfo::Class()->IgnoreTObjectStreamer();
-  TGenInfo::Class()->IgnoreTObjectStreamer();
-  TMuon::Class()->IgnoreTObjectStreamer();
-  TElectron::Class()->IgnoreTObjectStreamer();
-  TJet::Class()->IgnoreTObjectStreamer();
-  TPhoton::Class()->IgnoreTObjectStreamer();
-  TVertex::Class()->IgnoreTObjectStreamer();
-  TNSVFit::Class()->IgnoreTObjectStreamer();
+  TGenInfo::Class()  ->IgnoreTObjectStreamer();
+  TVertex::Class()   ->IgnoreTObjectStreamer();
+  TSVfit::Class()    ->IgnoreTObjectStreamer();
+  TJet::Class()      ->IgnoreTObjectStreamer();
+  TMuon::Class()     ->IgnoreTObjectStreamer();
+  TPhoton::Class()   ->IgnoreTObjectStreamer();
+  TElectron::Class() ->IgnoreTObjectStreamer();
 }
 
-//--------------------------------------------------------------------------------------------------
 HttNtuplerMod::~HttNtuplerMod()
 {
-  // Destructor
 }	
 
-//--------------------------------------------------------------------------------------------------      
 void HttNtuplerMod::Begin()
 {
 }
 
-//--------------------------------------------------------------------------------------------------
 void HttNtuplerMod::SlaveBegin()
 {
-  //
-  // Request BAMBU branches
-  //
-  ReqBranch(fPartName,            fParticles); 
-  ReqBranch(fMCEvtInfoName,       fMCEvtInfo);
-  ReqBranch(Names::gkGenJetBrn , fGenJets);
-  ReqBranch(fMuonName,            fMuons);
-  ReqBranch(fElectronName,        fElectrons);
-  ReqBranch(fPrimVtxName,         fPrimVerts);
-  ReqBranch(fBeamSpotName,        fBeamSpot);
-  ReqBranch(fPFJetName,           fPFJets);
-  ReqBranch(fTrigMaskName,        fTrigMask);
-  ReqBranch(fPFMetName,           fPFMet);
-  ReqBranch(fPhotonName,          fPhotons);
-  ReqBranch(fConversionName,      fConversions);
-  ReqBranch(fPileupName,          fPileup);
-  ReqBranch(fPUEnergyDensityName, fPUEnergyDensity);
-  ReqBranch(fPFCandidateName,     fPFCandidates); 
-  if(fIsData==2) ReqBranch(fEmbedWeightName, fEmbedWeight);
+  // request Bambu branches for input
+  ReqBranch( fPartName            , fParticles ); 
+  ReqBranch( fMCEvtInfoName       , fMCEvtInfo );
+  ReqBranch( Names::gkGenJetBrn   , fGenJets   );
+  ReqBranch( fMuonName            , fMuons     );
+  ReqBranch( fElectronName        , fElectrons );
+  ReqBranch( fPrimVtxName         , fPrimVerts );
+  ReqBranch( fBeamSpotName        , fBeamSpot  );
+  ReqBranch( fPFJetName           , fPFJets    );
+  ReqBranch( fTrigMaskName        , fTrigMask  );
+  ReqBranch( fPFMetName           , fPFMet     );
+  ReqBranch( fPhotonName          , fPhotons   );
+  ReqBranch( fConversionName      , fConversions );
+  ReqBranch( fPileupName          , fPileup    );
+  ReqBranch( fPUEnergyDensityName , fPUEnergyDensity );
+  ReqBranch( fPFCandidateName     , fPFCandidates ); 
+  if(fIsData==2){ ReqBranch( fEmbedWeightName , fEmbedWeight ); }
 
-
-  // Pileup and NoPileup collections of PFCandidates  
-  fPFPileUp = new PFCandidateOArr;
-  fPFNoPileUp = new PFCandidateOArr;
-  fPFPileUpNoZ = new PFCandidateOArr;
+  // pileup and no-pileup collections of PFCandidates for delta beta corrected isolation 
+  fPFPileUp      = new PFCandidateOArr;
+  fPFNoPileUp    = new PFCandidateOArr;
+  fPFPileUpNoZ   = new PFCandidateOArr;
   fPFNoPileUpNoZ = new PFCandidateOArr;
  
+  // set up arrays for output
+  fMuonArr     = new TClonesArray( "mithep::TMuon"     ); assert( fMuonArr     );
+  fElectronArr = new TClonesArray( "mithep::TElectron" ); assert( fElectronArr );
+  fPFJetArr    = new TClonesArray( "mithep::TJet"      ); assert( fPFJetArr    );
+  fPhotonArr   = new TClonesArray( "mithep::TPhoton"   ); assert( fPhotonArr   );
+  fPVArr       = new TClonesArray( "mithep::TVertex"   ); assert( fPVArr       );
+  fSVfitEMuArr = new TClonesArray( "mithep::TSVfit"    ); assert( fSVfitEMuArr );
   
-  //
-  // Set up arrays
-  //
-  fMuonArr     = new TClonesArray("mithep::TMuon");	assert(fMuonArr);
-  fElectronArr = new TClonesArray("mithep::TElectron"); assert(fElectronArr);
-  fPFJetArr    = new TClonesArray("mithep::TJet");	assert(fPFJetArr);
-  fPhotonArr   = new TClonesArray("mithep::TPhoton");	assert(fPhotonArr);
-  fPVArr       = new TClonesArray("mithep::TVertex");	assert(fPVArr);
-  fNSVFitEMuArr= new TClonesArray("mithep::TNSVFit");   assert(fNSVFitEMuArr);
+  // open the output file
+  fOutputFile = new TFile( fOutputName, "RECREATE" );
   
-  //
-  // Create output file
-  //
-  fOutputFile = new TFile(fOutputName, "RECREATE");
-  
-  //
-  // Initialize data trees and structs 
-  // 
-  fEventTree = new TTree("Events","Events");
+  // setup output trees and structs 
+  fEventTree = new TTree( "Events", "Events" );
+  if( (fIsData!=1) && fUseGen ){
+    fEventTree->Branch( "Gen", &fGenInfo );
+  }
+  fEventTree->Branch( "Info"     , &fEventInfo   );
+  fEventTree->Branch( "Muon"     , &fMuonArr     );
+  fEventTree->Branch( "Electron" , &fElectronArr );
+  fEventTree->Branch( "PFJet"    , &fPFJetArr    );
+  fEventTree->Branch( "Photon"   , &fPhotonArr   );
+  fEventTree->Branch( "PV"       , &fPVArr       );
+  fEventTree->Branch( "SVfitEMu" , &fSVfitEMuArr );
 
-  fEventTree->Branch("Info",&fEventInfo);
-  if((fIsData!=1) && fUseGen)
-    fEventTree->Branch("Gen",&fGenInfo);
-  fEventTree->Branch("Muon",    &fMuonArr);
-  fEventTree->Branch("Electron",&fElectronArr);
-  fEventTree->Branch("PFJet",   &fPFJetArr);
-  fEventTree->Branch("Photon",  &fPhotonArr);
-  fEventTree->Branch("PV",      &fPVArr);
-  fEventTree->Branch("NSVFitEMu", &fNSVFitEMuArr);
-
-  //
-  // Set up jet corrections for PF jets
-  //
+  // setup jet corrections for PF jets
   std::vector<JetCorrectorParameters> correctionParameters;
-  for(UInt_t icorr=0; icorr<fJetCorrParsv.size(); icorr++)
+  for(unsigned int icorr=0; icorr<fJetCorrParsv.size(); icorr++){
     correctionParameters.push_back(JetCorrectorParameters(fJetCorrParsv[icorr].Data()));
-    
+  }
   // initialize jet corrector class
   fJetCorrector = new FactorizedJetCorrector(correctionParameters);
-
   // initialize jet uncertainties
   JetCorrectorParameters param(string("/home/vdutta/cms/cmssw/023_2/CMSSW_4_2_4_patch1/src/MitPhysics/data/START42_V12_AK5PF_Uncertainty.txt"));
   fJetUnc = new JetCorrectionUncertainty(param);
-
+  // initialize MET significance for svfit
   fMetSignificance = new MetSignificance();
+  // initialize tools for electron ID
   fEleTools = new ElectronTools();
 
   // setup selecting with JSON file, if necessary
   fhasJSON = fJSONv.size() > 0;
-  for(UInt_t i=0; i<fJSONv.size(); i++) {
-    frlrm.AddJSONFile(fJSONv[i].Data());
+  for(unsigned int idx=0; idx<fJSONv.size(); idx++) {
+    frlrm.AddJSONFile(fJSONv[idx].Data());
   }
-
   fLastRunLumi = RunLumiRangeMap::RunLumiPairType(0,0);
 }
 
@@ -208,66 +186,52 @@ void HttNtuplerMod::SlaveBegin()
 // scaledJet in this case was a reco::Jet, you just multiply the p4 I guess
 // scaledJet.scaleEnergy( 1+jetMet);
 
-
 // The JetUncertainties class itself:
 // http://cmssw.cvs.cern.ch/cgi-bin/cmssw.cgi/CMSSW/CondFormats/JetMETObjects/interface/JetCorrectionUncertainty.h?revision=1.5&view=markup
 
-
-
-
-//--------------------------------------------------------------------------------------------------
 void HttNtuplerMod::SlaveTerminate()
 {
-  //
-  // Save to ROOT file
-  //
-  fEventTree->Print();
-
+  // save output to file and close
+  fEventTree ->Print();
   fOutputFile->Write();
   fOutputFile->Close();
 
+  // cleanup
   delete fPFPileUp;
   delete fPFNoPileUp;
   delete fPFPileUpNoZ;
   delete fPFNoPileUpNoZ;
- 
   delete fMuonArr;
   delete fElectronArr;
   delete fPFJetArr;
   delete fPhotonArr;
   delete fPVArr;
-  delete fNSVFitEMuArr;
-  
+  delete fSVfitEMuArr;
   delete fJetCorrector;
   delete fJetUnc;
   delete fMetSignificance;
   delete fEleTools;
 
-  //
   // dump json file
-  //
   TString jsonfname = fOutputName.ReplaceAll("root","json");
-  if(fIsData)
+  if(fIsData){
     fRunLumiSet.DumpJSONFile(jsonfname.Data());
+  }
 }
 
-//--------------------------------------------------------------------------------------------------
 void HttNtuplerMod::Terminate()
 {
 }
 
-//--------------------------------------------------------------------------------------------------
 void HttNtuplerMod::BeginRun()
 {
   if(HasHLTInfo() && fPrintTable) { GetHLTTable()->Print(); }
 }
 
-//--------------------------------------------------------------------------------------------------
 void HttNtuplerMod::EndRun()
 {
 }
 
-//--------------------------------------------------------------------------------------------------
 void HttNtuplerMod::Process()
 {
   RunLumiRangeMap::RunLumiPairType rl(GetEventHeader()->RunNum(), GetEventHeader()->LumiSec());
@@ -335,7 +299,7 @@ void HttNtuplerMod::Process()
   fPFJetArr->Clear();
   fPhotonArr->Clear();
   fPVArr->Clear();
-  fNSVFitEMuArr  ->Clear();
+  fSVfitEMuArr  ->Clear();
   //fSVFitArr->Clear();
 
 
@@ -384,11 +348,6 @@ void HttNtuplerMod::Process()
   separatePileUp(fPFCandidates, fVertex, fPrimVerts, fPFPileUp, fPFNoPileUp, kTRUE);
   separatePileUp(fPFCandidates, fVertex, fPrimVerts, fPFPileUpNoZ, fPFNoPileUpNoZ, kFALSE);
  
-  //assert(fNSVFitEmu);
-  /*for(UInt_t i=0; i<fNSVFitEmu->GetEntries(); ++i) {
-    const NSVFit *nsvfit = fNSVFitEmu->At(i);
-    if(nsvfit->IsValid()) { FillSVFit(nsvfit); }
-  }*/
   for(UInt_t i0 = 0; i0 < fMuons->GetEntries(); i0++) {
     const Muon *pMu = fMuons->At(i0);
     if(!looseMuId(pMu)) continue;
@@ -397,11 +356,7 @@ void HttNtuplerMod::Process()
       if(!looseEleId(pElectron))                               continue;
       if(MathUtils::DeltaR(pElectron->Mom(),pMu->Mom()) < 0.3) continue;
       TMatrixD lMetMatrix = fMetSignificance->getSignificance(fPFJets,fPFCandidates,0,pMu,pElectron);
-      //const NSVFit *pFit = 0;
-      //for(UInt_t i = 0; i < fNSVFitEmu->GetEntries(); i++)
-        //if(match(fNSVFitEmu->At(i),(Particle*)pMu,(Particle*) pElectron)) pFit = fNSVFitEmu->At(i);
-      //FillNSVFit(pFit, fNSVFitEMuArr,(Particle*)pMu,(Particle*)pElectron,lMetMatrix);
-      FillNSVFit(fNSVFitEMuArr,(Particle*)pMu,(Particle*)pElectron,lMetMatrix);
+      FillSVfit(fSVfitEMuArr,(Particle*)pMu,(Particle*)pElectron,lMetMatrix);
     }
   }
 
@@ -1683,7 +1638,7 @@ void HttNtuplerMod::FillGenWW()
 }
 
 //--------------------------------------------------------------------------------------------------
-/*void HttNtuplerMod::FillSVFit(const NSVFit *nsvfit) 
+/*void HttNtuplerMod::FillSVFit(const SVfit *nsvfit) 
 {
   TClonesArray &rSVFitArr = *fSVFitArr;
   assert(rSVFitArr.GetEntries() < rSVFitArr.GetSize());
@@ -1704,37 +1659,17 @@ void HttNtuplerMod::FillGenWW()
 }*/
 
 //--------------------------------------------------------------------------------------------------
-//void HttNtuplerMod::FillNSVFit(const NSVFit *nsvfit, TClonesArray *iArr,Particle* iPart0,Particle* iPart1,TMatrixD iMatrix) {
-void HttNtuplerMod::FillNSVFit(TClonesArray *iArr,Particle* iPart0,Particle* iPart1,TMatrixD iMatrix) {
-  TClonesArray &rNSVFitArr = *iArr;
-  const Int_t index = rNSVFitArr.GetEntries();
-  new(rNSVFitArr[index]) TNSVFit();
-  TNSVFit *pNSVFit = (TNSVFit*)rNSVFitArr[index];
-/*  if(nsvfit != 0) {
-    pNSVFit->isValid = nsvfit->IsValid();
-    pNSVFit->mass = nsvfit->Mass();
-    pNSVFit->massErrUp = nsvfit->MassErrUp();
-    pNSVFit->massErrDown = nsvfit->MassErrDown();
-    pNSVFit->massMean = nsvfit->MassMean();
-    pNSVFit->massMedian = nsvfit->MassMedian();
-    pNSVFit->massMaximum = nsvfit->MassMaximum();
-    pNSVFit->massMaxInterpol = nsvfit->MassMaxInterpol();
-  }*/
-  pNSVFit->daughter1 = iPart0->Mom();
-  pNSVFit->daughter2 = iPart1->Mom();
-  pNSVFit->cov_00    = iMatrix(0,0);
-  pNSVFit->cov_10    = iMatrix(1,0);
-  pNSVFit->cov_01    = iMatrix(0,1);
-  pNSVFit->cov_11    = iMatrix(1,1);
-}
-//--------------------------------------------------------------------------------------------------
-Bool_t HttNtuplerMod::match(const NSVFit *iFit,Particle *iPart0,Particle *iPart1) { 
-  Bool_t lMatch = false;
-  if(MathUtils::DeltaR(iFit->Daughter(0),iPart0->Mom()) == 0.) lMatch = true;
-  if(MathUtils::DeltaR(iFit->Daughter(0),iPart1->Mom()) == 0.) lMatch = true;
-  if(MathUtils::DeltaR(iFit->Daughter(1),iPart0->Mom()) == 0. && lMatch) return true;
-  if(MathUtils::DeltaR(iFit->Daughter(1),iPart1->Mom()) == 0. && lMatch) return true;
-  return false;
+void HttNtuplerMod::FillSVfit(TClonesArray *iArr,Particle* iPart0,Particle* iPart1,TMatrixD iMatrix) {
+  TClonesArray &rSVfitArr = *iArr;
+  const Int_t index = rSVfitArr.GetEntries();
+  new(rSVfitArr[index]) TSVfit();
+  TSVfit *pSVfit = (TSVfit*)rSVfitArr[index];
+  pSVfit->daughter1 = iPart0->Mom();
+  pSVfit->daughter2 = iPart1->Mom();
+  pSVfit->cov_00    = iMatrix(0,0);
+  pSVfit->cov_10    = iMatrix(1,0);
+  pSVfit->cov_01    = iMatrix(0,1);
+  pSVfit->cov_11    = iMatrix(1,1);
 }
 //--------------------------------------------------------------------------------------------------
 Bool_t HttNtuplerMod::looseEleId(const Electron *iElectron) { 

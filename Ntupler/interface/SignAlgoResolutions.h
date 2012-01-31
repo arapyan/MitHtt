@@ -12,12 +12,13 @@
 #include "MitAna/DataTree/interface/PFJet.h"
 #include "MitAna/DataTree/interface/PFCandidate.h"
 
-/**\class SignAlgoResolutions SignAlgoResolutions.h MitHtt/Ntupler/include/SignAlgoResolutions.h
+/**
+   \class SignAlgoResolutions SignAlgoResolutions.h MitHtt/Ntupler/include/SignAlgoResolutions.h
 
- Description: <one line class summary>
+   \brief Description: <one line class summary>
 
- Implementation:
-     <Notes on implementation>
+   Implementation:
+   <Notes on implementation>
 */
 
 namespace mithep {

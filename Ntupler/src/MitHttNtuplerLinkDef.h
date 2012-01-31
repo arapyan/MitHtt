@@ -9,9 +9,9 @@
 #include "MitHtt/Ntupler/interface/TJet.hh"
 #include "MitHtt/Ntupler/interface/TPhoton.hh"
 #include "MitHtt/Ntupler/interface/TVertex.hh"
-#include "MitHtt/Ntupler/interface/TNSVFit.hh"
+#include "MitHtt/Ntupler/interface/TSVfit.h"
 #include "MitHtt/Ntupler/interface/MetSignificance.hh"
-#include "MitHtt/Ntupler/interface/TSVFitter.hh"
+#include "MitHtt/Ntupler/interface/TSVfitter.h"
 #include "MitHtt/Ntupler/interface/svFitAuxFunctions.h"
 #endif
 
@@ -33,7 +33,7 @@
 #pragma link C++ class mithep::TJet+;
 #pragma link C++ class mithep::TPhoton+;
 #pragma link C++ class mithep::TVertex+;
-#pragma link C++ class mithep::TNSVFit+;
+#pragma link C++ class mithep::TSVfit+;
 #pragma link C++ class mithep::MetSignificance+;
-#pragma link C++ class mithep::TSVFitter+;
+#pragma link C++ class mithep::TSVfitter+;
 #endif
