@@ -9,10 +9,9 @@
 #include "MitHtt/Ntupler/interface/TJet.hh"
 #include "MitHtt/Ntupler/interface/TPhoton.hh"
 #include "MitHtt/Ntupler/interface/TVertex.hh"
-#include "MitHtt/Ntupler/interface/TSVfit.h"
-#include "MitHtt/Ntupler/interface/MetSignificance.hh"
+#include "MitHtt/Ntupler/interface/MetSignificance.h"
 #include "MitHtt/Ntupler/interface/TSVfitter.h"
-#include "MitHtt/Ntupler/interface/svFitAuxFunctions.h"
+#include "MitHtt/Ntupler/interface/TSVfit.h"
 #endif
 
 #ifdef __CINT__
@@ -22,7 +21,6 @@
 #pragma link C++ nestedclass;
 #pragma link C++ nestedtypedef;
 #pragma link C++ namespace mithep;
-#pragma link C++ namespace SVfit_namespace;
 
 #pragma link C++ class mithep::BambuGenDumperMod+;
 #pragma link C++ class mithep::HttNtuplerMod+;
@@ -33,7 +31,7 @@
 #pragma link C++ class mithep::TJet+;
 #pragma link C++ class mithep::TPhoton+;
 #pragma link C++ class mithep::TVertex+;
-#pragma link C++ class mithep::TSVfit+;
 #pragma link C++ class mithep::MetSignificance+;
 #pragma link C++ class mithep::TSVfitter+;
+#pragma link C++ class mithep::TSVfit+;
 #endif

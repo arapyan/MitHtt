@@ -21,6 +21,13 @@
 #include "RecoMET/METAlgorithms/interface/SigInputObj.h"
 #include "MitHtt/Ntupler/interface/SignAlgoResolutions.h"
 
+/**
+   \class MetSignificance MetSignificance.h MitHtt/Ntupler/include/MetSignificance.h
+
+   \brief Description: <one line class summary>
+
+   <Notes on implementation>
+*/
 
 namespace mithep { 
   class MetSignificance { 

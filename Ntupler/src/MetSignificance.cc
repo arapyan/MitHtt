@@ -1,10 +1,12 @@
-#include <iostream>
-#include "DataFormats/PatCandidates/interface/Jet.h"
-#include "RecoMET/METAlgorithms/interface/significanceAlgo.h"
-#include "MitHtt/Ntupler/interface/MetSignificance.hh"
+#include "iostream"
+
 #include "MitCommon/MathTools/interface/MathUtils.h"
+#include "DataFormats/PatCandidates/interface/Jet.h"
+#include "MitHtt/Ntupler/interface/MetSignificance.h"
+#include "RecoMET/METAlgorithms/interface/significanceAlgo.h"
 
 using namespace mithep;
+
 
 MetSignificance::MetSignificance()  {
   loadResolutions();

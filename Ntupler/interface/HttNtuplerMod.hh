@@ -16,7 +16,7 @@
 #include "CondFormats/JetMETObjects/interface/FactorizedJetCorrector.h"
 #include "CondFormats/JetMETObjects/interface/JetCorrectionUncertainty.h"
 #include "MitPhysics/Utils/interface/ElectronTools.h"
-#include "MitHtt/Ntupler/interface/MetSignificance.hh"
+#include "MitHtt/Ntupler/interface/MetSignificance.h"
 
 #include "HiggsAnaDefs.hh"
 #include "TEventInfo.hh"
