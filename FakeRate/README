@@ -1,0 +1,9 @@
+-see run.sh
+
+-ComputeElectronFakeRate_Data.C & ComputeMuonFakeRate_Data.C computes the electron and muon fake rates respectively as a function of
+    pt and eta, and produce root files with graphs.
+
+-predictFakesMuEle.C reads the fake rates from these root files and applies them to
+    a mueg (Bacon) ntuple(s), and writes an ntuple that can be read by plotEmu.C. Just move
+    this ntuple to the selection directory along with the selections from selectEmu.C
+    Input files and json are listed at the top of predictFakseMuEle.C
