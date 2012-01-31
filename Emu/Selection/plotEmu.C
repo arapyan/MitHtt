@@ -410,7 +410,7 @@ void plotEmu(const TString  conf,         // input file
   evtlistfile_boost << "#run" << setw(13) << "lumi" << setw(15) << "event" << endl;
   evtlistfile_vbf << "#run" << setw(13) << "lumi" << setw(15) << "event" << endl;
   evtlistfile_nob << "#run" << setw(13) << "lumi" << setw(15) << "event" << endl;
-  evtlistfile_b << "3run" << setw(13) << "lumi" << setw(15) << "event" << endl;
+  evtlistfile_b << "#run" << setw(13) << "lumi" << setw(15) << "event" << endl;
   
   for(UInt_t isam=0; isam<samplev.size(); isam++) {
     if((isam==0) && !hasData) continue;
