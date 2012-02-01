@@ -1,14 +1,6 @@
 #ifndef MITHTT_NTUPLER_HTTNTUPLERMOD_H
 #define MITHTT_NTUPLER_HTTNTUPLERMOD_H
 
-//#include "vector"
-
-//#include "TClonesArray.h"
-//#include "TLorentzVector.h"
-
-#include "CondFormats/JetMETObjects/interface/FactorizedJetCorrector.h"
-#include "CondFormats/JetMETObjects/interface/JetCorrectionUncertainty.h"
-
 #include "MitAna/TreeMod/interface/BaseMod.h"
 #include "MitAna/DataTree/interface/MCEventInfo.h"
 #include "MitAna/DataTree/interface/BaseVertex.h"
@@ -34,6 +26,9 @@
 #include "MitHtt/Ntupler/interface/MetSignificance.h"
 
 #include "MitPhysics/Utils/interface/ElectronTools.h"
+
+#include "CondFormats/JetMETObjects/interface/FactorizedJetCorrector.h"
+#include "CondFormats/JetMETObjects/interface/JetCorrectionUncertainty.h"
 
 /// forward declarations
 class TTree;
