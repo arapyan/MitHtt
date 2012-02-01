@@ -1,4 +1,6 @@
-#include "MitHtt/Ntupler/interface/HttNtuplerMod.hh"
+#include "TFile.h"
+#include "TTree.h"
+
 #include "MitAna/DataTree/interface/Names.h"
 #include "MitAna/DataTree/interface/MCParticleCol.h"
 #include "MitAna/DataTree/interface/MuonCol.h"
@@ -19,15 +21,12 @@
 #include "MitAna/DataTree/interface/PFMet.h"
 #include "MitAna/DataTree/interface/DecayParticle.h"
 #include "MitAna/DataTree/interface/StableData.h"
+
 #include "MitCommon/MathTools/interface/MathUtils.h"
-#include "MitPhysics/Utils/interface/ElectronTools.h"
+#include "MitHtt/Ntupler/interface/HttNtuplerMod.hh"
+
 #include "JetMETCorrections/Objects/interface/JetCorrectionsRecord.h"
 #include "CondFormats/JetMETObjects/interface/JetCorrectorParameters.h"
-#include <TTree.h>
-#include <TFile.h>
-#include <TH1F.h>
-#include <TLorentzVector.h>
-#include <vector>
 
 using namespace mithep;
 
@@ -35,7 +34,7 @@ ClassImp(mithep::HttNtuplerMod)
 
 HttNtuplerMod::HttNtuplerMod(const char *name, const char *title):
   BaseMod        (name,title),
-  fOutputFile    (0),
+  fOutputFile    ( 0),
   fOutputName    ("ntuple.root"),
   fPartName      (Names::gkMCPartBrn),
   fMCEvtInfoName (Names::gkMCEvtInfoBrn),
@@ -52,42 +51,42 @@ HttNtuplerMod::HttNtuplerMod(const char *name, const char *title):
   fPUEnergyDensityName(Names::gkPileupEnergyDensityBrn),
   fPFCandidateName(Names::gkPFCandidatesBrn),
   fEmbedWeightName("EmbedWeight"),
-  fParticles      (0),
-  fMCEvtInfo      (0),
-  fGenJets        (0),
-  fMuons          (0),
-  fElectrons      (0),
-  fPrimVerts      (0),
-  fBeamSpot       (0),
-  fPFJets         (0),
-  fPhotons        (0),  
-  fTrigMask       (0),
-  fPFMet          (0),
-  fConversions    (0),
-  fPileup         (0),
-  fPUEnergyDensity(0),
-  fPFCandidates   (0),
-  fIsData         (0),
-  fUseGen         (0),
+  fParticles      ( 0),
+  fMCEvtInfo      ( 0),
+  fGenJets        ( 0),
+  fMuons          ( 0),
+  fElectrons      ( 0),
+  fPrimVerts      ( 0),
+  fBeamSpot       ( 0),
+  fPFJets         ( 0),
+  fPhotons        ( 0),  
+  fTrigMask       ( 0),
+  fPFMet          ( 0),
+  fConversions    ( 0),
+  fPileup         ( 0),
+  fPUEnergyDensity( 0),
+  fPFCandidates   ( 0),
+  fIsData         ( 0),
+  fUseGen         ( 0),
   fPrintTable     (kFALSE),
   fSkipIfHLTFail  (kFALSE),
   fMuPtMin        (15),
   fMuPtMax        (1000),
   fMuEtaMin       (-3),
-  fMuEtaMax       (3),
+  fMuEtaMax       ( 3),
   fEleEtMin       (15),
   fEleEtMax       (1000),
   fEleEtaMin      (-3),
-  fEleEtaMax      (3),
+  fEleEtaMax      ( 3),
   fJetPtMin       (15),
   fPhotonEtMin    (10),
-  fMinNTracksFit  (0),
-  fMinNdof        (4),
+  fMinNTracksFit  ( 0),
+  fMinNdof        ( 4),
   fMaxAbsZ        (24),
-  fMaxRho         (2),
-  fEventTree      (0),
-  fJetCorrector   (0),
-  fJetUnc         (0)
+  fMaxRho         ( 2),
+  fEventTree      ( 0),
+  fJetCorrector   ( 0),
+  fJetUnc         ( 0)
 {
   // don't write TObject part of the objects
   TEventInfo::Class()->IgnoreTObjectStreamer();
@@ -125,10 +124,13 @@ void HttNtuplerMod::SlaveBegin()
   ReqBranch( fConversionName      , fConversions );
   ReqBranch( fPileupName          , fPileup    );
   ReqBranch( fPUEnergyDensityName , fPUEnergyDensity );
-  ReqBranch( fPFCandidateName     , fPFCandidates ); 
+  ReqBranch( fPFCandidateName     , fPFCandidates );
+  // add embbeding weights for embedded samples 
   if(fIsData==2){ ReqBranch( fEmbedWeightName , fEmbedWeight ); }
 
-  // pileup and no-pileup collections of PFCandidates for delta beta corrected isolation 
+  // pileup and no-pileup collections of PFCandidates for delta beta corrected 
+  // isolation including and not including the association of tracks to primary 
+  // vertices based on their distance along the z-axis
   fPFPileUp      = new PFCandidateOArr;
   fPFNoPileUp    = new PFCandidateOArr;
   fPFPileUpNoZ   = new PFCandidateOArr;
@@ -147,9 +149,7 @@ void HttNtuplerMod::SlaveBegin()
   
   // setup output trees and structs 
   fEventTree = new TTree( "Events", "Events" );
-  if( (fIsData!=1) && fUseGen ){
-    fEventTree->Branch( "Gen", &fGenInfo );
-  }
+  if( (fIsData!=1) && fUseGen ){ fEventTree->Branch( "Gen", &fGenInfo ); }
   fEventTree->Branch( "Info"     , &fEventInfo   );
   fEventTree->Branch( "Muon"     , &fMuonArr     );
   fEventTree->Branch( "Electron" , &fElectronArr );
@@ -166,6 +166,8 @@ void HttNtuplerMod::SlaveBegin()
   // initialize jet corrector class
   fJetCorrector = new FactorizedJetCorrector(correctionParameters);
   // initialize jet uncertainties
+  //JetCorrectorParameters param(string("$CMSSW_BASE/MitPhysics/data/START42_V12_AK5PF_Uncertainty.txt"));
+  //JetCorrectorParameters param(string("/data/blue/rwolf/CMSSW_4_4_2/MitPhysics/data/START42_V12_AK5PF_Uncertainty.txt"));
   JetCorrectorParameters param(string("/home/vdutta/cms/cmssw/023_2/CMSSW_4_2_4_patch1/src/MitPhysics/data/START42_V12_AK5PF_Uncertainty.txt"));
   fJetUnc = new JetCorrectionUncertainty(param);
   // initialize MET significance for svfit
@@ -613,8 +615,8 @@ void HttNtuplerMod::FillElectron(const Electron *ele)
   pElectron->trkIso03        = ele->TrackIsolationDr03();
   pElectron->emIso03         = ele->EcalRecHitIsoDr03();
   pElectron->hadIso03        = ele->HcalTowerSumEtDr03();
-  pElectron->pfIso03         = computePFEleIso(ele,0.3); 
-  pElectron->pfIso04         = computePFEleIso(ele,0.4);
+  pElectron->pfIso03         = computePFElecIso(ele,0.3); 
+  pElectron->pfIso04         = computePFElecIso(ele,0.4);
   pElectron->d0              = ele->BestTrk()->D0Corrected(*fVertex);
   pElectron->dz              = ele->BestTrk()->DzCorrected(*fVertex);  
   pElectron->scEt            = ele->SCluster()->Et();
@@ -961,7 +963,7 @@ Float_t HttNtuplerMod::computePFMuonIso(const Muon *muon, const Double_t dRMax)
   return iso;
 }
 
-Float_t HttNtuplerMod::computePFEleIso(const Electron *electron, const Double_t dRMax)
+Float_t HttNtuplerMod::computePFElecIso(const Electron *electron, const Double_t dRMax)
 {
   const Double_t dRMin    = 0;
   const Double_t neuPtMin = 1.0;
@@ -1001,34 +1003,31 @@ Float_t HttNtuplerMod::computePFEleIso(const Electron *electron, const Double_t 
 }
 
 //--------------------------------------------------------------------------------------------------
-Double_t HttNtuplerMod::PFIsoNoPileup(const ChargedParticle *p, PFCandidateCol *pfNoPileUp,
-                                      Double_t ptMin, Double_t extRadius, Double_t intRadius,
-                                      Int_t isoType)
+Double_t 
+HttNtuplerMod::PFIsoNoPileup(const ChargedParticle *p, PFCandidateCol *pfNoPileUp, Double_t ptMin, Double_t extRadius, Double_t intRadius, Int_t isoType)
 {
   assert(p);
-
+  
   Double_t ptSum = 0.0;
-  for(UInt_t i = 0; i < pfNoPileUp->GetEntries(); i++)
-  {
+  for(UInt_t i = 0; i < pfNoPileUp->GetEntries(); i++){
     const PFCandidate *pf = pfNoPileUp->At(i);
     assert(pf);
-
+    
     PFCandidate::EPFType pfType = pf->PFType();
-
+    
     if((isoType == 1 && (pfType == PFCandidate::eHadron || pfType == PFCandidate::eElectron || pfType == PFCandidate::eMuon)) ||
        (isoType == 2 && pfType == PFCandidate::eNeutralHadron) ||
        (isoType == 3 && pfType == PFCandidate::eGamma))
-    {
-      if(pf->Pt() >= ptMin &&
-         !(pf->TrackerTrk() && p->TrackerTrk() && pf->TrackerTrk() == p->TrackerTrk()))
       {
-        // Add p_T to running sum if PFCandidate is close enough
-        Double_t dr = MathUtils::DeltaR(p->Mom(), pf->Mom());
-        if(dr < extRadius && dr >= intRadius) ptSum += pf->Pt();
+	if(pf->Pt() >= ptMin &&
+	   !(pf->TrackerTrk() && p->TrackerTrk() && pf->TrackerTrk() == p->TrackerTrk()))
+	  {
+	    // Add p_T to running sum if PFCandidate is close enough
+	    Double_t dr = MathUtils::DeltaR(p->Mom(), pf->Mom());
+	    if(dr < extRadius && dr >= intRadius) ptSum += pf->Pt();
+	  }
       }
-    }
   }
-
   return ptSum;
 }
 
