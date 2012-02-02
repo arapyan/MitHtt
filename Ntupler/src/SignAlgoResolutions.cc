@@ -1,20 +1,19 @@
-#include <math.h>
-#include <string>
-#include <cstdlib>
-#include <sstream>
-#include <iostream>
-#include <sys/stat.h>
+#include "math.h"
+#include "string"
+#include "cstdlib"
+#include "sstream"
+#include "iostream"
+#include "sys/stat.h"
 
 #include "FWCore/ParameterSet/interface/ParameterSet.h"
+#include "MitHtt/Ntupler/interface/SignAlgoResolutions.h"
 #include "FWCore/PythonParameterSet/interface/MakeParameterSets.h"
 
-#include "MitHtt/Ntupler/interface/SignAlgoResolutions.h"
-
-
 mithep::SignAlgoResolutions::SignAlgoResolutions() :
-  functionmap_(), ptResol_(0), phiResol_(0),
-  fName("/build/pharris/CMSSW_4_2_4_patch1/src/RecoMET/METProducers/python/METSigParams_cfi.py")
+  functionmap_(), ptResol_(0), phiResol_(0)
 {
+  char* PATH = getenv("CMSSW_RELEASE_BASE"); assert(PATH);
+  fName=std::string(TString::Format("%s/src/RecoMET/METProducers/python/METSigParams_cfi.py", PATH));
   addResolutions();
 }
 

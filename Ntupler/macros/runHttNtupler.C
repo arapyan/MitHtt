@@ -1,5 +1,6 @@
 #if !defined(__CINT__) || defined(__MAKECINT__)
-#include <TROOT.h>
+#include "TROOT.h"
+#include "cstdlib"
 #include "MitAna/DataUtil/interface/Debug.h"
 #include "MitAna/Catalog/interface/Catalog.h"
 #include "MitAna/TreeMod/interface/Analysis.h"
@@ -110,18 +111,17 @@ void runHttNtupler(
 
 
   // Jet corrections
-  TString path("/home/vdutta/cms/cmssw/023/CMSSW_4_2_4_patch1");
-  path += "/src/MitPhysics/data/";
-
-  mymod->AddJetCorr(path   + "START42_V12_AK5PF_L1FastJet.txt");
-  mymod->AddJetCorr(path   + "START42_V12_AK5PF_L2Relative.txt");
-  mymod->AddJetCorr(path   + "START42_V12_AK5PF_L3Absolute.txt");
-  if(isData)		      				  
+  char* PATH = getenv("CMSSW_BASE"); assert(PATH);
+  TString path(TString::Format("%s/src/MitPhysics/data/", PATH));
+  mymod->AddJetCorr(path + "START42_V12_AK5PF_L1FastJet.txt"   );
+  mymod->AddJetCorr(path + "START42_V12_AK5PF_L2Relative.txt"  );
+  mymod->AddJetCorr(path + "START42_V12_AK5PF_L3Absolute.txt"  );
+  if(isData){
     mymod->AddJetCorr(path + "START42_V12_AK5PF_L2L3Residual.txt");
-
-  if(TString(json).Length() > 0)
+  }
+  if(TString(json).Length() > 0){
     mymod->AddJSON(json);
-  
+  }
   //
   // MuEG
   // 

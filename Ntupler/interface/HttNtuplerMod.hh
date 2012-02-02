@@ -38,10 +38,15 @@ class TString;
 /**
    \class HttNtuplerMod HttNtuplerMod.h MitHtt/Ntupler/include/HttNtuplerMod.h
 
-   \brief Description: <one line class summary>
+   \brief Description: Main module to do the filling from Bambu to Bacon
 
    Implementation:
    <Notes on implementation>
+
+   useGen :   1 : Fill generator information for Higgs
+              2 : Fill generator information for Z Boson
+              3 : Fill generator information for W Boson
+              4 : Fill generator information for DiBoson
 */
 
 namespace mithep

@@ -1,15 +1,5 @@
 #ifndef MITHTT_NTUPLER_METSIGNIFICANCE_HH
 #define MITHTT_NTUPLER_METSIGNIFICANCE_HH
-#include <TVectorD.h>
-
-//#include "DataFormats/Candidate/interface/Candidate.h"
-//#include "DataFormats/JetReco/interface/PFJet.h"
-//#include "DataFormats/ParticleFlowCandidate/interface/PFCandidate.h"
-
-//#include "DataFormats/PatCandidates/interface/MET.h"
-//#include "DataFormats/PatCandidates/interface/Muon.h"
-//#include "DataFormats/PatCandidates/interface/Electron.h"
-//#include "DataFormats/PatCandidates/interface/Tau.h"
 
 #include "MitAna/DataTree/interface/ParticleCol.h"
 #include "MitAna/DataTree/interface/MuonCol.h"
@@ -18,62 +8,62 @@
 #include "MitAna/DataTree/interface/PFCandidateCol.h"
 #include "MitAna/DataTree/interface/PFTauCol.h"
 
+#include "TVectorD.h"
 #include "RecoMET/METAlgorithms/interface/SigInputObj.h"
 #include "MitHtt/Ntupler/interface/SignAlgoResolutions.h"
 
 /**
    \class MetSignificance MetSignificance.h MitHtt/Ntupler/include/MetSignificance.h
 
-   \brief Description: <one line class summary>
+   \brief Description: Class to calculate the MET significance as input to the svfit
 
-   <Notes on implementation>
+   This is a class to calculate the MET significance from particle flow candidates as
+   input to the svfit. Input objects are all selected particle flow jets, all selected 
+   particle flow candidates outside jets (excluding the selected electron, muon and/or 
+   tau) and explicitely the selected electron, muon and/or tau. The actual significance 
+   matrix (2d) is calculatec from metsig::significanceAlgo in RecoMET/METAlgorithms. 
+
+   This class is a mirror of the same class in RecoMET/METAlgorithms but replacing 
+   official dataformats by Bambu dataformats and specializing it to the needs for Higgs 
+   to Tau Tau analyses.
 */
 
 namespace mithep { 
   class MetSignificance { 
   public:
+
+    /// default constructor
     MetSignificance();
-    /*
-    bool filter(const PFJet *iPart,   MuonOArr *iParticleCol,double iDRMin);
-    bool filter(const PFJet *iPart,   ElectronOArr *iParticleCol,double iDRMin);
-    bool filter(const PFCandidate *iPart,   MuonOArr *iParticleCol,double iDRMin);
-    bool filter(const PFCandidate *iPart,   ElectronOArr *iParticleCol,double iDRMin);
-    bool filter(const PFJet *iJet,       MuonOArr     *iParticleol);
-    bool filter(const PFJet *iJet,       ElectronOArr *iParticleol);
-    bool filter(const PFCandidate *iPart,const PFJetCol    *iPFJetCol);
-    void addJets      (std::vector<metsig::SigInputObj> &fSig,const PFJetCol *iJets,MuonOArr *iMuons,ElectronOArr *iElectrons);
-    void addCandidates(std::vector<metsig::SigInputObj> &fSig,const PFCandidateCol *iPFCands,const PFJetCol *iJets,
-		       MuonOArr *iMuons,ElectronOArr *iElectrons);
-    void addMuons     (std::vector<metsig::SigInputObj> &fSig,const MuonOArr  *iMuons);
-    void addElectrons (std::vector<metsig::SigInputObj> &fSig,const ElectronOArr *iElectrons);
-    */
-    bool filter(const mithep::PFJet *iJet,       const mithep::Particle *iCandidate);
-    bool filter(const mithep::PFCandidate *iPart,const mithep::PFJetCol  *iPFJetCol);
-    void addJets(std::vector<metsig::SigInputObj> &fSig,const mithep::PFJetCol *iJets,
-		 const mithep::Particle *iCan1,const mithep::Particle *iCan2);
-    void addCandidates(std::vector<metsig::SigInputObj> &fSig,const mithep::PFCandidateCol *iCands,
-		       const mithep::PFJetCol *iJets,const mithep::Particle *iCan1,const mithep::Particle *iCan2);
-    void addTau       (std::vector<metsig::SigInputObj> &fSig,const mithep::PFTau *iTau);
+    /// returns true if the particle flow candidate is located within a radius of fDRCandMin in the vicinity of the particle flow jet
+    bool filter(const mithep::PFJet* iJet, const mithep::Particle* iCandidate);
+    /// returns true if the particle flow candidate is located within a radius of fDRCandMin in the vicinity of any particle flow jet in the collection
+    bool filter(const mithep::PFCandidate* iPart, const mithep::PFJetCol* iPFJetCol);
+    /// add jets to the input for the significance calculation if they do not contain iCan1 or iCan2
+    void addJets(std::vector<metsig::SigInputObj>& fSig, const mithep::PFJetCol* iJets, const mithep::Particle* iCan1, const mithep::Particle* iCan2);
+    /// add particle flow candidates to the input for the significance calculation if they do not belong to the jets in iJets and if they are not iCan1 or iCan2
+    void addCandidates(std::vector<metsig::SigInputObj> &fSig,const mithep::PFCandidateCol *iCands, const mithep::PFJetCol *iJets,const mithep::Particle *iCan1,const mithep::Particle *iCan2);
+    /// add particle flow jet corresponding to particle flow tau to the input for the significance calculation
+    void addTau(std::vector<metsig::SigInputObj> &fSig,const mithep::PFTau *iTau);
+    /// add particle flow jet to input for the significance calculation
     void add(const mithep::PFJet       *iJet,      std::vector<metsig::SigInputObj> &fSig);
+    /// add particle flow candidate to input for the significance calculation
     void add(const mithep::PFCandidate *iCandidate,std::vector<metsig::SigInputObj> &fSig);
+    /// add muon to input for the significance calculation
     void add(const mithep::Muon        *iMuon,     std::vector<metsig::SigInputObj> &fSig);
+    /// add electron to input for the significance calculation
     void add(const mithep::Electron    *iElectron, std::vector<metsig::SigInputObj> &fSig);
-    TMatrixD getSignificance(const mithep::PFJetCol *iJets,const mithep::PFCandidateCol *iCands,
-			     const mithep::PFTau    *iTau ,const mithep::Muon *iMuon,const mithep::Electron *iElectron);
+    /// get the MET significance
+    TMatrixD getSignificance(const mithep::PFJetCol *iJets,const mithep::PFCandidateCol *iCands, const mithep::PFTau    *iTau ,const mithep::Muon *iMuon,const mithep::Electron *iElectron);
+    /// load resolutions and instantiate SgnAlgoResolutions object
     void loadResolutions();
-    //void setup(const PFJetCol *iJets,const PFCandidateCol *iCands,const PFTauCol *iTaus,
-    //const MuonCol *iMuons,const ElectronCol *iElectrons);
 
   private:
-    double                           fDRLepJetMin;
-    double                           fDRCandMin;
-    mithep::SignAlgoResolutions   *fMetRes;
-    //std::vector<metsig::SigInputObj> *fSig;
-    //const MuonCol                   *fMuons;
-    //const ElectronCol               *fElectrons;
-    //const PFTauCol                  *fTaus;
-    //const PFJetCol                  *fJets;
-    //const PFCandidateCol            *fPFCands;
+    /// minimal distance between jet and leptons (for electorn and muon)
+    double fDRLepJetMin;
+    /// minimal distance between particle flow candidate and particle flow jet
+    double fDRCandMin;
+    /// contains object resolutions for MET significance calculation
+    mithep::SignAlgoResolutions* fMetRes;
   };
 }
 #endif
