@@ -7,13 +7,16 @@
 /**
    \class TSVfit TSVfit.h MitHtt/Ntupler/include/TSVfit.h
 
-   \brief Description: <one line class summary>
+   \brief Description: Bacon svfit input
 
-   <Notes on implementation>
+   All information that is available on Bacon to calculate svfit for a given lepton pair.
+   In principle all this informatino can be recomputed on any level if the particle flow 
+   candidates and the particle flow jets are kept.
 */
 
 namespace mithep 
 {
+  /// four vector with (pt, eta, phi, m) as coordinates
   typedef ROOT::Math::LorentzVector<ROOT::Math::PtEtaPhiM4D<Double_t> > FourVectorM;
 
   class TSVfit : public TObject
@@ -24,22 +27,6 @@ namespace mithep
     /// default destructor
     ~TSVfit(){} 
   
-    /// indicated whether has the fit been successful or not
-    bool isValid;
-    /// return fitted mass
-    double mass;
-    /// return fit uncertainty in up direction
-    double massErrUp;
-    /// return fit uncertainty in down direction
-    double massErrDown;
-    /// obsolete
-    double massMean;
-    /// obsolete
-    double massMedian;
-    /// obsolete
-    double massMaximum;
-    /// obsolete
-    double massMaxInterpol;
     /// met significance matrix element [x|x]
     double cov_00;
     /// met significance matrix element [y|x]
@@ -48,11 +35,12 @@ namespace mithep
     double cov_01;
     /// met significance matrix element [y|y]
     double cov_11;
-    /// di-lepton resonance daughters. NOTE: daughter1 in doubt is always taken to be an electron/muon
+    /// EGenType Id of daughter1 and daughter2
+    unsigned int daughterId1, daughterId2;
+    /// di-lepton resonance daughters.
     FourVectorM daughter1, daughter2;
 
-    /// root class definition
-    ClassDef(TSVfit,2)
+    ClassDef(TSVfit, 1);
   };  
 }
 #endif

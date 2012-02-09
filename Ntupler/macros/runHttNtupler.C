@@ -4,7 +4,7 @@
 #include "MitAna/DataUtil/interface/Debug.h"
 #include "MitAna/Catalog/interface/Catalog.h"
 #include "MitAna/TreeMod/interface/Analysis.h"
-#include "MitHtt/Ntupler/interface/HttNtuplerMod.hh"
+#include "MitHtt/Ntupler/interface/HttNtupler.h"
 #endif
 
 using namespace mithep;
@@ -27,6 +27,7 @@ using namespace mithep;
  *   root -b -l -q runHttNtupler.C+\(\"0000\",\"s11-h100tt-gf-v1g1-pu\",\"t2mit/filefi/022\",\"/home/cmsprod/catalog\",0,1,10,0\)
  *   root -b -l -q runHttNtupler.C+\(\"0000\",\"r11a-mueg-m10-v1\",\"local/filefi/021\",\"/home/cmsprod/catalog\",1,0,-1,1\)
  *   root -b -l -q runHttNtupler.C+\(\"0000\",\"r11a-mueg-m10-v1\",\"local/filefi/021\",\"/home/cmsprod/catalog\",1,0,100,1,\"foo.json\"\)|grep -v '^\*'         
+ *   root -b -l -q runHttNtupler.C+\(\"0000\",\"s11-h120tt-gf-v11-pu\",\"cern/filefi/025\",\"/home/mitprod/catalog\",0,1,100,0\)
  * Output file name has standard format: <dataset>_<fileset>_ntuple.root
  *
  */
@@ -89,7 +90,7 @@ void runHttNtupler(
   //
   // setup ntupler module
   //
-  HttNtuplerMod *mymod = new HttNtuplerMod;
+  HttNtupler *mymod = new HttNtupler;
   mymod->SetOutputName(output);          // output ntuple file name
   mymod->SetIsData(isData);              // toggle data specific or MC specific procedures
   mymod->SetUseGen(useGen);              // use generator info
@@ -215,9 +216,9 @@ void runHttNtupler(
   mymod->AddTrigger("HLT_Mu30_v3",kHLT_Mu30,"hltSingleMu30L3Filtered30",kHLT_Mu30_MuObj);
   mymod->AddTrigger("HLT_Mu30_v4",kHLT_Mu30,"hltSingleMu30L3Filtered30",kHLT_Mu30_MuObj);
   mymod->AddTrigger("HLT_Mu30_v5",kHLT_Mu30,"hltSingleMu30L3Filtered30",kHLT_Mu30_MuObj);
-  mymod->AddTrigger("HLT_Mu40_v5",kHLT_Mu40,"hltSingleMu40L2QualL3Filtered40",kHLT_Mu40_MuObj);
-  mymod->AddTrigger("HLT_Mu40_eta2p1_v1",kHLT_Mu40,"hltL3fL1sMu16Eta2p1L1f0L2f16QL3Filtered40",kHLT_Mu40_MuObj);
-  mymod->AddTrigger("HLT_Mu40_eta2p1_v4",kHLT_Mu40,"hltL3fL1sMu16Eta2p1L1f0L2f16QL3Filtered40",kHLT_Mu40_MuObj);
+  //mymod->AddTrigger("HLT_Mu40_v5",kHLT_Mu40,"hltSingleMu40L2QualL3Filtered40",kHLT_Mu40_MuObj);
+  //mymod->AddTrigger("HLT_Mu40_eta2p1_v1",kHLT_Mu40,"hltL3fL1sMu16Eta2p1L1f0L2f16QL3Filtered40",kHLT_Mu40_MuObj);
+  //mymod->AddTrigger("HLT_Mu40_eta2p1_v4",kHLT_Mu40,"hltL3fL1sMu16Eta2p1L1f0L2f16QL3Filtered40",kHLT_Mu40_MuObj);
   mymod->AddTrigger("HLT_IsoMu17_v5",kHLT_IsoMu17,"hltSingleMuIsoL3IsoFiltered17",kHLT_IsoMu17_MuObj);
   mymod->AddTrigger("HLT_IsoMu17_v6",kHLT_IsoMu17,"hltSingleMuIsoL3IsoFiltered17",kHLT_IsoMu17_MuObj);
   mymod->AddTrigger("HLT_IsoMu17_v8",kHLT_IsoMu17,"hltSingleMuIsoL3IsoFiltered17",kHLT_IsoMu17_MuObj);
@@ -230,8 +231,8 @@ void runHttNtupler(
   mymod->AddTrigger("HLT_IsoMu24_v6",kHLT_IsoMu24,"hltSingleMuIsoL3IsoFiltered24",kHLT_IsoMu24_MuObj);
   mymod->AddTrigger("HLT_IsoMu24_v7",kHLT_IsoMu24,"hltSingleMuIsoL3IsoFiltered24",kHLT_IsoMu24_MuObj);
   mymod->AddTrigger("HLT_IsoMu24_v8",kHLT_IsoMu24,"hltSingleMuIsoL3IsoFiltered24",kHLT_IsoMu24_MuObj);
-  mymod->AddTrigger("HLT_IsoMu30_eta2p1_v3",kHLT_IsoMu30,"hltL3IsoL1sMu14Eta2p1L1f0L2f14QL2IsoL3f30L3IsoFiltered",kHLT_IsoMu30_MuObj);
-  mymod->AddTrigger("HLT_IsoMu30_eta2p1_v3",kHLT_IsoMu30,"hltL3IsoL1sMu14Eta2p1L1f0L2f14QL2IsoL3f30L3IsoFiltered",kHLT_IsoMu30_MuObj);
+  //mymod->AddTrigger("HLT_IsoMu30_eta2p1_v3",kHLT_IsoMu30,"hltL3IsoL1sMu14Eta2p1L1f0L2f14QL2IsoL3f30L3IsoFiltered",kHLT_IsoMu30_MuObj);
+  //mymod->AddTrigger("HLT_IsoMu30_eta2p1_v3",kHLT_IsoMu30,"hltL3IsoL1sMu14Eta2p1L1f0L2f14QL2IsoL3f30L3IsoFiltered",kHLT_IsoMu30_MuObj);
 
   //
   // DoubleElectron
@@ -286,8 +287,8 @@ void runHttNtupler(
   mymod->AddTrigger("HLT_Ele32_CaloIdT_CaloIsoT_TrkIdT_TrkIsoT_SC17_v6",     kHLT_Ele32_CaloIdT_CaloIsoT_TrkIdT_TrkIsoT_SC17, "hltEle32CaloIdTCaloIsoTTrkIdTTrkIsoTSC17TrackIsolFilter", kHLT_Ele32_CaloIdT_CaloIsoT_TrkIdT_TrkIsoT_SC17_EleObj, 0, "hltEle32CaloIdTCaloIsoTTrkIdTTrkIsoTSC17HEDoubleFilter", kHLT_Ele32_CaloIdT_CaloIsoT_TrkIdT_TrkIsoT_SC17_SCObj,0);
   mymod->AddTrigger("HLT_Ele32_CaloIdT_CaloIsoT_TrkIdT_TrkIsoT_SC17_v7",     kHLT_Ele32_CaloIdT_CaloIsoT_TrkIdT_TrkIsoT_SC17, "hltEle32CaloIdTCaloIsoTTrkIdTTrkIsoTSC17TrackIsolFilter", kHLT_Ele32_CaloIdT_CaloIsoT_TrkIdT_TrkIsoT_SC17_EleObj, 0, "hltEle32CaloIdTCaloIsoTTrkIdTTrkIsoTSC17HEDoubleFilter", kHLT_Ele32_CaloIdT_CaloIsoT_TrkIdT_TrkIsoT_SC17_SCObj,0);
 
-  mymod->AddTrigger("HLT_Ele32_CaloIdT_CaloIsoT_TrkIdT_TrkIsoT_Ele17_v1",    kHLT_Ele32_CaloIdT_CaloIsoT_TrkIdT_TrkIsoT_Ele17, "hltEle32CaloIdTCaloIsoTTrkIdTTrkIsoTEle17TrackIsolFilter", kHLT_Ele32_CaloIdT_CaloIsoT_TrkIdT_TrkIsoT_Ele17_Ele1Obj, 0, "hltEle32CaloIdTCaloIsoTTrkIdTTrkIsoTEle17PixelMatchDoubleFilter", kHLT_Ele32_CaloIdT_CaloIsoT_TrkIdT_TrkIsoT_Ele17_Ele2Obj, 0);
-  mymod->AddTrigger("HLT_Ele32_CaloIdT_CaloIsoT_TrkIdT_TrkIsoT_Ele17_v2",    kHLT_Ele32_CaloIdT_CaloIsoT_TrkIdT_TrkIsoT_Ele17, "hltEle32CaloIdTCaloIsoTTrkIdTTrkIsoTEle17TrackIsolFilter", kHLT_Ele32_CaloIdT_CaloIsoT_TrkIdT_TrkIsoT_Ele17_Ele1Obj, 0, "hltEle32CaloIdTCaloIsoTTrkIdTTrkIsoTEle17PixelMatchDoubleFilter", kHLT_Ele32_CaloIdT_CaloIsoT_TrkIdT_TrkIsoT_Ele17_Ele2Obj, 0);
+  //mymod->AddTrigger("HLT_Ele32_CaloIdT_CaloIsoT_TrkIdT_TrkIsoT_Ele17_v1",    kHLT_Ele32_CaloIdT_CaloIsoT_TrkIdT_TrkIsoT_Ele17, "hltEle32CaloIdTCaloIsoTTrkIdTTrkIsoTEle17TrackIsolFilter", kHLT_Ele32_CaloIdT_CaloIsoT_TrkIdT_TrkIsoT_Ele17_Ele1Obj, 0, "hltEle32CaloIdTCaloIsoTTrkIdTTrkIsoTEle17PixelMatchDoubleFilter", kHLT_Ele32_CaloIdT_CaloIsoT_TrkIdT_TrkIsoT_Ele17_Ele2Obj, 0);
+  //mymod->AddTrigger("HLT_Ele32_CaloIdT_CaloIsoT_TrkIdT_TrkIsoT_Ele17_v2",    kHLT_Ele32_CaloIdT_CaloIsoT_TrkIdT_TrkIsoT_Ele17, "hltEle32CaloIdTCaloIsoTTrkIdTTrkIsoTEle17TrackIsolFilter", kHLT_Ele32_CaloIdT_CaloIsoT_TrkIdT_TrkIsoT_Ele17_Ele1Obj, 0, "hltEle32CaloIdTCaloIsoTTrkIdTTrkIsoTEle17PixelMatchDoubleFilter", kHLT_Ele32_CaloIdT_CaloIsoT_TrkIdT_TrkIsoT_Ele17_Ele2Obj, 0);
 
   mymod->AddTrigger("HLT_Ele17_CaloIdVT_CaloIsoVT_TrkIdT_TrkIsoVT_SC8_Mass30_v1", kHLT_Ele17_CaloIdVT_CaloIsoVT_TrkIdT_TrkIsoVT_SC8_Mass30, "hltEle17CaloIdVTCaloIsoVTTrkIdTTrkIsoVTSC8TrackIsolFilter", kHLT_Ele17_CaloIdVT_CaloIsoVT_TrkIdT_TrkIsoVT_SC8_Mass30_EleObj, 0, "hltEle17CaloIdVTCaloIsoVTTrkIdTTrkIsoVTSC8PMMassFilter", kHLT_Ele17_CaloIdVT_CaloIsoVT_TrkIdT_TrkIsoVT_SC8_Mass30_SCObj);
   mymod->AddTrigger("HLT_Ele17_CaloIdVT_CaloIsoVT_TrkIdT_TrkIsoVT_SC8_Mass30_v2", kHLT_Ele17_CaloIdVT_CaloIsoVT_TrkIdT_TrkIsoVT_SC8_Mass30, "hltEle17CaloIdVTCaloIsoVTTrkIdTTrkIsoVTSC8TrackIsolFilter", kHLT_Ele17_CaloIdVT_CaloIsoVT_TrkIdT_TrkIsoVT_SC8_Mass30_EleObj, 0, "hltEle17CaloIdVTCaloIsoVTTrkIdTTrkIsoVTSC8PMMassFilter", kHLT_Ele17_CaloIdVT_CaloIsoVT_TrkIdT_TrkIsoVT_SC8_Mass30_SCObj);
@@ -399,41 +400,41 @@ void runHttNtupler(
   mymod->AddTrigger("HLT_Photon20_CaloIdVT_IsoT_Ele8_CaloIdL_CaloIsoVL_v9", kHLT_Photon20_CaloIdVT_IsoT_Ele8_CaloIdL_CaloIsoVL , "hltPhoton20CaloIdVTIsoTTrackIsoFilter", kHLT_Photon20_CaloIdVT_IsoT_Ele8_CaloIdL_CaloIsoVL_PhoObj, 0, "hltEle8CaloIdLCaloIsoVLNoL1SeedPixelMatchFilter" , kHLT_Photon20_CaloIdVT_IsoT_Ele8_CaloIdL_CaloIsoVL_EleObj, 0);
   mymod->AddTrigger("HLT_Photon20_CaloIdVT_IsoT_Ele8_CaloIdL_CaloIsoVL_v10", kHLT_Photon20_CaloIdVT_IsoT_Ele8_CaloIdL_CaloIsoVL , "hltPhoton20CaloIdVTIsoTTrackIsoFilter", kHLT_Photon20_CaloIdVT_IsoT_Ele8_CaloIdL_CaloIsoVL_PhoObj, 0, "hltEle8CaloIdLCaloIsoVLNoL1SeedPixelMatchFilter" , kHLT_Photon20_CaloIdVT_IsoT_Ele8_CaloIdL_CaloIsoVL_EleObj, 0);
 
-  mymod->AddTrigger("HLT_Jet30_v1", kHLT_Jet30 , "hltSingleJet30", kHLT_Jet30_JetObj);
-  mymod->AddTrigger("HLT_Jet30_v2", kHLT_Jet30 , "hltSingleJet30", kHLT_Jet30_JetObj);
-  mymod->AddTrigger("HLT_Jet30_v3", kHLT_Jet30 , "hltSingleJet30", kHLT_Jet30_JetObj);
-  mymod->AddTrigger("HLT_Jet30_v4", kHLT_Jet30 , "hltSingleJet30", kHLT_Jet30_JetObj);
-  mymod->AddTrigger("HLT_Jet30_v5", kHLT_Jet30 , "hltSingleJet30", kHLT_Jet30_JetObj);
-  mymod->AddTrigger("HLT_Jet30_v6", kHLT_Jet30 , "hltSingleJet30", kHLT_Jet30_JetObj);
-  mymod->AddTrigger("HLT_Jet60_v1", kHLT_Jet60 , "hltSingleJet60Regional", kHLT_Jet60_JetObj);
-  mymod->AddTrigger("HLT_Jet60_v2", kHLT_Jet60 , "hltSingleJet60Regional", kHLT_Jet60_JetObj);
-  mymod->AddTrigger("HLT_Jet60_v3", kHLT_Jet60 , "hltSingleJet60Regional", kHLT_Jet60_JetObj);
-  mymod->AddTrigger("HLT_Jet60_v4", kHLT_Jet60 , "hltSingleJet60Regional", kHLT_Jet60_JetObj);
-  mymod->AddTrigger("HLT_Jet60_v5", kHLT_Jet60 , "hltSingleJet60Regional", kHLT_Jet60_JetObj);
-  mymod->AddTrigger("HLT_Jet60_v6", kHLT_Jet60 , "hltSingleJet60Regional", kHLT_Jet60_JetObj);
-  mymod->AddTrigger("HLT_Jet80_v1", kHLT_Jet80 , "hltSingleJet80Regional", kHLT_Jet80_JetObj);
-  mymod->AddTrigger("HLT_Jet80_v2", kHLT_Jet80 , "hltSingleJet80Regional", kHLT_Jet80_JetObj);
-  mymod->AddTrigger("HLT_Jet80_v3", kHLT_Jet80 , "hltSingleJet80Regional", kHLT_Jet80_JetObj);
-  mymod->AddTrigger("HLT_Jet80_v4", kHLT_Jet80 , "hltSingleJet80Regional", kHLT_Jet80_JetObj);
-  mymod->AddTrigger("HLT_Jet80_v5", kHLT_Jet80 , "hltSingleJet80Regional", kHLT_Jet80_JetObj);
-  mymod->AddTrigger("HLT_Jet80_v6", kHLT_Jet80 , "hltSingleJet80Regional", kHLT_Jet80_JetObj);
-  mymod->AddTrigger("HLT_Jet110_v1", kHLT_Jet110 , "hltSingleJet110Regional", kHLT_Jet110_JetObj);
-  mymod->AddTrigger("HLT_Jet110_v2", kHLT_Jet110 , "hltSingleJet110Regional", kHLT_Jet110_JetObj);
-  mymod->AddTrigger("HLT_Jet110_v3", kHLT_Jet110 , "hltSingleJet110Regional", kHLT_Jet110_JetObj);
-  mymod->AddTrigger("HLT_Jet110_v4", kHLT_Jet110 , "hltSingleJet110Regional", kHLT_Jet110_JetObj);
-  mymod->AddTrigger("HLT_Jet110_v5", kHLT_Jet110 , "hltSingleJet110Regional", kHLT_Jet110_JetObj);
-  mymod->AddTrigger("HLT_Jet110_v6", kHLT_Jet110 , "hltSingleJet110Regional", kHLT_Jet110_JetObj);
+  //mymod->AddTrigger("HLT_Jet30_v1", kHLT_Jet30 , "hltSingleJet30", kHLT_Jet30_JetObj);
+  //mymod->AddTrigger("HLT_Jet30_v2", kHLT_Jet30 , "hltSingleJet30", kHLT_Jet30_JetObj);
+  //mymod->AddTrigger("HLT_Jet30_v3", kHLT_Jet30 , "hltSingleJet30", kHLT_Jet30_JetObj);
+  //mymod->AddTrigger("HLT_Jet30_v4", kHLT_Jet30 , "hltSingleJet30", kHLT_Jet30_JetObj);
+  //mymod->AddTrigger("HLT_Jet30_v5", kHLT_Jet30 , "hltSingleJet30", kHLT_Jet30_JetObj);
+  //mymod->AddTrigger("HLT_Jet30_v6", kHLT_Jet30 , "hltSingleJet30", kHLT_Jet30_JetObj);
+  //mymod->AddTrigger("HLT_Jet60_v1", kHLT_Jet60 , "hltSingleJet60Regional", kHLT_Jet60_JetObj);
+  //mymod->AddTrigger("HLT_Jet60_v2", kHLT_Jet60 , "hltSingleJet60Regional", kHLT_Jet60_JetObj);
+  //mymod->AddTrigger("HLT_Jet60_v3", kHLT_Jet60 , "hltSingleJet60Regional", kHLT_Jet60_JetObj);
+  //mymod->AddTrigger("HLT_Jet60_v4", kHLT_Jet60 , "hltSingleJet60Regional", kHLT_Jet60_JetObj);
+  //mymod->AddTrigger("HLT_Jet60_v5", kHLT_Jet60 , "hltSingleJet60Regional", kHLT_Jet60_JetObj);
+  //mymod->AddTrigger("HLT_Jet60_v6", kHLT_Jet60 , "hltSingleJet60Regional", kHLT_Jet60_JetObj);
+  //mymod->AddTrigger("HLT_Jet80_v1", kHLT_Jet80 , "hltSingleJet80Regional", kHLT_Jet80_JetObj);
+  //mymod->AddTrigger("HLT_Jet80_v2", kHLT_Jet80 , "hltSingleJet80Regional", kHLT_Jet80_JetObj);
+  //mymod->AddTrigger("HLT_Jet80_v3", kHLT_Jet80 , "hltSingleJet80Regional", kHLT_Jet80_JetObj);
+  //mymod->AddTrigger("HLT_Jet80_v4", kHLT_Jet80 , "hltSingleJet80Regional", kHLT_Jet80_JetObj);
+  //mymod->AddTrigger("HLT_Jet80_v5", kHLT_Jet80 , "hltSingleJet80Regional", kHLT_Jet80_JetObj);
+  //mymod->AddTrigger("HLT_Jet80_v6", kHLT_Jet80 , "hltSingleJet80Regional", kHLT_Jet80_JetObj);
+  //mymod->AddTrigger("HLT_Jet110_v1", kHLT_Jet110 , "hltSingleJet110Regional", kHLT_Jet110_JetObj);
+  //mymod->AddTrigger("HLT_Jet110_v2", kHLT_Jet110 , "hltSingleJet110Regional", kHLT_Jet110_JetObj);
+  //mymod->AddTrigger("HLT_Jet110_v3", kHLT_Jet110 , "hltSingleJet110Regional", kHLT_Jet110_JetObj);
+  //mymod->AddTrigger("HLT_Jet110_v4", kHLT_Jet110 , "hltSingleJet110Regional", kHLT_Jet110_JetObj);
+  //mymod->AddTrigger("HLT_Jet110_v5", kHLT_Jet110 , "hltSingleJet110Regional", kHLT_Jet110_JetObj);
+  //mymod->AddTrigger("HLT_Jet110_v6", kHLT_Jet110 , "hltSingleJet110Regional", kHLT_Jet110_JetObj);
 
-  mymod->AddTrigger("HLT_Mu3_v3", kHLT_Mu3 , "hltSingleMu3L3Filtered3", kHLT_Mu3_MuObj);
-  mymod->AddTrigger("HLT_Mu3_v4", kHLT_Mu3 , "hltSingleMu3L3Filtered3", kHLT_Mu3_MuObj);
-  mymod->AddTrigger("HLT_Mu3_v5", kHLT_Mu3 , "hltSingleMu3L3Filtered3", kHLT_Mu3_MuObj);
-  mymod->AddTrigger("HLT_Mu3_v7", kHLT_Mu3 , "hltSingleMu3L3Filtered3", kHLT_Mu3_MuObj);
-  mymod->AddTrigger("HLT_Mu3_v9", kHLT_Mu3 , "hltSingleMu3L3Filtered3", kHLT_Mu3_MuObj);
-  mymod->AddTrigger("HLT_Mu5_v3", kHLT_Mu5 , "hltSingleMu5L3Filtered5", kHLT_Mu5_MuObj);
-  mymod->AddTrigger("HLT_Mu5_v4", kHLT_Mu5 , "hltSingleMu5L3Filtered5", kHLT_Mu5_MuObj);
-  mymod->AddTrigger("HLT_Mu5_v5", kHLT_Mu5 , "hltSingleMu5L3Filtered5", kHLT_Mu5_MuObj);
-  mymod->AddTrigger("HLT_Mu5_v7", kHLT_Mu5 , "hltSingleMu5L3Filtered5", kHLT_Mu5_MuObj);
-  mymod->AddTrigger("HLT_Mu5_v9", kHLT_Mu5 , "hltSingleMu5L3Filtered5", kHLT_Mu5_MuObj);
+  //mymod->AddTrigger("HLT_Mu3_v3", kHLT_Mu3 , "hltSingleMu3L3Filtered3", kHLT_Mu3_MuObj);
+  //mymod->AddTrigger("HLT_Mu3_v4", kHLT_Mu3 , "hltSingleMu3L3Filtered3", kHLT_Mu3_MuObj);
+  //mymod->AddTrigger("HLT_Mu3_v5", kHLT_Mu3 , "hltSingleMu3L3Filtered3", kHLT_Mu3_MuObj);
+  //mymod->AddTrigger("HLT_Mu3_v7", kHLT_Mu3 , "hltSingleMu3L3Filtered3", kHLT_Mu3_MuObj);
+  //mymod->AddTrigger("HLT_Mu3_v9", kHLT_Mu3 , "hltSingleMu3L3Filtered3", kHLT_Mu3_MuObj);
+  //mymod->AddTrigger("HLT_Mu5_v3", kHLT_Mu5 , "hltSingleMu5L3Filtered5", kHLT_Mu5_MuObj);
+  //mymod->AddTrigger("HLT_Mu5_v4", kHLT_Mu5 , "hltSingleMu5L3Filtered5", kHLT_Mu5_MuObj);
+  //mymod->AddTrigger("HLT_Mu5_v5", kHLT_Mu5 , "hltSingleMu5L3Filtered5", kHLT_Mu5_MuObj);
+  //mymod->AddTrigger("HLT_Mu5_v7", kHLT_Mu5 , "hltSingleMu5L3Filtered5", kHLT_Mu5_MuObj);
+  //mymod->AddTrigger("HLT_Mu5_v9", kHLT_Mu5 , "hltSingleMu5L3Filtered5", kHLT_Mu5_MuObj);
 
 
 
@@ -501,7 +502,7 @@ void runHttNtupler(
 //   //
 //   // setup ntupler module
 //   //
-//   HttNtuplerMod *mymod = new HttNtuplerMod;
+//   HttNtupler *mymod = new HttNtupler;
 //   mymod->SetOutputName(output);          // output ntuple file name
 //   mymod->SetIsData(isData);              // toggle data specific or MC specific procedures
 //   mymod->SetUseGen(useGen);              // use generator info

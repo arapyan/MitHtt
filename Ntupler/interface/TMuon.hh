@@ -1,48 +1,87 @@
 #ifndef MITHTT_NTUPLER_TMUON_HH
 #define MITHTT_NTUPLER_TMUON_HH
 
-#include <TObject.h>
+#include "TObject.h"
+#include "MitHtt/Ntupler/interface/HiggsAnaDefs.hh"
+
+/**
+   \class TMuon TMuon.h MitHtt/Ntupler/include/TMuon.h
+
+   \brief Description: Bacon muon
+
+   All information that is available on a Bacon muon.
+*/
 
 namespace mithep 
 {
   class TMuon : public TObject
   {
-    public:
-      TMuon(){}
-      ~TMuon(){} 
-  
-      Float_t pt, ptErr, eta, phi;    // kinematics
-      Float_t staPt, staEta, staPhi;  // standalone muon measurements
-      Float_t trkIso03;	              // track isolation
-      Float_t emIso03;	              // ECAL-based isolation
-      Float_t hadIso03;	              // HCAL-based isolation
-      Float_t pfIso03, pfIso04;       // Particle Flow isolation
-      Float_t pfPx, pfPy;             // Matching Particle Flow candidate (px,py)
-      Float_t d0, dz;                 // impact parameter
-      Float_t tkNchi2;	              // track chi^2/ndf 
-      Float_t muNchi2;	              // global muon chi^2/ndf
-      Int_t   q;		      // charge
-      Int_t   nValidHits;	      // number of valid hits in muon system
-      UInt_t  qualityBits;            // bits for various muon quality criteria
-      UInt_t  typeBits;	              // global muon, tracker muon, or standalone muon
-      UInt_t  nTkHits;	              // number of inner tracker hits
-      UInt_t  nPixHits;	              // number of pixel hits
-      UInt_t  nSeg;  	              // number of muon segments
-      UInt_t  nMatch;                 // number of muon chambers matched to segments
-      ULong64_t  hltMatchBits;           // bits for matching with HLT primitives 
-      UInt_t  trkID;                  // tracker track ID
-      // Mike's PF Isolation
-      Float_t pfIsoCharged;
-      Float_t pfIsoChargedNoZ;
-      Float_t pfIsoNeutral;
-      Float_t pfIsoNeutralNoZ;
-      Float_t pfIsoGamma;
-      Float_t pfIsoGammaNoZ;
-      Float_t puIso;
-      Float_t puIsoNoZ;
-
-
-    ClassDef(TMuon,3)
+  public:
+    /// default constructor
+    TMuon(){}
+    /// default destructor
+    ~TMuon(){} 
+    
+    /// kinematics of the muon
+    float pt, eta, phi, ptErr;
+    /// kinematics from standalone muon (-9999. if standalone track does not exist)
+    float staPt, staEta, staPhi;
+    /// classic detector based track isolation with isolation cone of 0.3
+    float trkIso03;
+    /// classic detector based ECAL isolation with isolation cone of 0.3
+    float emIso03;
+    /// classic detector based HCAL isolation with isolation cone of 0.3
+    float hadIso03;
+    /// particle flow isolation with charged component restricted to the hard interaction vertex with isolation cone 0.3 and 0.4
+    float pfIso03, pfIso04;
+    /// impact parameter wrt the selected primary vertex along the z-axis and perpendicular to to the z-axis
+    float d0, dz;
+    /// 3d impact parameter and 3d impact parameter significance
+    float ip3d, ip3dSig;
+    /// track chi**2/ndof
+    float tkNchi2;
+    /// muon fit chi**2/ndof (in order global, standalone, tracker); first come first fill
+    float muNchi2;
+    /// muon charge
+    int q;
+    /// number of valid hits in muon chambers (filled directly from Bambu NValidHits)
+    int nValidHits;
+    /// muon quality bit mask (filled from Bambu Quality().QualityMask().Mask())
+    unsigned int qualityBits;
+    /// muon type bits (kGlobal, kTracker, kStandalone)
+    unsigned int  typeBits;	              // global muon, tracker muon, or standalone muon
+    /// number of tracker hits (0 if the muon does not have a tracker track)
+    unsigned int nTkHits;
+    /// number of pixel hits
+    unsigned int nPixHits;
+    /// number of hit segments in the muon system 
+    unsigned int nSeg;
+    /// number of muon chambers that match to track segments 
+    unsigned int nMatch;
+    /// HLT bits for which the offline reconstructed muon could be matched on trigger level
+    TriggerBits hltMatchBits;
+    /// unique track ID (filled from Bambu TrackerTrk()->GetUniqueID())    
+    unsigned int trkID;
+    /// common isolation from pfNoPileup, ptMin=0.0, dRMax=0.4, dRMin=0.0001, type charged hadron  
+    float pfIsoCharged;
+    /// common isolation from pfNoPileup, ptMin=0.0, dRMax=0.4, dRMin=0.0001, type charged hadron (no Z restriction)
+    float pfIsoChargedNoZ;
+    /// common isolation from pfNoPileup, ptMin=0.5, dRMax=0.4, dRMin=0.01  , type neutral hadron  
+    float pfIsoNeutral;
+    /// common isolation from pfNoPileup, ptMin=0.5, dRMax=0.4, dRMin=0.01  , type neutral hadron (no Z restriction)
+    float pfIsoNeutralNoZ;
+    /// common isolation from pfNoPileup, ptMin=0.5, dRMax=0.4, dRMin=0.01  , type photon
+    float pfIsoGamma;
+    /// common isolation from pfNoPileup, ptMin=0.5, dRMax=0.4, dRMin=0.01  , type photon (no Z restriction)
+    float pfIsoGammaNoZ;
+    /// naive isolation from pfPileup ptMin=0.5, dRMax=0.4, dRMin=0.01
+    float puIso;
+    /// naive isolation from pfPileup ptMin=0.5, dRMax=0.4, dRMin=0.01 (no Z restriction)
+    float puIsoNoZ;
+    /// px and py of the matching particle flow candidate
+    float pfPx, pfPy;
+    
+    ClassDef(TMuon, 1)
   };  
 }
 #endif
