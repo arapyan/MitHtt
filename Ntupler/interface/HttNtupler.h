@@ -379,6 +379,8 @@ namespace mithep
     JetCorrectionUncertainty* fJetUncertainties;
     /// electron tools
     ElectronTools* fEleTools;
+    //met significance
+    MetSignificance* metSign;
     /// list JSON files to be applied
     std::vector<TString> fJSONv;
     /// map of certified runs and lumi sections (for internal use)
