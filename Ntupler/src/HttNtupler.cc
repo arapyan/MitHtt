@@ -132,6 +132,9 @@ HttNtupler::SlaveBegin()
   fJetUncertainties = new JetCorrectionUncertainty(param);
   // initialize tools for electron ID
   fEleTools = new ElectronTools();
+
+  metSign = new MetSignificance();
+  
   // setup selection with JSON file, if necessary
   for(unsigned int idx=0; idx<fJSONv.size(); ++idx){
     frlrm.AddJSONFile(fJSONv[idx].Data());
@@ -154,7 +157,8 @@ void
 HttNtupler::SlaveTerminate()
 {
   fEventTree ->Print(); fOutputFile->Write(); fOutputFile->Close(); cleanup();
-  delete fJetCorrector; delete fJetUncertainties; delete fEleTools;
+  delete fJetCorrector; delete fJetUncertainties; delete fEleTools, delete metSign;
+
   // dump json file
   TString jsonfname = fOutputName.ReplaceAll("root","json");
   if( fIsData ){
@@ -266,87 +270,29 @@ HttNtupler::fillGenerator()
   assert(fParticles);
   const MCParticle* boson_a=0, *dau1_a=0, *dau2_a=0; 
   const MCParticle* boson_b=0, *dau1_b=0, *dau2_b=0;
-  const MCParticle* top=0, *tbar=0;
-  bool lNext = false;
   for(unsigned int i=0; i<fParticles->GetEntries(); ++i){
     const MCParticle* p = fParticles->At(i);
-    // fill status 3 muon or electron
-    if(p->Status() == 3 && (p->AbsPdgId() == 13 || p->AbsPdgId() == 11) && dau1_a == 0) dau1_a = p;
-    if(p->Status() == 3 && (p->AbsPdgId() == 13 || p->AbsPdgId() == 11) && dau1_a != 0) dau2_a = p;
-    if(p->Status() == 1 && lNext && dau1_a == 0) {dau1_a = p; lNext = false; }
-    if(p->Status() == 1 && lNext && dau1_a != 0) {dau2_a = p; lNext = false; }
-    if(p->Status() == 1 && p->AbsPdgId() == 16 ) { lNext = true; }
     if((p->Status() != 3 && fUseGen != ESampleType::kEmbed) || (fUseGen == ESampleType::kEmbed && p->Status() != 2)) continue;
     // fill boson 
     int id = p->PdgId();
     if((fUseGen==ESampleType::kH)      && (id==25 || id==35 || id==36)) boson_a = p;
-    if((fUseGen==ESampleType::kH)      && (id==25 || id==35 || id==36)) boson_a = p;
     if((fUseGen==ESampleType::kEmbed)  &&  id== 23)                     boson_a = p;
     if((fUseGen==ESampleType::kZ)      &&  id== 23)                     boson_a = p;
-    if((fUseGen==ESampleType::kW)      &&  id== 24)                     boson_a = p;
-    if((fUseGen==ESampleType::kW)      &&  id==-24)                     boson_a = p;
     if((fUseGen==ESampleType::kVV) && (id==23 || abs(id)==24)) { if(!boson_a) { boson_a = p; } else if(!boson_b) boson_b = p; }
-    if((fUseGen==ESampleType::kHWW) && (id==25 || id==35 || id==36)) {
-      const MCParticle* pHig = p;
-      for(unsigned int i0=0; i0<pHig->NDaughters(); ++i0){
-	const MCParticle* pD = pHig->Daughter(i0);
-	if(pD->PdgId() ==  24) boson_a = pD; 
-	if(pD->PdgId() == -24) boson_b = pD; 
-      }
-    }
-    if((fUseGen==ESampleType::kHZZ) && (id==25 || id==35 || id==36)) {
-      const MCParticle* pHig = p;
-      for(unsigned int i0=0; i0<pHig->NDaughters(); ++i0){
-	const MCParticle* pD = pHig->Daughter(i0);
-	if(pD->PdgId()==23) {
-	  assert(!(boson_a && boson_b));
-	  if(!boson_a)       boson_a = pD; 
-	  else if(!boson_b)  boson_b = pD; 
-	}
-      }
-    }
-    if(fUseGen==ESampleType::kVttH) {
-      if(id==25 || id==35 || id==36)  boson_a = p; 
-      if(id ==  6)                    top     = p; 
-      if(id == -6)                    tbar    = p; 
-      if(!(top && tbar))              boson_b = p; 
-    }
   }
-  if(fUseGen==ESampleType::kHZZ && !boson_a && !boson_b) { cout << "Error! no bosons. HZZ" << endl; return;}
   // special treatment for powheg-herwig interface...
   if(!boson_a ) {
     assert(boson_b);
-    if(fUseGen==ESampleType::kVttH) {
-      while(!boson_a) {
-	boson_a = boson_b->FindDaughter(25);
-	boson_b = boson_b->FindDaughter(boson_b->PdgId());
-      }
-    }
     while(boson_a->NDaughters()==1) boson_a = boson_a->FindDaughter(boson_a->PdgId());
     while(boson_b->NDaughters()==1) boson_b = boson_b->FindDaughter(boson_b->PdgId());
   }
   assert(boson_a);
   // madgraph zz sample has a few one-z events
   if(fUseGen==ESampleType::kVV && !boson_b && boson_a->NDaughters()==5) boson_b = boson_a;
-  if(fUseGen==ESampleType::kVV || fUseGen==ESampleType::kHWW || fUseGen==ESampleType::kHZZ) assert(boson_b);
+  if(fUseGen==ESampleType::kVV) assert(boson_b);
   // assign daughters for first boson
   if(boson_a) fillMCParticles(boson_a,dau1_a,dau2_a);
   // assign daughters for second boson
-  if((fUseGen==ESampleType::kVttH) && top && tbar) { 
-    // get charged daughters of Ws from top quarks
-    const MCParticle* w1 = top->FindDaughter(24, true); 
-    for(unsigned int idau=0; idau<w1->NDaughters(); ++idau){
-      const MCParticle* d = w1->Daughter(idau);
-      if(d->PdgId() == w1->PdgId()) continue;
-      (d->Charge() > 0 ) ?  dau1_b = d : dau2_b = d;
-    }
-    const MCParticle* w2 = tbar->FindDaughter(-24,kTRUE); assert(w2);
-    for(unsigned idau=0; idau<w2->NDaughters(); ++idau){
-      const MCParticle* d = w2->Daughter(idau);
-      if(d->PdgId() == w2->PdgId()) continue;
-      (d->Charge() > 0 ) ?  dau1_b = d : dau2_b = d;
-    }
-  }
   else if(boson_b) fillMCParticles(boson_b,dau1_b,dau2_b);
   // madgraph zz sample...
   if(fUseGen==ESampleType::kVV && boson_a->NDaughters()==5) {
@@ -396,25 +342,24 @@ HttNtupler::fillGenerator()
   
   if(dau1_a != 0) { 
     FourVectorM lL1;  int lId1 = 0;
-    if(fUseGen==ESampleType::kZ && fabs(pdgId(dau1_a)) == EGenType::kTauHadr) {
-      lL1  = visibleMCMomentum(dau1_a); 
-      lId1 = EGenType::kTauHadr;
-    }
-    fGenInfo.pt_1_b   = dau1_b ? dau1_b->Pt()	: lL1.Pt(); 
-    fGenInfo.eta_1_b  = dau1_b ? dau1_b->Eta()	: lL1.Eta(); 
-    fGenInfo.phi_1_b  = dau1_b ? dau1_b->Phi()	: lL1.Phi();
-    fGenInfo.id_1_b   = dau1_b ? pdgId(dau1_b)  : lId1;
+ 
+    lL1  = visibleMCMomentum(dau1_a); 
+    lId1 = pdgId(dau1_a);
+    
+    fGenInfo.pt_1_b   = lL1.Pt(); 
+    fGenInfo.eta_1_b  = lL1.Eta(); 
+    fGenInfo.phi_1_b  = lL1.Phi();
+    fGenInfo.id_1_b   = lId1;
   } 
   if(dau2_a != 0) { 
-      FourVectorM lL2; int lId2 = 0;
-      if(fUseGen==ESampleType::kZ && fabs(pdgId(dau2_a)) == EGenType::kTauHadr) {
-	lL2  = visibleMCMomentum(dau2_a);
-	lId2 = EGenType::kTauHadr;
-      }
-      fGenInfo.pt_2_b   = dau2_b ? dau2_b->Pt()	 : lL2.Pt();
-      fGenInfo.eta_2_b  = dau2_b ? dau2_b->Eta() : lL2.Eta(); 
-      fGenInfo.phi_2_b  = dau2_b ? dau2_b->Phi() : lL2.Phi(); 
-      fGenInfo.id_2_b   = dau2_b ? pdgId(dau2_b) : lId2;
+    FourVectorM lL2; int lId2 = 0;
+    lL2  = visibleMCMomentum(dau2_a);
+    lId2 = pdgId(dau2_a);
+    
+    fGenInfo.pt_2_b   = lL2.Pt();
+    fGenInfo.eta_2_b  = lL2.Eta(); 
+    fGenInfo.phi_2_b  = lL2.Phi(); 
+    fGenInfo.id_2_b   = lId2;
   }
   fGenInfo.decx   = boson_a->DecayVertex().X();
   fGenInfo.decy   = boson_a->DecayVertex().Y(); 
@@ -870,13 +815,12 @@ HttNtupler::fillPhotons()
 void 
 HttNtupler::fillSVfit() 
 { 
-  MetSignificance metSign;
   for(unsigned int idx=0; idx<fMuons->GetEntries(); ++idx){ 
     const Muon* pMu = fMuons->At(idx); if( !looseMuId(pMu) ){ continue; }
     for(unsigned int jdx=0; jdx<fElectrons->GetEntries(); ++jdx){ 
       const Electron* pElectron = fElectrons->At(jdx); if( !looseEleId(pElectron) ){ continue; }
       if( MathUtils::DeltaR(pElectron->Mom(), pMu->Mom()) < 0.3 ){ continue; }
-      TMatrixD lMetMatrix = metSign.getSignificance(fPFJets, fPFCandidates, 0, pMu, pElectron);	
+      TMatrixD lMetMatrix = metSign->getSignificance(fPFJets, fPFCandidates, 0, pMu, pElectron);	
       fillSVfit(fSVfitEMuArr, (Particle*)pMu, EGenType::kMuon, (Particle*)pElectron, EGenType::kElectron, lMetMatrix);
     }
   }
@@ -885,14 +829,14 @@ HttNtupler::fillSVfit()
     for(unsigned int jdx=0; jdx<fMuons->GetEntries(); ++jdx){
       const Muon* pMu = fMuons->At(jdx); if( !looseMuId(pMu) ){ continue; }
       if( MathUtils::DeltaR(pPFTau->Mom(), pMu->Mom())<0.3 ){ continue; }
-      TMatrixD lMetMatrix = metSign.getSignificance(fPFJets, fPFCandidates, pPFTau, pMu, 0);
-      std::cout << "fill" << std::endl;	
+      TMatrixD lMetMatrix = metSign->getSignificance(fPFJets, fPFCandidates, pPFTau, pMu, 0);
+      //std::cout << "fill" << std::endl;	
       fillSVfit(fSVfitMuTauArr, (Particle*)pMu, EGenType::kMuon, (Particle*)pPFTau, EGenType::kTau, lMetMatrix);
     }
     for(unsigned int jdx=0; jdx<fElectrons->GetEntries(); ++jdx){ 
       const Electron* pElectron = fElectrons->At(jdx); if( !looseEleId(pElectron) ){ continue; }
       if( MathUtils::DeltaR(pPFTau->Mom(), pElectron->Mom())<0.3 ){ continue; }
-      TMatrixD lMetMatrix = metSign.getSignificance(fPFJets, fPFCandidates, pPFTau, 0, pElectron);	
+      TMatrixD lMetMatrix = metSign->getSignificance(fPFJets, fPFCandidates, pPFTau, 0, pElectron);	
       fillSVfit(fSVfitETauArr, (Particle*)pElectron, EGenType::kElectron, (Particle*)pPFTau, EGenType::kTau, lMetMatrix);
     }
   }
@@ -906,7 +850,7 @@ HttNtupler::fillSVfit(TClonesArray*& iArr, Particle* lep1, unsigned int lepId1, 
   new(rSVfitArr[index]) TSVfit();
   TSVfit* pSVfit = (TSVfit*)rSVfitArr[index];
   pSVfit->daughter1 = lep1->Mom(); pSVfit->daughterId1 = lepId1;
-  pSVfit->daughter2 = lep2->Mom(); pSVfit->daughterId1 = lepId2;
+  pSVfit->daughter2 = lep2->Mom(); pSVfit->daughterId2 = lepId2;
   pSVfit->cov_00 = iMatrix(0,0)  ; pSVfit->cov_10 = iMatrix(1,0);
   pSVfit->cov_01 = iMatrix(0,1)  ; pSVfit->cov_11 = iMatrix(1,1);
 }
