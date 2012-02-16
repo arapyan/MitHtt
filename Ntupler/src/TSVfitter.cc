@@ -38,6 +38,12 @@ TLorentzVector mithep::TSVfitter::fit(mithep::TSVfit* fit, double iMet, double i
   algo.fit(); 
   NSVfitStandalone::LorentzVector lL  = algo.fittedDiTauSystem(); TLorentzVector result;
   result.SetXYZM(lL.x(), lL.y(), lL.z(), lL.mass());
+  //Fill Additional variables
+  fMassUnc      = algo.massUncert();
+  fFittedMET    = algo.fittedMET().Pt();
+  fFittedMETPhi = algo.fittedMET().Phi();
+  fMeasMET      = algo.measuredMET().Pt();
+  fMeasMETPhi   = algo.measuredMET().Phi();
   //std::cout << "===> Fit check " << fit->mass << " -- " << lL.M() << std::endl;
   return result;
 } 
