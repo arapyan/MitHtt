@@ -32,8 +32,8 @@ namespace mithep
     float hadIso03;
     /// particle flow isolation with charged component restricted to the hard interaction vertex with isolation cone 0.3 and 0.4
     float pfIso03, pfIso04;    // Particle Flow isolation
-    /// impact parameter wrt the selected primary vertex along the z-axis and perpendicular to to the z-axis
-    float d0, dz;
+    /// impact parameter wrt the selected primary vertex along the z-axis and perpendicular to to the z-axis, impact parameter significance
+    float d0, dz, d0Sig;
     /// kinematics from super cluster 
     float scEt, scEta, scPhi;
     /// hadronic energy over electromagnetic energy
@@ -56,6 +56,8 @@ namespace mithep
     float partnerDist; 
     /// electron charge  
     int q;
+    /// electron supercluster energy
+    float E;
     /// electron momentum
     float p;
     // 3d impact parameter and 3d impact paramter significance
@@ -78,6 +80,10 @@ namespace mithep
     bool isConv;
     /// indicates whether this is an ECAL barrel electron
     bool isEB;
+    /// additional variables used for MVA id
+    float gsfTrackChi2OverNdof, deltaEtaCalo, deltaPhiCalo, R9, scEtaWidth, scPhiWidth, coviEtaiPhi, psOverRaw;
+    /// rho-corrected PF isolation variables with 0.3 and 0.4 cone sizes used for MVA id
+    float chargedIso03OverPt, neutralHadronIso03OverPt, gammaIso03OverPt, chargedIso04OverPt, neutralHadronIso04OverPt, gammaIso04OverPt;
     /// common isolation from pfNoPileup, ptMin=0.0, dRMax=0.4, dRMin=0.015, type charged hadron  
     float pfIsoCharged;
     /// common isolation from pfNoPileup, ptMin=0.0, dRMax=0.4, dRMin=0.015, type charged hadron (no Z restriction)
@@ -97,7 +103,7 @@ namespace mithep
     /// px and py of the matching particle flow candidate
     float pfPx, pfPy;
 
-    ClassDef(TElectron, 1)
+    ClassDef(TElectron, 2)
   };
 }
 #endif

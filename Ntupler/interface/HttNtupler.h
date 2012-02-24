@@ -32,6 +32,7 @@
 #include "MitHtt/Ntupler/interface/HiggsAnaDefs.hh"
 #include "MitHtt/Ntupler/interface/MetSignificance.h"
 #include "MitPhysics/Utils/interface/ElectronTools.h"
+#include "MitPhysics/Utils/interface/MuonTools.h"
 
 #include "CondFormats/JetMETObjects/interface/FactorizedJetCorrector.h"
 #include "CondFormats/JetMETObjects/interface/JetCorrectionUncertainty.h"
@@ -215,10 +216,10 @@ namespace mithep
     TString fPileupName;
     /// name of the energy density rho for pileup corrections with fastjet in Bambu
     TString fPUEnergyDensityName;
-    /// name of the MC event info in Bambu
-    TString fMCEvtInfoName;
     /// name of the MC particle collection in Bambu
     TString fPartName;
+    /// name of the MC event info in Bambu
+    TString fMCEvtInfoName;
     /// name of the muon collection in Bambu
     TString fMuonName;
     /// name of the electron collection in Bambu
@@ -379,6 +380,8 @@ namespace mithep
     JetCorrectionUncertainty* fJetUncertainties;
     /// electron tools
     ElectronTools* fEleTools;
+    /// muon tools
+    MuonTools* fMuonTools;
     //met significance
     MetSignificance* metSign;
     /// list JSON files to be applied

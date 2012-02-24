@@ -34,8 +34,8 @@ namespace mithep
     float hadIso03;
     /// particle flow isolation with charged component restricted to the hard interaction vertex with isolation cone 0.3 and 0.4
     float pfIso03, pfIso04;
-    /// impact parameter wrt the selected primary vertex along the z-axis and perpendicular to to the z-axis
-    float d0, dz;
+    /// impact parameter wrt the selected primary vertex along the z-axis and perpendicular to to the z-axis, impact parameter significance
+    float d0, dz, d0Sig;
     /// 3d impact parameter and 3d impact parameter significance
     float ip3d, ip3dSig;
     /// track chi**2/ndof
@@ -62,6 +62,16 @@ namespace mithep
     TriggerBits hltMatchBits;
     /// unique track ID (filled from Bambu TrackerTrk()->GetUniqueID())    
     unsigned int trkID;
+    /// muon track kink variable
+    float trkKink;
+    /// muon segment compatibility based on likelihood of well defined track through chambers
+    float segCompatibility;
+    /// muon calo compatibility value based on calorimeter templates
+    float caloCompatibility;
+    /// miscellaneous rho-corrected detector-based isolation variables used for MVA id
+    float hadEOverPt, hoEOverPt, emEOverPt, hadS9EOverPt, hoS9EOverPt, emS9EOverPt, trkIso03OverPt, emIso03OverPt, hadIso03OverPt, trkIso05OverPt, emIso05OverPt, hadIso05OverPt;
+    /// miscellaneous rho-corrected PF isolation variables used for MVA id
+    float chargedIso03OverPt, neutralIso03OverPt, chargedIso04OverPt, neutralIso04OverPt;
     /// common isolation from pfNoPileup, ptMin=0.0, dRMax=0.4, dRMin=0.0001, type charged hadron  
     float pfIsoCharged;
     /// common isolation from pfNoPileup, ptMin=0.0, dRMax=0.4, dRMin=0.0001, type charged hadron (no Z restriction)
@@ -81,7 +91,7 @@ namespace mithep
     /// px and py of the matching particle flow candidate
     float pfPx, pfPy;
     
-    ClassDef(TMuon, 1)
+    ClassDef(TMuon, 2)
   };  
 }
 #endif
