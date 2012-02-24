@@ -22,6 +22,7 @@
 
 #include "MitHtt/Ntupler/interface/HttNtupler.h"
 #include "MitCommon/MathTools/interface/MathUtils.h"
+#include "MitPhysics/Utils/interface/IsolationTools.h"
 
 #include "JetMETCorrections/Objects/interface/JetCorrectionsRecord.h"
 #include "CondFormats/JetMETObjects/interface/JetCorrectorParameters.h"
@@ -33,37 +34,38 @@ ClassImp(mithep::HttNtupler)
 HttNtupler::HttNtupler(const char *name, const char *title):
   BaseMod        (name,title),
   fOutputFile    ( 0),
+  fEventTree     ( 0),
   fOutputName    ("ntuple.root"),
+  fBeamSpotName  (Names::gkBeamSpotBrn),
+  fPrimVtxName   (Names::gkPVBrn),
+  fTrigMaskName  (Names::gkHltBitBrn),
+  fPileupName    (Names::gkPileupInfoBrn),
+  fPUEnergyDensityName(Names::gkPileupEnergyDensityBrn),
   fPartName      (Names::gkMCPartBrn),
   fMCEvtInfoName (Names::gkMCEvtInfoBrn),
   fMuonName      (Names::gkMuonBrn),
   fElectronName  (Names::gkElectronBrn),
   fHPSTauName    ("HPSTaus"),
-  fPrimVtxName   (Names::gkPVBrn),
-  fBeamSpotName  (Names::gkBeamSpotBrn),
   fPFJetName     (Names::gkPFJetBrn),
-  fPhotonName    (Names::gkPhotonBrn),
-  fTrigMaskName  (Names::gkHltBitBrn),
   fPFMetName     ("PFMet"),
+  fPhotonName    (Names::gkPhotonBrn),
   fConversionName(Names::gkMvfConversionBrn),
-  fPileupName    (Names::gkPileupInfoBrn),
-  fPUEnergyDensityName(Names::gkPileupEnergyDensityBrn),
   fPFCandidateName(Names::gkPFCandidatesBrn),
   fEmbedWeightName("EmbedWeight"),
   fParticles      ( 0),
   fMCEvtInfo      ( 0),
   fGenJets        ( 0),
-  fMuons          ( 0),
-  fElectrons      ( 0),
-  fPrimVerts      ( 0),
   fBeamSpot       ( 0),
-  fPFJets         ( 0),
-  fPhotons        ( 0),  
+  fPrimVerts      ( 0),
   fTrigMask       ( 0),
-  fPFMet          ( 0),
-  fConversions    ( 0),
   fPileup         ( 0),
   fPUEnergyDensity( 0),
+  fMuons          ( 0),
+  fElectrons      ( 0),
+  fPFJets         ( 0),
+  fPFMet          ( 0),
+  fPhotons        ( 0),  
+  fConversions    ( 0),
   fPFCandidates   ( 0),
   fIsData         ( 0),
   fUseGen         ( 0),
@@ -85,7 +87,6 @@ HttNtupler::HttNtupler(const char *name, const char *title):
   fMinNdof        ( 4),
   fMaxAbsZ        (24),
   fMaxRho         ( 2),
-  fEventTree      ( 0),
   fJetCorrector   ( 0),
   fJetUncertainties( 0)
   //BaseMod(name,title), fOutputName("HttNtuple.root"), fBeamSpotName(Names::gkBeamSpotBrn), fPrimVtxName(Names::gkPVBrn), fTrigMaskName(Names::gkHltBitBrn), 
@@ -132,6 +133,8 @@ HttNtupler::SlaveBegin()
   fJetUncertainties = new JetCorrectionUncertainty(param);
   // initialize tools for electron ID
   fEleTools = new ElectronTools();
+  // initialize tools for muon ID
+  fMuonTools = new MuonTools();
 
   metSign = new MetSignificance();
   
@@ -157,7 +160,7 @@ void
 HttNtupler::SlaveTerminate()
 {
   fEventTree ->Print(); fOutputFile->Write(); fOutputFile->Close(); cleanup();
-  delete fJetCorrector; delete fJetUncertainties; delete fEleTools, delete metSign;
+  delete fJetCorrector; delete fJetUncertainties; delete fEleTools, delete fMuonTools, delete metSign;
 
   // dump json file
   TString jsonfname = fOutputName.ReplaceAll("root","json");
@@ -484,9 +487,10 @@ HttNtupler::fillMuons()
     pMuon->pfIso04  = computePFMuonIso(mu,0.4);  
     pMuon->d0       = muTrk->D0Corrected(*fVertex);
     pMuon->dz       = muTrk->DzCorrected(*fVertex);
+    pMuon->d0Sig    = mu->D0PVSignificance();
     pMuon->ip3d     = mu->Ip3dPV();
     pMuon->ip3dSig  = mu->Ip3dPVSignificance();
-    pMuon->tkNchi2  = (mu->HasTrackerTrk()) ? mu->TrackerTrk()->RChi2() : 0;
+    pMuon->tkNchi2  = muTrk->RChi2();
     if     (mu->HasGlobalTrk()    ) { pMuon->muNchi2 = mu->GlobalTrk()->RChi2();     }
     else if(mu->HasStandaloneTrk()) { pMuon->muNchi2 = mu->StandaloneTrk()->RChi2(); }
     else if(mu->HasTrackerTrk()   ) { pMuon->muNchi2 = mu->TrackerTrk()->RChi2();    }
@@ -500,12 +504,47 @@ HttNtupler::fillMuons()
     if(mu->IsGlobalMuon())     { pMuon->typeBits |= kGlobal;     }
     if(mu->IsTrackerMuon())    { pMuon->typeBits |= kTracker;    }
     if(mu->IsStandaloneMuon()) { pMuon->typeBits |= kStandalone; }
-    pMuon->nTkHits         = mu->HasTrackerTrk() ? mu->TrackerTrk()->NHits() : 0;
+    pMuon->nTkHits         = muTrk->NHits();
     pMuon->nPixHits        = muTrk->NPixelHits();
     pMuon->nSeg            = mu->NSegments();
     pMuon->nMatch          = mu->NMatches();
     pMuon->hltMatchBits    = matchHLT(pMuon->hltMatchBits, muTrk->Eta(),muTrk->Phi());
     pMuon->trkID           = mu->HasTrackerTrk() ? mu->TrackerTrk()->GetUniqueID() :  0;
+
+    // additional variables used for MVA id
+    pMuon->trkKink         = mu->TrkKink();
+    pMuon->segCompatibility  = fMuonTools->GetSegmentCompatability(mu);
+    pMuon->caloCompatibility = fMuonTools->GetCaloCompatability(mu, kTRUE, kTRUE);
+
+    Double_t rho = 0;
+    if (!(TMath::IsNaN(fPUEnergyDensity->At(0)->Rho()) || isinf(fPUEnergyDensity->At(0)->Rho()))) rho = fPUEnergyDensity->At(0)->Rho();
+    Double_t chargedIso03 = 0;
+    Double_t neutralIso03_05Threshold = 0;
+    Double_t chargedIso04 = 0;
+    Double_t neutralIso04_05Threshold = 0;
+    chargedIso03 = IsolationTools::PFMuonIsolation(mu, fPFCandidates, fVertex, 0.1, 99999, 0.3, 0.0, 0.0);
+    neutralIso03_05Threshold = IsolationTools::PFMuonIsolation(mu, fPFCandidates, fVertex, 0.0, 0.5, 0.3, 0.0, 0.0);
+    chargedIso04 = IsolationTools::PFMuonIsolation(mu, fPFCandidates, fVertex, 0.1, 99999, 0.4, 0.0, 0.0);
+    neutralIso04_05Threshold = IsolationTools::PFMuonIsolation(mu, fPFCandidates, fVertex, 0.0, 0.5, 0.4, 0.0, 0.0);
+
+    // isolation variables used for MVA id
+    pMuon->hadEOverPt      = (mu->HadEnergy() - rho*MuonTools::MuonEffectiveArea(MuonTools::kMuHadEnergy,muTrk->Eta()))/muTrk->Pt();
+    pMuon->hoEOverPt       = (mu->HoEnergy() - rho*MuonTools::MuonEffectiveArea(MuonTools::kMuHoEnergy,muTrk->Eta()))/muTrk->Pt();
+    pMuon->emEOverPt       = (mu->EmEnergy() - rho*MuonTools::MuonEffectiveArea(MuonTools::kMuEmEnergy,muTrk->Eta()))/muTrk->Pt();
+    pMuon->hadS9EOverPt    = (mu->HadS9Energy() - rho*MuonTools::MuonEffectiveArea(MuonTools::kMuHadS9Energy,muTrk->Eta()))/muTrk->Pt();
+    pMuon->hoS9EOverPt     = (mu->HoS9Energy() - rho*MuonTools::MuonEffectiveArea(MuonTools::kMuHoS9Energy,muTrk->Eta()))/muTrk->Pt();
+    pMuon->emS9EOverPt     = (mu->EmS9Energy() - rho*MuonTools::MuonEffectiveArea(MuonTools::kMuEmS9Energy,muTrk->Eta()))/muTrk->Pt();
+    pMuon->trkIso03OverPt       = (mu->IsoR03SumPt() - rho*MuonTools::MuonEffectiveArea(MuonTools::kMuTrkIso03,muTrk->Eta()))/muTrk->Pt();
+    pMuon->emIso03OverPt        = (mu->IsoR03EmEt() - rho*MuonTools::MuonEffectiveArea(MuonTools::kMuEMIso03,muTrk->Eta()))/muTrk->Pt();
+    pMuon->hadIso03OverPt       = (mu->IsoR03HadEt() - rho*MuonTools::MuonEffectiveArea(MuonTools::kMuHadIso03,muTrk->Eta()))/muTrk->Pt();
+    pMuon->trkIso05OverPt       = (mu->IsoR05SumPt() - rho*MuonTools::MuonEffectiveArea(MuonTools::kMuTrkIso05,muTrk->Eta()))/muTrk->Pt();
+    pMuon->emIso05OverPt        = (mu->IsoR05EmEt() - rho*MuonTools::MuonEffectiveArea(MuonTools::kMuEMIso05,muTrk->Eta()))/muTrk->Pt();
+    pMuon->hadIso05OverPt       = (mu->IsoR05HadEt() - rho*MuonTools::MuonEffectiveArea(MuonTools::kMuHadIso05,muTrk->Eta()))/muTrk->Pt();
+    pMuon->chargedIso03OverPt   = (chargedIso03 - rho*MuonTools::MuonEffectiveArea(MuonTools::kMuChargedIso03,muTrk->Eta()))/muTrk->Pt();
+    pMuon->neutralIso03OverPt   = (neutralIso03_05Threshold - rho*MuonTools::MuonEffectiveArea(MuonTools::kMuNeutralIso03,muTrk->Eta()))/muTrk->Pt();
+    pMuon->chargedIso04OverPt   = (chargedIso04 - rho*MuonTools::MuonEffectiveArea(MuonTools::kMuChargedIso04,muTrk->Eta()))/muTrk->Pt();
+    pMuon->neutralIso04OverPt   = (neutralIso04_05Threshold - rho*MuonTools::MuonEffectiveArea(MuonTools::kMuNeutralIso04,muTrk->Eta()))/muTrk->Pt();
+
     pMuon->pfIsoCharged    = computeCommonIso(mu, fPFNoPileUp    , 0.0, 0.4, 0.0001,  1);
     pMuon->pfIsoChargedNoZ = computeCommonIso(mu, fPFNoPileUpNoZ , 0.0, 0.4, 0.0001,  1);
     pMuon->pfIsoNeutral    = computeCommonIso(mu, fPFNoPileUp    , 0.5, 0.4,   0.01,  2);
@@ -550,6 +589,7 @@ HttNtupler::fillElecs()
     pElectron->pfIso04         = computePFElecIso(ele,0.4);
     pElectron->d0              = ele->BestTrk()->D0Corrected(*fVertex);
     pElectron->dz              = ele->BestTrk()->DzCorrected(*fVertex);  
+    pElectron->d0Sig           = ele->D0PVSignificance();
     pElectron->scEt            = ele->SCluster()->Et();
     pElectron->scEta           = ele->SCluster()->Eta();
     pElectron->scPhi           = ele->SCluster()->Phi();
@@ -563,6 +603,7 @@ HttNtupler::fillElecs()
     pElectron->partnerDeltaCot = ele->ConvPartnerDCotTheta();
     pElectron->partnerDist     = ele->ConvPartnerDist();
     pElectron->q               = ele->Charge(); 
+    pElectron->E               = ele->SCluster()->Energy();
     pElectron->p               = ele->BestTrk()->P();
     pElectron->ip3d            = ele->Ip3dPV();
     pElectron->ip3dSig         = ele->Ip3dPVSignificance();
@@ -578,6 +619,38 @@ HttNtupler::fillElecs()
     pElectron->isEB            = ele->IsEB();
     pElectron->ip3d            = ele->Ip3dPV();
     pElectron->ip3dSig         = ele->Ip3dPVSignificance();
+
+    // additional variables used for mva id
+    pElectron->gsfTrackChi2OverNdof = ele->BestTrk()->Chi2() / ele->BestTrk()->Ndof();
+    pElectron->deltaEtaCalo    = ele->DeltaEtaSeedClusterTrackAtCalo();
+    pElectron->deltaPhiCalo    = ele->DeltaPhiSeedClusterTrackAtCalo();
+    pElectron->R9              = ele->SCluster()->R9();
+    pElectron->scEtaWidth      = ele->SCluster()->EtaWidth();
+    pElectron->scPhiWidth      = ele->SCluster()->PhiWidth();
+    pElectron->coviEtaiPhi     = ele->SCluster()->Seed()->CoviEtaiPhi();
+    pElectron->psOverRaw       = ele->SCluster()->PreshowerEnergy() / ele->SCluster()->RawEnergy();
+
+    Double_t rho = 0;
+    if (!(TMath::IsNaN(fPUEnergyDensity->At(0)->Rho()) || isinf(fPUEnergyDensity->At(0)->Rho()))) rho = fPUEnergyDensity->At(0)->Rho();
+
+    // isolation variables used for MVA id
+    pElectron->chargedIso03OverPt          = (IsolationTools::PFElectronIsolation(ele, fPFCandidates, fVertex, 0.1, 99999, 0.3, 0.0)
+       - rho * ElectronTools::ElectronEffectiveArea(ElectronTools::kEleChargedIso03, ele->SCluster()->Eta())) / ele->Pt();
+    pElectron->neutralHadronIso03OverPt    = (IsolationTools::PFElectronIsolation(ele, fPFCandidates, fVertex, 0.1, 0.5, 0.3, 0.0, PFCandidate::eNeutralHadron)
+       - rho * ElectronTools::ElectronEffectiveArea(ElectronTools::kEleNeutralHadronIso03, ele->SCluster()->Eta())
+       + rho * ElectronTools::ElectronEffectiveArea(ElectronTools::kEleNeutralHadronIso007,ele->SCluster()->Eta())) / ele->Pt();
+    pElectron->gammaIso03OverPt            = (IsolationTools::PFElectronIsolation(ele, fPFCandidates, fVertex, 0.1, 0.5, 0.3, 0.0, PFCandidate::eGamma)
+       - rho * ElectronTools::ElectronEffectiveArea(ElectronTools::kEleGammaIso03, ele->SCluster()->Eta())
+       + rho * ElectronTools::ElectronEffectiveArea(ElectronTools::kEleGammaIsoVetoEtaStrip03,ele->SCluster()->Eta())) / ele->Pt();
+    pElectron->chargedIso04OverPt          = (IsolationTools::PFElectronIsolation(ele, fPFCandidates, fVertex, 0.1, 99999, 0.4, 0.0)
+       - rho * ElectronTools::ElectronEffectiveArea(ElectronTools::kEleChargedIso04, ele->SCluster()->Eta())) / ele->Pt();
+    pElectron->neutralHadronIso04OverPt    = (IsolationTools::PFElectronIsolation(ele, fPFCandidates, fVertex, 0.1, 0.5, 0.4, 0.0, PFCandidate::eNeutralHadron)
+       - rho * ElectronTools::ElectronEffectiveArea(ElectronTools::kEleNeutralHadronIso04, ele->SCluster()->Eta())
+       + rho * ElectronTools::ElectronEffectiveArea(ElectronTools::kEleNeutralHadronIso007,ele->SCluster()->Eta())) / ele->Pt() ;
+    pElectron->gammaIso04OverPt            = (IsolationTools::PFElectronIsolation(ele, fPFCandidates, fVertex, 0.1, 0.5, 0.4, 0.0, PFCandidate::eGamma)
+       - rho * ElectronTools::ElectronEffectiveArea(ElectronTools::kEleGammaIso04, ele->SCluster()->Eta())
+       + rho * ElectronTools::ElectronEffectiveArea(ElectronTools::kEleGammaIsoVetoEtaStrip04,ele->SCluster()->Eta())) / ele->Pt();
+
     pElectron->pfIsoCharged    = computeCommonIso(ele, fPFNoPileUp    , 0.0, 0.4, 0.015,  1);
     pElectron->pfIsoChargedNoZ = computeCommonIso(ele, fPFNoPileUpNoZ , 0.0, 0.4, 0.015,  1);
     pElectron->pfIsoNeutral    = computeCommonIso(ele, fPFNoPileUp    , 0.5, 0.4,   0.0,  2);
