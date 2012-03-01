@@ -131,7 +131,7 @@ namespace mithep
     ///everything that needs to be done for each event
     void Process();
     /// load HLT trigger table from Bambu at the beginning of each event   
-    void loadTriggerTable();
+    void loadTriggerTable(TriggerBits& trigBits);
     /// load all relevant Bambu branches at the beginning of each event
     void loadBambuBranches();
      /// clear all arrays before filling
@@ -139,7 +139,7 @@ namespace mithep
     /// fill generator infomration depending on the indicated sample type (distinguished by enumerator ESampleType)
     void fillGenerator();
     /// fill general event information from Bambu
-    void fillCommon();
+    void fillCommon(TriggerBits& trigBits);
     /// fill muons from Bambu
     void fillMuons();
     /// fill electrons from Bambu
@@ -167,7 +167,7 @@ namespace mithep
     /// determine the pdgId of the leptons, which is the PDG standard in most cases but can be special for leptonic/hadronic tau decays
     int pdgId(const MCParticle* part);
     /// match offline reconstructed object to object on HLT level (potentially including minimum pt cut)
-    TriggerObjects matchHLT(TriggerBits& iBits, const double eta, const double phi, const double pt=-999.);
+    TriggerObjects matchHLT(const double eta, const double phi, const double pt=0.);
     /// check whether this electron is classified to come from a photon conversion according to MVA
     bool isConversion(const Electron* elec);
     /// get the vertex, which associated to the tau lepton for official tau isolation (not implemented)

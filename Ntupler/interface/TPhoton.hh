@@ -43,7 +43,7 @@ namespace mithep
     /// indicated whether the super cluster has a seed in the pixel or not
     bool hasPixelSeed;
     /// HLT bits for which the offline reconstructed photon could be matched on trigger level
-    TriggerBits hltMatchBits;
+    TriggerObjects hltMatchBits;
     
     ClassDef(TPhoton,1)
   };  

@@ -69,7 +69,7 @@ namespace mithep
     /// energy of the seed cluster over pt at vertex and at calorimeter surface 
     float ESeedClusterOverPIn, ESeedClusterOverPOut;
     /// HLT bits for which the offline reconstructed electron could be matched on trigger level
-    TriggerBits  hltMatchBits;
+    TriggerObjects  hltMatchBits;
     // supercluster ID (for matching to photon superclusters)
     unsigned int scID;
     /// unique track ID (filled from Bambu TrackerTrk()->GetUniqueID()) 

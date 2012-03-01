@@ -94,7 +94,7 @@ namespace mithep
     /// leading charged hadron (if it exists, empty else)
     TPFCandidate leadChargedHadronPFCand;
     /// HLT bits for which the offline reconstructed tau could be matched on trigger level
-    TriggerBits hltMatchBits;
+    TriggerObjects hltMatchBits;
     /// isolation using computePFTauIso 
     float isoEtPU;
     /// official tau POG isolation  

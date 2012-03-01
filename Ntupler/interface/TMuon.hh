@@ -59,7 +59,7 @@ namespace mithep
     /// number of muon chambers that match to track segments 
     unsigned int nMatch;
     /// HLT bits for which the offline reconstructed muon could be matched on trigger level
-    TriggerBits hltMatchBits;
+    TriggerObjects hltMatchBits;
     /// unique track ID (filled from Bambu TrackerTrk()->GetUniqueID())    
     unsigned int trkID;
     /// muon track kink variable

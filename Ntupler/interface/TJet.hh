@@ -53,7 +53,7 @@ namespace mithep
     /// pdgId of matched hen jet
     int matchedId;
     /// HLT bits for which the offline reconstructed jet could be matched on trigger level
-    TriggerBits  hltMatchBits;
+    TriggerObjects  hltMatchBits;
     
     ClassDef(TJet,4)
   };

@@ -182,10 +182,10 @@ HttNtupler::Process()
   if( fJSONv.size()>0 && !frlrm.HasRunLumi(rl) ){ return; } // not certified run? Skip to next event...
   if( rl!=fLastRunLumi ){ fLastRunLumi = rl; fRunLumiSet.Add(rl); }
 
-  // load trigger table
-  loadBambuBranches();
   // load relevant Bambu branches
-  loadTriggerTable();
+  loadBambuBranches();
+  // load trigger table
+  loadTriggerTable(fTriggerBits);
   // check whether a trigger table is available or not (if required)
   if( fSkipIfHLTFail && fTriggerBits==0 ){ return; }
   // increment the number of events that have been processed
@@ -195,7 +195,7 @@ HttNtupler::Process()
   // fill generator information
   if( fUseGen>0 ){ fillGenerator(); }
   // fill general event info
-  fillCommon();
+  fillCommon(fTriggerBits);
   // loop and fill muons
   fillMuons();
   // loop and fill electrons
@@ -213,15 +213,15 @@ HttNtupler::Process()
 }
 
 void
-HttNtupler::loadTriggerTable() 
+HttNtupler::loadTriggerTable(TriggerBits& trigBits) 
 { 
-  TriggerBits fTriggerBits=0;
+  trigBits=0;
   if( HasHLTInfo() ){
     const TriggerTable* hltTable = GetHLTTable();
     for(unsigned int itrig=0; itrig<fTriggerNamesv.size(); ++itrig){
       const TriggerName* trigname = hltTable->Get(fTriggerNamesv[itrig].Data());
       if( !trigname ) continue;
-      if( fTrigMask->At(trigname->Id()) ) { fTriggerBits[fTriggerIdsv[itrig]] = true; }
+      if( fTrigMask->At(trigname->Id()) ) { trigBits[fTriggerIdsv[itrig]] = true; }
     }  
   }
 }
@@ -370,7 +370,7 @@ HttNtupler::fillGenerator()
 }
 
 void 
-HttNtupler::fillCommon() 
+HttNtupler::fillCommon(TriggerBits& trigBits) 
 {
   // get pileup information (for MC samples only)
   int npu0 = -1; int npu1 = -1; int npu2 = -1;
@@ -435,7 +435,7 @@ HttNtupler::fillCommon()
   fEventInfo.nPU          = fIsData ? 0 : npu0;
   fEventInfo.nPUPlus      = fIsData ? 0 : npu1;
   fEventInfo.nPUMinus     = fIsData ? 0 : npu2;
-  fEventInfo.triggerBits  = fTriggerBits;
+  fEventInfo.triggerBits  = trigBits;
   fEventInfo.pvx          = fVertex->X();
   fEventInfo.pvy          = fVertex->Y();
   fEventInfo.pvz          = fVertex->Z();
@@ -508,7 +508,7 @@ HttNtupler::fillMuons()
     pMuon->nPixHits        = muTrk->NPixelHits();
     pMuon->nSeg            = mu->NSegments();
     pMuon->nMatch          = mu->NMatches();
-    pMuon->hltMatchBits    = matchHLT(pMuon->hltMatchBits, muTrk->Eta(),muTrk->Phi());
+    pMuon->hltMatchBits    = matchHLT(muTrk->Eta(),muTrk->Phi(),muTrk->Pt());
     pMuon->trkID           = mu->HasTrackerTrk() ? mu->TrackerTrk()->GetUniqueID() :  0;
 
     // additional variables used for MVA id
@@ -611,7 +611,7 @@ HttNtupler::fillElecs()
     pElectron->ESeedClusterOverPOut  = ele->ESeedClusterOverPout();
     pElectron->sigiPhiiPhi     = ele->SCluster()->Seed()->CoviPhiiPhi();
     pElectron->nBrem           = ele->NumberOfClusters()-1;  
-    pElectron->hltMatchBits    = matchHLT(pElectron->hltMatchBits, ele->SCluster()->Eta(), ele->SCluster()->Phi());
+    pElectron->hltMatchBits    = matchHLT(ele->SCluster()->Eta(), ele->SCluster()->Phi(), ele->SCluster()->Et());
     pElectron->scID            = ele->SCluster()->GetUniqueID();
     pElectron->trkID           = (ele->HasTrackerTrk()) ? ele->TrackerTrk()->GetUniqueID() : 0;
     pElectron->isEcalDriven    = ele->IsEcalDriven();
@@ -770,8 +770,7 @@ HttNtupler::fillPFTaus()
       if( pftau->DiscriminationByMediumCombinedIsolationDBSumPtCorr() ) pPFTau->hpsDiscriminators |= TPFTau::kMediumCombIso;
       if( pftau->DiscriminationByTightCombinedIsolationDBSumPtCorr()  ) pPFTau->hpsDiscriminators |= TPFTau::kTightCombIso;
       // HLT matching
-      pPFTau->hltMatchBits = 0;
-      pPFTau->hltMatchBits = matchHLT(pPFTau->hltMatchBits, pftau->Eta(), pftau->Phi());
+      pPFTau->hltMatchBits = matchHLT(pftau->Eta(), pftau->Phi(), pftau->Pt());
       for(unsigned int itrig=0; itrig<fTriggerNamesv.size(); ++itrig){
 	if( pPFTau->hltMatchBits[fTriggerObjIds1v[itrig]] && !pPFTau->hltMatchBits[fTriggerObjIds2v[itrig]]) pPFTau->hltMatchBits[fTriggerIdsv[itrig]] = false;
       }
@@ -849,7 +848,7 @@ HttNtupler::fillJets()
 	}
       }
       pPFJet->matchedId    = matchedFlavor;
-      pPFJet->hltMatchBits = matchHLT(pPFJet->hltMatchBits, jet->Eta(), jet->Phi());
+      pPFJet->hltMatchBits = matchHLT(jet->Eta(), jet->Phi(), jet->Pt());
     }
   }
 }
@@ -878,7 +877,7 @@ HttNtupler::fillPhotons()
       pPhoton->HoverE	    = pho->HadOverEm();
       pPhoton->R9	    = pho->R9();
       pPhoton->sigiEtaiEta  = pho->CoviEtaiEta();
-      pPhoton->hltMatchBits = matchHLT(pPhoton->hltMatchBits, pho->SCluster()->Eta(), pho->SCluster()->Phi());
+      pPhoton->hltMatchBits = matchHLT(pho->SCluster()->Eta(), pho->SCluster()->Phi(), pho->SCluster()->Et());
       pPhoton->scID         = pho->SCluster()->GetUniqueID();
       pPhoton->hasPixelSeed = pho->HasPixelSeed();
     }
@@ -984,11 +983,11 @@ HttNtupler::pdgId(const MCParticle* part)
 }
 
 TriggerObjects 
-HttNtupler::matchHLT(TriggerBits& bits, const double eta, const double phi, const double pt) 
+HttNtupler::matchHLT(const double eta, const double phi, const double pt) 
 {
-  TriggerObjects emptyBits=0;
-  if( !HasHLTInfo() ) return emptyBits;  
-  const double hltMatchR      = 0.2;
+  TriggerObjects toBits=0;
+  if( !HasHLTInfo() ) return toBits;  
+  const double hltMatchR      = 0.5;
   const double hltMatchPtFrac = 0.5;
   const TriggerTable* hltTable = GetHLTTable(); assert(hltTable);
   for(unsigned int itrig=0; itrig<fTriggerNamesv.size(); ++itrig){
@@ -1003,27 +1002,27 @@ HttNtupler::matchHLT(TriggerBits& bits, const double eta, const double phi, cons
 	  if( to->Pt() < fTriggerObjMinPt1v[itrig] ) match=false;
 	  if( MathUtils::DeltaR(phi, eta, to->Phi(), to->Eta()) > hltMatchR ) match=false;
 	  if( hltMatchPtFrac>0 && (fabs(pt-to->Pt() )>hltMatchPtFrac*(to->Pt())) ) match=false;
-	  if( match ) {bits[fTriggerObjIds1v[itrig]] = true; bits[fTriggerIdsv[itrig]] = fTriggerBits[fTriggerIdsv[itrig]];}
+	  if( match ) {toBits[fTriggerObjIds1v[itrig]] = true; }
 	}
 	if( fTriggerObjNames2v[itrig].Length()>0 && fTriggerObjNames2v[itrig].CompareTo(to->ModuleName())==0 ){
 	  bool match = true;
 	  if( to->Pt() < fTriggerObjMinPt2v[itrig] ) match=false;
 	  if( MathUtils::DeltaR(phi, eta, to->Phi(), to->Eta()) > hltMatchR ) match=false;
 	  if( hltMatchPtFrac>0 && (fabs(pt - to->Pt())>hltMatchPtFrac*(to->Pt())) ) match=false;
-	  if( match ) {bits[fTriggerObjIds2v[itrig]] = true; bits[fTriggerIdsv[itrig]] = fTriggerBits[fTriggerIdsv[itrig]];}
+	  if( match ) {toBits[fTriggerObjIds2v[itrig]] = true; }
 	}
 	if( fTriggerObjNames1v[itrig].Length()==0 && fTriggerObjNames2v[itrig].Length()==0 ){
 	  bool match = true;
 	  if( to->Pt() < fTriggerObjMinPt1v[itrig] ) match=false;
 	  if( MathUtils::DeltaR(phi,eta,to->Phi(),to->Eta()) > hltMatchR ) match=false;
 	  if( hltMatchPtFrac>0 && (fabs(pt - to->Pt())>hltMatchPtFrac*(to->Pt())) ) match=false;
-	  if( match ) {bits[fTriggerObjIds1v[itrig]] = true;  bits[fTriggerIdsv[itrig]] = fTriggerBits[fTriggerIdsv[itrig]];}
+	  if( match ) {toBits[fTriggerObjIds1v[itrig]] = true; }
 	}
       }
       to = dynamic_cast<const TriggerObject*>(iter.Next());
     }    
   }
-  return bits;
+  return toBits;
 }
 
 bool 
