@@ -50,8 +50,10 @@ namespace mithep
     float  neuHadrfrac;
     /// pdgId of matched parton flavour
     int mcFlavor;
-    /// pdgId of matched hen jet
+    /// pdgId of matched MC particle
     int matchedId;
+    /// pdgId of matched GenJet parton flavor
+    int matchedFlavor;
     /// HLT bits for which the offline reconstructed jet could be matched on trigger level
     TriggerObjects  hltMatchBits;
     

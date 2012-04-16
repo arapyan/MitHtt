@@ -13,6 +13,7 @@
 #include "MitAna/DataTree/interface/PileupEnergyDensityFwd.h"
 #include "MitAna/DataTree/interface/EmbedWeight.h"
 #include "MitAna/DataTree/interface/EmbedWeightFwd.h"
+//#include "MitAna/DataTree/interface/DCASigFwd.h"
 #include "MitAna/DataTree/interface/TriggerMask.h"
 #include "MitAna/DataCont/interface/RunLumiSet.h"
 #include "MitAna/DataCont/interface/RunLumiRangeMap.h"
@@ -180,6 +181,8 @@ namespace mithep
     float computePFMuonIso(const Muon* muon, const double dRMax);
     /// compute particle flow isolation for electron with charged hadrons restricted to the primary vertex in use (no correction for neutrals yet though)
     float computePFElecIso(const Electron* elec, const double dRMax);
+    /// check whether PF candidate is a good lepton
+    bool findLeptonFootprint(const PFCandidate* pfcand);
     /// compute particle flow isolation for tau with charged hadrons restricted to the primary vertex in use (no correction for neutrals yet though)
     float computePFTauIso(const PFTau* tau, const Track* track);
     /// compute official POG tau isolation
@@ -195,7 +198,7 @@ namespace mithep
     /// does this electron fullfil the loose electron Id?
     bool looseEleId(const Electron *iElectron);
     /// fill input information for svfit for a given svfit array
-    void fillSVfit(TClonesArray*& iArr, Particle* lep1, unsigned int lepId1, Particle* lep2, unsigned int lepId2, TMatrixD iMatrix);
+    void fillSVfit(TClonesArray*& iArr, Particle* lep1, unsigned int lepId1, Particle* lep2, unsigned int lepId2, TMatrixD iMatrix, double dcaSig3D, double dcaSig2D, double dca3DErr, double dca2DErr);
 
   protected:
 
@@ -238,6 +241,8 @@ namespace mithep
     TString fPFCandidateName;
     /// name of the embedded weight collection for the embedding sample in Bambu
     TString fEmbedWeightName;
+    /// name of dca significance collection for lepton pairs in Bambu
+    //TString fDCASigName;
 
     /// generator particles
     const MCParticleCol* fParticles;
@@ -273,6 +278,8 @@ namespace mithep
     const PFCandidateCol* fPFCandidates;
     /// weights for embedded sample(s)
     const EmbedWeightCol* fEmbedWeight;
+    /// dca significance for lepton pairs
+    //const DCASigCol* fDCASigs;
     
     /// flag to indicate if processing collision data
     bool fIsData;
@@ -417,6 +424,7 @@ namespace mithep
     ReqBranch( Names::gkGenJetBrn   , fGenJets         );
     ReqBranch( fMCEvtInfoName       , fMCEvtInfo       );
     ReqBranch( fEmbedWeightName     , fEmbedWeight     ); 
+    //ReqBranch( fDCASigName          , fDCASigs         );
   } 
 
   inline void

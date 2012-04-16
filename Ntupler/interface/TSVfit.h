@@ -35,6 +35,14 @@ namespace mithep
     double cov_01;
     /// met significance matrix element [y|y]
     double cov_11;
+    /// 3D dca significance of lepton pair
+    double dcaSig3D;
+    /// 2D dca significance of lepton pair
+    double dcaSig2D;
+   /// 3D dca significance error of lepton pair
+    double dcaSig3DErr;
+    /// 2D dca significance error of lepton pair
+    double dcaSig2DErr;
     /// EGenType Id of daughter1 and daughter2
     unsigned int daughterId1, daughterId2;
     /// di-lepton resonance daughters.
