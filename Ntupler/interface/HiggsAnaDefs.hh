@@ -193,7 +193,19 @@ enum ETriggerBit {
   kHLT_MediumIsoPFTau15                                                                 = 72,
   kHLT_MediumIsoPFTau20                                                                 = 74,
   kHLT_TightIsoPFTau15                                                                  = 75,
-  kHLT_TightIsoPFTau20                                                                  = 76
+  kHLT_TightIsoPFTau20                                                                  = 76,
+  /* 2012 Triggers               ---------------------------------------------------------------------------------------------- */
+  kHLT_Mu17_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL                                     = 77,
+  kHLT_Mu8_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL                                     = 78,
+  kHLT_Ele27_WP80                                                                       = 79,
+  kHLT_Mu17                                                                             = 80,
+  kHLT_Ele17_CaloIdVT_CaloIsoVT_TrkIdT_TrkIsoVT_Ele8_Mass50                             = 81,
+  kHLT_Ele20_CaloIdVT_CaloIsoVT_TrkIdT_TrkIsoVT_SC4_Mass50                              = 82,
+  kHLT_Ele32_CaloIdT_CaloIsoT_TrkIdT_TrkIsoT_SC17_Mass50                                = 83,
+  kHLT_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_Jet30                                   = 84,
+  kHLT_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL                                         = 85,
+  kHLT_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_Jet30                                    = 86,
+  kHLT_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL                                          = 87
 };
 
 const unsigned int kNTrigObj = 128;
@@ -322,7 +334,24 @@ enum ETriggerObject {
   kHLT_MediumIsoPFTau15_TauObj                                                                  = 106,
   kHLT_MediumIsoPFTau20_TauObj                                                                  = 107,
   kHLT_TightIsoPFTau15_TauObj                                                                   = 108,
-  kHLT_TightIsoPFTau20_TauObj                                                                   = 109
+  kHLT_TightIsoPFTau20_TauObj                                                                   = 109,
+  /* 2012                      ------------------------------------------------------------------------------------------------- */
+  kHLT_Mu17_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_MuObj                                       = 110,
+  kHLT_Mu17_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_EGObj                                       = 111,
+  kHLT_Mu8_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_MuObj                                       = 112,
+  kHLT_Mu8_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_EGObj                                       = 113,
+  kHLT_Ele27_WP80_EleObj                                                                        = 114,
+  kHLT_Mu17_MuObj                                                                               = 115,
+  kHLT_Ele17_CaloIdVT_CaloIsoVT_TrkIdT_TrkIsoVT_Ele8_Mass50_Ele1Obj                             = 116,
+  kHLT_Ele17_CaloIdVT_CaloIsoVT_TrkIdT_TrkIsoVT_Ele8_Mass50_Ele2Obj                             = 117,
+  kHLT_Ele20_CaloIdVT_CaloIsoVT_TrkIdT_TrkIsoVT_SC4_Mass50_EleObj                               = 118,
+  kHLT_Ele20_CaloIdVT_CaloIsoVT_TrkIdT_TrkIsoVT_SC4_Mass50_SCObj                                = 119,
+  kHLT_Ele32_CaloIdT_CaloIsoT_TrkIdT_TrkIsoT_SC17_Mass50_EleObj                                 = 120,
+  kHLT_Ele32_CaloIdT_CaloIsoT_TrkIdT_TrkIsoT_SC17_Mass50_SCObj                                  = 121,
+  kHLT_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_Jet30_EleObj                                    = 122,
+  kHLT_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_EleObj                                          = 123,
+  kHLT_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_Jet30_EleObj                                     = 124,
+  kHLT_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_EleObj                                           = 125
 };
 
 #endif
