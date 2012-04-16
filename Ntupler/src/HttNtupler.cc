@@ -1552,6 +1552,19 @@ HttNtupler::fillSVfit(TClonesArray*& iArr, Particle* lep1, unsigned int lepId1, 
   pSVfit->dcaSig2DErr = dca2DErr;
 }
 
+void
+HttNtupler::fillSVfit(TClonesArray*& iArr, Particle* lep1, unsigned int lepId1, Particle* lep2, unsigned int lepId2, TMatrixD iMatrix)
+{
+  TClonesArray& rSVfitArr = *iArr;
+  const int index = rSVfitArr.GetEntries();
+  new(rSVfitArr[index]) TSVfit();
+  TSVfit* pSVfit = (TSVfit*)rSVfitArr[index];
+  pSVfit->daughter1 = lep1->Mom(); pSVfit->daughterId1 = lepId1;
+  pSVfit->daughter2 = lep2->Mom(); pSVfit->daughterId2 = lepId2;
+  pSVfit->cov_00 = iMatrix(0,0)  ; pSVfit->cov_10 = iMatrix(1,0);
+  pSVfit->cov_01 = iMatrix(0,1)  ; pSVfit->cov_11 = iMatrix(1,1);
+}
+
 void 
 HttNtupler::fillMCParticles(const MCParticle*& boson, const MCParticle*& daughterA, const MCParticle*& daughterB) 
 {

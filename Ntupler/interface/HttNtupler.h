@@ -199,6 +199,8 @@ namespace mithep
     bool looseEleId(const Electron *iElectron);
     /// fill input information for svfit for a given svfit array
     void fillSVfit(TClonesArray*& iArr, Particle* lep1, unsigned int lepId1, Particle* lep2, unsigned int lepId2, TMatrixD iMatrix, double dcaSig3D, double dcaSig2D, double dca3DErr, double dca2DErr);
+    /// fill input information for svfit for a given svfit array
+    void fillSVfit(TClonesArray*& iArr, Particle* lep1, unsigned int lepId1, Particle* lep2, unsigned int lepId2, TMatrixD iMatrix);
 
   protected:
 
