@@ -16,14 +16,16 @@
 
 // define structures to read in ntuple
 #include "MitHtt/Ntupler/interface/HiggsAnaDefs.hh"
-#include "MitHtt/Ntupler/interface/TGenInfo.hh"
 #include "MitHtt/Ntupler/interface/TEventInfo.hh"
-#include "MitHtt/Ntupler/interface/TMuon.hh"
-#include "MitHtt/Ntupler/interface/TElectron.hh"
-#include "MitHtt/Ntupler/interface/TPhoton.hh"
-#include "MitHtt/Ntupler/interface/TJet.hh"
+#include "MitHtt/Ntupler/interface/TGenInfo.hh"
 #include "MitHtt/Ntupler/interface/TVertex.hh"
-#include "MitHtt/Ntupler/interface/TNSVFit.hh"
+#include "MitHtt/Ntupler/interface/TMuon.hh"
+#include "MitHtt/Ntupler/interface/TPFTau.hh"
+#include "MitHtt/Ntupler/interface/TPhoton.hh"
+#include "MitHtt/Ntupler/interface/TElectron.hh"
+#include "MitHtt/Ntupler/interface/TJet.hh"
+#include "MitHtt/Ntupler/interface/TMet.hh"
+#include "MitHtt/Ntupler/interface/TSVfit.h"
 
 // lumi section selection with JSON files
 #include "MitAna/DataCont/interface/RunLumiRangeMap.h"
@@ -65,7 +67,7 @@ void SkimNtuples(const TString input = "skim.input")
   mithep::TJet::Class()->IgnoreTObjectStreamer();
   mithep::TPhoton::Class()->IgnoreTObjectStreamer();
   mithep::TVertex::Class()->IgnoreTObjectStreamer();
-  mithep::TNSVFit::Class()->IgnoreTObjectStreamer();
+  mithep::TSVfit::Class()->IgnoreTObjectStreamer();
   
   // Data structures to store info from TTrees
   mithep::TEventInfo *info  = new mithep::TEventInfo();
@@ -77,7 +79,7 @@ void SkimNtuples(const TString input = "skim.input")
   TClonesArray *pfJetArr    = new TClonesArray("mithep::TJet");
   TClonesArray *photonArr   = new TClonesArray("mithep::TPhoton");
   TClonesArray *pvArr       = new TClonesArray("mithep::TVertex");
-  TClonesArray *svfitArr    = new TClonesArray("mithep::TNSVFit");
+  TClonesArray *svfitArr    = new TClonesArray("mithep::TSVfit");
   
   UInt_t nInputEvts = 0;
   UInt_t nPassEvts  = 0;
@@ -97,7 +99,7 @@ void SkimNtuples(const TString input = "skim.input")
   outEventTree->Branch("PFJet",    &pfJetArr);
   outEventTree->Branch("Photon",   &photonArr);
   outEventTree->Branch("PV",       &pvArr);
-  outEventTree->Branch("NSVFitEMu",&svfitArr);
+  outEventTree->Branch("SVfitEMu", &svfitArr);
 
   for(UInt_t ifile=0; ifile<infilenames.size(); ifile++) {
     cout << "Skimming " << infilenames[ifile] << "..." << endl;
@@ -117,7 +119,7 @@ void SkimNtuples(const TString input = "skim.input")
     eventTree->SetBranchAddress("PFJet",    &pfJetArr);      TBranch *pfJetBr    = eventTree->GetBranch("PFJet");
     eventTree->SetBranchAddress("Photon",   &photonArr);     TBranch *photonBr   = eventTree->GetBranch("Photon");
     eventTree->SetBranchAddress("PV",       &pvArr);         TBranch *pvBr       = eventTree->GetBranch("PV");
-    eventTree->SetBranchAddress("NSVFitEMu",&svfitArr);      TBranch *svfitBr    = eventTree->GetBranch("NSVFitEMu");
+    eventTree->SetBranchAddress("SVfitEMu" ,&svfitArr);      TBranch *svfitBr    = eventTree->GetBranch("SVfitEMu");
 
     
     for(UInt_t ientry=0; ientry<eventTree->GetEntries(); ientry++) { 
