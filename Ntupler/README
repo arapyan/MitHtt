@@ -5,29 +5,20 @@ are very, very loose.
 
 Steps to run:
 
-1)  export MIT_VERS=025;cd ~/cms/cmssw/$MIT_VERS/CMSSW_X_X_X/src;
+1)  export MIT_VERS=025 (or whatever); cd ~/cms/cmssw/$MIT_VERS/CMSSW_X_X_X/src;
 2)  compile Ntupler
-3)  test runmacro, of course (probably runHttNtupler.C)
+3)  test runHttNtupler.C in macros directory
 4)  cd condor
 5)  choose datasets to comment in htt.config
 6)  ./process.sh
 7)  wait for jobs to finish
-8)  ./checkResults.sh <condor-results-dir>
-9)  ./checkRootFiles.sh
-10) ./runMerge.sh
-11) ./clean.sh
+8)  ./runmerge.sh
+9)  ./runskim.sh
 
 Explanation:
 
-6) reads lines from htt.config, then calls submitjobs.sh for each dataset. This then calls runjob.sh
-on each fileset. Specify output dir in process.sh
+6) reads lines from htt.config, then calls submitjobs.sh for each dataset. This then calls runjob.sh on each fileset. Specify output dir in process.sh
 
-8) greps for many errors in the condor output files.
+8) merges output root/json files.
 
-9) checks that all files are present. Not as useful as it was in CP's framework, since now if a job crashes halfway
-through you still get half an output file, rather than none.
-
-10) specify output dir here. If a job failed halfway through this will complain, but charge on regardless,
-so if you ignored the errors in (5) you will again be warned here.
-
-11) specify output dir here.
+9) skims merged ntuples. Modify macros/SkimNtuples.C to change skimming.
