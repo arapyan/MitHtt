@@ -3,9 +3,9 @@
 skimname=emu
 config=htt.config
 if [ "` hostname | grep '\.mit\.edu'`" ]; then
-    ntupledir=/scratch/$USER/htt
+    ntupledir=/scratch/$USER/htt/025
 else
-    ntupledir=/data/blue/$USER/htt
+    ntupledir=/data/blue/$USER/htt/025
 fi
 
 for dataset in `cat $config | grep -v ^# | tr -s ' ' | cut -d' ' -f 1`; do
