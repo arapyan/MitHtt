@@ -3,6 +3,7 @@
 #include <TSystem.h>                // interface to OS
 #include <TFile.h>                  // file handle class
 #include <TH1.h>                    // histogram base class
+#include <TH2.h>                    // 2d histogram base class
 #include <TNtuple.h>                // class to access ntuples
 #include <TTree.h>                  // class to access trees
 #include <TRegexp.h>                // ROOT regexp class
@@ -18,10 +19,8 @@
 #include <string>                   // C++ string class
 #include <sstream>                  // class for parsing strings
 
-#include "MitHtt/Common/MitStyleRemix.hh"  // style settings for drawing
 #include "MitHtt/Common/CSample.hh"        // helper class for organizing input ntuple files
 #include "MitHtt/Common/MyTools.hh"        // miscellaneous helper functions
-#include "MitHtt/Common/CPlot.hh"          // helper class for plots
 
 // define structures to read in ntuple
 #include "MitHtt/Ntupler/interface/HiggsAnaDefs.hh"
@@ -31,8 +30,8 @@
 #include "MitHtt/Ntupler/interface/TElectron.hh"
 #include "MitHtt/Ntupler/interface/TJet.hh"   
 #include "MitHtt/Ntupler/interface/TVertex.hh"   
-#include "MitHtt/Ntupler/interface/TNSVFit.hh"
-#include "MitHtt/Ntupler/interface/TSVFitter.hh"
+#include "MitHtt/Ntupler/interface/TSVfit.h"
+#include "MitHtt/Ntupler/interface/TSVfitter.h"
 
 // recoil corrections
 #include "MitHtt/Utils/RecoilCorrector.hh"
@@ -122,9 +121,8 @@ void selectEmu(const TString conf,         // input config file
       continue; 
     }
     if(line[0]=='$') {
-      // fakes come from a separate macro
-      if((TString(line).Contains("fake")) && (state>0)) continue;
-
+      // fake-rate fakes come from a separate macro
+      if((TString(line).Contains("fake")) && !(TString(line).Contains("ss"))) continue;
       samplev.push_back(new CSample());
       stringstream ss(line);
       string chr;
@@ -144,6 +142,7 @@ void selectEmu(const TString conf,         // input config file
       Int_t type;
       stringstream ss(line);
       ss >> fname >> type >> json;
+      if(TString(fname).Contains("dummy",TString::kIgnoreCase)) continue;
       samplev.back()->fnamev.push_back(fname);
       samplev.back()->typev.push_back(type);
       samplev.back()->xsecv.push_back(0);
@@ -175,7 +174,7 @@ void selectEmu(const TString conf,         // input config file
   const Double_t kElePt2Min  = 10;
 
   const Double_t kJetPtMin   = 30;
-  const Double_t kBJetPtMin  = 20;
+  const Double_t kBJetPtMin  = 15;
   
   Bool_t doKFactors = kTRUE;
 
@@ -183,12 +182,12 @@ void selectEmu(const TString conf,         // input config file
 
   mithep::ElectronIDMVA *electronIDMVANoIPInfo = new mithep::ElectronIDMVA();
   electronIDMVANoIPInfo->Initialize("BDTG method",
-                                      "/home/vdutta/cms/cmssw/023_2/CMSSW_4_2_4_patch1/src/MitPhysics/data/ElectronMVAWeights/Subdet0LowPt_NoIPInfo_BDTG.weights.xml", 
-                                      "/home/vdutta/cms/cmssw/023_2/CMSSW_4_2_4_patch1/src/MitPhysics/data/ElectronMVAWeights/Subdet1LowPt_NoIPInfo_BDTG.weights.xml", 
-                                      "/home/vdutta/cms/cmssw/023_2/CMSSW_4_2_4_patch1/src/MitPhysics/data/ElectronMVAWeights/Subdet2LowPt_NoIPInfo_BDTG.weights.xml", 
-                                      "/home/vdutta/cms/cmssw/023_2/CMSSW_4_2_4_patch1/src/MitPhysics/data/ElectronMVAWeights/Subdet0HighPt_NoIPInfo_BDTG.weights.xml", 
-                                      "/home/vdutta/cms/cmssw/023_2/CMSSW_4_2_4_patch1/src/MitPhysics/data/ElectronMVAWeights/Subdet1HighPt_NoIPInfo_BDTG.weights.xml", 
-                                      "/home/vdutta/cms/cmssw/023_2/CMSSW_4_2_4_patch1/src/MitPhysics/data/ElectronMVAWeights/Subdet2HighPt_NoIPInfo_BDTG.weights.xml",
+                                      TString::Format("%s/src/MitPhysics/data/ElectronMVAWeights/Subdet0LowPt_NoIPInfo_BDTG.weights.xml", getenv("CMSSW_BASE")),
+                                      TString::Format("%s/src/MitPhysics/data/ElectronMVAWeights/Subdet1LowPt_NoIPInfo_BDTG.weights.xml", getenv("CMSSW_BASE")),
+                                      TString::Format("%s/src/MitPhysics/data/ElectronMVAWeights/Subdet2LowPt_NoIPInfo_BDTG.weights.xml", getenv("CMSSW_BASE")),
+                                      TString::Format("%s/src/MitPhysics/data/ElectronMVAWeights/Subdet0HighPt_NoIPInfo_BDTG.weights.xml", getenv("CMSSW_BASE")),
+                                      TString::Format("%s/src/MitPhysics/data/ElectronMVAWeights/Subdet1HighPt_NoIPInfo_BDTG.weights.xml", getenv("CMSSW_BASE")),
+                                      TString::Format("%s/src/MitPhysics/data/ElectronMVAWeights/Subdet2HighPt_NoIPInfo_BDTG.weights.xml", getenv("CMSSW_BASE")),
                                       mithep::ElectronIDMVA::kNoIPInfo );
 
   //
@@ -204,7 +203,7 @@ void selectEmu(const TString conf,         // input config file
   TClonesArray *electronArr = new TClonesArray("mithep::TElectron");
   TClonesArray *jetArr      = new TClonesArray("mithep::TJet");
   TClonesArray *pvArr       = new TClonesArray("mithep::TVertex");
-  TClonesArray *svfitArr    = new TClonesArray("mithep::TNSVFit");
+  TClonesArray *svfitArr    = new TClonesArray("mithep::TSVfit");
 
   Bool_t hasData = (samplev[0]->fnamev.size()>0);
 
@@ -227,16 +226,16 @@ void selectEmu(const TString conf,         // input config file
 
     EmuData data;
     Double_t rawMet,rawprojvar,npuWgt, rawMetphi;
-    UInt_t npt20jets;
-    const UInt_t kMaxPt20Jets=35;
-    TArrayF btagArray; btagArray.Set(kMaxPt20Jets); // array to hold b-tag values for pt-20 jets
-    TArrayF jptArray; jptArray.Set(kMaxPt20Jets);   // array to hold jet pt values
-    TArrayF jetaArray; jetaArray.Set(kMaxPt20Jets); // array to hold jet eta values
+    UInt_t npt15jets;
+    const UInt_t kMaxPt15Jets=50;
+    TArrayF btagArray; btagArray.Set(kMaxPt15Jets); // array to hold b-tag values for pt-15 jets
+    TArrayF jptArray; jptArray.Set(kMaxPt15Jets);   // array to hold jet pt values
+    TArrayF jetaArray; jetaArray.Set(kMaxPt15Jets); // array to hold jet eta values
     outtree.Branch("Events",&data.runNum,
-"runNum/i:evtNum:lumiSec:nPV:njets:nbjets:vpt/F:vphi:rawmet:rawmetphi:met:metphi:mass:dphi:mt:pt:phi:pmet:pvis:eleiso:muiso:lpt1:leta1:lphi1:lpt2:leta2:lphi2:jpt1:jeta1:jphi1:jpt2:jeta2:jphi2:bjpt:bjeta:bjphi:mjj:svfmass:genlpt1:genleta1:genlphi1:genlpt2:genleta2:genlphi2:weight:state/I");
+"runNum/i:evtNum:lumiSec:nPV:njets:nbjets:vpt/F:vphi:rawmet:rawmetphi:met:metphi:mass:dphi:mt:pt:phi:pmet:pvis:eleiso:muiso:eled0:eled0sig:eleip3d:eleip3dsig:mud0:mud0sig:muip3d:muip3dsig:lpt1:leta1:lphi1:lpt2:leta2:lphi2:jpt1:jeta1:jphi1:jpt2:jeta2:jphi2:bjpt:bjeta:bjphi:mjj:svfmass:svfmassunc:genlpt1:genleta1:genlphi1:genlpt2:genleta2:genlphi2:weight:state/I");
 
     // extra branches
-    outtree.Branch("npt20jets",&npt20jets);
+    outtree.Branch("npt15jets",&npt15jets);
     outtree.Branch("btagArray",&btagArray);
     outtree.Branch("jptArray",&jptArray);
     outtree.Branch("jetaArray",&jetaArray);
@@ -270,16 +269,14 @@ void selectEmu(const TString conf,         // input config file
       Bool_t reallyDoKf = doKFactors && sfname.Contains("-gf-");
       Bool_t ismadz     = sfname.Contains("-zll") || sfname.Contains("-zjets"); // madgraph z samples
       Bool_t ismadzmm   = snamev[isam].Contains("zmm") && (sfname.Contains("-zll") || sfname.Contains("-zjets")); // madgraph z samples
-      Bool_t isvvj      = sfname.Contains("-ww2l-");
       Bool_t doIdScale  = !isdata;
       Bool_t doTrigScale= !isdata;
-      Bool_t getGen     = doRecoil || reallyDoKf || isvvj || ismadz || isemb;
+      Bool_t getGen     = doRecoil || reallyDoKf || ismadz || isemb;
       Bool_t doJetUnc   = (jetunc!=kNo) && (isdata || is42mc);
 
       // PU reweighting
       TString pileupReweightFile;
       if(sfname.Contains("f11")) {
-	cout << "Fall11 sample!" << endl;
 	pileupReweightFile = "/data/smurf/sixie/Pileup/weights/PileupReweighting.Fall11_To_Full2011.root";
       } else pileupReweightFile = "/data/smurf/sixie/Pileup/weights/PileupReweighting.Summer11DYmm_To_Full2011.root";
       TH1F *puWeights = 0;
@@ -300,7 +297,7 @@ void selectEmu(const TString conf,         // input config file
         corrector = new RecoilCorrector("$CMSSW_BASE/src/MitHtt/Utils/recoilfits/recoilfit_datamm_njet.root");
       }
 
-      mithep::TSVFitter *fitter = new mithep::TSVFitter();
+      mithep::TSVfitter *fitter = new mithep::TSVfitter();
 
 
       TH1D *hKFactors = (reallyDoKf) ? kfFHPInit(higgsmass(basename)) : 0;
@@ -314,7 +311,7 @@ void selectEmu(const TString conf,         // input config file
       eventTree->SetBranchAddress("Electron", &electronArr); TBranch *electronBr = eventTree->GetBranch("Electron");
       eventTree->SetBranchAddress("PFJet",    &jetArr);      TBranch *jetBr      = eventTree->GetBranch("PFJet");      
       eventTree->SetBranchAddress("PV",       &pvArr);       TBranch *pvBr       = eventTree->GetBranch("PV");
-      eventTree->SetBranchAddress("NSVFitEMu",&svfitArr);    TBranch *svfitBr    = eventTree->GetBranch("NSVFitEMu");
+      eventTree->SetBranchAddress("SVfitEMu", &svfitArr);    TBranch *svfitBr    = eventTree->GetBranch("SVfitEMu");
 
       TBranch *genBr=0;
       if(getGen) {
@@ -344,27 +341,22 @@ void selectEmu(const TString conf,         // input config file
 
 	if(getGen)  genBr->GetEntry(ientry);
 
-	// skip non-ww events in vvj sample
-	if(isvvj && (gen->id != EGenType::kWW)) continue;
-
 	// skip non-tau events in madgraph sample
-	if(ismadz && (fabs(gen->id_1)<3 || fabs(gen->id_1)>6)) continue;
+	if(ismadz && !ismadzmm && (fabs(gen->id_1_a)<15 || fabs(gen->id_1_a)>19)) continue;
 
         // skip non-mumu events in madgraph sample for zmm
-        if(ismadzmm && (fabs(gen->id_1) != 1)) continue;
+        if(ismadzmm && (fabs(gen->id_1_a)>14 && fabs(gen->id_1_a)<20)) continue;
 
         mithep::RunLumiRangeMap::RunLumiPairType rl(info->runNum, info->lumiSec);
         if(hasJSON && !rlrm.HasRunLumi(rl)) continue;  // not certified run? Skip to next event...
 
-        ULong64_t trigger =  kHLT_Mu17_Ele8_CaloIdL | kHLT_Mu8_Ele17_CaloIdL | kHLT_Mu8_Ele17_CaloIdT_CaloIsoVL | kHLT_Mu17_Ele8_CaloIdT_CaloIsoVL;
-
-	Bool_t passHLT = kFALSE;
-
-	if(info->runNum <= 170053) passHLT = passHLT || ((info->triggerBits & kHLT_Mu8_Ele17_CaloIdL) || (info->triggerBits & kHLT_Mu17_Ele8_CaloIdL));
-	if(info->runNum >  170053 && info->runNum <= 173199) passHLT = passHLT || ((info->triggerBits & kHLT_Mu8_Ele17_CaloIdT_CaloIsoVL) || (info->triggerBits & kHLT_Mu17_Ele8_CaloIdL));
-	if(info->runNum >  173199) passHLT = passHLT || ((info->triggerBits & kHLT_Mu8_Ele17_CaloIdT_CaloIsoVL) || (info->triggerBits & kHLT_Mu17_Ele8_CaloIdT_CaloIsoVL));
-	if((isemb || isfall11) && !(info->triggerBits & trigger)) continue;
-	if(hasTrigs && !passHLT) continue;
+	// require trigger
+        if((isemb || isfall11) && !(info->triggerBits[kHLT_Mu17_Ele8_CaloIdL] || info->triggerBits[kHLT_Mu8_Ele17_CaloIdL] || info->triggerBits[kHLT_Mu8_Ele17_CaloIdT_CaloIsoVL] || info->triggerBits[kHLT_Mu17_Ele8_CaloIdT_CaloIsoVL])) continue;
+        if(hasTrigs) {
+          if(info->runNum <= 170053 && !(info->triggerBits[kHLT_Mu8_Ele17_CaloIdL] || info->triggerBits[kHLT_Mu17_Ele8_CaloIdL])) continue;
+          else if(info->runNum >  170053 && info->runNum <= 173199 && !(info->triggerBits[kHLT_Mu8_Ele17_CaloIdT_CaloIsoVL] || info->triggerBits[kHLT_Mu17_Ele8_CaloIdL])) continue;
+          else if(info->runNum >  173199 && !(info->triggerBits[kHLT_Mu8_Ele17_CaloIdT_CaloIsoVL] || info->triggerBits[kHLT_Mu17_Ele8_CaloIdT_CaloIsoVL])) continue;
+        }
 
         // No good primary vertex? Skip to next event...
         if(!info->hasGoodPV) continue;
@@ -383,7 +375,7 @@ void selectEmu(const TString conf,         // input config file
 
 	  looseMuonsv.push_back(muon);
 
-	  ULong64_t trigmatch = muon->hltMatchBits & (kHLT_Mu17_Ele8_CaloIdL_MuObj | kHLT_Mu8_Ele17_CaloIdL_MuObj | kHLT_Mu8_Ele17_CaloIdT_CaloIsoVL_MuObj | kHLT_Mu17_Ele8_CaloIdT_CaloIsoVL_MuObj);
+	  Bool_t trigmatch = muon->hltMatchBits[kHLT_Mu17_Ele8_CaloIdL_MuObj] || muon->hltMatchBits[kHLT_Mu8_Ele17_CaloIdL_MuObj] || muon->hltMatchBits[kHLT_Mu8_Ele17_CaloIdT_CaloIsoVL_MuObj] || muon->hltMatchBits[kHLT_Mu17_Ele8_CaloIdT_CaloIsoVL_MuObj];
 	  //if(isdata && !trigmatch)                     continue;
 
           if(muon->pt < kMuonPt2Min)                     continue;
@@ -401,7 +393,7 @@ void selectEmu(const TString conf,         // input config file
 
           if(fabs(electron->eta) > 2.5)   	            continue;
 
-	  ULong64_t trigmatch = electron->hltMatchBits & (kHLT_Mu17_Ele8_CaloIdL_EGObj | kHLT_Mu8_Ele17_CaloIdL_EGObj | kHLT_Mu8_Ele17_CaloIdT_CaloIsoVL_EGObj | kHLT_Mu17_Ele8_CaloIdT_CaloIsoVL_EGObj);
+	  Bool_t trigmatch = electron->hltMatchBits[kHLT_Mu17_Ele8_CaloIdL_EGObj] || electron->hltMatchBits[kHLT_Mu8_Ele17_CaloIdL_EGObj] || electron->hltMatchBits[kHLT_Mu8_Ele17_CaloIdT_CaloIsoVL_EGObj] || electron->hltMatchBits[kHLT_Mu17_Ele8_CaloIdT_CaloIsoVL_EGObj];
 	  //if(isdata && !trigmatch)                          continue;
 
           Bool_t hasMuonTrack=kFALSE;
@@ -443,6 +435,7 @@ void selectEmu(const TString conf,         // input config file
         TLorentzVector lep1, lep2, dilep;  // lepton 4-vectors
         Int_t finalState=-1;	           // final state type
         Double_t svfmass = -999;
+	Double_t svfmassunc = -999;
 
 	//----------------------------------------------------------------------------------------
 
@@ -479,10 +472,10 @@ void selectEmu(const TString conf,         // input config file
 
 	// trigger requirements
 	if(mupt  < kMuonPt1Min) {
-          if(!(info->triggerBits & (kHLT_Mu8_Ele17_CaloIdL | kHLT_Mu8_Ele17_CaloIdT_CaloIsoVL))) continue; // if failed trig1
+          if(!(info->triggerBits[kHLT_Mu8_Ele17_CaloIdL] || info->triggerBits[kHLT_Mu8_Ele17_CaloIdT_CaloIsoVL])) continue; // if failed trig1
 	}
 	else if(elept < kElePt1Min) {
-	  if(!(info->triggerBits & (kHLT_Mu17_Ele8_CaloIdL | kHLT_Mu17_Ele8_CaloIdT_CaloIsoVL))) continue; // if failed trig2
+          if(!(info->triggerBits[kHLT_Mu17_Ele8_CaloIdL] || info->triggerBits[kHLT_Mu17_Ele8_CaloIdT_CaloIsoVL])) continue; // if failed trig2
 	}
 
 	if(issamesign) {
@@ -512,7 +505,7 @@ void selectEmu(const TString conf,         // input config file
         jetBr->GetEntry(ientry);
         UInt_t njets = 0, nbjets = 0;
         const mithep::TJet *jet1=0, *jet2=0, *bjet=0;
-	btagArray.Reset();         jptArray.Reset();        jetaArray.Reset();   npt20jets=0;
+	btagArray.Reset();         jptArray.Reset();        jetaArray.Reset();   npt15jets=0;
         for(Int_t i=0; i<jetArr->GetEntriesFast(); i++) {
 	  mithep::TJet *jet = (mithep::TJet*)((*jetArr)[i]);
 
@@ -531,8 +524,8 @@ void selectEmu(const TString conf,         // input config file
 
 	  // look for b-jets
 	  if((jet->pt > kBJetPtMin) && (fabs(jet->eta) < 2.4)) { // note: bjet can be the same as jet1 or jet2
-	    assert(npt20jets<kMaxPt20Jets);
-	    btagArray.AddAt(jet->tche,npt20jets); npt20jets++;
+	    assert(npt15jets<kMaxPt15Jets);
+	    btagArray.AddAt(jet->csv,npt15jets); npt15jets++;
 	    if(btagged) {
 	      nbjets++;
             if(!bjet || jet->pt > bjet->pt)
@@ -542,7 +535,7 @@ void selectEmu(const TString conf,         // input config file
 
 	  // look for jets
           if(jet->pt > kJetPtMin) {
-            assert(njets<kMaxPt20Jets);
+            assert(njets<kMaxPt15Jets);
             jptArray.AddAt(jet->pt,njets);
             jetaArray.AddAt(jet->eta,njets);
   	    njets++;
@@ -579,7 +572,7 @@ void selectEmu(const TString conf,         // input config file
 	double pU1      = 0;  //--
 	double pU2      = 0;  //--
 
-        if(corrector) corrector->CorrectAll(met,metphi,gen->vpt,gen->vphi,dilep.Pt(),dilep.Phi(), pU1, pU2, 0, 0, njets);
+        if(corrector) corrector->CorrectAll(met,metphi,gen->vpt_a,gen->vphi_a,dilep.Pt(),dilep.Phi(), pU1, pU2, 0, 0, njets);
 	metv.SetPtEtaPhi(met,0,metphi); // corrected met
 	projMet  =  metv.Dot(bisector);
 
@@ -588,7 +581,7 @@ void selectEmu(const TString conf,         // input config file
         svfitBr->GetEntry(ientry);
 
         for(Int_t i = 0; i < svfitArr->GetEntriesFast(); i++) {
-          mithep::TNSVFit *svfit = (mithep::TNSVFit*) svfitArr->At(i);
+          mithep::TSVfit *svfit = (mithep::TSVfit*) svfitArr->At(i);
           Int_t id = 0;
           if(toolbox::deltaR(lep1.Eta(),lep1.Phi(),svfit->daughter1.Eta(),svfit->daughter1.Phi()) < 0.01            ) id = 1;
           if(toolbox::deltaR(lep2.Eta(),lep2.Phi(),svfit->daughter1.Eta(),svfit->daughter1.Phi()) < 0.01 && id == 0) id = 2;
@@ -598,11 +591,12 @@ void selectEmu(const TString conf,         // input config file
           if(id < 3) continue;
           TLorentzVector svf = fitter->fit(svfit,met,metphi);
           svfmass = svf.M();
+	  svfmassunc = fitter->massUnc();
         }
 
         // get k-factor if necessary
         Double_t kf=1;
-        if(reallyDoKf) kf = kfFHPValue(gen->vpt, hKFactors);
+        if(reallyDoKf) kf = kfFHPValue(gen->vpt_a, hKFactors);
 
 	// lepton ID corrections
 	Double_t idscale = 1;
@@ -625,20 +619,20 @@ void selectEmu(const TString conf,         // input config file
 	Double_t embWgt = 1;
         Double_t pt1, eta1, phi1, pt2, eta2, phi2;
 	if(isemb)    {
-	  if(gen->pt_1 > gen->pt_2) {
-	    pt1 = gen->pt_1;
-	    eta1 = gen->eta_1;
-	    phi1 = gen->phi_1;
-            pt2 = gen->pt_2;
-            eta2 = gen->eta_2;
-	    phi2 = gen->phi_2;
+	  if(gen->pt_1_a > gen->pt_2_a) {
+	    pt1 = gen->pt_1_a;
+	    eta1 = gen->eta_1_a;
+	    phi1 = gen->phi_1_a;
+            pt2 = gen->pt_2_a;
+            eta2 = gen->eta_2_a;
+	    phi2 = gen->phi_2_a;
 	  } else {
-            pt2 = gen->pt_1;
-            eta2 = gen->eta_1;
-            phi2 = gen->phi_1;
-            pt1 = gen->pt_2;
-            eta1 = gen->eta_2;
-            phi1 = gen->phi_2;
+            pt2 = gen->pt_1_a;
+            eta2 = gen->eta_1_a;
+            phi2 = gen->phi_1_a;
+            pt1 = gen->pt_2_a;
+            eta1 = gen->eta_2_a;
+            phi1 = gen->phi_2_a;
 	  }
 	  embWgt=info->embWeight*embUnfoldWgt(pt1,eta1,pt2,eta2);
 	}
@@ -646,7 +640,7 @@ void selectEmu(const TString conf,         // input config file
 	// events passing selection in this file
 	nsel[0]    += weight*kf*npuWgt*trigscale*idscale*embWgt;
 	nselvar[0] += weight*weight*kf*kf*npuWgt*npuWgt*trigscale*trigscale*idscale*idscale*embWgt*embWgt;
-	if(corrector && (gen->vmass < 50)) nlowmass += weight*kf*npuWgt*trigscale*idscale*embWgt;
+	if(corrector && (gen->vmass_a < 50)) nlowmass += weight*kf*npuWgt*trigscale*idscale*embWgt;
 
 	// passing events in whole sample 
         nSelEvents[0] += weight*kf*npuWgt*trigscale*idscale*embWgt;
@@ -657,8 +651,8 @@ void selectEmu(const TString conf,         // input config file
         data.nPV      = pvArr->GetEntriesFast();
         data.njets    = njets;
         data.nbjets   = nbjets;
-	data.vpt      = (corrector) ? gen->vpt : 0;
-        data.vphi     = (corrector) ? gen->vphi : 0;
+	data.vpt      = (corrector) ? gen->vpt_a : 0;
+        data.vphi     = (corrector) ? gen->vphi_a : 0;
 	data.rawmet   = rawMet;
 	data.rawmetphi= rawMetphi;
         data.met      = met;
@@ -672,6 +666,14 @@ void selectEmu(const TString conf,         // input config file
 	data.pvis     = projVis;
 	data.eleiso   = eleiso;
 	data.muiso    = muiso;
+        data.eled0    = ele->d0;
+        data.eled0sig = ele->d0Sig;
+        data.eleip3d  = ele->ip3d;
+        data.eleip3dsig = ele->ip3dSig;
+        data.mud0     = mu->d0;
+        data.mud0sig  = mu->d0Sig;
+        data.muip3d   = mu->ip3d;
+        data.muip3dsig  = mu->ip3dSig;
         data.lpt1     = lep1.Pt();
 	data.leta1    = lep1.Eta();
 	data.lphi1    = lep1.Phi();
@@ -689,6 +691,7 @@ void selectEmu(const TString conf,         // input config file
 	data.bjphi    = (bjet) ? bjet->phi : 0;
         data.mjj      = (njets>1) ? dijet.M() : 0;
         data.svfmass  = svfmass;
+	data.svfmassunc = svfmassunc;
         data.genlpt1  = (isemb)? pt1 : 0;
         data.genleta1 = (isemb)? eta1: 0;
         data.genlphi1 = (isemb)? phi1: 0;
@@ -769,36 +772,34 @@ Double_t kfFHPValue(Double_t pt, TH1D* hKF)
 Bool_t isbtagged(mithep::TJet *jet, Int_t isdata, UInt_t btageff, UInt_t mistag)
 {
 
-  //          mistag                         scale factor
-  // TCHEM  0.0175 \pm .0003 \pm .0038      1.21 \pm .02 \pm .17
-  //          btag eff.                      scale factor
-  // TCHEM  0.63 \pm 0.01                   0.93 \pm 0.02 \pm 0.07
+    // new scale factors
+    // TCHEM    btag eff: 0.96 \pm 0.04         mistag rate: 0.0286 \pm 0.0003          mistag scale factor: 1.20 \pm 0.14
+    // CSVM     btag eff: 0.97 \pm 0.04         mistag rate: 0.0152 \pm 0.0002          mistag scale factor: 1.10 \pm 0.11
 
   Bool_t btagged;
-  Double_t demoteProb=0; // ~probability to demote from tagged
-  if(btageff==kNo)        demoteProb = 1-0.93;  // SF = 0.93 -> 0.07 = (prob to demote from tagged status)
-  else if(btageff==kDown) demoteProb = 1-0.93+0.07;
-  else if(btageff==kUp)   demoteProb = 1-0.93-0.07;
+  Double_t demoteProb=0; // ~probability to demote from tagged 
+  if(btageff==kNo)        demoteProb = 1-0.97; //1-0.93;  // SF = 0.97 => 0.03 = (prob to demote from tagged status)
+  else if(btageff==kDown) demoteProb = 1-0.97+0.04; //1-0.93+0.07;
+  else if(btageff==kUp)   demoteProb = 1-0.97-0.04; //1-0.93-0.07;
   Double_t promoteProb=0; // ~probability to promote to tagged
-  if(mistag==kNo)         promoteProb = (1.21-1)*0.0145/(1-0.0145);  // (1-SF)*mistag = (prob. to promote to tagged status)*(1-mistag)
-  else if(mistag==kDown)  promoteProb = (1.21-1+0.17)*0.0145/(1-0.0145);
-  else if(mistag==kUp)    promoteProb = (1.21-1-0.17)*0.0145/(1-0.0145);
+  if(mistag==kNo)         promoteProb = (1.10-1)*0.0152/(1-0.0152); //(1.21-1)*0.0145/(1-0.0145);  // (1-SF)*mistag = (prob. to promote to tagged status)*(1-mistag)
+  else if(mistag==kDown)  promoteProb = (1.10-1+0.11)*0.0152/(1-0.0152);
+  else if(mistag==kUp)    promoteProb = (1.10-1-0.11)*0.0152/(1-0.0152);
 
   UInt_t jetflavor = 0;
-                   
-  if(isdata ==1) {
-    if(jet->tche>3.3) btagged = kTRUE;
-    else              btagged = kFALSE;
+  if(isdata == 1) {
+    if(jet->csv>0.679) btagged = kTRUE;
+    else               btagged = kFALSE;
   } else { // MC
     if(isdata == 0)jetflavor = abs(jet->mcFlavor);
     else jetflavor = abs(jet->matchedId);
     if(jetflavor==5) {
-      if(jet->tche>3.3) {
+      if(jet->csv>0.679) {
       if(randm.Uniform()>demoteProb) btagged = kTRUE;  // leave it tagged
       else                           btagged = kFALSE; // demote it
       } else                           btagged = kFALSE; // leave it untagged
     } else { // not bjet
-      if(jet->tche>3.3)                    btagged = kTRUE;  // leave it tagged
+      if(jet->csv>0.679)                   btagged = kTRUE;  // leave it tagged
       else if(randm.Uniform()<promoteProb) btagged = kTRUE;  // promote to tagged
       else                                 btagged = kFALSE; // leave it untagged
     }
@@ -945,6 +946,7 @@ Double_t unskimmedEntries(TString skimname)
   Double_t entries;
   
   skimname.ReplaceAll("_emu_skim.root","_ntuple.root");
+  skimname.ReplaceAll("_emunod0_skim.root","_ntuple.root");
   TFile unskimmed(skimname);
   assert(unskimmed.IsOpen());
   TTree *tree = 0;

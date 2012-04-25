@@ -151,7 +151,9 @@ void plotEmu(const TString  conf,         // input file
     if(snamev[isam].Contains("htt_vtth_sm")) ism_vtth=isam;
   }
 
-  CPlot::sOutDir = outputDir + TString("/plots");
+  const TString outDirName = outputDir + TString("/plots");
+  CPlot::sOutDir = outDirName;
+  gSystem->mkdir(outDirName,kTRUE);
   
   enum { kMuMu, kEleEle, kEleMu, kMuEle };  // final state type
 
@@ -357,14 +359,14 @@ void plotEmu(const TString  conf,         // input file
 
   EmuData data;
   Double_t rawMet=0,rawprojvar=0,npuWgt=1;
-  UInt_t npt20jets;
-  const UInt_t kMaxPt20Jets=35;
+  UInt_t npt15jets;
+  const UInt_t kMaxPt15Jets=50;
   TArrayF *btagArray = new TArrayF;
   TArrayF *jptArray = new TArrayF;
   TArrayF *jetaArray = new TArrayF;
-  btagArray->Set(kMaxPt20Jets);
-  jptArray->Set(kMaxPt20Jets);
-  jetaArray->Set(kMaxPt20Jets);
+  btagArray->Set(kMaxPt15Jets);
+  jptArray->Set(kMaxPt15Jets);
+  jetaArray->Set(kMaxPt15Jets);
   
   //
   // Access samples and fill histograms
@@ -424,7 +426,7 @@ void plotEmu(const TString  conf,         // input file
     eventTree = (TTree*)infile->Get("Events"); assert(eventTree);
     eventTree->SetBranchAddress("Events",&data);
     // extra branches
-    eventTree->SetBranchAddress("npt20jets",&npt20jets);
+    eventTree->SetBranchAddress("npt15jets",&npt15jets);
     eventTree->SetBranchAddress("btagArray",&btagArray);
     eventTree->SetBranchAddress("jptArray",&jptArray);
     eventTree->SetBranchAddress("jetaArray",&jetaArray);
@@ -436,11 +438,6 @@ void plotEmu(const TString  conf,         // input file
     assert(samplev[isam]->fnamev.size()>0);
     nUnskEventsv[isam] = lumi*samplev[isam]->xsecv[0];
 
-    TH1D *helectron=0;
-    char ehname[100];
-    if (ecorr==kCenter) sprintf(ehname,"hecenter");
-    else if (ecorr==kDown) sprintf(ehname,"hedown");
-   
     for(UInt_t ientry=0; ientry<eventTree->GetEntries(); ientry++) {
       eventTree->GetEntry(ientry);
 
@@ -452,7 +449,7 @@ void plotEmu(const TString  conf,         // input file
       else if (isam==ifake) // fake-rate fakes have their weight stored in the ntuple
 	wgt = data.weight;
       if(isam==iemb) {
-	wgt=data.weight*lumi*0.04201335;        // normalized using madgraph
+	wgt=data.weight*lumi*0.042;        // normalized using madgraph
 	Double_t pt1,eta1,pt2,eta2;
 	pt1 = data.genlpt1; eta1 = data.genleta1; pt2 = data.genlpt2; eta2 = data.genleta2;
 
@@ -488,8 +485,8 @@ void plotEmu(const TString  conf,         // input file
 	hNjetsv[isam]      ->Fill(data.njets,      wgt);
 	hNbjetsv[isam]     ->Fill(data.nbjets,     wgt);
 
-	assert(npt20jets<kMaxPt20Jets);
-	for(UInt_t ib=0;ib<npt20jets;ib++)
+	assert(npt15jets<kMaxPt15Jets);
+	for(UInt_t ib=0;ib<npt15jets;ib++)
 	  hBdiscrv[isam]   ->Fill((*btagArray)[ib],  wgt);
 
 	hDPhiv[isam]   ->Fill(data.dphi*180./pi, wgt);
@@ -632,7 +629,7 @@ void plotEmu(const TString  conf,         // input file
 	  hMassPF_vbfv[isam]	->Fill(data.svfmass, (isam==iztt) ? kCat_vbf*wgt              : wgt);
 	  nSel_vbfv[isam]     +=                (isam==iztt) ? kCat_vbf*wgt              : wgt;
 	  nSelVar_vbfv[isam]  +=                (isam==iztt) ? kCat_vbf*wgt*kCat_vbf*wgt : wgt*wgt;
-	  for(UInt_t ib=0;ib<npt20jets;ib++)
+	  for(UInt_t ib=0;ib<npt15jets;ib++)
 	    hBdiscr_vbfv[isam]   ->Fill((*btagArray)[ib], (isam==iztt) ? kCat_vbf*wgt           : wgt);
 	  if (isam==0) {
 	    evtlistfile_vbf << data.runNum << setw(10) << data.lumiSec << setw(15) << data.evtNum << endl;

@@ -1,12 +1,12 @@
 Instructions for running on Bacon:
 
-selectEmu.C reads the (bacon) ntuples and does lepton, jet id and computes variables. It then writes another ntuple (in my case to /build/vdutta/htt/selections/<selection-name>/ntuples) to be read by the plotting macro plotEmu.C, which also does some selection and produces yield tables, plots, an html page with links to all the plots, and a file with input histograms for calculating limits.
+selectEmu.C reads the ("bacon") ntuples and does lepton, jet id and computes variables. It then writes flat ntuples ("bacon bits", if you like :-)) to be read by the plotting macro plotEmu.C, which also does some selection and produces yield tables, plots, an html page with links to all the plots, and a file with input histograms for calculating limits.
 
 
 Steps:
 
 1) Adjust emu.conf to reflect the ntuples which you've made and want to run over and your json location.
-2) change command-line arguments in run.sh to reflect what you want to happen. Probably just run selectEmu.C by itself to start with.
+2) change command-line arguments in run.sh to reflect what you want to happen. You could start by running selectEmu.C ... be aware, this takes a while if you're running over the full sample list!
 3) ./run.sh
 4) change run.sh to run plotEmu.C with the arguments you want.
 5) ./run.sh
@@ -14,5 +14,9 @@ Steps:
 
 Same-sign fakes:
 
-Run on data only, with the name 'data' changed to 'ss-fakes' in emu.conf.
+These come from data, with the name 'data' changed to 'ss-fakes' in emu.conf (already set up to work).
 
+
+Fake-rate fakes:
+
+These are estimated separately, see MitHtt/FakeRate.
