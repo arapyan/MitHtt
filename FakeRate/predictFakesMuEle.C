@@ -22,8 +22,8 @@
 #include "MitHtt/Ntupler/interface/TElectron.hh"
 #include "MitHtt/Ntupler/interface/TJet.hh"
 #include "MitHtt/Ntupler/interface/TVertex.hh"
-#include "MitHtt/Ntupler/interface/TNSVFit.hh"
-#include "MitHtt/Ntupler/interface/TSVFitter.hh"
+#include "MitHtt/Ntupler/interface/TSVfit.h"
+#include "MitHtt/Ntupler/interface/TSVfitter.h"
 
 // lumi section selection with JSON files
 #include "MitAna/DataCont/interface/RunLumiRangeMap.h"
@@ -55,19 +55,19 @@ void predictFakesMuEle(const TString outputDir   // output directory
   vector<TString> datatypev;
   vector<TString> jsonv;
 
-  fnamev.push_back("/data/blue/vdutta/htt/2011/r11a-mueg-m10-v1_emu_skim.root"); datatypev.push_back(eMuEl);
+  fnamev.push_back("/data/blue/vdutta/htt/025/mva/new/r11a-mueg-m10-v1_emu_skim.root"); datatypev.push_back(eMuEl);
   jsonv.push_back("/home/vdutta/cms/root/json/Cert_160404-163869_7TeV_May10ReReco_Collisions11_JSON_v3.txt");
 
-  fnamev.push_back("/data/blue/vdutta/htt/2011/r11a-mueg-pr-v4_emu_skim.root");  datatypev.push_back(eMuEl);
+  fnamev.push_back("/data/blue/vdutta/htt/025/mva/new/r11a-mueg-pr-v4_emu_skim.root");  datatypev.push_back(eMuEl);
   jsonv.push_back("/home/vdutta/cms/root/json/Cert_160404-180252_7TeV_PromptReco_Collisions11_JSON.txt");
 
-  fnamev.push_back("/data/blue/vdutta/htt/2011/r11a-mueg-a05-v1_emu_skim.root");  datatypev.push_back(eMuEl);
+  fnamev.push_back("/data/blue/vdutta/htt/025/mva/new/r11a-mueg-a05-v1_emu_skim.root");  datatypev.push_back(eMuEl);
   jsonv.push_back("/home/vdutta/cms/root/json/Cert_170249-172619_7TeV_ReReco5Aug_Collisions11_JSON_v3.txt");
 
-  fnamev.push_back("/data/blue/vdutta/htt/2011/r11a-mueg-o03-v1_emu_skim.root");  datatypev.push_back(eMuEl);
+  fnamev.push_back("/data/blue/vdutta/htt/025/mva/new/r11a-mueg-o03-v1_emu_skim.root");  datatypev.push_back(eMuEl);
   jsonv.push_back("/home/vdutta/cms/root/json/Cert_160404-180252_7TeV_PromptReco_Collisions11_JSON.txt");
 
-  fnamev.push_back("/data/blue/vdutta/htt/2011/r11b-mueg-pr-v1_emu_skim.root");  datatypev.push_back(eMuEl);
+  fnamev.push_back("/data/blue/vdutta/htt/025/mva/new/r11b-mueg-pr-v1_emu_skim.root");  datatypev.push_back(eMuEl);
   jsonv.push_back("/home/vdutta/cms/root/json/Cert_160404-180252_7TeV_PromptReco_Collisions11_JSON.txt");
 
   const Double_t kMuonPt1Min = 20;
@@ -77,19 +77,19 @@ void predictFakesMuEle(const TString outputDir   // output directory
   const Double_t kElePt2Min  = 10;
 
   const Double_t kJetPtMin   = 30;
-  const Double_t kBJetPtMin  = 20;
+  const Double_t kBJetPtMin  = 15;
   
   enum { kMuMu, kEleEle, kEleMu, kMuEle };      // final state type
 
   // setup MVA
   mithep::ElectronIDMVA *electronIDMVANoIPInfo = new mithep::ElectronIDMVA();
   electronIDMVANoIPInfo->Initialize("BDTG method",
-                              "/home/vdutta/cms/cmssw/023_2/CMSSW_4_2_4_patch1/src/MitPhysics/data/ElectronMVAWeights/Subdet0LowPt_NoIPInfo_BDTG.weights.xml",
-                              "/home/vdutta/cms/cmssw/023_2/CMSSW_4_2_4_patch1/src/MitPhysics/data/ElectronMVAWeights/Subdet1LowPt_NoIPInfo_BDTG.weights.xml",
-                              "/home/vdutta/cms/cmssw/023_2/CMSSW_4_2_4_patch1/src/MitPhysics/data/ElectronMVAWeights/Subdet2LowPt_NoIPInfo_BDTG.weights.xml",
-                              "/home/vdutta/cms/cmssw/023_2/CMSSW_4_2_4_patch1/src/MitPhysics/data/ElectronMVAWeights/Subdet0HighPt_NoIPInfo_BDTG.weights.xml",
-                              "/home/vdutta/cms/cmssw/023_2/CMSSW_4_2_4_patch1/src/MitPhysics/data/ElectronMVAWeights/Subdet1HighPt_NoIPInfo_BDTG.weights.xml",
-                              "/home/vdutta/cms/cmssw/023_2/CMSSW_4_2_4_patch1/src/MitPhysics/data/ElectronMVAWeights/Subdet2HighPt_NoIPInfo_BDTG.weights.xml",
+                              TString::Format("%s/src/MitPhysics/data/ElectronMVAWeights/Subdet0LowPt_NoIPInfo_BDTG.weights.xml", getenv("CMSSW_BASE")), 
+                              TString::Format("%s/src/MitPhysics/data/ElectronMVAWeights/Subdet1LowPt_NoIPInfo_BDTG.weights.xml", getenv("CMSSW_BASE")),
+                              TString::Format("%s/src/MitPhysics/data/ElectronMVAWeights/Subdet2LowPt_NoIPInfo_BDTG.weights.xml", getenv("CMSSW_BASE")),
+                              TString::Format("%s/src/MitPhysics/data/ElectronMVAWeights/Subdet0HighPt_NoIPInfo_BDTG.weights.xml", getenv("CMSSW_BASE")),
+                              TString::Format("%s/src/MitPhysics/data/ElectronMVAWeights/Subdet1HighPt_NoIPInfo_BDTG.weights.xml", getenv("CMSSW_BASE")),
+                              TString::Format("%s/src/MitPhysics/data/ElectronMVAWeights/Subdet2HighPt_NoIPInfo_BDTG.weights.xml", getenv("CMSSW_BASE")),
                               mithep::ElectronIDMVA::kNoIPInfo );
 
     
@@ -100,12 +100,6 @@ void predictFakesMuEle(const TString outputDir   // output directory
   //
   // parse fake rate data
   //
-  //TFile frfile(frname);
-  //TH2D *hFR     = (TH2D*)frfile.Get("frEtaPt");
-  //TH2D *hFRErrl = (TH2D*)frfile.Get("errlEtaPt");
-  //TH2D *hFRErrh = (TH2D*)frfile.Get("errhEtaPt");
-  //CEffUser2D fr;
-  //fr.loadEff(hFR,hFRErrl,hFRErrh);
 
   Bool_t use2DFakeRate = kTRUE;
   Bool_t useFitFunction = kFALSE;
@@ -140,18 +134,18 @@ void predictFakesMuEle(const TString outputDir   // output directory
 
   EmuData data;
   Double_t rawMet,rawprojvar, trigeff=1;
-  UInt_t npt20jets;
-  const UInt_t kMaxPt20Jets=15;
-  TArrayF btagArray; btagArray.Set(kMaxPt20Jets); // array to hold b-tag values for pt-20 jets
-  TArrayF jptArray; jptArray.Set(kMaxPt20Jets); // array to hold b-tag values for pt-20 jets
-  TArrayF jetaArray; jetaArray.Set(kMaxPt20Jets); // array to hold b-tag values for pt-20 jets
+  UInt_t npt15jets;
+  const UInt_t kMaxPt15Jets=50;
+  TArrayF btagArray; btagArray.Set(kMaxPt15Jets); // array to hold b-tag values for pt-15 jets
+  TArrayF jptArray; jptArray.Set(kMaxPt15Jets); // array to hold b-tag values for pt-15 jets
+  TArrayF jetaArray; jetaArray.Set(kMaxPt15Jets); // array to hold b-tag values for pt-15 jets
 
   Float_t varl,varh;
     outtree.Branch("Events",&data.runNum,
-"runNum/i:evtNum:lumiSec:nPV:njets:nbjets:vpt/F:vphi:rawmet:rawmetphi:met:metphi:mass:dphi:mt:pt:phi:pmet:pvis:eleiso:muiso:lpt1:leta1:lphi1:lpt2:leta2:lphi2:jpt1:jeta1:jphi1:jpt2:jeta2:jphi2:bjpt:bjeta:bjphi:mjj:svfmass:genlpt1:genleta1:genlphi1:genlpt2:genleta2:genlphi2:weight:state/I");
+"runNum/i:evtNum:lumiSec:nPV:njets:nbjets:vpt/F:vphi:rawmet:rawmetphi:met:metphi:mass:dphi:mt:pt:phi:pmet:pvis:eleiso:muiso:eled0:eled0sig:eleip3d:eleip3dsig:mud0:mud0sig:muip3d:muip3dsig:lpt1:leta1:lphi1:lpt2:leta2:lphi2:jpt1:jeta1:jphi1:jpt2:jeta2:jphi2:bjpt:bjeta:bjphi:mjj:svfmass:svfmassunc:genlpt1:genleta1:genlphi1:genlpt2:genleta2:genlphi2:weight:state/I");
 
   // extra branches
-  outtree.Branch("npt20jets",&npt20jets);
+  outtree.Branch("npt15jets",&npt15jets);
   outtree.Branch("btagArray",&btagArray);
   outtree.Branch("jptArray",&jptArray);
   outtree.Branch("jetaArray",&jetaArray);
@@ -170,9 +164,9 @@ void predictFakesMuEle(const TString outputDir   // output directory
   TClonesArray *electronArr = new TClonesArray("mithep::TElectron");
   TClonesArray *jetArr      = new TClonesArray("mithep::TJet");
   TClonesArray *pvArr       = new TClonesArray("mithep::TVertex");
-  TClonesArray *svfitArr    = new TClonesArray("mithep::TNSVFit");
+  TClonesArray *svfitArr    = new TClonesArray("mithep::TSVfit");
 
-  mithep::TSVFitter *fitter = new mithep::TSVFitter();
+  mithep::TSVfitter *fitter = new mithep::TSVfitter();
 
   
   //
@@ -201,7 +195,7 @@ void predictFakesMuEle(const TString outputDir   // output directory
     eventTree->SetBranchAddress("Electron",&electronArr); TBranch *electronBr = eventTree->GetBranch("Electron");
     eventTree->SetBranchAddress("PFJet",   &jetArr);      TBranch *jetBr      = eventTree->GetBranch("PFJet");
     eventTree->SetBranchAddress("PV",      &pvArr);       TBranch *pvBr       = eventTree->GetBranch("PV");
-    eventTree->SetBranchAddress("NSVFitEMu",    &svfitArr);    TBranch *svfitBr    = eventTree->GetBranch("NSVFitEMu");
+    eventTree->SetBranchAddress("SVfitEMu",&svfitArr);    TBranch *svfitBr    = eventTree->GetBranch("SVfitEMu");
    
     Double_t weight=1;
 
@@ -217,19 +211,11 @@ void predictFakesMuEle(const TString outputDir   // output directory
       if(hasJSON && !rlrm.HasRunLumi(rl)) continue;  
       
       // trigger requirement
-      ULong_t trigger = 0;
-      if(datatypev[ifile] == eMuEl) trigger = kHLT_Mu17_Ele8_CaloIdL | kHLT_Mu8_Ele17_CaloIdL | kHLT_Mu8_Ele17_CaloIdT_CaloIsoVL | kHLT_Mu17_Ele8_CaloIdT_CaloIsoVL;
-      else {cout << "data type not defined" << endl; assert(0);}
-      //if(datatypev[ifile]!=eMC && !(info->triggerBits & trigger)) continue;
+      if(info->runNum <= 170053 && !(info->triggerBits[kHLT_Mu8_Ele17_CaloIdL] || info->triggerBits[kHLT_Mu17_Ele8_CaloIdL])) continue;
+      else if(info->runNum >  170053 && info->runNum <= 173199 && !(info->triggerBits[kHLT_Mu8_Ele17_CaloIdT_CaloIsoVL] || info->triggerBits[kHLT_Mu17_Ele8_CaloIdL])) continue;
+      else if(info->runNum >  173199 && !(info->triggerBits[kHLT_Mu8_Ele17_CaloIdT_CaloIsoVL] || info->triggerBits[kHLT_Mu17_Ele8_CaloIdT_CaloIsoVL])) continue;
 
-        Bool_t passHLT = kFALSE;
-
-        if(info->runNum <= 170053) passHLT = passHLT || ((info->triggerBits & kHLT_Mu8_Ele17_CaloIdL) || (info->triggerBits & kHLT_Mu17_Ele8_CaloIdL));
-        if(info->runNum >  170053 && info->runNum <= 173199) passHLT = passHLT || ((info->triggerBits & kHLT_Mu8_Ele17_CaloIdT_CaloIsoVL) || (info->triggerBits & kHLT_Mu17_Ele8_CaloIdL));
-        if(info->runNum >  173199) passHLT = passHLT || ((info->triggerBits & kHLT_Mu8_Ele17_CaloIdT_CaloIsoVL) || (info->triggerBits & kHLT_Mu17_Ele8_CaloIdT_CaloIsoVL));
-        if(!passHLT) continue;
-
-                
+      // No good primary vertex? Skip to next event...
       if(!(info->hasGoodPV)) continue;
       
       pvArr->Clear();
@@ -253,9 +239,8 @@ void predictFakesMuEle(const TString outputDir   // output directory
       for(Int_t i=0; i<muonArr->GetEntriesFast(); i++) {
         const mithep::TMuon* muon = (mithep::TMuon*)((*muonArr)[i]);
 
-	Bool_t trigmatch = muon->hltMatchBits & (kHLT_Mu17_Ele8_CaloIdL_MuObj | kHLT_Mu8_Ele17_CaloIdL_MuObj | kHLT_Mu8_Ele17_CaloIdT_CaloIsoVL_MuObj | kHLT_Mu17_Ele8_CaloIdT_CaloIsoVL_MuObj);
-        if(info->runNum<167000) // trigger matching broken after this run
-          if(!trigmatch)                     continue;
+        Bool_t trigmatch = muon->hltMatchBits[kHLT_Mu17_Ele8_CaloIdL_MuObj] || muon->hltMatchBits[kHLT_Mu8_Ele17_CaloIdL_MuObj] || muon->hltMatchBits[kHLT_Mu8_Ele17_CaloIdT_CaloIsoVL_MuObj] || muon->hltMatchBits[kHLT_Mu17_Ele8_CaloIdT_CaloIsoVL_MuObj];
+        //if(!trigmatch)                     continue;
 
 	if(muon->pt < kMuonPt2Min)    continue;
 	if(fabs(muon->eta) > 2.1)     continue;
@@ -297,11 +282,10 @@ void predictFakesMuEle(const TString outputDir   // output directory
 	if(electron->pt        < kElePt2Min)  continue;
 	if(fabs(electron->eta) > 2.5)         continue;
 
-	Bool_t trigmatch = electron->hltMatchBits & (kHLT_Mu17_Ele8_CaloIdL_EGObj | kHLT_Mu8_Ele17_CaloIdL_EGObj | kHLT_Mu8_Ele17_CaloIdT_CaloIsoVL_EGObj | kHLT_Mu17_Ele8_CaloIdT_CaloIsoVL_EGObj);
-        if(info->runNum<167000) // trigger matching broken after this run
-	  if(!trigmatch)                          continue;
+        Bool_t trigmatch = electron->hltMatchBits[kHLT_Mu17_Ele8_CaloIdL_EGObj] || electron->hltMatchBits[kHLT_Mu8_Ele17_CaloIdL_EGObj] || electron->hltMatchBits[kHLT_Mu8_Ele17_CaloIdT_CaloIsoVL_EGObj] || electron->hltMatchBits[kHLT_Mu17_Ele8_CaloIdT_CaloIsoVL_EGObj];
+	//if(!trigmatch)                          continue;
 
-          Double_t mvaValue =  electronIDMVANoIPInfo->MVAValue(
+        Double_t mvaValue =  electronIDMVANoIPInfo->MVAValue(
                                           electron->pt,electron->scEta,
                                           electron->sigiEtaiEta,
                                           electron->deltaEtaIn,
@@ -347,13 +331,13 @@ void predictFakesMuEle(const TString outputDir   // output directory
           if(mu->q == ele->q) continue;                    
 
           if(mu->pt < kMuonPt2Min  || ele->pt < kElePt2Min) continue;
-	  if(mu->pt<kMuonPt1Min  && ele->pt<kElePt1Min) continue;
+	  if(mu->pt < kMuonPt1Min  && ele->pt < kElePt1Min) continue;
 
-	  if(mu->pt < 20) {
-	    if(!(info->triggerBits & (kHLT_Mu8_Ele17_CaloIdL | kHLT_Mu8_Ele17_CaloIdT_CaloIsoVL))) continue; // if failed trig1
-	  }
-	  else if(ele->pt < 20) {
-	    if(!(info->triggerBits & (kHLT_Mu17_Ele8_CaloIdL | kHLT_Mu17_Ele8_CaloIdT_CaloIsoVL))) continue; // if failed trig2
+	  if(mu->pt < kMuonPt1Min) {
+            if(!(info->triggerBits[kHLT_Mu8_Ele17_CaloIdL] || info->triggerBits[kHLT_Mu8_Ele17_CaloIdT_CaloIsoVL])) continue; // if failed trig1
+          }
+          else if(ele->pt < kElePt1Min) {
+            if(!(info->triggerBits[kHLT_Mu17_Ele8_CaloIdL] || info->triggerBits[kHLT_Mu17_Ele8_CaloIdT_CaloIsoVL])) continue; // if failed trig2
 	  }
 
           Double_t muiso = muonIsoPU(mu);
@@ -362,6 +346,7 @@ void predictFakesMuEle(const TString outputDir   // output directory
 	  TLorentzVector lep1, lep2, dilep;  // lepton 4-vectors
 	  Int_t finalState=-1;	           // final state type
           Double_t svfmass = -999;
+          Double_t svfmassunc = -999;
 
 	  if(mu->pt > ele->pt) {
 	    lep1.SetPtEtaPhiM(mu->pt,  mu->eta,  mu->phi,  0.105658369);
@@ -377,12 +362,12 @@ void predictFakesMuEle(const TString outputDir   // output directory
 
           Double_t met=info->pfMET,metphi=info->pfMETphi;
 
-          // NSVFit info
+          // SVFit info
           svfitArr->Clear();
           svfitBr->GetEntry(ientry);
 
           for(Int_t i = 0; i < svfitArr->GetEntriesFast(); i++) {
-            mithep::TNSVFit *svfit = (mithep::TNSVFit*) svfitArr->At(i);
+            mithep::TSVfit *svfit = (mithep::TSVfit*) svfitArr->At(i);
             Int_t id = 0;
             if(toolbox::deltaR(lep1.Eta(),lep1.Phi(),svfit->daughter1.Eta(),svfit->daughter1.Phi()) < 0.01            ) id = 1;
             if(toolbox::deltaR(lep2.Eta(),lep2.Phi(),svfit->daughter1.Eta(),svfit->daughter1.Phi()) < 0.01 && id == 0) id = 2;
@@ -392,6 +377,7 @@ void predictFakesMuEle(const TString outputDir   // output directory
             if(id < 3) continue;
             TLorentzVector svf = fitter->fit(svfit,met,metphi);
             svfmass = svf.M();
+            svfmassunc = fitter->massUnc();
           }
 
 
@@ -400,7 +386,7 @@ void predictFakesMuEle(const TString outputDir   // output directory
 	  jetBr->GetEntry(ientry);
 	  UInt_t njets = 0, nbjets = 0;
 	  const mithep::TJet *jet1=0, *jet2=0, *bjet=0;
-	  btagArray.Reset();          jptArray.Reset();        jetaArray.Reset();  npt20jets=0;
+	  btagArray.Reset();          jptArray.Reset();        jetaArray.Reset();  npt15jets=0;
 	  for(Int_t ijet=0; ijet<jetArr->GetEntriesFast(); ijet++) {
 	    const mithep::TJet *jet = (mithep::TJet*)((*jetArr)[ijet]);
 
@@ -411,8 +397,8 @@ void predictFakesMuEle(const TString outputDir   // output directory
 
 	    // look for b-jets
 	    if((jet->pt > kBJetPtMin) && (fabs(jet->eta) < 2.4)) { // note: bjet can be the same as jet1 or jet2
-	      assert(npt20jets<kMaxPt20Jets);
-	      btagArray.AddAt(jet->tche,npt20jets); npt20jets++;
+	      assert(npt15jets<kMaxPt15Jets);
+	      btagArray.AddAt(jet->csv,npt15jets); npt15jets++;
 	      if(jet->tche > 3.3) {
 		nbjets++;
 		if(!bjet || jet->pt > bjet->pt)
@@ -422,7 +408,7 @@ void predictFakesMuEle(const TString outputDir   // output directory
 
 	    // look for vbf jets
 	    if(jet->pt > kJetPtMin) {
-              assert(njets<kMaxPt20Jets);
+              assert(njets<kMaxPt15Jets);
               jptArray.AddAt(jet->pt,njets);
               jetaArray.AddAt(jet->eta,njets);
 	      njets++;
@@ -495,6 +481,14 @@ void predictFakesMuEle(const TString outputDir   // output directory
           data.pvis     = projVis;
           data.eleiso   = eleiso;
           data.muiso    = muiso;
+          data.eled0    = ele->d0;
+          data.eled0sig = ele->d0Sig;
+          data.eleip3d  = ele->ip3d;
+          data.eleip3dsig = ele->ip3dSig;
+          data.mud0     = mu->d0;
+          data.mud0sig  = mu->d0Sig;
+          data.muip3d   = mu->ip3d;
+          data.muip3dsig  = mu->ip3dSig;
           data.lpt1     = lep1.Pt();
           data.leta1    = lep1.Eta();
           data.lphi1    = lep1.Phi();
@@ -512,6 +506,7 @@ void predictFakesMuEle(const TString outputDir   // output directory
           data.bjphi    = (bjet) ? bjet->phi : 0;
           data.mjj      = (njets>1) ? dijet.M() : 0;
           data.svfmass  = svfmass;
+          data.svfmassunc = svfmassunc;
           data.genlpt1  = 0;
           data.genleta1 = 0;
           data.genlphi1 = 0;
@@ -535,13 +530,13 @@ void predictFakesMuEle(const TString outputDir   // output directory
           if(mu->q == ele->q) continue;
 
           if(mu->pt < kMuonPt2Min  || ele->pt < kElePt2Min) continue;
-          if(mu->pt<kMuonPt1Min  && ele->pt<kElePt1Min) continue;
+          if(mu->pt < kMuonPt1Min  && ele->pt < kElePt1Min) continue;
 
-          if(mu->pt < 20) {
-            if(!(info->triggerBits & (kHLT_Mu8_Ele17_CaloIdL | kHLT_Mu8_Ele17_CaloIdT_CaloIsoVL))) continue; // if failed trig1
+          if(mu->pt  < kMuonPt1Min) {
+            if(!(info->triggerBits[kHLT_Mu8_Ele17_CaloIdL] || info->triggerBits[kHLT_Mu8_Ele17_CaloIdT_CaloIsoVL])) continue; // if failed trig1
           }
-          else if(ele->pt < 20) {
-            if(!(info->triggerBits & (kHLT_Mu17_Ele8_CaloIdL | kHLT_Mu17_Ele8_CaloIdT_CaloIsoVL))) continue; // if failed trig2
+          else if(ele->pt < kElePt1Min) {
+            if(!(info->triggerBits[kHLT_Mu17_Ele8_CaloIdL] || info->triggerBits[kHLT_Mu17_Ele8_CaloIdT_CaloIsoVL])) continue; // if failed trig2
           }
 
           Double_t muiso = muonIsoPU(mu);
@@ -550,6 +545,7 @@ void predictFakesMuEle(const TString outputDir   // output directory
           TLorentzVector lep1, lep2, dilep;  // lepton 4-vectors
           Int_t finalState=-1;             // final state type
           Double_t svfmass = -999;
+          Double_t svfmassunc = -999;
 
           if(mu->pt > ele->pt) {
             lep1.SetPtEtaPhiM(mu->pt,  mu->eta,  mu->phi,  0.105658369);
@@ -565,12 +561,12 @@ void predictFakesMuEle(const TString outputDir   // output directory
 
           Double_t met=info->pfMET,metphi=info->pfMETphi;
 
-          // NSVFit info
+          // SVFit info
           svfitArr->Clear();
           svfitBr->GetEntry(ientry);
 
           for(Int_t i = 0; i < svfitArr->GetEntriesFast(); i++) {
-            mithep::TNSVFit *svfit = (mithep::TNSVFit*) svfitArr->At(i);
+            mithep::TSVfit *svfit = (mithep::TSVfit*) svfitArr->At(i);
             Int_t id = 0;
             if(toolbox::deltaR(lep1.Eta(),lep1.Phi(),svfit->daughter1.Eta(),svfit->daughter1.Phi()) < 0.01            ) id = 1;
             if(toolbox::deltaR(lep2.Eta(),lep2.Phi(),svfit->daughter1.Eta(),svfit->daughter1.Phi()) < 0.01 && id == 0) id = 2;
@@ -580,6 +576,7 @@ void predictFakesMuEle(const TString outputDir   // output directory
             if(id < 3) continue;
             TLorentzVector svf = fitter->fit(svfit,met,metphi);
             svfmass = svf.M();
+            svfmassunc = fitter->massUnc();
           }
 
 
@@ -588,7 +585,7 @@ void predictFakesMuEle(const TString outputDir   // output directory
           jetBr->GetEntry(ientry);
           UInt_t njets = 0, nbjets = 0;
           const mithep::TJet *jet1=0, *jet2=0, *bjet=0;
-          btagArray.Reset();          jptArray.Reset();        jetaArray.Reset();  npt20jets=0;
+          btagArray.Reset();          jptArray.Reset();        jetaArray.Reset();  npt15jets=0;
           for(Int_t ijet=0; ijet<jetArr->GetEntriesFast(); ijet++) {
             const mithep::TJet *jet = (mithep::TJet*)((*jetArr)[ijet]);
 
@@ -599,9 +596,9 @@ void predictFakesMuEle(const TString outputDir   // output directory
 
             // look for b-jets
             if((jet->pt > kBJetPtMin) && (fabs(jet->eta) < 2.4)) { // note: bjet can be the same as jet1 or jet2
-              assert(npt20jets<kMaxPt20Jets);
-              btagArray.AddAt(jet->tche,npt20jets); npt20jets++;
-              if(jet->tche > 3.3) {
+              assert(npt15jets<kMaxPt15Jets);
+              btagArray.AddAt(jet->csv,npt15jets); npt15jets++;
+              if(jet->csv > 0.679) {
                 nbjets++;
                 if(!bjet || jet->pt > bjet->pt)
                   bjet = jet; // leading b-jet
@@ -610,7 +607,7 @@ void predictFakesMuEle(const TString outputDir   // output directory
 
             // look for vbf jets
             if(jet->pt > kJetPtMin) {
-              assert(njets<kMaxPt20Jets);
+              assert(njets<kMaxPt15Jets);
               jptArray.AddAt(jet->pt,njets);
               jetaArray.AddAt(jet->eta,njets);
               njets++;
@@ -683,6 +680,14 @@ void predictFakesMuEle(const TString outputDir   // output directory
           data.pvis     = projVis;
           data.eleiso   = eleiso;
           data.muiso    = muiso;
+          data.eled0    = ele->d0;
+          data.eled0sig = ele->d0Sig;
+          data.eleip3d  = ele->ip3d;
+          data.eleip3dsig = ele->ip3dSig;
+          data.mud0     = mu->d0;
+          data.mud0sig  = mu->d0Sig;
+          data.muip3d   = mu->ip3d;
+          data.muip3dsig  = mu->ip3dSig;
           data.lpt1     = lep1.Pt();
           data.leta1    = lep1.Eta();
           data.lphi1    = lep1.Phi();
@@ -700,6 +705,7 @@ void predictFakesMuEle(const TString outputDir   // output directory
           data.bjphi    = (bjet) ? bjet->phi : 0;
           data.mjj      = (njets>1) ? dijet.M() : 0;
           data.svfmass  = svfmass;
+          data.svfmassunc = svfmassunc;
           data.genlpt1  = 0;
           data.genleta1 = 0;
           data.genlphi1 = 0;
