@@ -34,9 +34,11 @@ namespace mithep
     float          fittedMETPhi() {return fFittedMETPhi;}
     float          measMETPhi()   {return fMeasMETPhi;}
     float          massUnc()      {return fMassUnc;}
+    int            status()       {return fstatus;}
 
   protected:
     float fMassUnc;         //Uncertainty
+    int fstatus;            //valid solution?
     float fFittedMET;       //Best fit MET
     float fMeasMET;         //Original MET
     float fFittedMETPhi;    //Best fit MET phi
