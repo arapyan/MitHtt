@@ -3,6 +3,10 @@
 
 #include "MitHtt/Ntupler/interface/AntiElectronIDMVA.h"
 
+ClassImp(mithep::AntiElectronIDMVA)
+
+using namespace mithep;
+
 AntiElectronIDMVA::AntiElectronIDMVA():
   isInitialized_(kFALSE),
   methodName_("BDT")

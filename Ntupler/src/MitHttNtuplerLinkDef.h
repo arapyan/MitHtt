@@ -14,9 +14,9 @@
 #include "MitHtt/Ntupler/interface/TVertex.hh"
 #include "MitHtt/Ntupler/interface/MetSignificance.h"
 #include "MitHtt/Ntupler/interface/TSVfitter.h"
-#include "MitHtt/Ntupler/interface/TSVSuperFitter.hh"
+//#include "MitHtt/Ntupler/interface/TSVSuperFitter.hh"
 #include "MitHtt/Ntupler/interface/TSVfit.h"
-//#include "MitHtt/Ntupler/interface/AntiElectronIDMVA.h"
+#include "MitHtt/Ntupler/interface/AntiElectronIDMVA.h"
 #endif
 
 #ifdef __CINT__
@@ -41,7 +41,7 @@
 #pragma link C++ class mithep::TVertex+;
 #pragma link C++ class mithep::MetSignificance+;
 #pragma link C++ class mithep::TSVfitter+;
-#pragma link C++ class mithep::TSVSuperFitter+;
+//#pragma link C++ class mithep::TSVSuperFitter+;
 #pragma link C++ class mithep::TSVfit+;
-//#pragma link C++ class mithep::AntiElectronIDMVA+; 
+#pragma link C++ class mithep::AntiElectronIDMVA+; 
 #endif

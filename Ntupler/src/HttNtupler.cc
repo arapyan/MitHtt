@@ -52,7 +52,6 @@ HttNtupler::HttNtupler(const char *name, const char *title):
   fConversionName(Names::gkMvfConversionBrn),
   fPFCandidateName(Names::gkPFCandidatesBrn),
   fEmbedWeightName("EmbedWeight"),
-  //fDCASigName     ("DCASig"),
   fParticles      ( 0),
   fMCEvtInfo      ( 0),
   fGenJets        ( 0),
@@ -122,9 +121,10 @@ HttNtupler::SlaveBegin()
   fJetCorrector = new FactorizedJetCorrector(correctionParameters); 
   // setup jet energy scale uncertainties
   std::string jetCorrectorParams;
-  if(TString(getenv("CMSSW_BASE")).Contains("CMSSW_5")) jetCorrectorParams = std::string(TString::Format("%s/src/MitPhysics/data/START50_V15_Uncertainty_AK5PF.t xt", getenv("CMSSW_BASE")));
-  //if(TString(getenv("CMSSW_BASE")).Contains("CMSSW_5")) jetCorrectorParams = std::string(TString::Format("%s/src/MitPhysics/data/Summer12_V7_MC_Uncertainty_AK5PF.txt", getenv("CMSSW_BASE")));
-  else jetCorrectorParams = std::string(TString::Format("%s/src/MitPhysics/data/START42_V12_AK5PF_Uncertainty.txt", getenv("CMSSW_BASE")));
+  if(TString(getenv("CMSSW_BASE")).Contains("CMSSW_5")) jetCorrectorParams = std::string(TString::Format("%s/src/MitPhysics/data/Summer12_V7_MC_Uncertainty_AK5PF.txt", getenv("CMSSW_BASE")));
+  else jetCorrectorParams = std::string(TString::Format("%s/src/MitPhysics/data/START42_V17_AK5PF_Uncertainty.txt", getenv("CMSSW_BASE")));
+//   if(TString(getenv("CMSSW_BASE")).Contains("CMSSW_5")) jetCorrectorParams = std::string(TString::Format("%s/src/MitPhysics/data/START50_V15_Uncertainty_AK5PF.t xt", getenv("CMSSW_BASE")));
+//   else jetCorrectorParams = std::string(TString::Format("%s/src/MitPhysics/data/START42_V12_AK5PF_Uncertainty.txt", getenv("CMSSW_BASE")));
   JetCorrectorParameters param(jetCorrectorParams);
   fJetUncertainties = new JetCorrectionUncertainty(param);
   // initialize tools for electron ID
@@ -134,58 +134,29 @@ HttNtupler::SlaveBegin()
 
   metSign = new MetSignificance();
 
-  // std::vector<std::string> weightFilesMuonID;
-//   weightFilesMuonID.push_back(getenv("CMSSW_BASE")+std::string("/src/MitPhysics/data/MuonMVAWeights/MuonIDMVA_BDTG_V0_barrel_lowpt.weights.xml"));
-//   weightFilesMuonID.push_back(getenv("CMSSW_BASE")+std::string("/src/MitPhysics/data/MuonMVAWeights/MuonIDMVA_BDTG_V0_barrel_highpt.weights.xml"));
-//   weightFilesMuonID.push_back(getenv("CMSSW_BASE")+std::string("/src/MitPhysics/data/MuonMVAWeights/MuonIDMVA_BDTG_V0_endcap_lowpt.weights.xml"));
-//   weightFilesMuonID.push_back(getenv("CMSSW_BASE")+std::string("/src/MitPhysics/data/MuonMVAWeights/MuonIDMVA_BDTG_V0_endcap_highpt.weights.xml"));
-//   weightFilesMuonID.push_back(getenv("CMSSW_BASE")+std::string("/src/MitPhysics/data/MuonMVAWeights/MuonIDMVA_BDTG_V0_tracker.weights.xml"));
-//   weightFilesMuonID.push_back(getenv("CMSSW_BASE")+std::string("/src/MitPhysics/data/MuonMVAWeights/MuonIDMVA_BDTG_V0_global.weights.xml"));
-
-//   std::vector<std::string> weightFilesMuonIso;
-//   weightFilesMuonIso.push_back(getenv("CMSSW_BASE")+std::string("/src/MitPhysics/data/MuonMVAWeights/MuonIsoMVA_BDTG_V0_barrel_lowpt.weights.xml"));
-//   weightFilesMuonIso.push_back(getenv("CMSSW_BASE")+std::string("/src/MitPhysics/data/MuonMVAWeights/MuonIsoMVA_BDTG_V0_barrel_highpt.weights.xml"));
-//   weightFilesMuonIso.push_back(getenv("CMSSW_BASE")+std::string("/src/MitPhysics/data/MuonMVAWeights/MuonIsoMVA_BDTG_V0_endcap_lowpt.weights.xml"));
-//   weightFilesMuonIso.push_back(getenv("CMSSW_BASE")+std::string("/src/MitPhysics/data/MuonMVAWeights/MuonIsoMVA_BDTG_V0_endcap_highpt.weights.xml"));
-//   weightFilesMuonIso.push_back(getenv("CMSSW_BASE")+std::string("/src/MitPhysics/data/MuonMVAWeights/MuonIsoMVA_BDTG_V0_tracker.weights.xml"));
-//   weightFilesMuonIso.push_back(getenv("CMSSW_BASE")+std::string("/src/MitPhysics/data/MuonMVAWeights/MuonIsoMVA_BDTG_V0_global.weights.xml"));
-
+ 
   std::vector<std::string> weightFilesEleID;
-//   weightFilesEleID.push_back(getenv("CMSSW_BASE")+std::string("/src/MitPhysics/data/ElectronMVAWeights/ElectronID_BDTG_EGamma2012NonTrigV0_Cat1.weights.xml"));
-//   weightFilesEleID.push_back(getenv("CMSSW_BASE")+std::string("/src/MitPhysics/data/ElectronMVAWeights/ElectronID_BDTG_EGamma2012NonTrigV0_Cat2.weights.xml"));
-//   weightFilesEleID.push_back(getenv("CMSSW_BASE")+std::string("/src/MitPhysics/data/ElectronMVAWeights/ElectronID_BDTG_EGamma2012NonTrigV0_Cat3.weights.xml"));
-//   weightFilesEleID.push_back(getenv("CMSSW_BASE")+std::string("/src/MitPhysics/data/ElectronMVAWeights/ElectronID_BDTG_EGamma2012NonTrigV0_Cat4.weights.xml"));
-//   weightFilesEleID.push_back(getenv("CMSSW_BASE")+std::string("/src/MitPhysics/data/ElectronMVAWeights/ElectronID_BDTG_EGamma2012NonTrigV0_Cat5.weights.xml"));
-//   weightFilesEleID.push_back(getenv("CMSSW_BASE")+std::string("/src/MitPhysics/data/ElectronMVAWeights/ElectronID_BDTG_EGamma2012NonTrigV0_Cat6.weights.xml"));
+  weightFilesEleID.push_back(getenv("CMSSW_BASE")+std::string("/src/MitPhysics/data/ElectronMVAWeights/ElectronID_BDTG_EGamma2012NonTrigV0_Cat1.weights.xml"));
+  weightFilesEleID.push_back(getenv("CMSSW_BASE")+std::string("/src/MitPhysics/data/ElectronMVAWeights/ElectronID_BDTG_EGamma2012NonTrigV0_Cat2.weights.xml"));
+  weightFilesEleID.push_back(getenv("CMSSW_BASE")+std::string("/src/MitPhysics/data/ElectronMVAWeights/ElectronID_BDTG_EGamma2012NonTrigV0_Cat3.weights.xml"));
+  weightFilesEleID.push_back(getenv("CMSSW_BASE")+std::string("/src/MitPhysics/data/ElectronMVAWeights/ElectronID_BDTG_EGamma2012NonTrigV0_Cat4.weights.xml"));
+  weightFilesEleID.push_back(getenv("CMSSW_BASE")+std::string("/src/MitPhysics/data/ElectronMVAWeights/ElectronID_BDTG_EGamma2012NonTrigV0_Cat5.weights.xml"));
+  weightFilesEleID.push_back(getenv("CMSSW_BASE")+std::string("/src/MitPhysics/data/ElectronMVAWeights/ElectronID_BDTG_EGamma2012NonTrigV0_Cat6.weights.xml"));
 
- //  std::vector<std::string> weightFilesEleIDTrig;
-//   weightFilesEleIDTrig.push_back(getenv("CMSSW_BASE")+std::string("/src/MitPhysics/data/ElectronMVAWeights/Electrons_BDTG_TrigV0_Cat1.weights.xml"));
-//   weightFilesEleIDTrig.push_back(getenv("CMSSW_BASE")+std::string("/src/MitPhysics/data/ElectronMVAWeights/Electrons_BDTG_TrigV0_Cat2.weights.xml"));
-//   weightFilesEleIDTrig.push_back(getenv("CMSSW_BASE")+std::string("/src/MitPhysics/data/ElectronMVAWeights/Electrons_BDTG_TrigV0_Cat3.weights.xml"));
-//   weightFilesEleIDTrig.push_back(getenv("CMSSW_BASE")+std::string("/src/MitPhysics/data/ElectronMVAWeights/Electrons_BDTG_TrigV0_Cat4.weights.xml"));
-//   weightFilesEleIDTrig.push_back(getenv("CMSSW_BASE")+std::string("/src/MitPhysics/data/ElectronMVAWeights/Electrons_BDTG_TrigV0_Cat5.weights.xml"));
-//   weightFilesEleIDTrig.push_back(getenv("CMSSW_BASE")+std::string("/src/MitPhysics/data/ElectronMVAWeights/Electrons_BDTG_TrigV0_Cat6.weights.xml"));
-
-//   std::vector<std::string> weightFilesEleIso;
-//   weightFilesEleIso.push_back(getenv("CMSSW_BASE")+std::string("/src/MitPhysics/data/ElectronMVAWeights/ElectronIso_BDTG_V0_BarrelPt5To10.weights.xml"));
-//   weightFilesEleIso.push_back(getenv("CMSSW_BASE")+std::string("/src/MitPhysics/data/ElectronMVAWeights/ElectronIso_BDTG_V0_EndcapPt5To10.weights.xml"));
-//   weightFilesEleIso.push_back(getenv("CMSSW_BASE")+std::string("/src/MitPhysics/data/ElectronMVAWeights/ElectronIso_BDTG_V0_BarrelPt10ToInf.weights.xml"));
-//   weightFilesEleIso.push_back(getenv("CMSSW_BASE")+std::string("/src/MitPhysics/data/ElectronMVAWeights/ElectronIso_BDTG_V0_EndcapPt10ToInf.weights.xml"));
-
- //  fMuonMVAID = new MuonIDMVA();
-//   fMuonMVAID->Initialize("BDTG method",MuonIDMVA::kIDV0,kTRUE,weightFilesMuonID);
-
-//   fMuonMVAIso = new MuonIDMVA();
-//   fMuonMVAIso->Initialize("BDTG method",MuonIDMVA::kIsoRingsV0,kTRUE,weightFilesMuonIso);
+  std::vector<std::string> weightFilesEleIDTrig;
+  weightFilesEleIDTrig.push_back(getenv("CMSSW_BASE")+std::string("/src/MitPhysics/data/ElectronMVAWeights/Electrons_BDTG_TrigV0_Cat1.weights.xml"));
+  weightFilesEleIDTrig.push_back(getenv("CMSSW_BASE")+std::string("/src/MitPhysics/data/ElectronMVAWeights/Electrons_BDTG_TrigV0_Cat2.weights.xml"));
+  weightFilesEleIDTrig.push_back(getenv("CMSSW_BASE")+std::string("/src/MitPhysics/data/ElectronMVAWeights/Electrons_BDTG_TrigV0_Cat3.weights.xml"));
+  weightFilesEleIDTrig.push_back(getenv("CMSSW_BASE")+std::string("/src/MitPhysics/data/ElectronMVAWeights/Electrons_BDTG_TrigV0_Cat4.weights.xml"));
+  weightFilesEleIDTrig.push_back(getenv("CMSSW_BASE")+std::string("/src/MitPhysics/data/ElectronMVAWeights/Electrons_BDTG_TrigV0_Cat5.weights.xml"));
+  weightFilesEleIDTrig.push_back(getenv("CMSSW_BASE")+std::string("/src/MitPhysics/data/ElectronMVAWeights/Electrons_BDTG_TrigV0_Cat6.weights.xml"));
 
   fElectronMVAID = new ElectronIDMVA();
   fElectronMVAID->Initialize("BDTG method",ElectronIDMVA::kIDEGamma2012NonTrigV0,kTRUE,weightFilesEleID);
 
-//   fElectronMVAIDTrig = new ElectronIDMVA();
-//   fElectronMVAIDTrig->Initialize("BDTG method",ElectronIDMVA::kIDHWW2012TrigV0,kTRUE,weightFilesEleIDTrig);
+  fElectronMVAIDTrig = new ElectronIDMVA();
+  fElectronMVAIDTrig->Initialize("BDTG method",ElectronIDMVA::kIDHWW2012TrigV0,kTRUE,weightFilesEleIDTrig);
 
-//   fElectronMVAIso = new ElectronIDMVA();
-//   fElectronMVAIso->Initialize("BDTG method",ElectronIDMVA::kIsoRingsV0,kTRUE,weightFilesEleIso);
 
   fJetIDMVA  = new JetIDMVA();
   if(TString(getenv("CMSSW_BASE")).Contains("CMSSW_5")) {
@@ -208,18 +179,7 @@ HttNtupler::SlaveBegin()
 
   fTauMVAIso = new TauIsoMVA();
   fTauMVAIso->Initialize(TString(getenv("CMSSW_BASE")+string("/src/MitPhysics/data/SXIsoMVA_BDTG.weights.xml")));
-  
-  //fAntiElectronID = new AntiElectronIDMVA();
-  //fAntiElectronID->Initialize("BDT",
-//			      TString(getenv("CMSSW_BASE")+string("/src/MitHtt/data/AntiElectronMVA/TMVAClassification_v2_X_0BL_BDT.weights.xml")),
-//			      TString(getenv("CMSSW_BASE")+string("/src/MitHtt/data/AntiElectronMVA/TMVAClassification_v2_1_1BL_BDT.weights.xml")),
-//			      TString(getenv("CMSSW_BASE")+string("/src/MitHtt/data/AntiElectronMVA/TMVAClassification_v2_0_1BL_BDT.weights.xml")),
-//			      TString(getenv("CMSSW_BASE")+string("/src/MitHtt/data/AntiElectronMVA/TMVAClassification_v2_X_0EC_BDT.weights.xml")),
-//			      TString(getenv("CMSSW_BASE")+string("/src/MitHtt/data/AntiElectronMVA/TMVAClassification_v2_1_1EC_BDT.weights.xml")),
-//			      TString(getenv("CMSSW_BASE")+string("/src/MitHtt/data/AntiElectronMVA/TMVAClassification_v2_0_1EC_BDT.weights.xml"))
-//			      );
-  
-				 
+ 			 
 				 
   fMVAMet    = new MVAMet();
   if(TString(getenv("CMSSW_BASE")).Contains("CMSSW_5")) {
@@ -239,6 +199,16 @@ HttNtupler::SlaveBegin()
                    TString(getenv("CMSSW_BASE")+string("/src/MitPhysics/data/gbrmetu1_42.root")),
                    TString(getenv("CMSSW_BASE")+string("/src/MitPhysics/data/gbrmetu2_42.root")));
   }
+
+  fAntiElectronIDMVA = new AntiElectronIDMVA();
+  fAntiElectronIDMVA->Initialize("BDT",
+  			      TString(getenv("CMSSW_BASE")+string("/src/MitHtt/data/AntiElectronMVA/TMVAClassification_v2_X_0BL_BDT.weights.xml")),
+			      TString(getenv("CMSSW_BASE")+string("/src/MitHtt/data/AntiElectronMVA/TMVAClassification_v2_1_1BL_BDT.weights.xml")),
+			      TString(getenv("CMSSW_BASE")+string("/src/MitHtt/data/AntiElectronMVA/TMVAClassification_v2_0_1BL_BDT.weights.xml")),
+			      TString(getenv("CMSSW_BASE")+string("/src/MitHtt/data/AntiElectronMVA/TMVAClassification_v2_X_0EC_BDT.weights.xml")),
+			      TString(getenv("CMSSW_BASE")+string("/src/MitHtt/data/AntiElectronMVA/TMVAClassification_v2_1_1EC_BDT.weights.xml")),
+			      TString(getenv("CMSSW_BASE")+string("/src/MitHtt/data/AntiElectronMVA/TMVAClassification_v2_0_1EC_BDT.weights.xml"))
+			      );
   
   // setup selection with JSON file, if necessary
   for(unsigned int idx=0; idx<fJSONv.size(); ++idx){
@@ -262,7 +232,7 @@ void
 HttNtupler::SlaveTerminate()
 {
   fEventTree ->Print(); fOutputFile->Write(); fOutputFile->Close(); cleanup();
-  delete fJetCorrector; delete fJetUncertainties; delete fEleTools, delete fMuonTools, delete metSign;delete fElectronMVAID; delete fJetIDMVA; delete fTauMVAIso;delete fMVAMet;
+  delete fJetCorrector; delete fJetUncertainties; delete fEleTools, delete fMuonTools, delete metSign;delete fElectronMVAID; delete fJetIDMVA; delete fTauMVAIso;delete fMVAMet; delete fAntiElectronIDMVA;
 
   // dump json file
   TString jsonfname = fOutputName.ReplaceAll("root","json");
@@ -322,7 +292,7 @@ HttNtupler::Process()
   // loop and fill jets
   fillJets();
   // loop and fill photons
-  fillPhotons();
+  //fillPhotons();
   // fill the tree
   fEventTree->Fill();
 }
@@ -619,19 +589,10 @@ HttNtupler::fillMuons()
     pMuon->eta      = muTrk->Eta();
     pMuon->phi      = muTrk->Phi();
     pMuon->ptErr    = muTrk->PtErr();
-    pMuon->staPt    = mu->HasStandaloneTrk() ? mu->StandaloneTrk()->Pt()  : -9999.;  
-    pMuon->staEta   = mu->HasStandaloneTrk() ? mu->StandaloneTrk()->Eta() : -9999.;
-    pMuon->staPhi   = mu->HasStandaloneTrk() ? mu->StandaloneTrk()->Phi() : -9999.;
     pMuon->trkIso03 = mu->IsoR03SumPt();
     pMuon->emIso03  = mu->IsoR03EmEt();
     pMuon->hadIso03 = mu->IsoR03HadEt();
     pMuon->hoIso03  = mu->IsoR03HoEt();
-    pMuon->trkIso05 = mu->IsoR05SumPt();
-    pMuon->emIso05  = mu->IsoR05EmEt();
-    pMuon->hadIso05 = mu->IsoR05HadEt();
-    pMuon->hoIso05  = mu->IsoR05HoEt();
-    pMuon->pfIso03  = computePFMuonIso(mu,0.3);
-    pMuon->pfIso04  = computePFMuonIso(mu,0.4);  
     pMuon->d0       = muTrk->D0Corrected(*fVertex);
     pMuon->dz       = muTrk->DzCorrected(*fVertex);
     pMuon->d0Sig    = mu->D0PVSignificance();
@@ -639,8 +600,6 @@ HttNtupler::fillMuons()
     pMuon->ip3dSig  = mu->Ip3dPVSignificance();
     pMuon->d0Ub     = mu->D0PVUB();
     pMuon->d0UbSig  = mu->D0PVUBSignificance();
-    pMuon->ip3dUb   = mu->Ip3dPVUB();
-    pMuon->ip3dUbSig= mu->Ip3dPVUBSignificance();
     pMuon->d0Bs     = mu->D0PVBS();
     pMuon->d0BsSig  = mu->D0PVBSSignificance();
     pMuon->ip3dBs   = mu->Ip3dPVBS();
@@ -666,35 +625,15 @@ HttNtupler::fillMuons()
     pMuon->hltMatchBits    = matchHLT(muTrk->Eta(),muTrk->Phi(),muTrk->Pt());
     pMuon->trkID           = mu->HasTrackerTrk() ? mu->TrackerTrk()->GetUniqueID() :  0;
 
-    // additional variables used for MVA id
-    pMuon->trkKink         = mu->TrkKink();
-    pMuon->globalKink      = mu->GlbKink();
-    pMuon->segCompatibility  = fMuonTools->GetSegmentCompatability(mu);
-    pMuon->caloCompatibility = fMuonTools->GetCaloCompatability(mu, kTRUE, kTRUE);
-    pMuon->hadEnergy         = mu->HadEnergy();
-    pMuon->hadS9Energy       = mu->HadS9Energy();
-    pMuon->hoEnergy          = mu->HoEnergy();
-    pMuon->hoS9Energy        = mu->HoS9Energy();
-    pMuon->emEnergy          = mu->EmEnergy();
-    pMuon->emS9Energy        = mu->EmS9Energy();
-
-   //  MuonTools::EMuonEffectiveAreaTarget EffectiveAreaTarget;
-//     if(fIsData || fUseGen == ESampleType::kEmbed) EffectiveAreaTarget = MuonTools::kMuEAData2011;
-//     else EffectiveAreaTarget = MuonTools::kMuEAFall11MC;
-//     const Vertex* pv = fVertex;
-//     const ElectronCol* goodElectrons = 0;
-//     const MuonCol*     goodMuons     = 0;
-
-    pMuon->mvaValID        = 0; //((mu->IsGlobalMuon() || mu->IsTrackerMuon()) ? fMuonMVAID->MVAValue(mu, pv, fMuonTools, fPFCandidates, fPUEnergyDensity, EffectiveAreaTarget, goodElectrons, goodMuons) : -2.0);
-    pMuon->mvaValIso       = 0; //((mu->IsGlobalMuon() || mu->IsTrackerMuon()) ? fMuonMVAIso->MVAValue(mu, pv, fMuonTools, fPFCandidates, fPUEnergyDensity, EffectiveAreaTarget, goodElectrons, goodMuons) : -2.0);
     pMuon->pfIsoCharged    = computeCommonIso(mu, fPFNoPileUp    , 0.0, 0.4, 0.0001,  1);
     pMuon->pfIsoChargedNoZ = computeCommonIso(mu, fPFNoPileUpNoZ , 0.0, 0.4, 0.0001,  1);
     pMuon->pfIsoNeutral    = computeCommonIso(mu, fPFNoPileUp    , 0.5, 0.4,   0.01,  2);
     pMuon->pfIsoNeutralNoZ = computeCommonIso(mu, fPFNoPileUpNoZ , 0.5, 0.4,   0.01,  2);
     pMuon->pfIsoGamma      = computeCommonIso(mu, fPFNoPileUp    , 0.5, 0.4,   0.01,  3);
     pMuon->pfIsoGammaNoZ   = computeCommonIso(mu, fPFNoPileUpNoZ , 0.5, 0.4,   0.01,  3);
-    pMuon->puIso           = computeNaiveIso(mu, fPFPileUp    , 0.5, 0.4, 0.01);
+    pMuon->puIso           = computeNaiveIso(mu, fPFPileUp    , 0.5, 0.4, 0.01); 
     pMuon->puIsoNoZ        = computeNaiveIso(mu, fPFPileUpNoZ , 0.5, 0.4, 0.01);
+    pMuon->pfDeltaBetaIso  = pMuon->pfIsoCharged + max(pMuon->pfIsoNeutral + pMuon->pfIsoGamma - 0.5*pMuon->puIso,0.0);
     pMuon->pfPx = 0; pMuon->pfPy = 0;
     bool foundPFMatch = false;
     unsigned int matchedType = 9999;
@@ -744,12 +683,6 @@ HttNtupler::fillElecs()
     pElectron->trkIso03        = ele->TrackIsolationDr03();
     pElectron->emIso03         = ele->EcalRecHitIsoDr03();
     pElectron->hadIso03        = ele->HcalTowerSumEtDr03();
-    pElectron->trkIso04        = ele->TrackIsolationDr04();
-    pElectron->emIso04         = ele->EcalRecHitIsoDr04();
-    pElectron->hadIso04        = ele->HcalTowerSumEtDr04();
-    pElectron->pfIso03         = computePFElecIso(ele,0.3); 
-    pElectron->pfIso04         = computePFElecIso(ele,0.4);
-
     pElectron->d0              = ele->BestTrk()->D0Corrected(*fVertex);
     pElectron->dz              = ele->BestTrk()->DzCorrected(*fVertex);  
     pElectron->d0Sig           = ele->D0PVSignificance();
@@ -771,9 +704,6 @@ HttNtupler::fillElecs()
     pElectron->P               = ele->P();
     pElectron->ip3d            = ele->Ip3dPV();
     pElectron->ip3dSig         = ele->Ip3dPVSignificance();
-    pElectron->ESeedClusterOverPIn   = ele->ESeedClusterOverPIn();
-    pElectron->ESeedClusterOverPOut  = ele->ESeedClusterOverPout();
-    pElectron->EEleClusterOverPOut   = ele->EEleClusterOverPout();
     pElectron->sigiPhiiPhi     = ele->SCluster()->Seed()->CoviPhiiPhi();
     pElectron->nBrem           = ele->NumberOfClusters()-1;  
     pElectron->hltMatchBits    = matchHLT(ele->SCluster()->Eta(), ele->SCluster()->Phi(), ele->SCluster()->Et());
@@ -793,23 +723,6 @@ HttNtupler::fillElecs()
     pElectron->ip3dBs          = ele->Ip3dPVBS();
     pElectron->ip3dBsSig       = ele->Ip3dPVBSSignificance();
 
-    // additional variables used for mva id
-    pElectron->gsfTrackChi2OverNdof = ele->BestTrk()->Chi2() / ele->BestTrk()->Ndof();
-    pElectron->kfTrackChi2OverNdof = (ele->TrackerTrk() ? ele->TrackerTrk()->Chi2() / ele->TrackerTrk()->Ndof() : -1);
-    pElectron->kfTrackNHits = (ele->TrackerTrk() ? ele->TrackerTrk()->NHits() : 0);
-    pElectron->kfTrackNLayers = ele->CTFTrkNLayersWithMeasurement();
-    pElectron->hcalDepth1OverEcal = ele->HcalDepth1OverEcal();
-    pElectron->hcalDepth2OverEcal = ele->HcalDepth2OverEcal();
-    pElectron->deltaEtaCalo    = ele->DeltaEtaSeedClusterTrackAtCalo();
-    pElectron->deltaPhiCalo    = ele->DeltaPhiSeedClusterTrackAtCalo();
-    pElectron->R9              = ele->SCluster()->R9();
-    pElectron->scEtaWidth      = ele->SCluster()->EtaWidth();
-    pElectron->scPhiWidth      = ele->SCluster()->PhiWidth();
-    pElectron->coviEtaiPhi     = ele->SCluster()->Seed()->CoviEtaiPhi();
-    pElectron->psOverRaw       = ele->SCluster()->PreshowerEnergy() / ele->SCluster()->RawEnergy();
-    pElectron->seedE1x5OverE = ele->SCluster()->Seed()->E1x5() / ele->SCluster()->Seed()->Energy();
-    pElectron->seedE5x5OverE = ele->SCluster()->Seed()->E5x5() / ele->SCluster()->Seed()->Energy();
-
     ElectronTools::EElectronEffectiveAreaTarget EffectiveAreaTarget;
     if(fIsData || fUseGen == ESampleType::kEmbed) EffectiveAreaTarget = ElectronTools::kEleEAData2012;
     else EffectiveAreaTarget = ElectronTools::kEleEAFall11MC;
@@ -818,8 +731,7 @@ HttNtupler::fillElecs()
     const MuonCol*     goodMuons     = 0;
 
     pElectron->mvaValID        = fElectronMVAID->MVAValue(ele, pv, fPFCandidates, fPUEnergyDensity, EffectiveAreaTarget, goodElectrons, goodMuons);
-    pElectron->mvaValIDTrig    = 0; //fElectronMVAIDTrig->MVAValue(ele, pv, fPFCandidates, fPUEnergyDensity, EffectiveAreaTarget, goodElectrons, goodMuons);
-    pElectron->mvaValIso       = 0; //fElectronMVAIso->MVAValue(ele, pv, fPFCandidates, fPUEnergyDensity, EffectiveAreaTarget, goodElectrons, goodMuons);
+    pElectron->mvaValIDTrig    = fElectronMVAIDTrig->MVAValue(ele, pv, fPFCandidates, fPUEnergyDensity, EffectiveAreaTarget, goodElectrons, goodMuons);
     pElectron->pfIsoCharged    = computeCommonIso(ele, fPFNoPileUp    , 0.0, 0.4, fabs(ele->SCluster()->Eta()) > 1.479 ? 0.015 : 0.01,  1);
     pElectron->pfIsoChargedNoZ = computeCommonIso(ele, fPFNoPileUpNoZ , 0.0, 0.4, fabs(ele->SCluster()->Eta()) > 1.479 ? 0.015 : 0.01,  1);
     pElectron->pfIsoNeutral    = computeCommonIso(ele, fPFNoPileUp    , 0.0, 0.4,   0.0,  2);
@@ -828,14 +740,7 @@ HttNtupler::fillElecs()
     pElectron->pfIsoGammaNoZ   = computeCommonIso(ele, fPFNoPileUpNoZ , 0.0, 0.4,  fabs(ele->SCluster()->Eta()) > 1.479 ? 0.08 : 0.0,  3);
     pElectron->puIso           = computeNaiveIso(ele, fPFPileUp    , 0.0, 0.4,  0.01);
     pElectron->puIsoNoZ        = computeNaiveIso(ele, fPFPileUpNoZ , 0.0, 0.4,  0.01);
-    pElectron->pfPx=0; pElectron->pfPy=0;
-    for(unsigned int i=0; i<fPFCandidates->GetEntries(); ++i){
-      const PFCandidate* pfcand = fPFCandidates->At(i);
-      if( (pfcand->HasTrackerTrk() && ele->TrackerTrk() == pfcand->TrackerTrk()) || (pfcand->HasGsfTrk() && ele->GsfTrk() == pfcand->GsfTrk()) ){
-	pElectron->pfPx = pfcand->Px(); pElectron->pfPy = pfcand->Py();
-	break;
-      }	 
-    }
+    pElectron->pfDeltaBetaIso = pElectron->pfIsoCharged + max(pElectron->pfIsoNeutral + pElectron->pfIsoGamma - 0.5*pElectron->puIso,0.0);
   }
 }
 
@@ -922,14 +827,7 @@ HttNtupler::fillPFTaus()
       pPFTau->puIsoNoZ    = computeCommonIso((const ChargedParticle*) pftau, (PFCandidateCol*)fPFCandidates, 0.5, 0.5, 0.0001, 0);
       pPFTau->puIsoNoPt   = computeCommonIso((const ChargedParticle*) pftau,                   fPFPileUp    ,  0., 0.5,     0., 0);
       pPFTau->ringIso =  fTauMVAIso->MVAValue(pftau,fPUEnergyDensity->At(0)->Rho());
-      //pPFTau->antiEleID =  fAntiElectronID->MVAValue(pftau);
-     //  pPFTau->antiEleID =  MVAValue(pPFTau->eta,pPFTau->pt,
-// 		  pPFTau->nSignalPFChargedHadrCands,pPFTau->nSignalPFGammaCands,
-// 		  pPFTau->leadChargedHadronPFCand.mvaEPi,
-// 		  pPFTau->hcalOverP, pPFTau->ecalOverP,
-// 		  pPFTau->hasGsf,pPFTau->m,pPFTau->emFraction,
-// 		  pPFTau->gammaDEta2, pPFTau->gammaDPhi2,pPFTau->gammaPtR
-// 		  );
+      pPFTau->antiEleID =  fAntiElectronIDMVA->MVAValue(pPFTau);
       if(pftau->LeadChargedHadronPFCand() && pftau->LeadChargedHadronPFCand()->Trk()) {
 	pPFTau->isoEtPU = computePFTauIso(pftau, pftau->LeadChargedHadronPFCand()->Trk());
       }
@@ -968,7 +866,6 @@ HttNtupler::fillJets()
     fJetCorrector->setJetPt ( rawMom.Pt()  );
     fJetCorrector->setJetPhi( rawMom.Phi() );
     fJetCorrector->setJetE  ( rawMom.E()   );
-    //fJetCorrector->setRho   ( fPUEnergyDensity->At(0)->RhoHighEta() );
     fJetCorrector->setRho   ( fPUEnergyDensity->At(0)->RhoKt6PFJets() );
     fJetCorrector->setJetA  ( jet->JetArea() );
     fJetCorrector->setJetEMF( -99.0 );        
@@ -993,7 +890,6 @@ HttNtupler::fillJets()
       fJetCorrector->setJetPt ( rawMom.Pt()  );
       fJetCorrector->setJetPhi( rawMom.Phi() );
       fJetCorrector->setJetE  ( rawMom.E()   );
-      //fJetCorrector->setRho   ( fPUEnergyDensity->At(0)->RhoHighEta() );
       fJetCorrector->setRho   ( fPUEnergyDensity->At(0)->RhoKt6PFJets() );
       fJetCorrector->setJetA  ( jet->JetArea() );
       fJetCorrector->setJetEMF( -99.0 );
@@ -1002,7 +898,6 @@ HttNtupler::fillJets()
       pPFJet->pt          = rawMom.Pt()*fJetCorrector->getCorrection();
       pPFJet->eta         = rawMom.Eta();
       pPFJet->phi         = rawMom.Phi();
-      //pPFJet->mass        = jet->Mass();
       pPFJet->mass        = rawMom.M()*fJetCorrector->getCorrection();
       pPFJet->unc         = fJetUncertainties->getUncertainty(true);
       pPFJet->ptraw       = rawMom.Pt();
@@ -1013,25 +908,22 @@ HttNtupler::fillJets()
       pPFJet->neuEMfrac   = jet->NeutralEmEnergy()/jet->E();
       pPFJet->chgHadrfrac = jet->ChargedHadronEnergy()/jet->E();
       pPFJet->neuHadrfrac = jet->NeutralHadronEnergy()/jet->E();
-      pPFJet->tche        = jet->TrackCountingHighEffBJetTagsDisc();
-      pPFJet->tchp        = jet->TrackCountingHighPurBJetTagsDisc();
       pPFJet->csv         = jet->CombinedSecondaryVertexBJetTagsDisc();
-      pPFJet->csvMva      = jet->CombinedSecondaryVertexMVABJetTagsDisc();
       pPFJet->mva          = fJetIDMVA->MVAValue(jet,fVertex,fPrimVerts,fJetCorrector,fPUEnergyDensity);
       pPFJet->id           = (fJetIDMVA->pass(jet,fVertex,fPrimVerts,fJetCorrector,fPUEnergyDensity) ? 1 : 0) ;
 
       pPFJet->mcFlavor    = jet->MatchedMCFlavor();
       int matchedFlavor   = -999;
-//       if( fGenJets ){
-// 	double dRmin = 0.3;
-// 	for(unsigned int i=0; i<fGenJets->GetEntries(); ++i){
-// 	  const GenJet* j = fGenJets->At(i);
-// 	  if(MathUtils::DeltaR(*jet,*j) < dRmin) {
-// 	    dRmin = MathUtils::DeltaR(*jet,*j);
-// 	    matchedFlavor = j->MatchedMCFlavor();
-// 	  }
-// 	}
-//       }
+      if( fGenJets ){
+	double dRmin = 0.3;
+	for(unsigned int i=0; i<fGenJets->GetEntries(); ++i){
+	  const GenJet* j = fGenJets->At(i);
+	  if(MathUtils::DeltaR(*jet,*j) < dRmin) {
+	    dRmin = MathUtils::DeltaR(*jet,*j);
+	    matchedFlavor = j->MatchedMCFlavor();
+	  }
+	}
+      }
       pPFJet->matchedFlavor = matchedFlavor;
 
       int matchedId       = -999;
