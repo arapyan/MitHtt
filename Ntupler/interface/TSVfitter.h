@@ -3,6 +3,7 @@
 
 #include "TSVfit.h"
 #include "TObject.h"
+#include "TMatrixD.h"
 #include "TLorentzVector.h"
 
 /**
@@ -28,6 +29,7 @@ namespace mithep
     ~TSVfitter(){}
     /// do the fit 
     TLorentzVector fit(TSVfit* fit, double met, double metPhi);
+    TLorentzVector fit(TMatrixD lMM, mithep::FourVectorM dau1, mithep::FourVectorM dau2, double iMet, double iMetPhi);
     //return additional variables
     float          fittedMET()    {return fFittedMET;}
     float          measMET()      {return fMeasMET;}

@@ -38,6 +38,10 @@ namespace mithep
     float csv;
     /// combined secondary vertex MVA discriminator
     float csvMva;
+    /// jet MVA output
+    float mva;
+    /// pass or fail MVA id
+    unsigned int id;
     /// number of charged hardons in jet
     unsigned int nCharged;
     /// charged electromagnetic energy over uncorrected jet energy
@@ -57,7 +61,7 @@ namespace mithep
     /// HLT bits for which the offline reconstructed jet could be matched on trigger level
     TriggerObjects  hltMatchBits;
     
-    ClassDef(TJet,4)
+    ClassDef(TJet,5)
   };
 }
 #endif

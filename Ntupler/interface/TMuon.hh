@@ -42,24 +42,6 @@ namespace mithep
     float hadIso05;
     /// classic detector based HO isolation with isolation cone of 0.5
     float hoIso05;
-    /// miscellaneous PF isolation variables used for MVA id with isolation cone of 0.3
-    float chargedIso03, chargedIso03FromOtherVertices, neutralIso03_05Threshold, neutralIso03_10Threshold;
-    /// miscellaneous PF isolation variables used for MVA id with isolation cone of 0.4
-    float chargedIso04, chargedIso04FromOtherVertices, neutralIso04_05Threshold, neutralIso04_10Threshold;
-    /// charged PF isolation computed in rings of DR
-    float chargedIso_DR0p0To0p1, chargedIso_DR0p1To0p2, chargedIso_DR0p2To0p3, chargedIso_DR0p3To0p4, chargedIso_DR0p4To0p5, chargedIso_DR0p5To0p7, chargedIso_DR0p7To1p0;
-    /// gamma PF isolation computed in rings of DR
-    float gammaIso_DR0p0To0p1, gammaIso_DR0p1To0p2, gammaIso_DR0p2To0p3, gammaIso_DR0p3To0p4, gammaIso_DR0p4To0p5, gammaIso_DR0p5To0p7, gammaIso_DR0p7To1p0;
-    /// neutral PF isolation computed in rings of DR
-    float neutralIso_DR0p0To0p1, neutralIso_DR0p1To0p2, neutralIso_DR0p2To0p3, neutralIso_DR0p3To0p4, neutralIso_DR0p4To0p5, neutralIso_DR0p5To0p7, neutralIso_DR0p7To1p0;
-    /// shower shape variables from charged PF candidates
-    float chargedIso_MeanEta, chargedIso_MeanPhi, chargedIso_SigEtaEta, chargedIso_SigEtaPhi, chargedIso_SigPhiPhi;
-    /// shower shape variables from neutral PF candidates
-    float neutralIso_MeanEta, neutralIso_MeanPhi, neutralIso_SigEtaEta, neutralIso_SigEtaPhi, neutralIso_SigPhiPhi;
-    /// shower shape variables from gamma PF candidates
-    float gammaIso_MeanEta, gammaIso_MeanPhi, gammaIso_SigEtaEta, gammaIso_SigEtaPhi, gammaIso_SigPhiPhi;
-    /// directional isolation variables
-    float directionalChargedIso, directionalNeutralIso, directionalGammaIso, directionalPFIso;
     /// particle flow isolation with charged component restricted to the hard interaction vertex with isolation cone 0.3 and 0.4
     float pfIso03, pfIso04;
     /// impact parameter wrt the selected primary vertex along the z-axis and perpendicular to to the z-axis, impact parameter significance
@@ -68,6 +50,8 @@ namespace mithep
     float ip3d, ip3dSig;
     // impact parameters calculated with respect to unbiased vertex
     float d0Ub, d0UbSig, ip3dUb, ip3dUbSig;
+    // impact parameters calculated with beam spot constraint
+    float d0Bs, d0BsSig, ip3dBs, ip3dBsSig;
     /// track chi**2/ndof
     float tkNchi2;
     /// muon fit chi**2/ndof (in order global, standalone, tracker); first come first fill
@@ -110,6 +94,8 @@ namespace mithep
     float emEnergy;
     /// energy deposit in 3x3 ecal
     float emS9Energy;
+    /// mva values
+    float mvaValID, mvaValIso;
     /// common isolation from pfNoPileup, ptMin=0.0, dRMax=0.4, dRMin=0.0001, type charged hadron  
     float pfIsoCharged;
     /// common isolation from pfNoPileup, ptMin=0.0, dRMax=0.4, dRMin=0.0001, type charged hadron (no Z restriction)
@@ -128,8 +114,12 @@ namespace mithep
     float puIsoNoZ;
     /// px and py of the matching particle flow candidate
     float pfPx, pfPy;
+    /// check if the muon is matched to a PF candidate
+    bool matchesPFCand;
+    /// check type of matched PF candidate
+    unsigned int matchedPFType;
     
-    ClassDef(TMuon, 4)
+    ClassDef(TMuon, 7)
   };  
 }
 #endif

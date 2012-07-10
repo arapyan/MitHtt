@@ -53,7 +53,7 @@ namespace mithep {
     /// add electron to input for the significance calculation
     void add(const mithep::Electron    *iElectron, std::vector<metsig::SigInputObj> &fSig);
     /// get the MET significance
-    TMatrixD getSignificance(const mithep::PFJetCol *iJets,const mithep::PFCandidateCol *iCands, const mithep::PFTau    *iTau ,const mithep::Muon *iMuon,const mithep::Electron *iElectron);
+    TMatrixD getSignificance(const mithep::PFJetCol *iJets,const mithep::PFCandidateCol *iCands, const mithep::PFTau    *iTau , const mithep::PFTau    *jTau, const mithep::Muon *iMuon,const mithep::Electron *iElectron);
     /// load resolutions and instantiate SgnAlgoResolutions object
     void loadResolutions();
 

@@ -48,4 +48,40 @@ TLorentzVector mithep::TSVfitter::fit(mithep::TSVfit* fit, double iMet, double i
   //fMeasMETPhi   = algo.measuredMET().Phi();
   //std::cout << "===> Fit check " << fit->mass << " -- " << lL.M() << std::endl;
   return result;
-} 
+}
+
+ 
+TLorentzVector mithep::TSVfitter::fit(TMatrixD lMM, mithep::FourVectorM dau1, mithep::FourVectorM dau2, double iMet, double iMetPhi) 
+{
+  // setup lorentz vectors for input leptons
+  NSVfitStandalone::LorentzVector lLep1; lLep1.SetPxPyPzE( dau1.Px(), dau1.Py(), dau1.Pz(), dau1.E() );
+  NSVfitStandalone::LorentzVector lLep2; lLep2.SetPxPyPzE( dau2.Px(), dau2.Py(), dau2.Pz(), dau2.E() );
+  //std::cout << "---> Mass Check " << fit->daughter1.M() << " -- " << fit->daughter2.M() << std::endl;
+
+  // setup lepton types (depending on mass of the input particles)
+  NSVfitStandalone::kDecayType lId2 = NSVfitStandalone::kLepDecay; 
+  //if(dau2.M() != 0.105658 || dau2.M() != 0.000510999){  
+    //lId2 = NSVfitStandalone::kHadDecay;
+  //}
+  // setup MET vector
+  TVector3 buffer; buffer.SetPtThetaPhi(iMet,0,iMetPhi);
+  NSVfitStandalone::Vector lMet(buffer.x(), buffer.y(), buffer.z());
+  // configure the fit
+  std::vector<NSVfitStandalone::MeasuredTauLepton> measuredTauLeptons;
+  measuredTauLeptons.push_back(NSVfitStandalone::MeasuredTauLepton(NSVfitStandalone::kLepDecay, lLep1));
+  measuredTauLeptons.push_back(NSVfitStandalone::MeasuredTauLepton(lId2                       , lLep2));
+  NSVfitStandaloneAlgorithm algo(measuredTauLeptons,lMet, lMM, 0);
+  algo.maxObjFunctionCalls(5000);
+  algo.fit(); 
+  //algo.integrate();
+  NSVfitStandalone::LorentzVector lL  = algo.fittedDiTauSystem(); TLorentzVector result;
+  result.SetXYZM(lL.x(), lL.y(), lL.z(), lL.mass());
+  //Fill Additional variables
+  fMassUnc      = algo.massUncert();
+  //fFittedMET    = algo.fittedMET().Pt();
+  //fFittedMETPhi = algo.fittedMET().Phi();
+  //fMeasMET      = algo.measuredMET().Pt();
+  //fMeasMETPhi   = algo.measuredMET().Phi();
+  //std::cout << "===> Fit check " << fit->mass << " -- " << lL.M() << std::endl;
+  return result;
+}

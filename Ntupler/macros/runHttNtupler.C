@@ -114,11 +114,11 @@ void runHttNtupler(
   // Jet corrections
   char* PATH = getenv("CMSSW_BASE"); assert(PATH);
   TString path(TString::Format("%s/src/MitPhysics/data/", PATH));
-  mymod->AddJetCorr(path + "START42_V12_AK5PF_L1FastJet.txt"   );
-  mymod->AddJetCorr(path + "START42_V12_AK5PF_L2Relative.txt"  );
-  mymod->AddJetCorr(path + "START42_V12_AK5PF_L3Absolute.txt"  );
+  mymod->AddJetCorr(path + "START50_V15_L1FastJet_AK5PF.txt"   );
+  mymod->AddJetCorr(path + "START50_V15_L2Relative_AK5PF.txt"  );
+  mymod->AddJetCorr(path + "START50_V15_L3Absolute_AK5PF.txt"  );
   if(isData){
-    mymod->AddJetCorr(path + "START42_V12_AK5PF_L2L3Residual.txt");
+    mymod->AddJetCorr(path + "START50_V15_L2L3Residual_AK5PF.txt");
   }
   if(TString(json).Length() > 0){
     mymod->AddJSON(json);
@@ -505,8 +505,218 @@ void runHttNtupler(
   //mymod->AddTrigger("HLT_Mu5_v9", kHLT_Mu5 , "hltSingleMu5L3Filtered5", kHLT_Mu5_MuObj);
 
 
+  // Double Hadronic 2012
+  mymod->AddTrigger("HLT_DoubleMediumIsoPFTau30_Trk1_eta2p1_Jet30_v1", kHLT_DoubleMediumIsoPFTau30_Trk1_eta2p1_Jet30, "hltDoublePFTau30TrackPt1MediumIsolation",kHLT_DoubleMediumIsoPFTau30_Trk1_eta2p1_Jet30Obj);
+  
+  //Double Hadronic 2011
+ 
+   mymod->AddTrigger("HLT_DoubleIsoPFTau35_Trk5_eta2p1_v4", kHLT_DoubleIsoPFTau35_Trk5_eta2p1, "hltFilterDoubleIsoPFTau35Trk5LeadTrack5IsolationL1HLTMatched",kHLT_DoubleIsoPFTau35_Trk5_eta2p1Obj);
+   mymod->AddTrigger("HLT_DoubleIsoPFTau35_Trk5_eta2p1_v2", kHLT_DoubleIsoPFTau35_Trk5_eta2p1, "hltFilterDoubleIsoPFTau35Trk5LeadTrack5IsolationL1HLTMatched",kHLT_DoubleIsoPFTau35_Trk5_eta2p1Obj);
+ mymod->AddTrigger("HLT_DoubleIsoPFTau35_Trk5_eta2p1_v3", kHLT_DoubleIsoPFTau35_Trk5_eta2p1, "hltFilterDoubleIsoPFTau35Trk5LeadTrack5IsolationL1HLTMatched",kHLT_DoubleIsoPFTau35_Trk5_eta2p1Obj);
+   mymod->AddTrigger("HLT_DoubleIsoPFTau25_Trk5_eta2p1_v2", kHLT_DoubleIsoPFTau25_Trk5_eta2p1, "hltFilterDoubleIsoPFTau25Trk5LeadTrack5IsolationL1HLTMatched",kHLT_DoubleIsoPFTau25_Trk5_eta2p1Obj);
+   mymod->AddTrigger(" HLT_DoubleIsoPFTau20_Trk5_v4", kHLT_DoubleIsoPFTau20_Trk5, "hltFilterDoubleIsoPFTau20Trk5LeadTrack5IsolationL1HLTMatched",kHLT_DoubleIsoPFTau20_Trk5Obj);
+   mymod->AddTrigger(" HLT_DoubleIsoPFTau20_Trk5_v2", kHLT_DoubleIsoPFTau20_Trk5, "hltFilterDoubleIsoPFTau20Trk5LeadTrack5IsolationL1HLTMatched",kHLT_DoubleIsoPFTau20_Trk5Obj);
+   mymod->AddTrigger(" HLT_DoubleIsoPFTau20_Trk5_v1", kHLT_DoubleIsoPFTau20_Trk5, "hltFilterDoubleIsoPFTau20Trk5LeadTrack5IsolationL1HLTMatched",kHLT_DoubleIsoPFTau20_Trk5Obj);
+  
+  // Mu + MET
+  mymod->AddTrigger("HLT_IsoMu15_L1ETM20", kHLT_IsoMu15_L1ETM20, "", kHLT_IsoMu15_L1ETM20_MuObj);
+
+  // Tau + Muon triggers
+  mymod->AddTrigger("HLT_IsoMu12_LooseIsoPFTau10",
+                    kHLT_IsoMu12_LooseIsoPFTau10,
+                    "hltSingleMuIsoL3IsoFiltered12",
+                    kHLT_IsoMu12_LooseIsoPFTau10_MuObj, 0,
+                    "hltFilterIsoMu12IsoPFTau10LooseIsolation",
+                    kHLT_IsoMu12_LooseIsoPFTau10_TauObj, 0);
+
+  mymod->AddTrigger("HLT_Mu15_LooseIsoPFTau15",
+                    kHLT_Mu15_LooseIsoPFTau15,
+                    "hltSingleMu15L3Filtered15",
+                    kHLT_Mu15_LooseIsoPFTau15_MuObj, 0,
+                    "hltPFTau15TrackLooseIso",
+                    kHLT_Mu15_LooseIsoPFTau15_TauObj, 0);
+
+  mymod->AddTrigger("HLT_Mu15_LooseIsoPFTau20",
+                    kHLT_Mu15_LooseIsoPFTau20,
+                    "hltSingleMu15L3Filtered15",
+                    kHLT_Mu15_LooseIsoPFTau20_MuObj, 0,
+                    "hltPFTau20TrackLooseIso",
+                    kHLT_Mu15_LooseIsoPFTau20_TauObj, 0);
+
+  mymod->AddTrigger("HLT_IsoMu15_LooseIsoPFTau15",
+                    kHLT_IsoMu15_LooseIsoPFTau15,
+                    "hltSingleMuIsoL3IsoFiltered15",
+                    kHLT_IsoMu15_LooseIsoPFTau15_MuObj, 0,
+                    "hltPFTau15TrackLooseIso",
+                    kHLT_IsoMu15_LooseIsoPFTau15_TauObj, 0);
+
+  mymod->AddTrigger("HLT_IsoMu15_LooseIsoPFTau20",
+                    kHLT_IsoMu15_LooseIsoPFTau20,
+                    "hltSingleMuIsoL3IsoFiltered15",
+                    kHLT_IsoMu15_LooseIsoPFTau20_MuObj, 0,
+                    "hltPFTau20TrackLooseIso",
+                    kHLT_IsoMu15_LooseIsoPFTau20_TauObj, 0);
+
+  mymod->AddTrigger("HLT_IsoMu15_TightIsoPFTau20",
+                    kHLT_IsoMu15_TightIsoPFTau20,
+                    "hltSingleMuIsoL3IsoFiltered15",
+                    kHLT_IsoMu15_TightIsoPFTau20_MuObj, 0,
+                    "hltPFTauTightIso20TrackTightIso",
+                    kHLT_IsoMu15_TightIsoPFTau20_TauObj, 0);
+
+  mymod->AddTrigger("HLT_IsoMu15_eta2p1_LooseIsoPFTau20",
+                    kHLT_IsoMu15_eta2p1_LooseIsoPFTau20,
+                    "hltSingleMuIsoL1s14L3IsoFiltered15eta2p1",
+                    kHLT_IsoMu15_eta2p1_LooseIsoPFTau20_MuObj, 0,
+                    "hltPFTau20TrackLooseIso",
+                    kHLT_IsoMu15_eta2p1_LooseIsoPFTau20_TauObj, 0);
+
+  mymod->AddTrigger("HLT_IsoMu15_eta2p1_MediumIsoPFTau20",
+                    kHLT_IsoMu15_eta2p1_MediumIsoPFTau20,
+                    "hltSingleMuIsoL1s14L3IsoFiltered15eta2p1",
+                    kHLT_IsoMu15_eta2p1_MediumIsoPFTau20_MuObj, 0,
+                    "hltPFTauMediumIso20TrackMediumIso",
+                    kHLT_IsoMu15_eta2p1_MediumIsoPFTau20_TauObj, 0);
+
+  mymod->AddTrigger("HLT_IsoMu15_eta2p1_TightIsoPFTau20",
+                    kHLT_IsoMu15_eta2p1_TightIsoPFTau20,
+                    "hltSingleMuIsoL1s14L3IsoFiltered15eta2p1",
+                    kHLT_IsoMu15_eta2p1_TightIsoPFTau20_MuObj, 0,
+                    "hltPFTauTightIso20TrackTightIso",
+                    kHLT_IsoMu15_eta2p1_MediumIsoPFTau20_TauObj, 0);
+
+  mymod->AddTrigger("HLT_IsoMu18_eta2p1_LooseIsoPFTau20",
+                    kHLT_IsoMu18_eta2p1_LooseIsoPFTau20,
+                    "hltL3crIsoL1sMu16Eta2p1L1f0L2f16QL3f18QL3crIsoFiltered10",
+                    kHLT_IsoMu18_eta2p1_LooseIsoPFTau20_MuObj, 0,
+                    "hltPFTau20IsoMuVertex",
+                    kHLT_IsoMu18_eta2p1_LooseIsoPFTau20_TauObj, 0);
+
+  mymod->AddTrigger("HLT_Mu18_eta2p1_LooseIsoPFTau20",
+                    kHLT_Mu18_eta2p1_LooseIsoPFTau20,
+                    "hltL3fL1sMu16Eta2p1L1f0L2f16QL3Filtered18Q",
+                    kHLT_Mu18_eta2p1_LooseIsoPFTau20_MuObj, 0,
+                    "hltPFTau20MuVertex",
+                    kHLT_Mu18_eta2p1_LooseIsoPFTau20_TauObj, 0);
+
+  // Tau + Electron triggers
+  // Non-Iso Ele15 + LooseTau15
+  mymod->AddTrigger("HLT_Ele15_CaloIdVT_TrkIdT_LooseIsoPFTau15",
+                    kHLT_Ele15_CaloIdVT_TrkIdT_LooseIsoPFTau15,
+                    "hltEle15CaloIdVTTrkIdTDphiFilter",
+                    kHLT_Ele15_CaloIdVT_TrkIdT_LooseIsoPFTau15_EleObj, 0,
+                    "hltPFTau15TrackLooseIso",
+                    kHLT_Ele15_CaloIdVT_TrkIdT_LooseIsoPFTau15_TauObj, 0);
+
+  // Non-Iso Ele15 + LooseTau20
+  mymod->AddTrigger("HLT_Ele15_CaloIdVT_TrkIdT_LooseIsoPFTau20",
+                    kHLT_Ele15_CaloIdVT_TrkIdT_LooseIsoPFTau20,
+                    "hltEle15CaloIdVTTrkIdTDphiFilter",
+                    kHLT_Ele15_CaloIdVT_TrkIdT_LooseIsoPFTau20_EleObj, 0,
+                    "hltPFTau20TrackLooseIso",
+                    kHLT_Ele15_CaloIdVT_TrkIdT_LooseIsoPFTau20_TauObj, 0);
+
+  // Non-Iso Ele15 + TightTau20
+  mymod->AddTrigger("HLT_Ele15_CaloIdVT_TrkIdT_TightIsoPFTau20",
+                    kHLT_Ele15_CaloIdVT_TrkIdT_TightIsoPFTau20,
+                    "hltEle15CaloIdVTTrkIdTDphiFilter",
+                    kHLT_Ele15_CaloIdVT_TrkIdT_TightIsoPFTau20_EleObj, 0,
+                    "hltPFTauTightIso20TrackTightIso",
+                    kHLT_Ele15_CaloIdVT_TrkIdT_TightIsoPFTau20_TauObj, 0);
+
+  // Non-Iso Ele18 + MediumTau20
+  mymod->AddTrigger("HLT_Ele18_CaloIdVT_TrkIdT_MediumIsoPFTau20",
+                    kHLT_Ele18_CaloIdVT_TrkIdT_MediumIsoPFTau20,
+                    "hltEle18CaloIdVTTrkIdTDphiFilter",
+                    kHLT_Ele18_CaloIdVT_TrkIdT_MediumIsoPFTau20_EleObj, 0,
+                    "hltPFTauMediumIso20TrackMediumIso",
+                    kHLT_Ele18_CaloIdVT_TrkIdT_MediumIsoPFTau20_TauObj, 0);
+
+  // Ele 15 + LoosePFTau15
+  mymod->AddTrigger("HLT_Ele15_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_LooseIsoPFTau15",
+		    kHLT_Ele15_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_LooseIsoPFTau15,
+		    "hltEle15CaloIdVTTrkIdTCaloIsoTTrkIsoTTrackIsolFilter",
+		    kHLT_Ele15_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_LooseIsoPFTau15_EleObj, 0,
+		    "hltPFTau15TrackLooseIso",
+		    kHLT_Ele15_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_LooseIsoPFTau15_TauObj, 0);
+
+  mymod->AddTrigger("HLT_Ele15_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_LooseIsoPFTau15",
+		    kHLT_Ele15_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_LooseIsoPFTau15,
+		    "hltEle15CaloIdVTCaloIsoTTrkIdTTrkIsoTTrackIsoFilter",
+		    kHLT_Ele15_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_LooseIsoPFTau15_EleObj, 0,
+		    "hltPFTau15TrackLooseIso",
+		    kHLT_Ele15_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_LooseIsoPFTau15_TauObj, 0);
+
+  // Ele 15 + LoosePFTau20
+  mymod->AddTrigger("HLT_Ele15_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_LooseIsoPFTau20",
+		    kHLT_Ele15_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_LooseIsoPFTau20,
+		    "hltEle15CaloIdVTTrkIdTCaloIsoTTrkIsoTTrackIsolFilter",
+		    kHLT_Ele15_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_LooseIsoPFTau20_EleObj, 0,
+		    "hltPFTau20TrackLooseIso",
+		    kHLT_Ele15_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_LooseIsoPFTau20_TauObj, 0);
+
+  mymod->AddTrigger("HLT_Ele15_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_LooseIsoPFTau20",
+		    kHLT_Ele15_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_LooseIsoPFTau20,
+		    "hltEle15CaloIdVTCaloIsoTTrkIdTTrkIsoTTrackIsoFilter",
+		    kHLT_Ele15_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_LooseIsoPFTau20_EleObj, 0,
+		    "hltPFTau20TrackLooseIso",
+		    kHLT_Ele15_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_LooseIsoPFTau20_TauObj, 0);
+
+  // Ele 15 + TightPFTau20
+  mymod->AddTrigger("HLT_Ele15_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_TightIsoPFTau20",
+		    kHLT_Ele15_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_TightIsoPFTau20,
+		    "hltEle15CaloIdVTCaloIsoTTrkIdTTrkIsoTTrackIsoFilter",
+		    kHLT_Ele15_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_TightIsoPFTau20_EleObj,  0,
+		    "hltPFTauTightIso20TrackTightIso",
+		    kHLT_Ele15_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_TightIsoPFTau20_TauObj, 0);
+
+  // Ele 18 + LoosePFTau20
+  mymod->AddTrigger("HLT_Ele18_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_LooseIsoPFTau20",
+		    kHLT_Ele18_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_LooseIsoPFTau20,
+		    "hltEle18CaloIdVTCaloIsoTTrkIdTTrkIsoTTrackIsoFilter",
+		    kHLT_Ele18_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_LooseIsoPFTau20_EleObj,  0,
+		    "hltPFTau20TrackLooseIso",
+		    kHLT_Ele18_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_LooseIsoPFTau20_TauObj, 0);
+
+  // Ele18_MediumIsoPFTau20
+  mymod->AddTrigger("HLT_Ele18_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_MediumIsoPFTau20",
+		    kHLT_Ele18_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_MediumIsoPFTau20,
+		    "hltEle18CaloIdVTCaloIsoTTrkIdTTrkIsoTTrackIsoFilter",
+		    kHLT_Ele18_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_MediumIsoPFTau20_EleObj,  0,
+		    "hltPFTauMediumIso20TrackMediumIso",
+		    kHLT_Ele18_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_MediumIsoPFTau20_TauObj, 0);
 
   
+  // Ele20_MediumIsoPFTau20
+  mymod->AddTrigger("HLT_Ele20_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_MediumIsoPFTau20",
+		    kHLT_Ele20_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_MediumIsoPFTau20,
+		    "hltEle20CaloIdVTCaloIsoTTrkIdTTrkIsoTTrackIsoFilterL1SingleEG18orL1SingleEG20",
+		    kHLT_Ele20_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_MediumIsoPFTau20_EleObj,  0,
+		    "hltPFTauMediumIso20TrackMediumIso",
+		    kHLT_Ele20_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_MediumIsoPFTau20_TauObj, 0);
+
+  // Ele20 CaloIsoRho + LooseIsoPFTau20
+  mymod->AddTrigger("HLT_Ele20_CaloIdVT_CaloIsoRhoT_TrkIdT_TrkIsoT_LooseIsoPFTau20",
+		    kHLT_Ele20_CaloIdVT_CaloIsoRhoT_TrkIdT_TrkIsoT_LooseIsoPFTau20,
+		    "hltEle20CaloIdVTCaloIsoTTrkIdTTrkIsoTTrackIsoFilterL1IsoEG18OrEG20",
+		    kHLT_Ele20_CaloIdVT_CaloIsoRhoT_TrkIdT_TrkIsoT_LooseIsoPFTau20_EleObj,  0,
+		    "hltPFTauIsoEleVertex20",
+		    kHLT_Ele20_CaloIdVT_CaloIsoRhoT_TrkIdT_TrkIsoT_LooseIsoPFTau20_TauObj, 0);
+
+  // Ele20 + LooseIsoPFTau20
+  mymod->AddTrigger("HLT_Ele20_CaloIdVT_TrkIdT_LooseIsoPFTau20",
+		    kHLT_Ele20_CaloIdVT_TrkIdT_LooseIsoPFTau20,
+		    "hltEle20CaloIdVTTrkIdTDphiFilter",
+		    kHLT_Ele20_CaloIdVT_TrkIdT_LooseIsoPFTau20_EleObj,  0,
+		    "hltPFTauEleVertex20",
+		    kHLT_Ele20_CaloIdVT_TrkIdT_LooseIsoPFTau20_TauObj, 0);
+
+  // Jet triggers (lazy, didn't lookup L3 module names)
+  mymod->AddTrigger("HLT_Jet150",    kHLT_Jet150, "", kHLT_Jet150_JetObj);
+  mymod->AddTrigger("HLT_Jet190",    kHLT_Jet190, "", kHLT_Jet190_JetObj);
+  mymod->AddTrigger("HLT_Jet240",    kHLT_Jet240, "", kHLT_Jet240_JetObj);
+
+
   mymod->SetPrintHLT(kFALSE); // print HLT table at start of analysis?
   
   ana->AddSuperModule(mymod); 

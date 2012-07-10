@@ -23,12 +23,12 @@ AntiElectronIDMVA::~AntiElectronIDMVA()
 
 
 void AntiElectronIDMVA::Initialize(std::string methodName,
-				   std::string oneProng0Pi0_BL,
-				   std::string oneProng1pi0wGSF_BL,
-				   std::string oneProng1pi0woGSF_BL,
-				   std::string oneProng0Pi0_EC,
-				   std::string oneProng1pi0wGSF_EC,
-				   std::string oneProng1pi0woGSF_EC
+				   TString oneProng0Pi0_BL,
+				   TString oneProng1pi0wGSF_BL,
+				   TString oneProng1pi0woGSF_BL,
+				   TString oneProng0Pi0_EC,
+				   TString oneProng1pi0wGSF_EC,
+				   TString oneProng1pi0woGSF_EC
 				   ){
 
   for(UInt_t i=0; i<6; ++i) {

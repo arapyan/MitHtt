@@ -13,7 +13,6 @@
 #include "MitAna/DataTree/interface/PileupEnergyDensityFwd.h"
 #include "MitAna/DataTree/interface/EmbedWeight.h"
 #include "MitAna/DataTree/interface/EmbedWeightFwd.h"
-//#include "MitAna/DataTree/interface/DCASigFwd.h"
 #include "MitAna/DataTree/interface/TriggerMask.h"
 #include "MitAna/DataCont/interface/RunLumiSet.h"
 #include "MitAna/DataCont/interface/RunLumiRangeMap.h"
@@ -34,6 +33,13 @@
 #include "MitHtt/Ntupler/interface/MetSignificance.h"
 #include "MitPhysics/Utils/interface/ElectronTools.h"
 #include "MitPhysics/Utils/interface/MuonTools.h"
+#include "MitPhysics/Utils/interface/ElectronIDMVA.h"
+#include "MitPhysics/Utils/interface/TauIsoMVA.h"
+#include "MitPhysics/Utils/interface/MuonIDMVA.h"
+#include "MitPhysics/Utils/interface/JetIDMVA.h"
+#include "MitPhysics/Utils/interface/MVAMet.h"
+
+//#include "MitHtt/Ntupler/interface/AntiElectronIDMVA.h"
 
 #include "CondFormats/JetMETObjects/interface/FactorizedJetCorrector.h"
 #include "CondFormats/JetMETObjects/interface/JetCorrectionUncertainty.h"
@@ -363,6 +369,8 @@ namespace mithep
     TClonesArray* fSVfitMuTauArr;
     /// input information for svfit for etau
     TClonesArray* fSVfitETauArr;
+     /// input information for svfit for tautau
+    TClonesArray* fSVfitTauTauArr;
     
     /// names of triggers relevant for the analysis
     std::vector<TString> fTriggerNamesv;
@@ -393,9 +401,27 @@ namespace mithep
     MuonTools* fMuonTools;
     //met significance
     MetSignificance* metSign;
+    /// electron ID MVA
+    ElectronIDMVA* fElectronMVAID;
+    /// electron ID MVA for triggered electrons
+    ElectronIDMVA* fElectronMVAIDTrig;
+    /// electron isolation MVA
+    ElectronIDMVA* fElectronMVAIso;
+    /// muon ID MVA
+    MuonIDMVA* fMuonMVAID;
+    /// muon isolation MVA
+    MuonIDMVA* fMuonMVAIso;
+    /// jet id MVA
+    JetIDMVA* fJetIDMVA;
+    /// MET MVA
+    MVAMet* fMVAMet;
     /// list JSON files to be applied
     std::vector<TString> fJSONv;
     /// map of certified runs and lumi sections (for internal use)
+    /// Tau ring ISO
+    TauIsoMVA * fTauMVAIso;
+    /// Antielectron ID BDT
+    //AntiElectronIDMVA *fAntiElectronID;
     RunLumiRangeMap frlrm;
     /// run and lumi information (for internal use)
     RunLumiSet fRunLumiSet;
@@ -445,6 +471,7 @@ namespace mithep
     fSVfitEMuArr   = new TClonesArray( "mithep::TSVfit"    ); assert( fSVfitEMuArr   );
     fSVfitETauArr  = new TClonesArray( "mithep::TSVfit"    ); assert( fSVfitETauArr  );
     fSVfitMuTauArr = new TClonesArray( "mithep::TSVfit"    ); assert( fSVfitMuTauArr );    
+    fSVfitTauTauArr = new TClonesArray( "mithep::TSVfit"    ); assert( fSVfitTauTauArr );    
     // open file and configure branches
     fOutputFile    = new TFile( fOutputName, "RECREATE" );
     fEventTree     = new TTree( "Events"   , "Events"   );
@@ -460,6 +487,7 @@ namespace mithep
     fEventTree->Branch( "SVfitEMu"   , &fSVfitEMuArr    );
     fEventTree->Branch( "SVfitETau"  , &fSVfitETauArr   );
     fEventTree->Branch( "SVfitMuTau" , &fSVfitMuTauArr  );
+    fEventTree->Branch( "SVfitTauTau" , &fSVfitTauTauArr  );
   }
 
   inline void
@@ -479,6 +507,7 @@ namespace mithep
     delete fSVfitEMuArr; 
     delete fSVfitETauArr; 
     delete fSVfitMuTauArr;     
+    delete fSVfitTauTauArr;     
   }
 
   inline void 

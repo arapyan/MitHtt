@@ -35,6 +35,16 @@ namespace mithep
     double cov_01;
     /// met significance matrix element [y|y]
     double cov_11;
+    /// MVA met significance matrix element [x|x]
+    double mvacov_00;
+    /// MVA met significance matrix element [y|x]
+    double mvacov_10;
+    /// MVA met significance matrix element [x|y]
+    double mvacov_01;
+    /// MVA met significance matrix element [y|y]
+    double mvacov_11;
+    /// MVA met, metphi
+    double mvaMET, mvaMETphi;
     /// 3D dca significance of lepton pair
     double dcaSig3D;
     /// 2D dca significance of lepton pair
@@ -48,7 +58,7 @@ namespace mithep
     /// di-lepton resonance daughters.
     FourVectorM daughter1, daughter2;
 
-    ClassDef(TSVfit, 1);
+    ClassDef(TSVfit, 2);
   };  
 }
 #endif

@@ -106,6 +106,10 @@ namespace mithep
     /// common isolation using pfPileup candidates, ptMin=0., dRMax=0.5, dRMin=0.
     float puIsoNoPt;
 
+    //ring isolation	
+    float ringIso;
+    // antielectron id bdt
+    //float antiEleID;
     ClassDef(TPFTau, 1)
   };  
 }

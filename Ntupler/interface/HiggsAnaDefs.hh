@@ -130,85 +130,96 @@ enum ETriggerBit {
   kHLT_IsoMu17                                                                          = 16, // MC, data
   kHLT_IsoMu24                                                                          = 17, // data
   kHLT_IsoMu15                                                                          = 18, // data
-  /* SingleMu CrossObject       ---------------------------------------------------------------------------------------------- */
-  kHLT_IsoMu15_L1ETM20                                                                  = 19, // data
-  kHLT_Mu15_LooseIsoPFTau15                                                             = 20,
-  kHLT_Mu15_LooseIsoPFTau20                                                             = 21,
-  kHLT_IsoMu12_LooseIsoPFTau10                                                          = 22,
-  kHLT_IsoMu15_LooseIsoPFTau15                                                          = 23,
-  kHLT_IsoMu15_LooseIsoPFTau20                                                          = 24,
-  kHLT_IsoMu15_MediumIsoPFTau20                                                         = 25,
-  kHLT_IsoMu15_TightIsoPFTau20                                                          = 26,
   /* DoubleElectron             ----------------------------------------------------------------------------------------------- */
-  kHLT_Ele17_CaloIdL_CaloIsoVL_Ele8_CaloIdL_CaloIsoVL                                   = 27, // data
-  kHLT_Ele17_CaloIdT_TrkIdVL_CaloIsoVL_TrkIsoVL_Ele8_CaloIdT_TrkIdVL_CaloIsoVL_TrkIsoVL = 28, // data
-  kHLT_Ele17_CaloIdVT_CaloIsoVT_TrkIdT_TrkIsoVT_SC8_Mass30                              = 29, // data
-  kHLT_Ele17_CaloIdVT_CaloIsoVT_TrkIdT_TrkIsoVT_Ele8_Mass30                             = 30, // data
-  kHLT_Ele32_CaloIdL_CaloIsoVL_SC17                                                     = 31, // data
-  kHLT_Ele32_CaloIdT_CaloIsoT_TrkIdT_TrkIsoT_SC17                                       = 32, // data
+  kHLT_Ele17_CaloIdL_CaloIsoVL_Ele8_CaloIdL_CaloIsoVL                                   = 19, // data
+  kHLT_Ele17_CaloIdT_TrkIdVL_CaloIsoVL_TrkIsoVL_Ele8_CaloIdT_TrkIdVL_CaloIsoVL_TrkIsoVL = 20, // data
+  kHLT_Ele17_CaloIdVT_CaloIsoVT_TrkIdT_TrkIsoVT_SC8_Mass30                              = 21, // data
+  kHLT_Ele17_CaloIdVT_CaloIsoVT_TrkIdT_TrkIsoVT_Ele8_Mass30                             = 22, // data
+  kHLT_Ele32_CaloIdL_CaloIsoVL_SC17                                                     = 23, // data
+  kHLT_Ele32_CaloIdT_CaloIsoT_TrkIdT_TrkIsoT_SC17                                       = 24, // data
   /* SingleElectron             ----------------------------------------------------------------------------------------------- */
-  kHLT_Ele8                                                                             = 33, // data
-  kHLT_Ele8_CaloIdL_TrkIdVL                                                             = 34, // data
-  kHLT_Ele8_CaloIdL_CaloIsoVL                                                           = 35, // data
-  kHLT_Ele8_CaloIdT_TrkIdVL_CaloIsoVL_TrkIsoVL                                          = 36, // data
-  kHLT_Ele17_CaloIdL_CaloIsoVL                                                          = 37, // data
-  kHLT_Ele8_CaloIdL_CaloIsoVL_Jet40                                                     = 38, // data
-  kHLT_Photon20_CaloIdVT_IsoT_Ele8_CaloIdL_CaloIsoVL                                    = 39, // data
-  kHLT_Ele17_SW_L1R                                                                     = 40, // MC
-  kHLT_Ele22_SW_L1R                                                                     = 41, // MC
-  kHLT_Ele27_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT                                           = 42, // data
-  kHLT_Ele32_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT                                           = 43, // data
-  kHLT_Ele45_CaloIdVT_TrkIdT                                                            = 44, // data
-  kHLT_Ele52_CaloIdVT_TrkIdT                                                            = 45, // data
-  kHLT_Ele65_CaloIdVT_TrkIdT                                                            = 46, // data
-  kHLT_Ele80_CaloIdVT_TrkIdT                                                            = 47, // data
+  kHLT_Ele8                                                                             = 25, // data
+  kHLT_Ele8_CaloIdL_TrkIdVL                                                             = 26, // data
+  kHLT_Ele8_CaloIdL_CaloIsoVL                                                           = 27, // data
+  kHLT_Ele8_CaloIdT_TrkIdVL_CaloIsoVL_TrkIsoVL                                          = 28, // data
+  kHLT_Ele17_CaloIdL_CaloIsoVL                                                          = 29, // data
+  kHLT_Ele8_CaloIdL_CaloIsoVL_Jet40                                                     = 30, // data
+  kHLT_Photon20_CaloIdVT_IsoT_Ele8_CaloIdL_CaloIsoVL                                    = 31, // data
+  kHLT_Ele17_SW_L1R                                                                     = 32, // MC
+  kHLT_Ele22_SW_L1R                                                                     = 33, // MC
+  kHLT_Ele27_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT                                           = 34, // data
+  kHLT_Ele32_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT                                           = 35, // data
+  kHLT_Ele45_CaloIdVT_TrkIdT                                                            = 36, // data
+  kHLT_Ele52_CaloIdVT_TrkIdT                                                            = 37, // data
+  kHLT_Ele65_CaloIdVT_TrkIdT                                                            = 38, // data
+  kHLT_Ele80_CaloIdVT_TrkIdT                                                            = 39, // data
   /* Old Triggers               ---------------------------------------------------------------------------------------------- */
-  kHLT_Photon10_L1R			                                                = 48,
-  kHLT_Photon15_Cleaned_L1R		                                                = 49,
-  kHLT_Ele15_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT                                           = 50,
-  kHLT_Ele18_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT                                           = 51,
-  kHLT_Ele20_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT                                           = 52,
-  kHLT_Ele22_SW_TighterCaloIdIsol_L1R	                                                = 53,
-  /* SingleElectron CrossObject ----------------------------------------------------------------------------------------------- */
-  kHLT_Ele15_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_LooseIsoPFTau15                           = 54,
-  kHLT_Ele15_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_LooseIsoPFTau20                           = 55,
-  kHLT_Ele15_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_TightIsoPFTau20                           = 56,
-  kHLT_Ele18_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_LooseIsoPFTau20                           = 57,
-  kHLT_Ele18_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_MediumIsoPFTau20                          = 58,
-  kHLT_Ele20_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_MediumIsoPFTau20                          = 59,
+  kHLT_Photon10_L1R			                                                = 40,
+  kHLT_Photon15_Cleaned_L1R		                                                = 41,
+  kHLT_Ele15_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT                                           = 42,
+  kHLT_Ele18_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT                                           = 43,
+  kHLT_Ele20_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT                                           = 44,
+  kHLT_Ele22_SW_TighterCaloIdIsol_L1R	                                                = 45,
+ 
   /* JetMET                   ------------------------------------------------------------------------------------------------ */
-  kHLT_CentralJet80_MET100		                                                = 60,
-  kHLT_CentralJet80_MET160		                                                = 61,
-  kHLT_CentralJet80_MET80		                                                = 62,
-  kHLT_DiCentralJet20_BTagIP_MET65	                                                = 63,
-  kHLT_DiCentralJet20_MET80     	                                                = 64,
-  kHLT_MET100_HBHENoiseFiltered 	                                                = 65,
-  kHLT_MET100   			                                                = 66,
-  kHLT_MET120_HBHENoiseFiltered  	                                                = 67,
-  kHLT_MET120   			                                                = 68,
-  /* SingleTau                 ------------------------------------------------------------------------------------------------- */
-  kHLT_LooseIsoPFTau10                                                                  = 69,
-  kHLT_LooseIsoPFTau15                                                                  = 70,
-  kHLT_LooseIsoPFTau20                                                                  = 71,
-  kHLT_MediumIsoPFTau15                                                                 = 72,
-  kHLT_MediumIsoPFTau20                                                                 = 74,
-  kHLT_TightIsoPFTau15                                                                  = 75,
-  kHLT_TightIsoPFTau20                                                                  = 76,
+  kHLT_CentralJet80_MET100		                                                = 46,
+  kHLT_CentralJet80_MET160		                                                = 47,
+  kHLT_CentralJet80_MET80		                                                = 48,
+  kHLT_DiCentralJet20_BTagIP_MET65	                                                = 49,
+  kHLT_DiCentralJet20_MET80     	                                                = 50,
+  kHLT_MET100_HBHENoiseFiltered 	                                                = 51,
+  kHLT_MET100   			                                                = 52,
+  kHLT_MET120_HBHENoiseFiltered  	                                                = 53,
+  kHLT_MET120   			                                                = 54,
   /* 2012 Triggers               ---------------------------------------------------------------------------------------------- */
-  kHLT_Mu17_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL                                     = 77,
-  kHLT_Mu8_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL                                     = 78,
-  kHLT_Ele27_WP80                                                                       = 79,
-  kHLT_Mu17                                                                             = 80,
-  kHLT_Ele17_CaloIdVT_CaloIsoVT_TrkIdT_TrkIsoVT_Ele8_Mass50                             = 81,
-  kHLT_Ele20_CaloIdVT_CaloIsoVT_TrkIdT_TrkIsoVT_SC4_Mass50                              = 82,
-  kHLT_Ele32_CaloIdT_CaloIsoT_TrkIdT_TrkIsoT_SC17_Mass50                                = 83,
-  kHLT_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_Jet30                                   = 84,
-  kHLT_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL                                         = 85,
-  kHLT_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_Jet30                                    = 86,
-  kHLT_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL                                          = 87
+  kHLT_Mu17_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL                                     = 55,
+  kHLT_Mu8_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL                                     = 56,
+  kHLT_Ele27_WP80                                                                       = 57,
+  kHLT_Mu17                                                                             = 58,
+  kHLT_Ele17_CaloIdVT_CaloIsoVT_TrkIdT_TrkIsoVT_Ele8_Mass50                             = 59,
+  kHLT_Ele20_CaloIdVT_CaloIsoVT_TrkIdT_TrkIsoVT_SC4_Mass50                              = 60,
+  kHLT_Ele32_CaloIdT_CaloIsoT_TrkIdT_TrkIsoT_SC17_Mass50                                = 61,
+  kHLT_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_Jet30                                   = 62,
+  kHLT_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL                                         = 63,
+  kHLT_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_Jet30                                    = 64,
+  kHLT_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL                                          = 65,
+
+  //Tau+Tau 2012
+  kHLT_DoubleMediumIsoPFTau30_Trk1_eta2p1_Jet30 = 66,
+  //Tau+Tau 2011
+  kHLT_DoubleIsoPFTau35_Trk5_eta2p1             = 67,
+  kHLT_DoubleIsoPFTau25_Trk5_eta2p1             = 68,
+  kHLT_DoubleIsoPFTau20_Trk5                    = 69,
+
+  // Mu+Tau
+  kHLT_Mu15_LooseIsoPFTau15           = 70,
+  kHLT_Mu15_LooseIsoPFTau20           = 71,
+  kHLT_Mu18_eta2p1_LooseIsoPFTau20    = 72,
+  kHLT_IsoMu12_LooseIsoPFTau10        = 73,
+  kHLT_IsoMu15_LooseIsoPFTau15        = 74,
+  kHLT_IsoMu15_LooseIsoPFTau20        = 75,
+  kHLT_IsoMu15_TightIsoPFTau20        = 76,
+  kHLT_IsoMu15_eta2p1_LooseIsoPFTau20 = 77,
+  kHLT_IsoMu15_eta2p1_MediumIsoPFTau20 = 78,
+  kHLT_IsoMu15_eta2p1_TightIsoPFTau20 = 79,
+  kHLT_IsoMu18_eta2p1_LooseIsoPFTau20 = 80,
+  // E+Tau
+  kHLT_Ele15_CaloIdVT_TrkIdT_LooseIsoPFTau15 = 81,
+  kHLT_Ele15_CaloIdVT_TrkIdT_LooseIsoPFTau20 = 82,
+  kHLT_Ele15_CaloIdVT_TrkIdT_TightIsoPFTau20 = 83,
+  kHLT_Ele18_CaloIdVT_TrkIdT_MediumIsoPFTau20 = 84,
+  kHLT_Ele15_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_LooseIsoPFTau15 = 85,
+  kHLT_Ele15_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_LooseIsoPFTau20 = 86,
+  kHLT_Ele18_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_LooseIsoPFTau20 = 87,
+  kHLT_Ele15_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_TightIsoPFTau20 = 88,
+  kHLT_Ele18_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_TightIsoPFTau20 = 89,
+  kHLT_Ele18_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_MediumIsoPFTau20 = 90,
+  kHLT_Ele20_CaloIdVT_TrkIdT_LooseIsoPFTau20 = 91,
+  kHLT_Ele20_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_MediumIsoPFTau20 = 92,
+  kHLT_Ele20_CaloIdVT_CaloIsoRhoT_TrkIdT_TrkIsoT_LooseIsoPFTau20 = 93  
 };
 
-const unsigned int kNTrigObj = 128;
+const unsigned int kNTrigObj = 256;
 typedef std::bitset<kNTrigObj> TriggerObjects;
 
 /**
@@ -249,149 +260,130 @@ enum ETriggerObject {
   kHLT_IsoMu15_MuObj                                                                            =  27,
   kHLT_IsoMu17_MuObj                                                                            =  28,
   kHLT_IsoMu24_MuObj                                                                            =  29,
-  /* SingleMuon CrossObject    ------------------------------------------------------------------------------------------------- */
-  kHLT_IsoMu15_L1ETM20_MuObj                                                                    =  30,
-  kHLT_IsoMu15_L1ETM20_METObj                                                                   =  31,
-  kHLT_Mu15_LooseIsoPFTau15_MuObj                                                               =  32,
-  kHLT_Mu15_LooseIsoPFTau15_TauObj                                                              =  33,
-  kHLT_Mu15_LooseIsoPFTau20_MuObj                                                               =  34,
-  kHLT_Mu15_LooseIsoPFTau20_TauObj                                                              =  35,
-  kHLT_IsoMu12_LooseIsoPFTau10_MuObj                                                            =  36,
-  kHLT_IsoMu12_LooseIsoPFTau10_TauObj                                                           =  37,
-  kHLT_IsoMu15_LooseIsoPFTau15_MuObj                                                            =  38,
-  kHLT_IsoMu15_LooseIsoPFTau15_TauObj                                                           =  39,
-  kHLT_IsoMu15_LooseIsoPFTau20_MuObj                                                            =  40,
-  kHLT_IsoMu15_LooseIsoPFTau20_TauObj                                                           =  41,
-  kHLT_IsoMu15_MediumIsoPFTau20_MuObj                                                           =  42,
-  kHLT_IsoMu15_MediumIsoPFTau20_TauObj                                                          =  43,
-  kHLT_IsoMu15_TightIsoPFTau20_MuObj                                                            =  44,
-  kHLT_IsoMu15_TightIsoPFTau20_TauObj                                                           =  45,
   /* DoubleElectron            ------------------------------------------------------------------------------------------------- */
-  kHLT_Ele17_CaloIdL_CaloIsoVL_Ele8_CaloIdL_CaloIsoVL_Ele1Obj                                   =  46,
-  kHLT_Ele17_CaloIdL_CaloIsoVL_Ele8_CaloIdL_CaloIsoVL_Ele2Obj                                   =  47,
-  kHLT_Ele17_CaloIdT_TrkIdVL_CaloIsoVL_TrkIsoVL_Ele8_CaloIdT_TrkIdVL_CaloIsoVL_TrkIsoVL_Ele1Obj =  48,
-  kHLT_Ele17_CaloIdT_TrkIdVL_CaloIsoVL_TrkIsoVL_Ele8_CaloIdT_TrkIdVL_CaloIsoVL_TrkIsoVL_Ele2Obj =  49,
-  kHLT_Ele17_CaloIdVT_CaloIsoVT_TrkIdT_TrkIsoVT_SC8_Mass30_EleObj                               =  50,
-  kHLT_Ele17_CaloIdVT_CaloIsoVT_TrkIdT_TrkIsoVT_SC8_Mass30_SCObj                                =  51,
-  kHLT_Ele17_CaloIdVT_CaloIsoVT_TrkIdT_TrkIsoVT_Ele8_Mass30_Ele1Obj                             =  52,
-  kHLT_Ele17_CaloIdVT_CaloIsoVT_TrkIdT_TrkIsoVT_Ele8_Mass30_Ele2Obj                             =  53,
-  kHLT_Ele32_CaloIdL_CaloIsoVL_SC17_EleObj                                                      =  54,
-  kHLT_Ele32_CaloIdL_CaloIsoVL_SC17_SCObj                                                       =  55,
-  kHLT_Ele32_CaloIdT_CaloIsoT_TrkIdT_TrkIsoT_SC17_EleObj                                        =  56,
-  kHLT_Ele32_CaloIdT_CaloIsoT_TrkIdT_TrkIsoT_SC17_SCObj                                         =  57,
-  kHLT_Ele8_EleObj                                                                              =  58,
-  kHLT_Ele8_CaloIdL_TrkIdVL_EleObj                                                              =  59,
-  kHLT_Ele8_CaloIdL_CaloIsoVL_EleObj                                                            =  60,
-  kHLT_Ele8_CaloIdT_TrkIdVL_CaloIsoVL_TrkIsoVL_EleObj                                           =  61,
-  kHLT_Ele17_CaloIdL_CaloIsoVL_EleObj                                                           =  62,
-  kHLT_Ele8_CaloIdL_CaloIsoVL_Jet40_EleObj                                                      =  63,
-  kHLT_Ele8_CaloIdL_CaloIsoVL_Jet40_JetObj                                                      =  64,
-  kHLT_Photon20_CaloIdVT_IsoT_Ele8_CaloIdL_CaloIsoVL_PhoObj                                     =  65,
-  kHLT_Photon20_CaloIdVT_IsoT_Ele8_CaloIdL_CaloIsoVL_EleObj                                     =  66,
+  kHLT_Ele17_CaloIdL_CaloIsoVL_Ele8_CaloIdL_CaloIsoVL_Ele1Obj                                   =  30,
+  kHLT_Ele17_CaloIdL_CaloIsoVL_Ele8_CaloIdL_CaloIsoVL_Ele2Obj                                   =  31,
+  kHLT_Ele17_CaloIdT_TrkIdVL_CaloIsoVL_TrkIsoVL_Ele8_CaloIdT_TrkIdVL_CaloIsoVL_TrkIsoVL_Ele1Obj =  32,
+  kHLT_Ele17_CaloIdT_TrkIdVL_CaloIsoVL_TrkIsoVL_Ele8_CaloIdT_TrkIdVL_CaloIsoVL_TrkIsoVL_Ele2Obj =  33,
+  kHLT_Ele17_CaloIdVT_CaloIsoVT_TrkIdT_TrkIsoVT_SC8_Mass30_EleObj                               =  34,
+  kHLT_Ele17_CaloIdVT_CaloIsoVT_TrkIdT_TrkIsoVT_SC8_Mass30_SCObj                                =  35,
+  kHLT_Ele17_CaloIdVT_CaloIsoVT_TrkIdT_TrkIsoVT_Ele8_Mass30_Ele1Obj                             =  36,
+  kHLT_Ele17_CaloIdVT_CaloIsoVT_TrkIdT_TrkIsoVT_Ele8_Mass30_Ele2Obj                             =  37,
+  kHLT_Ele32_CaloIdL_CaloIsoVL_SC17_EleObj                                                      =  38,
+  kHLT_Ele32_CaloIdL_CaloIsoVL_SC17_SCObj                                                       =  39,
+  kHLT_Ele32_CaloIdT_CaloIsoT_TrkIdT_TrkIsoT_SC17_EleObj                                        =  40,
+  kHLT_Ele32_CaloIdT_CaloIsoT_TrkIdT_TrkIsoT_SC17_SCObj                                         =  41,
+  kHLT_Ele8_EleObj                                                                              =  42,
+  kHLT_Ele8_CaloIdL_TrkIdVL_EleObj                                                              =  43,
+  kHLT_Ele8_CaloIdL_CaloIsoVL_EleObj                                                            =  44,
+  kHLT_Ele8_CaloIdT_TrkIdVL_CaloIsoVL_TrkIsoVL_EleObj                                           =  45,
+  kHLT_Ele17_CaloIdL_CaloIsoVL_EleObj                                                           =  46,
+  kHLT_Ele8_CaloIdL_CaloIsoVL_Jet40_EleObj                                                      =  47,
+  kHLT_Ele8_CaloIdL_CaloIsoVL_Jet40_JetObj                                                      =  48,
+  kHLT_Photon20_CaloIdVT_IsoT_Ele8_CaloIdL_CaloIsoVL_PhoObj                                     =  49,
+  kHLT_Photon20_CaloIdVT_IsoT_Ele8_CaloIdL_CaloIsoVL_EleObj                                     =  50,
   /* SingleElectron             ------------------------------------------------------------------------------------------------- */  
-  kHLT_Ele27_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_EleObj                                            =  67,
-  kHLT_Ele32_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_EleObj                                            =  68,
-  kHLT_Ele45_CaloIdVT_TrkIdT_EleObj                                                             =  69, // data
-  kHLT_Ele52_CaloIdVT_TrkIdT_EleObj                                                             =  70, // data
-  kHLT_Ele65_CaloIdVT_TrkIdT_EleObj                                                             =  71, // data
-  kHLT_Ele80_CaloIdVT_TrkIdT_EleObj                                                             =  72, // data
-  kHLT_Photon10_L1R_EleObj			                                                =  73,
-  kHLT_Photon15_Cleaned_L1R_EleObj		                                                =  74,
-  kHLT_Ele15_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_EleObj                                            =  75,
-  kHLT_Ele18_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_EleObj                                            =  76,
-  kHLT_Ele20_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_EleObj                                            =  77,
-  kHLT_Ele22_SW_TighterCaloIdIsol_L1R_EleObj	                                                =  78,
-  /* SingleTau CorssObject     ------------------------------------------------------------------------------------------------- */
-  kHLT_Ele15_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_LooseIsoPFTau15_EleObj                            =  80,
-  kHLT_Ele15_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_LooseIsoPFTau15_TauObj                            =  81,
-  kHLT_Ele15_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_LooseIsoPFTau20_EleObj                            =  82,
-  kHLT_Ele15_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_LooseIsoPFTau20_TauObj                            =  83,
-  kHLT_Ele15_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_TightIsoPFTau20_EleObj                            =  84,
-  kHLT_Ele15_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_TightIsoPFTau20_TauObj                            =  85,
-  kHLT_Ele18_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_LooseIsoPFTau20_EleObj                            =  86,
-  kHLT_Ele18_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_LooseIsoPFTau20_TauObj                            =  87,
-  kHLT_Ele18_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_MediumIsoPFTau20_EleObj                           =  88,
-  kHLT_Ele18_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_MediumIsoPFTau20_TauObj                           =  89,
-  kHLT_Ele20_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_MediumIsoPFTau20_EleObj                           =  90,
-  kHLT_Ele20_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_MediumIsoPFTau20_TauObj                           =  91,
-  /* JetMET                    ------------------------------------------------------------------------------------------------- */  
-  kHLT_Jet150_JetObj                                                                            =  92,
-  kHLT_Jet190_JetObj                                                                            =  93,
-  kHLT_Jet240_JetObj                                                                            =  94,
-  kHLT_Jet300_JetObj                                                                            =  95,
-  kHLT_DiJetAve30_JetObj                                                                        =  96,
-  kHLT_DiJetAve240_JetObj                                                                       =  97,
-  kHLT_DiJetAve300_JetObj                                                                       =  98,
+  kHLT_Ele27_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_EleObj                                            =  51,
+  kHLT_Ele32_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_EleObj                                            =  52,
+  kHLT_Ele45_CaloIdVT_TrkIdT_EleObj                                                             =  53, // data
+  kHLT_Ele52_CaloIdVT_TrkIdT_EleObj                                                             =  54, // data
+  kHLT_Ele65_CaloIdVT_TrkIdT_EleObj                                                             =  55, // data
+  kHLT_Ele80_CaloIdVT_TrkIdT_EleObj                                                             =  56, // data
+  kHLT_Photon10_L1R_EleObj			                                                =  57,
+  kHLT_Photon15_Cleaned_L1R_EleObj		                                                =  58,
+  kHLT_Ele15_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_EleObj                                            =  59,
+  kHLT_Ele18_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_EleObj                                            =  60,
+  kHLT_Ele20_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_EleObj                                            =  61,
+  kHLT_Ele22_SW_TighterCaloIdIsol_L1R_EleObj	                                                =  62,
+  /* JetMET                    ------------------------------------------------------------------------------------------------- */
+  kHLT_Jet30_JetObj       = 63,
+  kHLT_Jet150_JetObj                                                                            =  64,
+  kHLT_Jet190_JetObj                                                                            =  65,
+  kHLT_Jet240_JetObj                                                                            =  66,
+  kHLT_Jet300_JetObj                                                                            =  67,
+  kHLT_DiJetAve30_JetObj                                                                        =  68,
+  kHLT_DiJetAve240_JetObj                                                                       =  69,
+  kHLT_DiJetAve300_JetObj                                                                       =  70,
   /* Photon                    ------------------------------------------------------------------------------------------------- */
-  kHLT_Photon20_CaloIdVL_IsoL_PhoObj                                                            =  99,
-  kHLT_Photon30_CaloIdVL_IsoL_PhoObj                                                            = 100,
-  kHLT_Photon50_CaloIdVL_IsoL_PhoObj                                                            = 101,
-  kHLT_Photon75_CaloIdVL_PhoObj                                                                 = 102,
-  /* Tau                       ------------------------------------------------------------------------------------------------- */
-  kHLT_LooseIsoPFTau10_TauObj                                                                   = 103,
-  kHLT_LooseIsoPFTau15_TauObj                                                                   = 104,
-  kHLT_LooseIsoPFTau20_TauObj                                                                   = 105,
-  kHLT_MediumIsoPFTau15_TauObj                                                                  = 106,
-  kHLT_MediumIsoPFTau20_TauObj                                                                  = 107,
-  kHLT_TightIsoPFTau15_TauObj                                                                   = 108,
-  kHLT_TightIsoPFTau20_TauObj                                                                   = 109,
+  kHLT_Photon20_CaloIdVL_IsoL_PhoObj                                                            =  71,
+  kHLT_Photon30_CaloIdVL_IsoL_PhoObj                                                            = 72,
+  kHLT_Photon50_CaloIdVL_IsoL_PhoObj                                                            = 73,
+  kHLT_Photon75_CaloIdVL_PhoObj                                                                 = 74,
   /* 2012                      ------------------------------------------------------------------------------------------------- */
-  kHLT_Mu17_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_MuObj                                       = 110,
-  kHLT_Mu17_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_EGObj                                       = 111,
-  kHLT_Mu8_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_MuObj                                       = 112,
-  kHLT_Mu8_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_EGObj                                       = 113,
-  kHLT_Ele27_WP80_EleObj                                                                        = 114,
-  kHLT_Mu17_MuObj                                                                               = 115,
-  kHLT_Ele17_CaloIdVT_CaloIsoVT_TrkIdT_TrkIsoVT_Ele8_Mass50_Ele1Obj                             = 116,
-  kHLT_Ele17_CaloIdVT_CaloIsoVT_TrkIdT_TrkIsoVT_Ele8_Mass50_Ele2Obj                             = 117,
-  kHLT_Ele20_CaloIdVT_CaloIsoVT_TrkIdT_TrkIsoVT_SC4_Mass50_EleObj                               = 118,
-  kHLT_Ele20_CaloIdVT_CaloIsoVT_TrkIdT_TrkIsoVT_SC4_Mass50_SCObj                                = 119,
-  kHLT_Ele32_CaloIdT_CaloIsoT_TrkIdT_TrkIsoT_SC17_Mass50_EleObj                                 = 120,
-  kHLT_Ele32_CaloIdT_CaloIsoT_TrkIdT_TrkIsoT_SC17_Mass50_SCObj                                  = 121,
-  kHLT_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_Jet30_EleObj                                    = 122,
-  kHLT_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_EleObj                                          = 123,
-  kHLT_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_Jet30_EleObj                                     = 124,
-  kHLT_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_EleObj                                           = 125
+  kHLT_Mu17_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_MuObj                                       = 75,
+  kHLT_Mu17_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_EGObj                                       = 76,
+  kHLT_Mu8_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_MuObj                                       = 77,
+  kHLT_Mu8_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_EGObj                                       = 78,
+  kHLT_Ele27_WP80_EleObj                                                                        = 79,
+  kHLT_Mu17_MuObj                                                                               = 80,
+  kHLT_Ele17_CaloIdVT_CaloIsoVT_TrkIdT_TrkIsoVT_Ele8_Mass50_Ele1Obj                             = 81,
+  kHLT_Ele17_CaloIdVT_CaloIsoVT_TrkIdT_TrkIsoVT_Ele8_Mass50_Ele2Obj                             = 82,
+  kHLT_Ele20_CaloIdVT_CaloIsoVT_TrkIdT_TrkIsoVT_SC4_Mass50_EleObj                               = 83,
+  kHLT_Ele20_CaloIdVT_CaloIsoVT_TrkIdT_TrkIsoVT_SC4_Mass50_SCObj                                = 84,
+  kHLT_Ele32_CaloIdT_CaloIsoT_TrkIdT_TrkIsoT_SC17_Mass50_EleObj                                 = 85,
+  kHLT_Ele32_CaloIdT_CaloIsoT_TrkIdT_TrkIsoT_SC17_Mass50_SCObj                                  = 86,
+  kHLT_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_Jet30_EleObj                                    = 87,
+  kHLT_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_EleObj                                          = 88,
+  kHLT_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_Jet30_EleObj                                     = 89,
+  kHLT_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_EleObj                                           = 90,
+  // Mu + MET
+  kHLT_IsoMu15_L1ETM20_MuObj = 91,
+  
+   // TauPlusX
+  kHLT_IsoMu12_LooseIsoPFTau10_MuObj  = 92,
+  kHLT_IsoMu12_LooseIsoPFTau10_TauObj = 93,
+  kHLT_Mu15_LooseIsoPFTau15_MuObj     = 94,
+  kHLT_Mu15_LooseIsoPFTau15_TauObj    = 95,
+  kHLT_Mu15_LooseIsoPFTau20_MuObj     = 96,
+  kHLT_Mu15_LooseIsoPFTau20_TauObj    = 97,
+  kHLT_Mu18_eta2p1_LooseIsoPFTau20_MuObj = 98,
+  kHLT_Mu18_eta2p1_LooseIsoPFTau20_TauObj = 99,
+  kHLT_IsoMu15_LooseIsoPFTau15_MuObj  = 100,
+  kHLT_IsoMu15_LooseIsoPFTau15_TauObj = 101,
+  kHLT_IsoMu15_LooseIsoPFTau20_MuObj  = 102,
+  kHLT_IsoMu15_LooseIsoPFTau20_TauObj = 103,
+  kHLT_IsoMu15_TightIsoPFTau20_MuObj  = 104,
+  kHLT_IsoMu15_TightIsoPFTau20_TauObj = 105,
+  kHLT_IsoMu15_eta2p1_LooseIsoPFTau20_MuObj = 106,
+  kHLT_IsoMu15_eta2p1_LooseIsoPFTau20_TauObj = 107,
+  kHLT_IsoMu15_eta2p1_MediumIsoPFTau20_MuObj = 108,
+  kHLT_IsoMu15_eta2p1_MediumIsoPFTau20_TauObj = 109,
+  kHLT_IsoMu15_eta2p1_TightIsoPFTau20_MuObj = 110,
+  kHLT_IsoMu15_eta2p1_TightIsoPFTau20_TauObj = 111,
+  kHLT_IsoMu18_eta2p1_LooseIsoPFTau20_MuObj = 112,
+  kHLT_IsoMu18_eta2p1_LooseIsoPFTau20_TauObj = 113,
+  kHLT_Ele15_CaloIdVT_TrkIdT_LooseIsoPFTau15_EleObj = 114,
+  kHLT_Ele15_CaloIdVT_TrkIdT_LooseIsoPFTau15_TauObj = 115,
+  kHLT_Ele15_CaloIdVT_TrkIdT_LooseIsoPFTau20_EleObj = 116,
+  kHLT_Ele15_CaloIdVT_TrkIdT_LooseIsoPFTau20_TauObj = 117,
+  kHLT_Ele15_CaloIdVT_TrkIdT_TightIsoPFTau20_EleObj = 118,
+  kHLT_Ele15_CaloIdVT_TrkIdT_TightIsoPFTau20_TauObj = 119,
+  kHLT_Ele18_CaloIdVT_TrkIdT_MediumIsoPFTau20_EleObj = 120,
+  kHLT_Ele18_CaloIdVT_TrkIdT_MediumIsoPFTau20_TauObj = 121,
+  kHLT_Ele20_CaloIdVT_TrkIdT_LooseIsoPFTau20_EleObj = 122,
+  kHLT_Ele20_CaloIdVT_TrkIdT_LooseIsoPFTau20_TauObj = 123,
+  kHLT_Ele15_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_LooseIsoPFTau15_EleObj = 124,
+  kHLT_Ele15_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_LooseIsoPFTau15_TauObj = 125,
+  kHLT_Ele15_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_LooseIsoPFTau20_EleObj = 126,
+  kHLT_Ele15_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_LooseIsoPFTau20_TauObj = 127,
+  kHLT_Ele18_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_LooseIsoPFTau20_EleObj = 128,
+  kHLT_Ele18_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_LooseIsoPFTau20_TauObj = 129,
+  kHLT_Ele15_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_TightIsoPFTau20_EleObj = 130,
+  kHLT_Ele15_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_TightIsoPFTau20_TauObj = 131,
+  kHLT_Ele18_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_TightIsoPFTau20_EleObj = 132,
+  kHLT_Ele18_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_TightIsoPFTau20_TauObj = 133,
+  kHLT_Ele18_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_MediumIsoPFTau20_EleObj = 134,
+  kHLT_Ele18_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_MediumIsoPFTau20_TauObj = 135,
+  kHLT_Ele20_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_MediumIsoPFTau20_EleObj = 136,
+  kHLT_Ele20_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_MediumIsoPFTau20_TauObj = 137,
+  kHLT_Ele20_CaloIdVT_CaloIsoRhoT_TrkIdT_TrkIsoT_LooseIsoPFTau20_EleObj = 138,
+  kHLT_Ele20_CaloIdVT_CaloIsoRhoT_TrkIdT_TrkIsoT_LooseIsoPFTau20_TauObj = 139,
+
+  //Tau+Tau
+  kHLT_DoubleIsoPFTau35_Trk5_eta2p1Obj = 140,
+  kHLT_DoubleIsoPFTau25_Trk5_eta2p1Obj = 141,
+  kHLT_DoubleIsoPFTau20_Trk5Obj        = 142,
+  kHLT_DoubleMediumIsoPFTau30_Trk1_eta2p1_Jet30Obj = 143
 };
 
 #endif
-
-
-/* 
-left overs from Valentina's implementation:
-
-enum ETriggerBit
-{  
-  kHLT_Mu3                                                 = (ULong64_t)1<<48, // data
-  kHLT_Mu5                                                 = (ULong64_t)1<<49, // data
-  kHLT_Mu30                                                = (ULong64_t)1<<12, // data
-  kHLT_Mu40                                                = (ULong64_t)1<<40, // data
-  kHLT_IsoMu30                                             = (ULong64_t)1<<14, // data
-  kHLT_Ele32_CaloIdT_CaloIsoT_TrkIdT_TrkIsoT_Ele17         = (ULong64_t)1<<48,
-  kHLT_Photon10_L1R                                        = (ULong64_t)1<<32,
-  kHLT_Photon15_Cleaned_L1R                                = (ULong64_t)1<<33,
-  kHLT_Ele15_SW_CaloEleId_L1R                              = (ULong64_t)1<<34,
-  kHLT_Ele17_SW_CaloEleId_L1R                              = (ULong64_t)1<<35,
-  kHLT_Ele17_SW_TightEleId_L1R                             = (ULong64_t)1<<36,
-  kHLT_Ele22_SW_TighterCaloIdIsol_L1R                      = (ULong64_t)1<<37,
-  kHLT_Jet30                                               = (ULong64_t)1<<44,
-  kHLT_Jet60                                               = (ULong64_t)1<<45,
-  kHLT_Jet80                                               = (ULong64_t)1<<46,
-  kHLT_Jet110                                              = (ULong64_t)1<<47
-};
-
-enum ETriggerObjBit
-{
-  // SingleMu
-  kHLT_Mu3_MuObj                                           = (ULong64_t)1<<58,
-  kHLT_Mu5_MuObj                                           = (ULong64_t)1<<59,
-  kHLT_Mu40_MuObj                                          = (ULong64_t)1<<49,
-  kHLT_IsoMu30_MuObj                                       = (ULong64_t)1<<50,
-  kHLT_Ele32_CaloIdT_CaloIsoT_TrkIdT_TrkIsoT_Ele17_Ele1Obj = (ULong64_t)1<<54,
-  kHLT_Ele32_CaloIdT_CaloIsoT_TrkIdT_TrkIsoT_Ele17_Ele2Obj = (ULong64_t)1<<55,
-  kHLT_Jet30_JetObj                                        = (ULong64_t)1<<54,
-  kHLT_Jet60_JetObj                                        = (ULong64_t)1<<55,
-  kHLT_Jet80_JetObj                                        = (ULong64_t)1<<56,
-  kHLT_Jet110_JetObj                                       = (ULong64_t)1<<57
-};
-*/

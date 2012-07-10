@@ -109,12 +109,13 @@ MetSignificance::add(const mithep::Electron *iElectron,std::vector<metsig::SigIn
   fSig.push_back(metsig::SigInputObj(lParticleType,lPt,lPhi,lPtE,lPhiE));
 }
 
-TMatrixD MetSignificance::getSignificance(const PFJetCol *iJets, const PFCandidateCol *iCands, const mithep::PFTau *iTau, const mithep::Muon *iMuon, const mithep::Electron *iElectron)
+TMatrixD MetSignificance::getSignificance(const PFJetCol *iJets, const PFCandidateCol *iCands, const mithep::PFTau *iTau, const mithep::PFTau *jTau, const mithep::Muon *iMuon, const mithep::Electron *iElectron)
 {
   std::vector<metsig::SigInputObj> fSig;
   addJets      (fSig,iJets       ,(mithep::Particle*) iMuon,(mithep::Particle*) iElectron);
   addCandidates(fSig,iCands,iJets,(mithep::Particle*) iMuon,(mithep::Particle*) iElectron);//iMuons,iElectrons);
   if(iTau      != 0) addTau        (fSig,iTau);
+  if(jTau      != 0) addTau        (fSig,iTau);
   if(iMuon     != 0) add (iMuon,    fSig);
   if(iElectron != 0) add (iElectron,fSig);
   

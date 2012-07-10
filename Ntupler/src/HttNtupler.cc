@@ -19,7 +19,6 @@
 #include "MitAna/DataTree/interface/PFMet.h"
 #include "MitAna/DataTree/interface/DecayParticle.h"
 #include "MitAna/DataTree/interface/StableData.h"
-//#include "MitAna/DataTree/interface/DCASig.h"
 
 #include "MitHtt/Ntupler/interface/HttNtupler.h"
 #include "MitCommon/MathTools/interface/MathUtils.h"
@@ -73,11 +72,11 @@ HttNtupler::HttNtupler(const char *name, const char *title):
   fUseGen         ( 0),
   fPrintTable     (kFALSE),
   fSkipIfHLTFail  (kFALSE),
-  fMuPtMin        (15),
+  fMuPtMin        (10),
   fMuPtMax        (1000),
   fMuEtaMin       (-3),
   fMuEtaMax       ( 3),
-  fEleEtMin       (15),
+  fEleEtMin       (10),
   fEleEtMax       (1000),
   fEleEtaMin      (-3),
   fEleEtaMax      ( 3),
@@ -91,14 +90,6 @@ HttNtupler::HttNtupler(const char *name, const char *title):
   fMaxRho         ( 2),
   fJetCorrector   ( 0),
   fJetUncertainties( 0)
-  //BaseMod(name,title), fOutputName("HttNtuple.root"), fBeamSpotName(Names::gkBeamSpotBrn), fPrimVtxName(Names::gkPVBrn), fTrigMaskName(Names::gkHltBitBrn), 
-  //fPileupName(Names::gkPileupInfoBrn), fPUEnergyDensityName(Names::gkPileupEnergyDensityBrn),fMCEvtInfoName(Names::gkMCEvtInfoBrn), fPartName(Names::gkMCPartBrn), 
-  //fMuonName(Names::gkMuonBrn), fElectronName(Names::gkElectronBrn), fHPSTauName("HPSTaus"), fPFJetName(Names::gkPFJetBrn), fPFMetName("PFMet"), fPhotonName(Names::gkPhotonBrn), 
-  //fConversionName(Names::gkMvfConversionBrn), fPFCandidateName(Names::gkPFCandidatesBrn), fEmbedWeightName("EmbedWeight"), fParticles(0), fMCEvtInfo(0), fGenJets(0), 
-  //fBeamSpot(0), fPrimVerts(0), fTrigMask(0), fPileup(0), fPUEnergyDensity(0), fMuons(0), fElectrons(0), fPFTaus(0), fPFJets(0), fPFMet(0), fPhotons(0), fConversions(0), 
-  //fPFCandidates(0), fIsData(0), fUseGen(0), fPrintTable(false), fSkipIfHLTFail(false), fMuPtMin(15.), fMuPtMax(9999.), fMuEtaMin(-3.), fMuEtaMax(3.), fEleEtMin(15.),
-  //fEleEtMax(9999.), fEleEtaMin(-3.), fEleEtaMax(3.), fPFTauPtMin(1.), fPFTauEtaMax(6.), fJetPtMin(15.), fPhotonEtMin(10.), fMinNTracksFit(0), fMinNdof(4), fMaxAbsZ(24.),
-  //fMaxRho(2.), fDzMax(0.2)
 {
   // don't write TObject part of the objects
   TEventInfo::Class()->IgnoreTObjectStreamer();
@@ -109,7 +100,6 @@ HttNtupler::HttNtupler(const char *name, const char *title):
   TMuon::Class()     ->IgnoreTObjectStreamer();
   TPhoton::Class()   ->IgnoreTObjectStreamer();
   TElectron::Class() ->IgnoreTObjectStreamer();
-  //TMet::Class()    ->IgnoreTObjectStreamer();
   TPFTau::Class()    ->IgnoreTObjectStreamer();
 }
 
@@ -131,7 +121,11 @@ HttNtupler::SlaveBegin()
   for(unsigned int icorr=0; icorr<fJetCorrParsv.size(); icorr++){ correctionParameters.push_back(JetCorrectorParameters(fJetCorrParsv[icorr].Data())); }
   fJetCorrector = new FactorizedJetCorrector(correctionParameters); 
   // setup jet energy scale uncertainties
-  JetCorrectorParameters param(std::string(TString::Format("%s/src/MitPhysics/data/START42_V12_AK5PF_Uncertainty.txt", getenv("CMSSW_BASE"))));
+  std::string jetCorrectorParams;
+  if(TString(getenv("CMSSW_BASE")).Contains("CMSSW_5")) jetCorrectorParams = std::string(TString::Format("%s/src/MitPhysics/data/START50_V15_Uncertainty_AK5PF.t xt", getenv("CMSSW_BASE")));
+  //if(TString(getenv("CMSSW_BASE")).Contains("CMSSW_5")) jetCorrectorParams = std::string(TString::Format("%s/src/MitPhysics/data/Summer12_V7_MC_Uncertainty_AK5PF.txt", getenv("CMSSW_BASE")));
+  else jetCorrectorParams = std::string(TString::Format("%s/src/MitPhysics/data/START42_V12_AK5PF_Uncertainty.txt", getenv("CMSSW_BASE")));
+  JetCorrectorParameters param(jetCorrectorParams);
   fJetUncertainties = new JetCorrectionUncertainty(param);
   // initialize tools for electron ID
   fEleTools = new ElectronTools();
@@ -139,6 +133,112 @@ HttNtupler::SlaveBegin()
   fMuonTools = new MuonTools();
 
   metSign = new MetSignificance();
+
+  // std::vector<std::string> weightFilesMuonID;
+//   weightFilesMuonID.push_back(getenv("CMSSW_BASE")+std::string("/src/MitPhysics/data/MuonMVAWeights/MuonIDMVA_BDTG_V0_barrel_lowpt.weights.xml"));
+//   weightFilesMuonID.push_back(getenv("CMSSW_BASE")+std::string("/src/MitPhysics/data/MuonMVAWeights/MuonIDMVA_BDTG_V0_barrel_highpt.weights.xml"));
+//   weightFilesMuonID.push_back(getenv("CMSSW_BASE")+std::string("/src/MitPhysics/data/MuonMVAWeights/MuonIDMVA_BDTG_V0_endcap_lowpt.weights.xml"));
+//   weightFilesMuonID.push_back(getenv("CMSSW_BASE")+std::string("/src/MitPhysics/data/MuonMVAWeights/MuonIDMVA_BDTG_V0_endcap_highpt.weights.xml"));
+//   weightFilesMuonID.push_back(getenv("CMSSW_BASE")+std::string("/src/MitPhysics/data/MuonMVAWeights/MuonIDMVA_BDTG_V0_tracker.weights.xml"));
+//   weightFilesMuonID.push_back(getenv("CMSSW_BASE")+std::string("/src/MitPhysics/data/MuonMVAWeights/MuonIDMVA_BDTG_V0_global.weights.xml"));
+
+//   std::vector<std::string> weightFilesMuonIso;
+//   weightFilesMuonIso.push_back(getenv("CMSSW_BASE")+std::string("/src/MitPhysics/data/MuonMVAWeights/MuonIsoMVA_BDTG_V0_barrel_lowpt.weights.xml"));
+//   weightFilesMuonIso.push_back(getenv("CMSSW_BASE")+std::string("/src/MitPhysics/data/MuonMVAWeights/MuonIsoMVA_BDTG_V0_barrel_highpt.weights.xml"));
+//   weightFilesMuonIso.push_back(getenv("CMSSW_BASE")+std::string("/src/MitPhysics/data/MuonMVAWeights/MuonIsoMVA_BDTG_V0_endcap_lowpt.weights.xml"));
+//   weightFilesMuonIso.push_back(getenv("CMSSW_BASE")+std::string("/src/MitPhysics/data/MuonMVAWeights/MuonIsoMVA_BDTG_V0_endcap_highpt.weights.xml"));
+//   weightFilesMuonIso.push_back(getenv("CMSSW_BASE")+std::string("/src/MitPhysics/data/MuonMVAWeights/MuonIsoMVA_BDTG_V0_tracker.weights.xml"));
+//   weightFilesMuonIso.push_back(getenv("CMSSW_BASE")+std::string("/src/MitPhysics/data/MuonMVAWeights/MuonIsoMVA_BDTG_V0_global.weights.xml"));
+
+  std::vector<std::string> weightFilesEleID;
+//   weightFilesEleID.push_back(getenv("CMSSW_BASE")+std::string("/src/MitPhysics/data/ElectronMVAWeights/ElectronID_BDTG_EGamma2012NonTrigV0_Cat1.weights.xml"));
+//   weightFilesEleID.push_back(getenv("CMSSW_BASE")+std::string("/src/MitPhysics/data/ElectronMVAWeights/ElectronID_BDTG_EGamma2012NonTrigV0_Cat2.weights.xml"));
+//   weightFilesEleID.push_back(getenv("CMSSW_BASE")+std::string("/src/MitPhysics/data/ElectronMVAWeights/ElectronID_BDTG_EGamma2012NonTrigV0_Cat3.weights.xml"));
+//   weightFilesEleID.push_back(getenv("CMSSW_BASE")+std::string("/src/MitPhysics/data/ElectronMVAWeights/ElectronID_BDTG_EGamma2012NonTrigV0_Cat4.weights.xml"));
+//   weightFilesEleID.push_back(getenv("CMSSW_BASE")+std::string("/src/MitPhysics/data/ElectronMVAWeights/ElectronID_BDTG_EGamma2012NonTrigV0_Cat5.weights.xml"));
+//   weightFilesEleID.push_back(getenv("CMSSW_BASE")+std::string("/src/MitPhysics/data/ElectronMVAWeights/ElectronID_BDTG_EGamma2012NonTrigV0_Cat6.weights.xml"));
+
+ //  std::vector<std::string> weightFilesEleIDTrig;
+//   weightFilesEleIDTrig.push_back(getenv("CMSSW_BASE")+std::string("/src/MitPhysics/data/ElectronMVAWeights/Electrons_BDTG_TrigV0_Cat1.weights.xml"));
+//   weightFilesEleIDTrig.push_back(getenv("CMSSW_BASE")+std::string("/src/MitPhysics/data/ElectronMVAWeights/Electrons_BDTG_TrigV0_Cat2.weights.xml"));
+//   weightFilesEleIDTrig.push_back(getenv("CMSSW_BASE")+std::string("/src/MitPhysics/data/ElectronMVAWeights/Electrons_BDTG_TrigV0_Cat3.weights.xml"));
+//   weightFilesEleIDTrig.push_back(getenv("CMSSW_BASE")+std::string("/src/MitPhysics/data/ElectronMVAWeights/Electrons_BDTG_TrigV0_Cat4.weights.xml"));
+//   weightFilesEleIDTrig.push_back(getenv("CMSSW_BASE")+std::string("/src/MitPhysics/data/ElectronMVAWeights/Electrons_BDTG_TrigV0_Cat5.weights.xml"));
+//   weightFilesEleIDTrig.push_back(getenv("CMSSW_BASE")+std::string("/src/MitPhysics/data/ElectronMVAWeights/Electrons_BDTG_TrigV0_Cat6.weights.xml"));
+
+//   std::vector<std::string> weightFilesEleIso;
+//   weightFilesEleIso.push_back(getenv("CMSSW_BASE")+std::string("/src/MitPhysics/data/ElectronMVAWeights/ElectronIso_BDTG_V0_BarrelPt5To10.weights.xml"));
+//   weightFilesEleIso.push_back(getenv("CMSSW_BASE")+std::string("/src/MitPhysics/data/ElectronMVAWeights/ElectronIso_BDTG_V0_EndcapPt5To10.weights.xml"));
+//   weightFilesEleIso.push_back(getenv("CMSSW_BASE")+std::string("/src/MitPhysics/data/ElectronMVAWeights/ElectronIso_BDTG_V0_BarrelPt10ToInf.weights.xml"));
+//   weightFilesEleIso.push_back(getenv("CMSSW_BASE")+std::string("/src/MitPhysics/data/ElectronMVAWeights/ElectronIso_BDTG_V0_EndcapPt10ToInf.weights.xml"));
+
+ //  fMuonMVAID = new MuonIDMVA();
+//   fMuonMVAID->Initialize("BDTG method",MuonIDMVA::kIDV0,kTRUE,weightFilesMuonID);
+
+//   fMuonMVAIso = new MuonIDMVA();
+//   fMuonMVAIso->Initialize("BDTG method",MuonIDMVA::kIsoRingsV0,kTRUE,weightFilesMuonIso);
+
+  fElectronMVAID = new ElectronIDMVA();
+  fElectronMVAID->Initialize("BDTG method",ElectronIDMVA::kIDEGamma2012NonTrigV0,kTRUE,weightFilesEleID);
+
+//   fElectronMVAIDTrig = new ElectronIDMVA();
+//   fElectronMVAIDTrig->Initialize("BDTG method",ElectronIDMVA::kIDHWW2012TrigV0,kTRUE,weightFilesEleIDTrig);
+
+//   fElectronMVAIso = new ElectronIDMVA();
+//   fElectronMVAIso->Initialize("BDTG method",ElectronIDMVA::kIsoRingsV0,kTRUE,weightFilesEleIso);
+
+  fJetIDMVA  = new JetIDMVA();
+  if(TString(getenv("CMSSW_BASE")).Contains("CMSSW_5")) {
+    fJetIDMVA->Initialize(JetIDMVA::kLoose,
+			  TString(getenv("CMSSW_BASE")+string("/src/MitPhysics/data/mva_JetID_lowpt.weights.xml")),
+                       //TString(getenv("CMSSW_BASE")+string("/src/MitPhysics/data/mva_JetID_highpt.weights.xml")),
+			  TString(getenv("CMSSW_BASE")+string("/src/MitPhysics/data/TMVAClassification_5x_BDT_fullPlusRMS.weights.xml")),
+			  //JetIDMVA::kBaseline,
+			  JetIDMVA::k52,
+			  TString(getenv("CMSSW_BASE")+string("/src/MitPhysics/Utils/python/JetIdParams_cfi.py")));
+  } else {
+    fJetIDMVA->Initialize(JetIDMVA::kLoose,
+			  TString(getenv("CMSSW_BASE")+string("/src/MitPhysics/data/mva_JetID_lowpt.weights.xml")),
+			  //TString(getenv("CMSSW_BASE")+string("/src/MitPhysics/data/mva_JetID_highpt.weights.xml")),
+			  TString(getenv("CMSSW_BASE")+string("/src/MitPhysics/data/TMVAClassification_PuJetIdOptMVA.weights.xml")),
+			  //JetIDMVA::kBaseline,
+			  JetIDMVA::k42,
+			  TString(getenv("CMSSW_BASE")+string("/src/MitPhysics/Utils/python/JetIdParams_cfi.py")));
+  }
+
+  fTauMVAIso = new TauIsoMVA();
+  fTauMVAIso->Initialize(TString(getenv("CMSSW_BASE")+string("/src/MitPhysics/data/SXIsoMVA_BDTG.weights.xml")));
+  
+  //fAntiElectronID = new AntiElectronIDMVA();
+  //fAntiElectronID->Initialize("BDT",
+//			      TString(getenv("CMSSW_BASE")+string("/src/MitHtt/data/AntiElectronMVA/TMVAClassification_v2_X_0BL_BDT.weights.xml")),
+//			      TString(getenv("CMSSW_BASE")+string("/src/MitHtt/data/AntiElectronMVA/TMVAClassification_v2_1_1BL_BDT.weights.xml")),
+//			      TString(getenv("CMSSW_BASE")+string("/src/MitHtt/data/AntiElectronMVA/TMVAClassification_v2_0_1BL_BDT.weights.xml")),
+//			      TString(getenv("CMSSW_BASE")+string("/src/MitHtt/data/AntiElectronMVA/TMVAClassification_v2_X_0EC_BDT.weights.xml")),
+//			      TString(getenv("CMSSW_BASE")+string("/src/MitHtt/data/AntiElectronMVA/TMVAClassification_v2_1_1EC_BDT.weights.xml")),
+//			      TString(getenv("CMSSW_BASE")+string("/src/MitHtt/data/AntiElectronMVA/TMVAClassification_v2_0_1EC_BDT.weights.xml"))
+//			      );
+  
+				 
+				 
+  fMVAMet    = new MVAMet();
+  if(TString(getenv("CMSSW_BASE")).Contains("CMSSW_5")) {
+    fMVAMet->Initialize(TString(getenv("CMSSW_BASE")+string("/src/MitPhysics/data/mva_JetID_lowpt.weights.xml")),
+                   TString(getenv("CMSSW_BASE")+string("/src/MitPhysics/data/mva_JetID_highpt.weights.xml")),
+                   TString(getenv("CMSSW_BASE")+string("/src/MitPhysics/Utils/python/JetIdParams_cfi.py")),
+                   TString(getenv("CMSSW_BASE")+string("/src/MitPhysics/data/gbrmet_52.root")),
+                   TString(getenv("CMSSW_BASE")+string("/src/MitPhysics/data/gbrmetphi_52.root")),
+                   TString(getenv("CMSSW_BASE")+string("/src/MitPhysics/data/gbrmetu1cov_52.root")),
+                   TString(getenv("CMSSW_BASE")+string("/src/MitPhysics/data/gbrmetu2cov_52.root")));
+  } else {
+    fMVAMet->Initialize(TString(getenv("CMSSW_BASE")+string("/src/MitPhysics/data/mva_JetID_lowpt.weights.xml")),
+                   TString(getenv("CMSSW_BASE")+string("/src/MitPhysics/data/mva_JetID_highpt.weights.xml")),
+                   TString(getenv("CMSSW_BASE")+string("/src/MitPhysics/Utils/python/JetIdParams_cfi.py")),
+                   TString(getenv("CMSSW_BASE")+string("/src/MitPhysics/data/gbrmet_42.root")),
+                   TString(getenv("CMSSW_BASE")+string("/src/MitPhysics/data/gbrmetphi_42.root")),
+                   TString(getenv("CMSSW_BASE")+string("/src/MitPhysics/data/gbrmetu1_42.root")),
+                   TString(getenv("CMSSW_BASE")+string("/src/MitPhysics/data/gbrmetu2_42.root")));
+  }
   
   // setup selection with JSON file, if necessary
   for(unsigned int idx=0; idx<fJSONv.size(); ++idx){
@@ -162,7 +262,7 @@ void
 HttNtupler::SlaveTerminate()
 {
   fEventTree ->Print(); fOutputFile->Write(); fOutputFile->Close(); cleanup();
-  delete fJetCorrector; delete fJetUncertainties; delete fEleTools, delete fMuonTools, delete metSign;
+  delete fJetCorrector; delete fJetUncertainties; delete fEleTools, delete fMuonTools, delete metSign;delete fElectronMVAID; delete fJetIDMVA; delete fTauMVAIso;delete fMVAMet;
 
   // dump json file
   TString jsonfname = fOutputName.ReplaceAll("root","json");
@@ -184,8 +284,21 @@ HttNtupler::Process()
   if( fJSONv.size()>0 && !frlrm.HasRunLumi(rl) ){ return; } // not certified run? Skip to next event...
   if( rl!=fLastRunLumi ){ fLastRunLumi = rl; fRunLumiSet.Add(rl); }
 
-  // load relevant Bambu branches
+  // Skim, require at the least two leptons passing loose ID
+  LoadBranch(fMuonName);
+  LoadBranch(fElectronName);
+  LoadBranch(fHPSTauName);
+  
+  int lLep = 0;
+  
+  for(unsigned int i0 = 0; i0 < fMuons->GetEntries(); i0++) if(looseMuId (fMuons->At(i0))) lLep++;
+  for(unsigned int i0 = 0; i0 < fElectrons->GetEntries(); i0++) if(looseEleId(fElectrons->At(i0))) lLep++;
+  for(unsigned int i0 = 0; i0 < fPFTaus->GetEntries(); i0++) if(looseTauId(fPFTaus->At(i0))) lLep++;
+  if(lLep < 2) return;
+
+  // load the rest of the relevant Bambu branches
   loadBambuBranches();
+  
   // load trigger table
   loadTriggerTable(fTriggerBits);
   // check whether a trigger table is available or not (if required)
@@ -209,7 +322,7 @@ HttNtupler::Process()
   // loop and fill jets
   fillJets();
   // loop and fill photons
-  //fillPhotons();
+  fillPhotons();
   // fill the tree
   fEventTree->Fill();
 }
@@ -231,9 +344,6 @@ HttNtupler::loadTriggerTable(TriggerBits& trigBits)
 void 
 HttNtupler::loadBambuBranches()
 {
-  LoadBranch( fMuonName            );
-  LoadBranch( fElectronName        );
-  LoadBranch( fHPSTauName          );
   LoadBranch( fPrimVtxName         );
   LoadBranch( fBeamSpotName        );
   LoadBranch( fPFJetName           );
@@ -243,7 +353,6 @@ HttNtupler::loadBambuBranches()
   LoadBranch( fConversionName      );
   LoadBranch( fPUEnergyDensityName );
   LoadBranch( fPFCandidateName     );
-  //LoadBranch( fDCASigName);
   if( !fIsData ){
     LoadBranch( fPartName          );
     if( fUseGen==ESampleType::kEmbed ){ 
@@ -263,7 +372,6 @@ HttNtupler::resetOutputArrays()
   fElectronArr   ->Clear();
   fHPSTauArr     ->Clear();
   fPFJetArr      ->Clear();
-  //fMetArr      ->Clear();
   fPhotonArr     ->Clear();
   fPVArr         ->Clear();
   fSVfitEMuArr   ->Clear();
@@ -277,6 +385,7 @@ HttNtupler::fillGenerator()
   assert(fParticles);
   const MCParticle* boson_a=0, *dau1_a=0, *dau2_a=0; 
   const MCParticle* boson_b=0, *dau1_b=0, *dau2_b=0;
+  const MCParticle *top=0, *tbar=0;
   for(unsigned int i=0; i<fParticles->GetEntries(); ++i){
     const MCParticle* p = fParticles->At(i);
     if((p->Status() != 3 && fUseGen != ESampleType::kEmbed) || (fUseGen == ESampleType::kEmbed && p->Status() != 2)) continue;
@@ -286,10 +395,22 @@ HttNtupler::fillGenerator()
     if((fUseGen==ESampleType::kEmbed)  &&  id== 23)                     boson_a = p;
     if((fUseGen==ESampleType::kZ)      &&  id== 23)                     boson_a = p;
     if((fUseGen==ESampleType::kVV) && (id==23 || abs(id)==24)) { if(!boson_a) { boson_a = p; } else if(!boson_b) boson_b = p; }
+    if(fUseGen==ESampleType::kVttH) { 
+      if(id==25 || id==35 || id==36)  boson_a = p;
+      if(id ==  6)                    top     = p;
+      if(id == -6)                    tbar    = p;
+      if(!(top && tbar) && (id==23 || abs(id)==24))              boson_b = p;
+    }
   }
   // special treatment for powheg-herwig interface...
   if(!boson_a ) {
     assert(boson_b);
+    if(fUseGen==ESampleType::kVttH) {
+      while(!boson_a) {
+        boson_a = boson_b->FindDaughter(25);
+        boson_b = boson_b->FindDaughter(boson_b->PdgId());
+      }
+    }
     while(boson_a->NDaughters()==1) boson_a = boson_a->FindDaughter(boson_a->PdgId());
     while(boson_b->NDaughters()==1) boson_b = boson_b->FindDaughter(boson_b->PdgId());
   }
@@ -297,8 +418,23 @@ HttNtupler::fillGenerator()
   // madgraph zz sample has a few one-z events
   if(fUseGen==ESampleType::kVV && !boson_b && boson_a->NDaughters()==5) boson_b = boson_a;
   if(fUseGen==ESampleType::kVV) assert(boson_b);
+  // get charged daughters of Ws from top quarks
+  if((fUseGen==ESampleType::kVttH) && top && tbar) {
+    const MCParticle *w1 = top->FindDaughter(24,kTRUE);
+    for(UInt_t idau=0; idau<w1->NDaughters(); idau++) {
+      const MCParticle *d = w1->Daughter(idau);
+      if(d->PdgId() == w1->PdgId()) continue;
+      (d->Charge() > 0 ) ?  dau1_b = d : dau2_b = d;
+    }
+    const MCParticle *w2 = tbar->FindDaughter(-24,kTRUE); assert(w2);
+    for(UInt_t idau=0; idau<w2->NDaughters(); idau++) {
+      const MCParticle *d = w2->Daughter(idau);
+      if(d->PdgId() == w2->PdgId()) continue;
+      (d->Charge() > 0 ) ?  dau1_b = d : dau2_b = d;
+    }
+  }
   // assign daughters for first boson
-  if(boson_a) fillMCParticles(boson_a,dau1_a,dau2_a);
+  else if(boson_a) fillMCParticles(boson_a,dau1_a,dau2_a);
   // assign daughters for second boson
   else if(boson_b) fillMCParticles(boson_b,dau1_b,dau2_b);
   // madgraph zz sample...
@@ -347,25 +483,24 @@ HttNtupler::fillGenerator()
   fGenInfo.vy_b     = boson_b ? boson_b->Rapidity() : 0;
   fGenInfo.vphi_b   = boson_b ? boson_b->Phi()      : 0;
   
-  if(dau1_a != 0) { 
+  if(dau1_b != 0) { 
     FourVectorM lL1;  int lId1 = 0;
- 
-    lL1  = visibleMCMomentum(dau1_a); 
-    lId1 = pdgId(dau1_a);
+    //lL1  = visibleMCMomentum(dau1_b); 
+    lId1 = pdgId(dau1_b);
     
-    fGenInfo.pt_1_b   = lL1.Pt(); 
-    fGenInfo.eta_1_b  = lL1.Eta(); 
-    fGenInfo.phi_1_b  = lL1.Phi();
+    fGenInfo.pt_1_b   = dau1_b->Pt(); //lL1.Pt(); 
+    fGenInfo.eta_1_b  = dau1_b->Eta(); //lL1.Eta(); 
+    fGenInfo.phi_1_b  = dau1_b->Phi(); //lL1.Phi();
     fGenInfo.id_1_b   = lId1;
   } 
-  if(dau2_a != 0) { 
+  if(dau2_b != 0) { 
     FourVectorM lL2; int lId2 = 0;
-    lL2  = visibleMCMomentum(dau2_a);
-    lId2 = pdgId(dau2_a);
+    //lL2  = visibleMCMomentum(dau2_a);
+    lId2 = pdgId(dau2_b);
     
-    fGenInfo.pt_2_b   = lL2.Pt();
-    fGenInfo.eta_2_b  = lL2.Eta(); 
-    fGenInfo.phi_2_b  = lL2.Phi(); 
+    fGenInfo.pt_2_b   = dau2_b->Pt(); //lL2.Pt();
+    fGenInfo.eta_2_b  = dau2_b->Eta(); //lL2.Eta(); 
+    fGenInfo.phi_2_b  = dau2_b->Phi(); //lL2.Phi(); 
     fGenInfo.id_2_b   = lId2;
   }
   fGenInfo.decx   = boson_a->DecayVertex().X();
@@ -446,7 +581,7 @@ HttNtupler::fillCommon(TriggerBits& trigBits)
   fEventInfo.bsx          = bsx;
   fEventInfo.bsy          = bsy;
   fEventInfo.bsz          = bsz;
-  fEventInfo.rho          = fPUEnergyDensity->At(0)->Rho();
+  fEventInfo.rho          = fPUEnergyDensity->At(0)->RhoKt6PFJets();
   fEventInfo.rhoHighEta   = fPUEnergyDensity->At(0)->RhoHighEta();
   fEventInfo.hasGoodPV    = hasGoodPV;
   fEventInfo.pfMET        = fPFMet->At(0)->Et();
@@ -465,213 +600,6 @@ HttNtupler::fillMuons()
   for(unsigned int i=0; i<fMuons->GetEntries(); ++i){
     const Muon* mu=fMuons->At(i); 
     if(!mu->HasTrk()) continue; 
-
-    double Muon_ChargedIso03=0, Muon_ChargedIso03FromOtherVertices=0, Muon_NeutralIso03_01Threshold=0, Muon_NeutralIso03_05Threshold=0, Muon_NeutralIso03_10Threshold=0, Muon_NeutralIso03_15Threshold=0;
-    double Muon_ChargedIso04=0, Muon_ChargedIso04FromOtherVertices=0, Muon_NeutralIso04_01Threshold=0, Muon_NeutralIso04_05Threshold=0, Muon_NeutralIso04_10Threshold=0, Muon_NeutralIso04_15Threshold=0;
-    double tmpPFIso_NormalizedMeanEta=0, tmpPFIso_NormalizedMeanPhi=0;
-    double tmpChargedIso_DR0p0To0p1=0, tmpChargedIso_DR0p1To0p2=0, tmpChargedIso_DR0p2To0p3=0, tmpChargedIso_DR0p3To0p4=0, tmpChargedIso_DR0p4To0p5=0, tmpChargedIso_DR0p5To0p7=0, tmpChargedIso_DR0p7To1p0=0;
-    double tmpChargedIso_MeanEta_numerator=0, tmpChargedIso_MeanPhi_numerator=0, tmpChargedIso_SigmaEtaEta_numerator=0, tmpChargedIso_SigmaPhiPhi_numerator=0, tmpChargedIso_SigmaEtaPhi_numerator=0, tmpChargedIso_Covariance_denominator=0;
-    double tmpGammaIso_DR0p0To0p1=0, tmpGammaIso_DR0p1To0p2=0, tmpGammaIso_DR0p2To0p3=0, tmpGammaIso_DR0p3To0p4=0, tmpGammaIso_DR0p4To0p5=0, tmpGammaIso_DR0p5To0p7=0, tmpGammaIso_DR0p7To1p0=0;
-    double tmpGammaIso_MeanEta_numerator=0, tmpGammaIso_MeanPhi_numerator=0, tmpGammaIso_SigmaEtaEta_numerator=0, tmpGammaIso_SigmaPhiPhi_numerator=0, tmpGammaIso_SigmaEtaPhi_numerator=0, tmpGammaIso_Covariance_denominator=0;
-    double tmpNeutralHadronIso_DR0p0To0p1=0, tmpNeutralHadronIso_DR0p1To0p2=0, tmpNeutralHadronIso_DR0p2To0p3=0, tmpNeutralHadronIso_DR0p3To0p4=0, tmpNeutralHadronIso_DR0p4To0p5=0, tmpNeutralHadronIso_DR0p5To0p7=0, tmpNeutralHadronIso_DR0p7To1p0=0;
-    double tmpNeutralHadronIso_MeanEta_numerator=0, tmpNeutralHadronIso_MeanPhi_numerator=0, tmpNeutralHadronIso_SigmaEtaEta_numerator=0, tmpNeutralHadronIso_SigmaPhiPhi_numerator=0, tmpNeutralHadronIso_SigmaEtaPhi_numerator=0, tmpNeutralHadronIso_Covariance_denominator=0;
-
-
-    double zMuon = 0.0;
-    if(mu->BestTrk()) zMuon = mu->BestTrk()->DzCorrected(*fVertex);
-    const PFCandidate *pfMuonMatched = 0;
-    for (unsigned int p=0; p<fPFCandidates->GetEntries();p++) {   
-      const PFCandidate *pf = fPFCandidates->At(p);
-      if (!pfMuonMatched) {
-        if(pf->TrackerTrk() && mu->TrackerTrk() && pf->TrackerTrk() == mu->TrackerTrk()) {
-          pfMuonMatched = pf;
-        }           
-      }
-
-      //exclude the muon itself
-      if(pf->TrackerTrk() && mu->TrackerTrk() && pf->TrackerTrk() == mu->TrackerTrk()) continue;      
-
-      double dr = MathUtils::DeltaR(mu->Mom(), pf->Mom());
- 
-      if(pf->BestTrk()) {
-        double deltaZ = TMath::Abs(pf->BestTrk()->DzCorrected(*fVertex) - zMuon);
-        //remove charged particles from other vertices
-        if (deltaZ <= 0.1) {
-          if (dr < 0.4) Muon_ChargedIso04 += pf->Pt();
-          if (dr < 0.3) Muon_ChargedIso03 += pf->Pt();
-        } else {
-          if (dr < 0.4) Muon_ChargedIso04FromOtherVertices += pf->Pt();          
-          if (dr < 0.3) Muon_ChargedIso03FromOtherVertices += pf->Pt();
-        }
-      } else {
-        if (dr < 0.4) {
-          if (pf->Pt() > 0.1) Muon_NeutralIso04_01Threshold += pf->Pt();
-          if (pf->Pt() > 0.5) Muon_NeutralIso04_05Threshold += pf->Pt();
-          if (pf->Pt() > 1.0) Muon_NeutralIso04_10Threshold += pf->Pt();
-          if (pf->Pt() > 1.5) Muon_NeutralIso04_15Threshold += pf->Pt();
-        }
-        if (dr < 0.3) {
-          if (pf->Pt() > 0.1) Muon_NeutralIso03_01Threshold += pf->Pt();
-          if (pf->Pt() > 0.5) Muon_NeutralIso03_05Threshold += pf->Pt();
-          if (pf->Pt() > 1.0) Muon_NeutralIso03_10Threshold += pf->Pt();
-          if (pf->Pt() > 1.5) Muon_NeutralIso03_15Threshold += pf->Pt();
-        }
-      }
-
-      // New Isolation Calculations
-      double deta = (mu->Eta() - pf->Eta());
-      double dphi = MathUtils::DeltaPhi(double(mu->Phi()),double(pf->Phi()));
-      if (dr < 1.0) {
-        bool isLeptonFootprint = findLeptonFootprint(pf);
-        if (!isLeptonFootprint) {
-	  bool passVeto = true;
-	  //Charged
-	  if(pf->BestTrk()) {	   
-	    if (!(fabs(pf->BestTrk()->DzCorrected(*fVertex) - zMuon) < 0.2)) passVeto = false;
-  	    // Veto any PFmuon, or PFEle
-  	    if (pf->PFType() == PFCandidate::eElectron || pf->PFType() == PFCandidate::eMuon) passVeto = false;
-  	    // Footprint Veto
-  	    if (dr < 0.015) passVeto = false;
-  	    if (passVeto) {
-  	      if (dr < 0.1) tmpChargedIso_DR0p0To0p1 += pf->Pt();
-              if (dr >= 0.1 && dr < 0.2) tmpChargedIso_DR0p1To0p2 += pf->Pt();
-  	      if (dr >= 0.2 && dr < 0.3) tmpChargedIso_DR0p2To0p3 += pf->Pt();
-   	      if (dr >= 0.3 && dr < 0.4) tmpChargedIso_DR0p3To0p4 += pf->Pt();
-   	      if (dr >= 0.4 && dr < 0.5) tmpChargedIso_DR0p4To0p5 += pf->Pt();
-  	      if (dr >= 0.5 && dr < 0.7) tmpChargedIso_DR0p5To0p7 += pf->Pt();
-  	      if (dr >= 0.7 && dr < 1.0) tmpChargedIso_DR0p7To1p0 += pf->Pt();
-  	      tmpChargedIso_Covariance_denominator += pf->Pt();
-  	      tmpChargedIso_MeanEta_numerator += pf->Pt() * deta;
-  	      tmpChargedIso_MeanPhi_numerator += pf->Pt() * dphi;
-  	      tmpChargedIso_SigmaEtaEta_numerator += pf->Pt() * deta*deta;
-  	      tmpChargedIso_SigmaPhiPhi_numerator += pf->Pt() * dphi*dphi;
-  	      tmpChargedIso_SigmaEtaPhi_numerator += pf->Pt() * deta*dphi;
-  	    } //pass veto	  
-  	  }
-  	  //Gamma
-  	  else if (pf->PFType() == PFCandidate::eGamma) {	   
-  	    if (dr < 0.05) passVeto = false;
-  	    if (passVeto) {
-  	      if (dr < 0.1) tmpGammaIso_DR0p0To0p1 += pf->Pt();
-              if (dr >= 0.1 && dr < 0.2) tmpGammaIso_DR0p1To0p2 += pf->Pt();
-  	      if (dr >= 0.2 && dr < 0.3) tmpGammaIso_DR0p2To0p3 += pf->Pt();
-  	      if (dr >= 0.3 && dr < 0.4) tmpGammaIso_DR0p3To0p4 += pf->Pt();
-  	      if (dr >= 0.4 && dr < 0.5) tmpGammaIso_DR0p4To0p5 += pf->Pt();
-  	      if (dr >= 0.5 && dr < 0.7) tmpGammaIso_DR0p5To0p7 += pf->Pt();
-  	      if (dr >= 0.7 && dr < 1.0) tmpGammaIso_DR0p7To1p0 += pf->Pt();
-  	      tmpGammaIso_Covariance_denominator += pf->Pt();
-  	      tmpGammaIso_MeanEta_numerator += pf->Pt() * deta;
-  	      tmpGammaIso_MeanPhi_numerator += pf->Pt() * dphi;
-  	      tmpGammaIso_SigmaEtaEta_numerator += pf->Pt() * deta*deta;
-  	      tmpGammaIso_SigmaPhiPhi_numerator += pf->Pt() * dphi*dphi;
-  	      tmpGammaIso_SigmaEtaPhi_numerator += pf->Pt() * deta*dphi;	   	   
-  	    }
-  	  }
-  	  //NeutralHadron
-  	  else {
-  	    if (dr < 0.1) tmpNeutralHadronIso_DR0p0To0p1 += pf->Pt();
-            if (dr >= 0.1 && dr < 0.2) tmpNeutralHadronIso_DR0p1To0p2 += pf->Pt();
-  	    if (dr >= 0.2 && dr < 0.3) tmpNeutralHadronIso_DR0p2To0p3 += pf->Pt();
-  	    if (dr >= 0.3 && dr < 0.4) tmpNeutralHadronIso_DR0p3To0p4 += pf->Pt();
-  	    if (dr >= 0.4 && dr < 0.5) tmpNeutralHadronIso_DR0p4To0p5 += pf->Pt();
-  	    if (dr >= 0.5 && dr < 0.7) tmpNeutralHadronIso_DR0p5To0p7 += pf->Pt();
-  	    if (dr >= 0.7 && dr < 1.0) tmpNeutralHadronIso_DR0p7To1p0 += pf->Pt();
-  	    tmpNeutralHadronIso_Covariance_denominator += pf->Pt();
-  	    tmpNeutralHadronIso_MeanEta_numerator += pf->Pt() * deta;
-  	    tmpNeutralHadronIso_MeanPhi_numerator += pf->Pt() * dphi;
-  	    tmpNeutralHadronIso_SigmaEtaEta_numerator += pf->Pt() * deta*deta;
-  	    tmpNeutralHadronIso_SigmaPhiPhi_numerator += pf->Pt() * dphi*dphi;
-  	    tmpNeutralHadronIso_SigmaEtaPhi_numerator += pf->Pt() * deta*dphi;
-  	  }
-  
-  	  //For directional iso calculation  
-  	  if (dr > 0 && passVeto) {
-  	    tmpPFIso_NormalizedMeanEta += pf->Pt() * deta / dr;
-  	    tmpPFIso_NormalizedMeanPhi += pf->Pt() * dphi / dr;
-  	  }
-        } //not lepton footprint
-      } //in 1.0 dr cone
-    }//loop over pfcands
-
-    TVector2 PFIsoCentroid(tmpPFIso_NormalizedMeanEta,tmpPFIso_NormalizedMeanPhi);
-    double tmpPFIsoAngleSqrSum=0, tmpChargedIsoAngleSqrSum=0, tmpGammaIsoAngleSqrSum=0, tmpNeutralHadronIsoAngleSqrSum=0;
-
-    for (unsigned int p=0; p<fPFCandidates->GetEntries();p++) {   
-      const PFCandidate *pf = fPFCandidates->At(p);
-        
-      //exclude the muon itself
-      if(pf->TrackerTrk() && mu->TrackerTrk() && pf->TrackerTrk() == mu->TrackerTrk()) continue;      
-  
-      // New Isolation Calculations
-      double deta = (mu->Eta() - pf->Eta());
-      double dphi = mithep::MathUtils::DeltaPhi(Double_t(mu->Phi()),Double_t(pf->Phi()));
-      double dr = mithep::MathUtils::DeltaR(mu->Phi(),mu->Eta(), pf->Phi(), pf->Eta());
-      
-      if (dr < 1.0) {
-        bool isLeptonFootprint = findLeptonFootprint(pf);
-        if (!isLeptonFootprint) {
-  	TVector2 *tmpPFAngle;
-  	if (dr > 0) {
-  	  tmpPFAngle = new TVector2(pf->Pt()*deta/dr, pf->Pt()*dphi/dr);
-  	} else {
-  	  continue;
-  	}
-  	assert(tmpPFAngle);
-  	if (tmpPFAngle->Mod()*PFIsoCentroid.Mod() == 0) continue;
-  	if (fabs((tmpPFAngle->Px()*PFIsoCentroid.Px() + tmpPFAngle->Py()*PFIsoCentroid.Py())/(tmpPFAngle->Mod()*PFIsoCentroid.Mod()) - 1) < 0.001) continue;
-  	
-  	bool passVeto = true;
-  	
-  	//Charged
-  	if(pf->BestTrk()) {	  
-  	  if (!(fabs(pf->BestTrk()->DzCorrected(*fVertex) - zMuon) < 0.2)) passVeto = false;
-  	  // Veto any PFmuon, or PFEle
-  	  if (pf->PFType() == PFCandidate::eElectron || pf->PFType() == PFCandidate::eMuon) passVeto = false;
-  	  // Footprint Veto
-  	  if (dr < 0.015) passVeto = false;
-  	  if (passVeto) tmpChargedIsoAngleSqrSum += pow(acos((tmpPFAngle->Px()*PFIsoCentroid.Px() + tmpPFAngle->Py()*PFIsoCentroid.Py())/(tmpPFAngle->Mod()*PFIsoCentroid.Mod())),2);
-  	}
-  	//Gamma
-  	else if (pf->PFType() == PFCandidate::eGamma) {	  
-  	  if (dr < 0.05) passVeto = false;
-  	  if (passVeto) tmpGammaIsoAngleSqrSum += pow(acos((tmpPFAngle->Px()*PFIsoCentroid.Px() + tmpPFAngle->Py()*PFIsoCentroid.Py())/(tmpPFAngle->Mod()*PFIsoCentroid.Mod())),2);
-  	}
-  	//NeutralHadron
-  	else {
-  	  tmpNeutralHadronIsoAngleSqrSum += pow(acos((tmpPFAngle->Px()*PFIsoCentroid.Px() + tmpPFAngle->Py()*PFIsoCentroid.Py())/(tmpPFAngle->Mod()*PFIsoCentroid.Mod())),2);
-  	}
-  	if (passVeto) tmpPFIsoAngleSqrSum += pow(acos((tmpPFAngle->Px()*PFIsoCentroid.Px() + tmpPFAngle->Py()*PFIsoCentroid.Py())/(tmpPFAngle->Mod()*PFIsoCentroid.Mod())),2);
-  	if (tmpPFAngle) delete tmpPFAngle;
-        } //not lepton footprint  
-      } //in 1.0 dr cone
-    } //loop over PF candidates
-
-    double tmpChargedIso_MeanEta  = (tmpChargedIso_Covariance_denominator>0) ? tmpChargedIso_MeanEta_numerator/tmpChargedIso_Covariance_denominator : 0;
-    double tmpChargedIso_MeanPhi  = (tmpChargedIso_Covariance_denominator>0) ? tmpChargedIso_MeanPhi_numerator/tmpChargedIso_Covariance_denominator : 0;
-    double tmpChargedIso_SigmaEtaEta  = (tmpChargedIso_Covariance_denominator>0) ? sqrt(tmpChargedIso_SigmaEtaEta_numerator/tmpChargedIso_Covariance_denominator) : 0;
-    double tmpChargedIso_SigmaPhiPhi  = (tmpChargedIso_Covariance_denominator>0) ? sqrt(tmpChargedIso_SigmaPhiPhi_numerator/tmpChargedIso_Covariance_denominator) : 0;
-    double tmpChargedIso_CovEtaPhi  = (tmpChargedIso_Covariance_denominator>0) ? (tmpChargedIso_SigmaEtaPhi_numerator/tmpChargedIso_Covariance_denominator) : 0;
-    double tmpChargedIso_SigmaEtaPhi = 0;
-    if (tmpChargedIso_SigmaEtaEta*tmpChargedIso_SigmaPhiPhi != 0) tmpChargedIso_SigmaEtaPhi = tmpChargedIso_CovEtaPhi / (tmpChargedIso_SigmaEtaEta*tmpChargedIso_SigmaPhiPhi);
-    else tmpChargedIso_SigmaEtaPhi = (tmpChargedIso_CovEtaPhi < 0) ? -1 : (tmpChargedIso_CovEtaPhi > 0);
-
-    double tmpGammaIso_MeanEta  = (tmpGammaIso_Covariance_denominator>0) ? tmpGammaIso_MeanEta_numerator/tmpGammaIso_Covariance_denominator : 0;
-    double tmpGammaIso_MeanPhi  = (tmpGammaIso_Covariance_denominator>0) ? tmpGammaIso_MeanPhi_numerator/tmpGammaIso_Covariance_denominator : 0;
-    double tmpGammaIso_SigmaEtaEta  = (tmpGammaIso_Covariance_denominator>0) ? sqrt(tmpGammaIso_SigmaEtaEta_numerator/tmpGammaIso_Covariance_denominator) : 0;
-    double tmpGammaIso_SigmaPhiPhi  = (tmpGammaIso_Covariance_denominator>0) ? sqrt(tmpGammaIso_SigmaPhiPhi_numerator/tmpGammaIso_Covariance_denominator) : 0;
-    double tmpGammaIso_CovEtaPhi  = (tmpGammaIso_Covariance_denominator>0) ? (tmpGammaIso_SigmaEtaPhi_numerator/tmpGammaIso_Covariance_denominator) : 0;
-    double tmpGammaIso_SigmaEtaPhi = 0;
-    if (tmpGammaIso_SigmaEtaEta*tmpGammaIso_SigmaPhiPhi != 0) tmpGammaIso_SigmaEtaPhi = tmpGammaIso_CovEtaPhi / (tmpGammaIso_SigmaEtaEta*tmpGammaIso_SigmaPhiPhi);
-    else tmpGammaIso_SigmaEtaPhi = (tmpGammaIso_CovEtaPhi < 0) ? -1 : (tmpGammaIso_CovEtaPhi > 0);
-
-    double tmpNeutralHadronIso_MeanEta  = (tmpNeutralHadronIso_Covariance_denominator>0) ? tmpNeutralHadronIso_MeanEta_numerator/tmpNeutralHadronIso_Covariance_denominator : 0;
-    double tmpNeutralHadronIso_MeanPhi  = (tmpNeutralHadronIso_Covariance_denominator>0) ? tmpNeutralHadronIso_MeanPhi_numerator/tmpNeutralHadronIso_Covariance_denominator : 0;
-    double tmpNeutralHadronIso_SigmaEtaEta  = (tmpNeutralHadronIso_Covariance_denominator>0) ? sqrt(tmpNeutralHadronIso_SigmaEtaEta_numerator/tmpNeutralHadronIso_Covariance_denominator) : 0;
-    double tmpNeutralHadronIso_SigmaPhiPhi  = (tmpNeutralHadronIso_Covariance_denominator>0) ? sqrt(tmpNeutralHadronIso_SigmaPhiPhi_numerator/tmpNeutralHadronIso_Covariance_denominator) : 0;
-    double tmpNeutralHadronIso_CovEtaPhi  = (tmpNeutralHadronIso_Covariance_denominator>0) ? (tmpNeutralHadronIso_SigmaEtaPhi_numerator/tmpNeutralHadronIso_Covariance_denominator) : 0;
-    double tmpNeutralHadronIso_SigmaEtaPhi = 0;
-    if (tmpNeutralHadronIso_SigmaEtaEta*tmpNeutralHadronIso_SigmaPhiPhi != 0) tmpNeutralHadronIso_SigmaEtaPhi = tmpNeutralHadronIso_CovEtaPhi / (tmpNeutralHadronIso_SigmaEtaEta*tmpNeutralHadronIso_SigmaPhiPhi);
-    else tmpNeutralHadronIso_SigmaEtaPhi = (tmpNeutralHadronIso_CovEtaPhi < 0) ? -1 : (tmpNeutralHadronIso_CovEtaPhi > 0);
 
     TClonesArray& rMuonArr = *fMuonArr; 
     assert(rMuonArr.GetEntries() < rMuonArr.GetSize());
@@ -702,56 +630,6 @@ HttNtupler::fillMuons()
     pMuon->emIso05  = mu->IsoR05EmEt();
     pMuon->hadIso05 = mu->IsoR05HadEt();
     pMuon->hoIso05  = mu->IsoR05HoEt();
-
-    pMuon->chargedIso03 = Muon_ChargedIso03;
-    pMuon->chargedIso03FromOtherVertices = Muon_ChargedIso03FromOtherVertices;
-    pMuon->neutralIso03_05Threshold = Muon_NeutralIso03_05Threshold ;
-    pMuon->neutralIso03_10Threshold = Muon_NeutralIso03_10Threshold ;
-    pMuon->chargedIso04 = Muon_ChargedIso04;
-    pMuon->chargedIso04FromOtherVertices = Muon_ChargedIso04FromOtherVertices;
-    pMuon->neutralIso04_05Threshold = Muon_NeutralIso04_05Threshold ;
-    pMuon->neutralIso04_10Threshold = Muon_NeutralIso04_10Threshold ;
-    pMuon->chargedIso_DR0p0To0p1 = tmpChargedIso_DR0p0To0p1;
-    pMuon->chargedIso_DR0p1To0p2 = tmpChargedIso_DR0p1To0p2;
-    pMuon->chargedIso_DR0p2To0p3 = tmpChargedIso_DR0p2To0p3;
-    pMuon->chargedIso_DR0p3To0p4 = tmpChargedIso_DR0p3To0p4;
-    pMuon->chargedIso_DR0p4To0p5 = tmpChargedIso_DR0p4To0p5;
-    pMuon->chargedIso_DR0p5To0p7 = tmpChargedIso_DR0p5To0p7;
-    pMuon->chargedIso_DR0p7To1p0 = tmpChargedIso_DR0p7To1p0;
-    pMuon->gammaIso_DR0p0To0p1 = tmpGammaIso_DR0p0To0p1;
-    pMuon->gammaIso_DR0p1To0p2 = tmpGammaIso_DR0p1To0p2;
-    pMuon->gammaIso_DR0p2To0p3 = tmpGammaIso_DR0p2To0p3;
-    pMuon->gammaIso_DR0p3To0p4 = tmpGammaIso_DR0p3To0p4;
-    pMuon->gammaIso_DR0p4To0p5 = tmpGammaIso_DR0p4To0p5;
-    pMuon->gammaIso_DR0p5To0p7 = tmpGammaIso_DR0p5To0p7;
-    pMuon->gammaIso_DR0p7To1p0 = tmpGammaIso_DR0p7To1p0;
-    pMuon->neutralIso_DR0p0To0p1 = tmpNeutralHadronIso_DR0p0To0p1;
-    pMuon->neutralIso_DR0p1To0p2 = tmpNeutralHadronIso_DR0p1To0p2;
-    pMuon->neutralIso_DR0p2To0p3 = tmpNeutralHadronIso_DR0p2To0p3;
-    pMuon->neutralIso_DR0p3To0p4 = tmpNeutralHadronIso_DR0p3To0p4;
-    pMuon->neutralIso_DR0p4To0p5 = tmpNeutralHadronIso_DR0p4To0p5;
-    pMuon->neutralIso_DR0p5To0p7 = tmpNeutralHadronIso_DR0p5To0p7;
-    pMuon->neutralIso_DR0p7To1p0 = tmpNeutralHadronIso_DR0p7To1p0;
-    pMuon->chargedIso_MeanEta = tmpChargedIso_MeanEta;
-    pMuon->chargedIso_MeanPhi = tmpChargedIso_MeanPhi;
-    pMuon->chargedIso_SigEtaEta = tmpChargedIso_SigmaEtaEta;
-    pMuon->chargedIso_SigPhiPhi = tmpChargedIso_SigmaPhiPhi;
-    pMuon->chargedIso_SigEtaPhi = tmpChargedIso_SigmaEtaPhi;
-    pMuon->gammaIso_MeanEta = tmpGammaIso_MeanEta;
-    pMuon->gammaIso_MeanPhi = tmpGammaIso_MeanPhi;
-    pMuon->gammaIso_SigEtaEta = tmpGammaIso_SigmaEtaEta;
-    pMuon->gammaIso_SigPhiPhi = tmpGammaIso_SigmaPhiPhi;
-    pMuon->gammaIso_SigEtaPhi = tmpGammaIso_SigmaEtaPhi;
-    pMuon->neutralIso_MeanEta = tmpNeutralHadronIso_MeanEta;
-    pMuon->neutralIso_MeanPhi = tmpNeutralHadronIso_MeanPhi;
-    pMuon->neutralIso_SigEtaEta = tmpNeutralHadronIso_SigmaEtaEta;
-    pMuon->neutralIso_SigPhiPhi = tmpNeutralHadronIso_SigmaPhiPhi;
-    pMuon->neutralIso_SigEtaPhi = tmpNeutralHadronIso_SigmaEtaPhi;
-    pMuon->directionalPFIso = tmpPFIsoAngleSqrSum;
-    pMuon->directionalChargedIso = tmpChargedIsoAngleSqrSum;
-    pMuon->directionalGammaIso = tmpGammaIsoAngleSqrSum;
-    pMuon->directionalNeutralIso = tmpNeutralHadronIsoAngleSqrSum;
-
     pMuon->pfIso03  = computePFMuonIso(mu,0.3);
     pMuon->pfIso04  = computePFMuonIso(mu,0.4);  
     pMuon->d0       = muTrk->D0Corrected(*fVertex);
@@ -763,6 +641,10 @@ HttNtupler::fillMuons()
     pMuon->d0UbSig  = mu->D0PVUBSignificance();
     pMuon->ip3dUb   = mu->Ip3dPVUB();
     pMuon->ip3dUbSig= mu->Ip3dPVUBSignificance();
+    pMuon->d0Bs     = mu->D0PVBS();
+    pMuon->d0BsSig  = mu->D0PVBSSignificance();
+    pMuon->ip3dBs   = mu->Ip3dPVBS();
+    pMuon->ip3dBsSig= mu->Ip3dPVBSSignificance();
     pMuon->tkNchi2  = muTrk->RChi2();
     if     (mu->HasGlobalTrk()    ) { pMuon->muNchi2 = mu->GlobalTrk()->RChi2();     }
     else if(mu->HasStandaloneTrk()) { pMuon->muNchi2 = mu->StandaloneTrk()->RChi2(); }
@@ -796,6 +678,15 @@ HttNtupler::fillMuons()
     pMuon->emEnergy          = mu->EmEnergy();
     pMuon->emS9Energy        = mu->EmS9Energy();
 
+   //  MuonTools::EMuonEffectiveAreaTarget EffectiveAreaTarget;
+//     if(fIsData || fUseGen == ESampleType::kEmbed) EffectiveAreaTarget = MuonTools::kMuEAData2011;
+//     else EffectiveAreaTarget = MuonTools::kMuEAFall11MC;
+//     const Vertex* pv = fVertex;
+//     const ElectronCol* goodElectrons = 0;
+//     const MuonCol*     goodMuons     = 0;
+
+    pMuon->mvaValID        = 0; //((mu->IsGlobalMuon() || mu->IsTrackerMuon()) ? fMuonMVAID->MVAValue(mu, pv, fMuonTools, fPFCandidates, fPUEnergyDensity, EffectiveAreaTarget, goodElectrons, goodMuons) : -2.0);
+    pMuon->mvaValIso       = 0; //((mu->IsGlobalMuon() || mu->IsTrackerMuon()) ? fMuonMVAIso->MVAValue(mu, pv, fMuonTools, fPFCandidates, fPUEnergyDensity, EffectiveAreaTarget, goodElectrons, goodMuons) : -2.0);
     pMuon->pfIsoCharged    = computeCommonIso(mu, fPFNoPileUp    , 0.0, 0.4, 0.0001,  1);
     pMuon->pfIsoChargedNoZ = computeCommonIso(mu, fPFNoPileUpNoZ , 0.0, 0.4, 0.0001,  1);
     pMuon->pfIsoNeutral    = computeCommonIso(mu, fPFNoPileUp    , 0.5, 0.4,   0.01,  2);
@@ -805,13 +696,28 @@ HttNtupler::fillMuons()
     pMuon->puIso           = computeNaiveIso(mu, fPFPileUp    , 0.5, 0.4, 0.01);
     pMuon->puIsoNoZ        = computeNaiveIso(mu, fPFPileUpNoZ , 0.5, 0.4, 0.01);
     pMuon->pfPx = 0; pMuon->pfPy = 0;
+    bool foundPFMatch = false;
+    unsigned int matchedType = 9999;
     for(unsigned int i=0; i<fPFCandidates->GetEntries(); ++i){    
       const PFCandidate* pfcand = fPFCandidates->At(i);
-      if(mu->HasTrackerTrk() && mu->TrackerTrk() == pfcand->TrackerTrk()){
-	pMuon->pfPx = pfcand->Px(); pMuon->pfPy = pfcand->Py();
-	break;
+      if(fUseGen == ESampleType::kEmbed) {
+	if(MathUtils::DeltaR(mu->Mom(), pfcand->Mom()) < 0.01) {
+          pMuon->pfPx = pfcand->Px(); pMuon->pfPy = pfcand->Py();
+          foundPFMatch = true;
+          matchedType = pfcand->PFType();
+          break;
+	}
+      } else {
+        if((mu->TrackerTrk() && pfcand->TrackerTrk()) && (mu->TrackerTrk() == pfcand->TrackerTrk())){
+	  pMuon->pfPx = pfcand->Px(); pMuon->pfPy = pfcand->Py();
+	  foundPFMatch = true;
+	  matchedType = pfcand->PFType();
+	  break;
+        }
       }
     }
+    pMuon->matchesPFCand = foundPFMatch;
+    pMuon->matchedPFType = matchedType;
   }
 }
 
@@ -825,265 +731,8 @@ HttNtupler::fillElecs()
     if((ele->Pt()  < fEleEtMin)  || (ele->Pt()  > fEleEtMax )) continue;
     if((ele->Eta() < fEleEtaMin) || (ele->Eta() > fEleEtaMax)) continue;
     if(!fEleTools->PassSpikeRemovalFilter(ele)) continue;
-    if(fUseGen==ESampleType::kEmbed && !ele->BestTrk()) continue;
+    if(fUseGen==ESampleType::kEmbed && (!ele->BestTrk() || !ele->SCluster())) continue;
 
-    double Electron_ChargedIso03=0, Electron_ChargedIso03FromOtherVertices=0, Electron_NeutralHadronIso03_01Threshold=0, Electron_GammaIso03_01Threshold=0, Electron_NeutralHadronIso03_05Threshold=0, Electron_GammaIso03_05Threshold=0, Electron_NeutralHadronIso03_10Threshold=0, Electron_GammaIso03_10Threshold=0, Electron_NeutralHadronIso03_15Threshold=0, Electron_GammaIso03_15Threshold=0;
-    double Electron_ChargedIso04=0, Electron_ChargedIso04FromOtherVertices=0, Electron_NeutralHadronIso04_01Threshold=0, Electron_GammaIso04_01Threshold=0, Electron_NeutralHadronIso04_05Threshold=0, Electron_GammaIso04_05Threshold=0, Electron_NeutralHadronIso04_10Threshold=0, Electron_GammaIso04_10Threshold=0, Electron_NeutralHadronIso04_15Threshold=0, Electron_GammaIso04_15Threshold=0;
-    double Electron_ChargedEMIsoVetoEtaStrip03=0, Electron_ChargedEMIsoVetoEtaStrip04=0, Electron_NeutralHadronIso007_01Threshold=0, Electron_GammaIsoVetoEtaStrip03_01Threshold=0, Electron_GammaIsoVetoEtaStrip04_01Threshold=0, Electron_NeutralHadronIso007_05Threshold=0, Electron_GammaIsoVetoEtaStrip03_05Threshold=0, Electron_GammaIsoVetoEtaStrip04_05Threshold=0, Electron_NeutralHadronIso007_10Threshold=0, Electron_GammaIsoVetoEtaStrip03_10Threshold=0, Electron_GammaIsoVetoEtaStrip04_10Threshold=0, Electron_NeutralHadronIso007_15Threshold=0, Electron_GammaIsoVetoEtaStrip03_15Threshold=0, Electron_GammaIsoVetoEtaStrip04_15Threshold=0;
-    double tmpPFIso_NormalizedMeanEta=0, tmpPFIso_NormalizedMeanPhi=0;
-    double tmpChargedIso_DR0p0To0p1=0, tmpChargedIso_DR0p1To0p2=0, tmpChargedIso_DR0p2To0p3=0, tmpChargedIso_DR0p3To0p4=0, tmpChargedIso_DR0p4To0p5=0, tmpChargedIso_DR0p5To0p7=0, tmpChargedIso_DR0p7To1p0=0;
-    double tmpChargedIso_MeanEta_numerator=0, tmpChargedIso_MeanPhi_numerator=0, tmpChargedIso_SigmaEtaEta_numerator=0, tmpChargedIso_SigmaPhiPhi_numerator=0, tmpChargedIso_SigmaEtaPhi_numerator=0, tmpChargedIso_Covariance_denominator=0;
-    double tmpGammaIso_DR0p0To0p1=0, tmpGammaIso_DR0p1To0p2=0, tmpGammaIso_DR0p2To0p3=0, tmpGammaIso_DR0p3To0p4=0, tmpGammaIso_DR0p4To0p5=0, tmpGammaIso_DR0p5To0p7=0, tmpGammaIso_DR0p7To1p0=0;
-    double tmpGammaIso_MeanEta_numerator=0, tmpGammaIso_MeanPhi_numerator=0, tmpGammaIso_SigmaEtaEta_numerator=0, tmpGammaIso_SigmaPhiPhi_numerator=0, tmpGammaIso_SigmaEtaPhi_numerator=0, tmpGammaIso_Covariance_denominator=0;
-    double tmpNeutralHadronIso_DR0p0To0p1=0, tmpNeutralHadronIso_DR0p1To0p2=0, tmpNeutralHadronIso_DR0p2To0p3=0, tmpNeutralHadronIso_DR0p3To0p4=0, tmpNeutralHadronIso_DR0p4To0p5=0, tmpNeutralHadronIso_DR0p5To0p7=0, tmpNeutralHadronIso_DR0p7To1p0=0;
-    double tmpNeutralHadronIso_MeanEta_numerator=0, tmpNeutralHadronIso_MeanPhi_numerator=0, tmpNeutralHadronIso_SigmaEtaEta_numerator=0, tmpNeutralHadronIso_SigmaPhiPhi_numerator=0, tmpNeutralHadronIso_SigmaEtaPhi_numerator=0, tmpNeutralHadronIso_Covariance_denominator=0;
-  
-    const PFCandidate *pfEleMatch = 0;
-    double zElectron = 0.0;
-    if(ele->BestTrk()) zElectron = ele->BestTrk()->DzCorrected(*fVertex);
-    for (unsigned int p=0; p<fPFCandidates->GetEntries();p++) {   
-      const PFCandidate *pf = fPFCandidates->At(p);
-      //find matching PFElectron
-      if (!pfEleMatch) {
-        if((pf->GsfTrk() && ele->GsfTrk() && pf->GsfTrk() == ele->GsfTrk()) || (pf->TrackerTrk() && ele->TrackerTrk() && pf->TrackerTrk() == ele->TrackerTrk())) {
-          pfEleMatch = pf;
-        }
-      }
-      //exclude the electron itself
-      if(pf->GsfTrk() && ele->GsfTrk() && pf->GsfTrk() == ele->GsfTrk()) continue;
-      if(pf->TrackerTrk() && ele->TrackerTrk() && pf->TrackerTrk() == ele->TrackerTrk()) continue;      
-  
-      double dr = MathUtils::DeltaR(ele->Mom(), pf->Mom());
-      
-      if(pf->BestTrk()) {
-        //remove charged particles from other vertices
-        double deltaZ = TMath::Abs(pf->BestTrk()->DzCorrected(*fVertex) - zElectron);
-  
-        if (deltaZ <= 0.1) {
-          if (dr < 0.4) Electron_ChargedIso04 += pf->Pt();          
-          if (dr < 0.3) Electron_ChargedIso03 += pf->Pt();
-          if (pf->PFType() == PFCandidate::eElectron) {
-            if (fabs(ele->Eta() - pf->Eta()) < 0.025 && dr < 0.3) Electron_ChargedEMIsoVetoEtaStrip03 += pf->Pt();
-            if (fabs(ele->Eta() - pf->Eta()) < 0.025 && dr < 0.4) Electron_ChargedEMIsoVetoEtaStrip04 += pf->Pt();
-          } 
-        } else {
-          if (dr < 0.4) Electron_ChargedIso04FromOtherVertices += pf->Pt();          
-          if (dr < 0.3) Electron_ChargedIso03FromOtherVertices += pf->Pt();
-        }
-      } else if (pf->PFType() == PFCandidate::eGamma) {
-        if (dr < 0.4) {
-          if (pf->Pt() > 0.1) Electron_GammaIso04_01Threshold += pf->Pt();
-          if (pf->Pt() > 0.5) Electron_GammaIso04_05Threshold += pf->Pt();
-          if (pf->Pt() > 1.0) Electron_GammaIso04_10Threshold += pf->Pt();
-          if (pf->Pt() > 1.5) Electron_GammaIso04_15Threshold += pf->Pt();
-        }
-        if (dr < 0.3) {
-          if (pf->Pt() > 0.1) Electron_GammaIso03_01Threshold += pf->Pt();
-          if (pf->Pt() > 0.5) Electron_GammaIso03_05Threshold += pf->Pt();
-          if (pf->Pt() > 1.0) Electron_GammaIso03_10Threshold += pf->Pt();
-          if (pf->Pt() > 1.5) Electron_GammaIso03_15Threshold += pf->Pt();
-        }
-        if (fabs(ele->Eta() - pf->Eta()) < 0.025 && dr < 0.3) {
-          if (pf->Pt() > 0.1) Electron_GammaIsoVetoEtaStrip03_01Threshold += pf->Pt();
-          if (pf->Pt() > 0.5) Electron_GammaIsoVetoEtaStrip03_05Threshold += pf->Pt();
-          if (pf->Pt() > 1.0) Electron_GammaIsoVetoEtaStrip03_10Threshold += pf->Pt();
-          if (pf->Pt() > 1.5) Electron_GammaIsoVetoEtaStrip03_15Threshold += pf->Pt();
-        }
-        if (fabs(ele->Eta() - pf->Eta()) < 0.025 && dr < 0.4) {
-          if (pf->Pt() > 0.1) Electron_GammaIsoVetoEtaStrip04_01Threshold += pf->Pt();
-          if (pf->Pt() > 0.5) Electron_GammaIsoVetoEtaStrip04_05Threshold += pf->Pt();
-          if (pf->Pt() > 1.0) Electron_GammaIsoVetoEtaStrip04_10Threshold += pf->Pt();
-          if (pf->Pt() > 1.5) Electron_GammaIsoVetoEtaStrip04_15Threshold += pf->Pt();
-        }
-      } else {
-        if (dr < 0.4) {
-          if (pf->Pt() > 0.1) Electron_NeutralHadronIso04_01Threshold += pf->Pt();
-          if (pf->Pt() > 0.5) Electron_NeutralHadronIso04_05Threshold += pf->Pt();
-          if (pf->Pt() > 1.0) Electron_NeutralHadronIso04_10Threshold += pf->Pt();
-          if (pf->Pt() > 1.5) Electron_NeutralHadronIso04_15Threshold += pf->Pt();
-        }
-        if (dr < 0.3) {
-          if (pf->Pt() > 0.1) Electron_NeutralHadronIso03_01Threshold += pf->Pt();
-          if (pf->Pt() > 0.5) Electron_NeutralHadronIso03_05Threshold += pf->Pt();        
-          if (pf->Pt() > 1.0) Electron_NeutralHadronIso03_10Threshold += pf->Pt();
-          if (pf->Pt() > 1.5) Electron_NeutralHadronIso03_15Threshold += pf->Pt();
-        }
-        if (dr < 0.07) {
-          if (pf->Pt() > 0.1) Electron_NeutralHadronIso007_01Threshold += pf->Pt();
-          if (pf->Pt() > 0.5) Electron_NeutralHadronIso007_05Threshold += pf->Pt();
-          if (pf->Pt() > 1.0) Electron_NeutralHadronIso007_10Threshold += pf->Pt();
-          if (pf->Pt() > 1.5) Electron_NeutralHadronIso007_15Threshold += pf->Pt();
-        }
-      }
-      
-      // New Isolation Calculations
-      double deta = (ele->Eta() - pf->Eta());
-      double dphi = MathUtils::DeltaPhi(double(ele->Phi()),double(pf->Phi()));
-  
-      if (dr < 1.0) {
-        bool isLeptonFootprint = findLeptonFootprint(pf);
-        if (!isLeptonFootprint) {
-  	bool passVeto = true;
-  	//Charged
-  	 if(pf->BestTrk()) {	  	   
-  	   if (!(fabs(pf->BestTrk()->DzCorrected(*fVertex) - zElectron) < 0.2)) passVeto = false;
-  	   // Veto any PFmuon, or PFEle
-  	   if (pf->PFType() == PFCandidate::eElectron || pf->PFType() == PFCandidate::eMuon) passVeto = false;
-  	   // Footprint Veto
-  	   if (dr < 0.015) passVeto = false;
-  	   if (passVeto) {
-  	     if (dr < 0.1) tmpChargedIso_DR0p0To0p1 += pf->Pt();
-             if (dr >= 0.1 && dr < 0.2) tmpChargedIso_DR0p1To0p2 += pf->Pt();
-  	     if (dr >= 0.2 && dr < 0.3) tmpChargedIso_DR0p2To0p3 += pf->Pt();
-  	     if (dr >= 0.3 && dr < 0.4) tmpChargedIso_DR0p3To0p4 += pf->Pt();
-  	     if (dr >= 0.4 && dr < 0.5) tmpChargedIso_DR0p4To0p5 += pf->Pt();
-  	     if (dr >= 0.5 && dr < 0.7) tmpChargedIso_DR0p5To0p7 += pf->Pt();
-  	     if (dr >= 0.7 && dr < 1.0) tmpChargedIso_DR0p7To1p0 += pf->Pt();
-  	     tmpChargedIso_Covariance_denominator += pf->Pt();
-  	     tmpChargedIso_MeanEta_numerator += pf->Pt() * deta;
-  	     tmpChargedIso_MeanPhi_numerator += pf->Pt() * dphi;
-  	     tmpChargedIso_SigmaEtaEta_numerator += pf->Pt() * deta*deta;
-  	     tmpChargedIso_SigmaPhiPhi_numerator += pf->Pt() * dphi*dphi;
-  	     tmpChargedIso_SigmaEtaPhi_numerator += pf->Pt() * deta*dphi;
-  	   } //pass veto
-  	 }
-  	 //Gamma
-  	 else if (pf->PFType() == PFCandidate::eGamma) {
-  	   // Footprint Veto
-  	   if (fabs(ele->Eta()) < 1.479) {
-  	     if (fabs(deta) < 0.025) passVeto = false;
-  	   } else {
-  	     if (dr < 0.08) passVeto = false;
-  	   }
-  	   if (passVeto) {
-  	     if (dr < 0.1) tmpGammaIso_DR0p0To0p1 += pf->Pt();
-             if (dr >= 0.1 && dr < 0.2) tmpGammaIso_DR0p1To0p2 += pf->Pt();
-  	     if (dr >= 0.2 && dr < 0.3) tmpGammaIso_DR0p2To0p3 += pf->Pt();
-  	     if (dr >= 0.3 && dr < 0.4) tmpGammaIso_DR0p3To0p4 += pf->Pt();
-  	     if (dr >= 0.4 && dr < 0.5) tmpGammaIso_DR0p4To0p5 += pf->Pt();
-  	     if (dr >= 0.5 && dr < 0.7) tmpGammaIso_DR0p5To0p7 += pf->Pt();
-  	     if (dr >= 0.7 && dr < 1.0) tmpGammaIso_DR0p7To1p0 += pf->Pt();
-  	     tmpGammaIso_Covariance_denominator += pf->Pt();
-  	     tmpGammaIso_MeanEta_numerator += pf->Pt() * deta;
-  	     tmpGammaIso_MeanPhi_numerator += pf->Pt() * dphi;
-  	     tmpGammaIso_SigmaEtaEta_numerator += pf->Pt() * deta*deta;
-  	     tmpGammaIso_SigmaPhiPhi_numerator += pf->Pt() * dphi*dphi;
-  	     tmpGammaIso_SigmaEtaPhi_numerator += pf->Pt() * deta*dphi;	   	   
-  	   }
-  	 }
-  	 //NeutralHadron
-  	 else {
-  	   if (dr < 0.1) tmpNeutralHadronIso_DR0p0To0p1 += pf->Pt();
-           if (dr >= 0.1 && dr < 0.2) tmpNeutralHadronIso_DR0p1To0p2 += pf->Pt();
-  	   if (dr >= 0.2 && dr < 0.3) tmpNeutralHadronIso_DR0p2To0p3 += pf->Pt();
-  	   if (dr >= 0.3 && dr < 0.4) tmpNeutralHadronIso_DR0p3To0p4 += pf->Pt();
-  	   if (dr >= 0.4 && dr < 0.5) tmpNeutralHadronIso_DR0p4To0p5 += pf->Pt();
-  	   if (dr >= 0.5 && dr < 0.7) tmpNeutralHadronIso_DR0p5To0p7 += pf->Pt();
-  	   if (dr >= 0.7 && dr < 1.0) tmpNeutralHadronIso_DR0p7To1p0 += pf->Pt();
-  	   tmpNeutralHadronIso_Covariance_denominator += pf->Pt();
-  	   tmpNeutralHadronIso_MeanEta_numerator += pf->Pt() * deta;
-  	   tmpNeutralHadronIso_MeanPhi_numerator += pf->Pt() * dphi;
-  	   tmpNeutralHadronIso_SigmaEtaEta_numerator += pf->Pt() * deta*deta;
-  	   tmpNeutralHadronIso_SigmaPhiPhi_numerator += pf->Pt() * dphi*dphi;
-  	   tmpNeutralHadronIso_SigmaEtaPhi_numerator += pf->Pt() * deta*dphi;
-  	 }
-  
-  	 //For directional iso calculation  
-  	 if (dr > 0 && passVeto) {
-  	   tmpPFIso_NormalizedMeanEta += pf->Pt() * deta / dr;
-  	   tmpPFIso_NormalizedMeanPhi += pf->Pt() * dphi / dr;
-  	 }
-        } //not lepton footprint
-      } //in 1.0 dr cone
-    } //loop over PF candidates
-  
-    TVector2 PFIsoCentroid(tmpPFIso_NormalizedMeanEta,tmpPFIso_NormalizedMeanPhi);
-    Double_t tmpPFIsoAngleSqrSum = 0;
-    Double_t tmpChargedIsoAngleSqrSum = 0;
-    Double_t tmpGammaIsoAngleSqrSum = 0;
-    Double_t tmpNeutralHadronIsoAngleSqrSum = 0;
-    
-  
-    for (unsigned int p=0; p<fPFCandidates->GetEntries();p++) {   
-      const PFCandidate *pf = fPFCandidates->At(p);
-        
-      //exclude the electron itself
-      if(pf->GsfTrk() && ele->GsfTrk() && pf->GsfTrk() == ele->GsfTrk()) continue;
-      if(pf->TrackerTrk() && ele->TrackerTrk() && pf->TrackerTrk() == ele->TrackerTrk()) continue;      
-      
-      // New Isolation Calculations
-      double deta = (ele->Eta() - pf->Eta());
-      double dphi = mithep::MathUtils::DeltaPhi(double(ele->Phi()),double(pf->Phi()));
-      double dr = mithep::MathUtils::DeltaR(ele->Phi(),ele->Eta(), pf->Phi(), pf->Eta());
-      
-      if (dr < 1.0) {
-        bool isLeptonFootprint = findLeptonFootprint(pf);
-        if (!isLeptonFootprint) {
-  	TVector2 *tmpPFAngle;
-  	if (dr > 0) {
-  	  tmpPFAngle = new TVector2(pf->Pt()*deta/dr, pf->Pt()*dphi/dr);
-  	} else {
-  	  continue;
-  	}
-  	assert(tmpPFAngle);
-  	if (tmpPFAngle->Mod()*PFIsoCentroid.Mod() == 0) continue;
-  	if (fabs((tmpPFAngle->Px()*PFIsoCentroid.Px() + tmpPFAngle->Py()*PFIsoCentroid.Py())/(tmpPFAngle->Mod()*PFIsoCentroid.Mod()) - 1) < 0.001) continue;
-  	
-  	bool passVeto = true;	
-  	//Charged
-  	if(pf->BestTrk()) {	  
-  	  if (!(fabs(pf->BestTrk()->DzCorrected(*fVertex) - zElectron) < 0.2)) passVeto = false;
-  	  // Veto any PFmuon, or PFEle
-  	  if (pf->PFType() == PFCandidate::eElectron || pf->PFType() == PFCandidate::eMuon) passVeto = false;
-  	  // Footprint Veto
-  	  if (dr < 0.015) passVeto = false;
-  	  if (passVeto) tmpChargedIsoAngleSqrSum += pow(acos((tmpPFAngle->Px()*PFIsoCentroid.Px() + tmpPFAngle->Py()*PFIsoCentroid.Py())/(tmpPFAngle->Mod()*PFIsoCentroid.Mod())),2);
-  	}
-  	//Gamma
-  	else if (pf->PFType() == PFCandidate::eGamma) {
-  	  // Footprint Veto
- 	  if (fabs(ele->Eta()) < 1.479) {
-  	    if (fabs(deta) < 0.025) passVeto = false;
-  	  } else {
-  	    if (dr < 0.08) passVeto = false;
-  	  }
-  	  if (passVeto) tmpGammaIsoAngleSqrSum += pow(acos((tmpPFAngle->Px()*PFIsoCentroid.Px() + tmpPFAngle->Py()*PFIsoCentroid.Py())/(tmpPFAngle->Mod()*PFIsoCentroid.Mod())),2);
-  	}
-  	//NeutralHadron
-  	else {
-  	  tmpNeutralHadronIsoAngleSqrSum += pow(acos((tmpPFAngle->Px()*PFIsoCentroid.Px() + tmpPFAngle->Py()*PFIsoCentroid.Py())/(tmpPFAngle->Mod()*PFIsoCentroid.Mod())),2);
-  	}
-  	if (passVeto) tmpPFIsoAngleSqrSum += pow(acos((tmpPFAngle->Px()*PFIsoCentroid.Px() + tmpPFAngle->Py()*PFIsoCentroid.Py())/(tmpPFAngle->Mod()*PFIsoCentroid.Mod())),2);   
-  	if(tmpPFAngle) delete tmpPFAngle;
-        } //not lepton footprint  
-      } //in 1.0 dr cone
-    } //loop over PF candidates
-  
-    double tmpChargedIso_MeanEta  = (tmpChargedIso_Covariance_denominator>0) ? tmpChargedIso_MeanEta_numerator/tmpChargedIso_Covariance_denominator : 0;
-    double tmpChargedIso_MeanPhi  = (tmpChargedIso_Covariance_denominator>0) ? tmpChargedIso_MeanPhi_numerator/tmpChargedIso_Covariance_denominator : 0;
-    double tmpChargedIso_SigmaEtaEta  = (tmpChargedIso_Covariance_denominator>0) ? sqrt(tmpChargedIso_SigmaEtaEta_numerator/tmpChargedIso_Covariance_denominator) : 0;
-    double tmpChargedIso_SigmaPhiPhi  = (tmpChargedIso_Covariance_denominator>0) ? sqrt(tmpChargedIso_SigmaPhiPhi_numerator/tmpChargedIso_Covariance_denominator) : 0;
-    double tmpChargedIso_CovEtaPhi  = (tmpChargedIso_Covariance_denominator>0) ? (tmpChargedIso_SigmaEtaPhi_numerator/tmpChargedIso_Covariance_denominator) : 0;
-    double tmpChargedIso_SigmaEtaPhi = 0;
-    if (tmpChargedIso_SigmaEtaEta*tmpChargedIso_SigmaPhiPhi != 0) tmpChargedIso_SigmaEtaPhi = tmpChargedIso_CovEtaPhi / (tmpChargedIso_SigmaEtaEta*tmpChargedIso_SigmaPhiPhi);
-    else tmpChargedIso_SigmaEtaPhi = (tmpChargedIso_CovEtaPhi < 0) ? -1 : (tmpChargedIso_CovEtaPhi > 0);
-    double tmpGammaIso_MeanEta  = (tmpGammaIso_Covariance_denominator>0) ? tmpGammaIso_MeanEta_numerator/tmpGammaIso_Covariance_denominator : 0;
-    double tmpGammaIso_MeanPhi  = (tmpGammaIso_Covariance_denominator>0) ? tmpGammaIso_MeanPhi_numerator/tmpGammaIso_Covariance_denominator : 0;
-    double tmpGammaIso_SigmaEtaEta  = (tmpGammaIso_Covariance_denominator>0) ? sqrt(tmpGammaIso_SigmaEtaEta_numerator/tmpGammaIso_Covariance_denominator) : 0;
-    double tmpGammaIso_SigmaPhiPhi  = (tmpGammaIso_Covariance_denominator>0) ? sqrt(tmpGammaIso_SigmaPhiPhi_numerator/tmpGammaIso_Covariance_denominator) : 0;
-    double tmpGammaIso_CovEtaPhi  = (tmpGammaIso_Covariance_denominator>0) ? (tmpGammaIso_SigmaEtaPhi_numerator/tmpGammaIso_Covariance_denominator) : 0;
-    double tmpGammaIso_SigmaEtaPhi = 0;
-    if (tmpGammaIso_SigmaEtaEta*tmpGammaIso_SigmaPhiPhi != 0) tmpGammaIso_SigmaEtaPhi = tmpGammaIso_CovEtaPhi / (tmpGammaIso_SigmaEtaEta*tmpGammaIso_SigmaPhiPhi);
-    else tmpGammaIso_SigmaEtaPhi = (tmpGammaIso_CovEtaPhi < 0) ? -1 : (tmpGammaIso_CovEtaPhi > 0);
-    double tmpNeutralHadronIso_MeanEta  = (tmpNeutralHadronIso_Covariance_denominator>0) ? tmpNeutralHadronIso_MeanEta_numerator/tmpNeutralHadronIso_Covariance_denominator : 0;
-    double tmpNeutralHadronIso_MeanPhi  = (tmpNeutralHadronIso_Covariance_denominator>0) ? tmpNeutralHadronIso_MeanPhi_numerator/tmpNeutralHadronIso_Covariance_denominator : 0;
-    double tmpNeutralHadronIso_SigmaEtaEta  = (tmpNeutralHadronIso_Covariance_denominator>0) ? sqrt(tmpNeutralHadronIso_SigmaEtaEta_numerator/tmpNeutralHadronIso_Covariance_denominator) : 0;
-    double tmpNeutralHadronIso_SigmaPhiPhi  = (tmpNeutralHadronIso_Covariance_denominator>0) ? sqrt(tmpNeutralHadronIso_SigmaPhiPhi_numerator/tmpNeutralHadronIso_Covariance_denominator) : 0;
-    double tmpNeutralHadronIso_CovEtaPhi  = (tmpNeutralHadronIso_Covariance_denominator>0) ? (tmpNeutralHadronIso_SigmaEtaPhi_numerator/tmpNeutralHadronIso_Covariance_denominator) : 0;
-    double tmpNeutralHadronIso_SigmaEtaPhi = 0;
-    if (tmpNeutralHadronIso_SigmaEtaEta*tmpNeutralHadronIso_SigmaPhiPhi != 0) tmpNeutralHadronIso_SigmaEtaPhi = tmpNeutralHadronIso_CovEtaPhi / (tmpNeutralHadronIso_SigmaEtaEta*tmpNeutralHadronIso_SigmaPhiPhi);
-    else tmpNeutralHadronIso_SigmaEtaPhi = (tmpNeutralHadronIso_CovEtaPhi < 0) ? -1 : (tmpNeutralHadronIso_CovEtaPhi > 0);
-  
     TClonesArray& rElectronArr = *fElectronArr;
     assert(rElectronArr.GetEntries() < rElectronArr.GetSize());
     const int index = rElectronArr.GetEntries();  
@@ -1100,82 +749,6 @@ HttNtupler::fillElecs()
     pElectron->hadIso04        = ele->HcalTowerSumEtDr04();
     pElectron->pfIso03         = computePFElecIso(ele,0.3); 
     pElectron->pfIso04         = computePFElecIso(ele,0.4);
-
-    pElectron->chargedIso03 = Electron_ChargedIso03;
-    pElectron->chargedIso03FromOtherVertices = Electron_ChargedIso03FromOtherVertices;
-    pElectron->neutralHadronIso03_01Threshold = Electron_NeutralHadronIso03_01Threshold;
-    pElectron->gammaIso03_01Threshold = Electron_GammaIso03_01Threshold;
-    pElectron->neutralHadronIso03_05Threshold = Electron_NeutralHadronIso03_05Threshold;
-    pElectron->gammaIso03_05Threshold = Electron_GammaIso03_05Threshold;
-    pElectron->neutralHadronIso03_10Threshold = Electron_NeutralHadronIso03_10Threshold;
-    pElectron->gammaIso03_10Threshold = Electron_GammaIso03_10Threshold;
-    pElectron->neutralHadronIso03_15Threshold = Electron_NeutralHadronIso03_15Threshold;
-    pElectron->gammaIso03_15Threshold = Electron_GammaIso03_15Threshold;
-    pElectron->chargedIso04 = Electron_ChargedIso04;
-    pElectron->chargedIso04FromOtherVertices = Electron_ChargedIso04FromOtherVertices;
-    pElectron->neutralHadronIso04_01Threshold = Electron_NeutralHadronIso04_01Threshold;
-    pElectron->gammaIso04_01Threshold = Electron_GammaIso04_01Threshold;
-    pElectron->neutralHadronIso04_05Threshold = Electron_NeutralHadronIso04_05Threshold;
-    pElectron->gammaIso04_05Threshold = Electron_GammaIso04_05Threshold;
-    pElectron->neutralHadronIso04_10Threshold = Electron_NeutralHadronIso04_10Threshold;
-    pElectron->gammaIso04_10Threshold = Electron_GammaIso04_10Threshold;
-    pElectron->neutralHadronIso04_15Threshold = Electron_NeutralHadronIso04_15Threshold;
-    pElectron->gammaIso04_15Threshold = Electron_GammaIso04_15Threshold;
-    pElectron->chargedEMIsoVetoEtaStrip03 = Electron_ChargedEMIsoVetoEtaStrip03;
-    pElectron->chargedEMIsoVetoEtaStrip04 = Electron_ChargedEMIsoVetoEtaStrip04;
-    pElectron->neutralHadronIso007_01Threshold = Electron_NeutralHadronIso007_01Threshold ;
-    pElectron->gammaIsoVetoEtaStrip03_01Threshold = Electron_GammaIsoVetoEtaStrip03_01Threshold;
-    pElectron->gammaIsoVetoEtaStrip04_01Threshold = Electron_GammaIsoVetoEtaStrip04_01Threshold ;
-    pElectron->neutralHadronIso007_05Threshold = Electron_NeutralHadronIso007_05Threshold ;
-    pElectron->gammaIsoVetoEtaStrip03_05Threshold = Electron_GammaIsoVetoEtaStrip03_05Threshold;
-    pElectron->gammaIsoVetoEtaStrip04_05Threshold = Electron_GammaIsoVetoEtaStrip04_05Threshold ;
-    pElectron->neutralHadronIso007_10Threshold = Electron_NeutralHadronIso007_10Threshold ;
-    pElectron->gammaIsoVetoEtaStrip03_10Threshold = Electron_GammaIsoVetoEtaStrip03_10Threshold;
-    pElectron->gammaIsoVetoEtaStrip04_10Threshold = Electron_GammaIsoVetoEtaStrip04_10Threshold ;
-    pElectron->neutralHadronIso007_15Threshold = Electron_NeutralHadronIso007_15Threshold ;
-    pElectron->gammaIsoVetoEtaStrip03_15Threshold = Electron_GammaIsoVetoEtaStrip03_15Threshold;
-    pElectron->gammaIsoVetoEtaStrip04_15Threshold = Electron_GammaIsoVetoEtaStrip04_15Threshold;
-
-    pElectron->chargedIso_DR0p0To0p1 = tmpChargedIso_DR0p0To0p1;
-    pElectron->chargedIso_DR0p1To0p2 = tmpChargedIso_DR0p1To0p2;
-    pElectron->chargedIso_DR0p2To0p3 = tmpChargedIso_DR0p2To0p3;
-    pElectron->chargedIso_DR0p3To0p4 = tmpChargedIso_DR0p3To0p4;
-    pElectron->chargedIso_DR0p4To0p5 = tmpChargedIso_DR0p4To0p5;
-    pElectron->chargedIso_DR0p5To0p7 = tmpChargedIso_DR0p5To0p7;
-    pElectron->chargedIso_DR0p7To1p0 = tmpChargedIso_DR0p7To1p0;
-    pElectron->gammaIso_DR0p0To0p1 = tmpGammaIso_DR0p0To0p1;
-    pElectron->gammaIso_DR0p1To0p2 = tmpGammaIso_DR0p1To0p2;
-    pElectron->gammaIso_DR0p2To0p3 = tmpGammaIso_DR0p2To0p3;
-    pElectron->gammaIso_DR0p3To0p4 = tmpGammaIso_DR0p3To0p4;
-    pElectron->gammaIso_DR0p4To0p5 = tmpGammaIso_DR0p4To0p5;
-    pElectron->gammaIso_DR0p5To0p7 = tmpGammaIso_DR0p5To0p7;
-    pElectron->gammaIso_DR0p7To1p0 = tmpGammaIso_DR0p7To1p0;
-    pElectron->neutralIso_DR0p0To0p1 = tmpNeutralHadronIso_DR0p0To0p1;
-    pElectron->neutralIso_DR0p1To0p2 = tmpNeutralHadronIso_DR0p1To0p2;
-    pElectron->neutralIso_DR0p2To0p3 = tmpNeutralHadronIso_DR0p2To0p3;
-    pElectron->neutralIso_DR0p3To0p4 = tmpNeutralHadronIso_DR0p3To0p4;
-    pElectron->neutralIso_DR0p4To0p5 = tmpNeutralHadronIso_DR0p4To0p5;
-    pElectron->neutralIso_DR0p5To0p7 = tmpNeutralHadronIso_DR0p5To0p7;
-    pElectron->neutralIso_DR0p7To1p0 = tmpNeutralHadronIso_DR0p7To1p0;
-    pElectron->chargedIso_MeanEta = tmpChargedIso_MeanEta;
-    pElectron->chargedIso_MeanPhi = tmpChargedIso_MeanPhi;
-    pElectron->chargedIso_SigEtaEta = tmpChargedIso_SigmaEtaEta;
-    pElectron->chargedIso_SigPhiPhi = tmpChargedIso_SigmaPhiPhi;
-    pElectron->chargedIso_SigEtaPhi = tmpChargedIso_SigmaEtaPhi;
-    pElectron->gammaIso_MeanEta = tmpGammaIso_MeanEta;
-    pElectron->gammaIso_MeanPhi = tmpGammaIso_MeanPhi;
-    pElectron->gammaIso_SigEtaEta = tmpGammaIso_SigmaEtaEta;
-    pElectron->gammaIso_SigPhiPhi = tmpGammaIso_SigmaPhiPhi;
-    pElectron->gammaIso_SigEtaPhi = tmpGammaIso_SigmaEtaPhi;
-    pElectron->neutralIso_MeanEta = tmpNeutralHadronIso_MeanEta;
-    pElectron->neutralIso_MeanPhi = tmpNeutralHadronIso_MeanPhi;
-    pElectron->neutralIso_SigEtaEta = tmpNeutralHadronIso_SigmaEtaEta;
-    pElectron->neutralIso_SigPhiPhi = tmpNeutralHadronIso_SigmaPhiPhi;
-    pElectron->neutralIso_SigEtaPhi = tmpNeutralHadronIso_SigmaEtaPhi;
-    pElectron->directionalPFIso = tmpPFIsoAngleSqrSum;
-    pElectron->directionalChargedIso = tmpChargedIsoAngleSqrSum;
-    pElectron->directionalGammaIso = tmpGammaIsoAngleSqrSum;
-    pElectron->directionalNeutralIso = tmpNeutralHadronIsoAngleSqrSum;
 
     pElectron->d0              = ele->BestTrk()->D0Corrected(*fVertex);
     pElectron->dz              = ele->BestTrk()->DzCorrected(*fVertex);  
@@ -1195,10 +768,12 @@ HttNtupler::fillElecs()
     pElectron->q               = ele->Charge(); 
     pElectron->E               = ele->SCluster()->Energy();
     pElectron->p               = ele->BestTrk()->P();
+    pElectron->P               = ele->P();
     pElectron->ip3d            = ele->Ip3dPV();
     pElectron->ip3dSig         = ele->Ip3dPVSignificance();
     pElectron->ESeedClusterOverPIn   = ele->ESeedClusterOverPIn();
     pElectron->ESeedClusterOverPOut  = ele->ESeedClusterOverPout();
+    pElectron->EEleClusterOverPOut   = ele->EEleClusterOverPout();
     pElectron->sigiPhiiPhi     = ele->SCluster()->Seed()->CoviPhiiPhi();
     pElectron->nBrem           = ele->NumberOfClusters()-1;  
     pElectron->hltMatchBits    = matchHLT(ele->SCluster()->Eta(), ele->SCluster()->Phi(), ele->SCluster()->Et());
@@ -1213,9 +788,16 @@ HttNtupler::fillElecs()
     pElectron->d0UbSig         = ele->D0PVUBSignificance();
     pElectron->ip3dUb          = ele->Ip3dPVUB();
     pElectron->ip3dUbSig       = ele->Ip3dPVUBSignificance();
+    pElectron->d0Bs            = ele->D0PVBS();
+    pElectron->d0BsSig         = ele->D0PVBSSignificance();
+    pElectron->ip3dBs          = ele->Ip3dPVBS();
+    pElectron->ip3dBsSig       = ele->Ip3dPVBSSignificance();
 
     // additional variables used for mva id
     pElectron->gsfTrackChi2OverNdof = ele->BestTrk()->Chi2() / ele->BestTrk()->Ndof();
+    pElectron->kfTrackChi2OverNdof = (ele->TrackerTrk() ? ele->TrackerTrk()->Chi2() / ele->TrackerTrk()->Ndof() : -1);
+    pElectron->kfTrackNHits = (ele->TrackerTrk() ? ele->TrackerTrk()->NHits() : 0);
+    pElectron->kfTrackNLayers = ele->CTFTrkNLayersWithMeasurement();
     pElectron->hcalDepth1OverEcal = ele->HcalDepth1OverEcal();
     pElectron->hcalDepth2OverEcal = ele->HcalDepth2OverEcal();
     pElectron->deltaEtaCalo    = ele->DeltaEtaSeedClusterTrackAtCalo();
@@ -1225,34 +807,27 @@ HttNtupler::fillElecs()
     pElectron->scPhiWidth      = ele->SCluster()->PhiWidth();
     pElectron->coviEtaiPhi     = ele->SCluster()->Seed()->CoviEtaiPhi();
     pElectron->psOverRaw       = ele->SCluster()->PreshowerEnergy() / ele->SCluster()->RawEnergy();
-    pElectron->seedEMaxOverE = ele->SCluster()->Seed()->EMax() / ele->SCluster()->Seed()->Energy();
-    pElectron->seedETopOverE = ele->SCluster()->Seed()->ETop() / ele->SCluster()->Seed()->Energy();
-    pElectron->seedEBottomOverE = ele->SCluster()->Seed()->EBottom() / ele->SCluster()->Seed()->Energy();
-    pElectron->seedELeftOverE = ele->SCluster()->Seed()->ELeft() / ele->SCluster()->Seed()->Energy();
-    pElectron->seedERightOverE = ele->SCluster()->Seed()->ERight() / ele->SCluster()->Seed()->Energy();
-    pElectron->seedE2ndOverE = ele->SCluster()->Seed()->E2nd() / ele->SCluster()->Seed()->Energy();
-    pElectron->seedE2x5RightOverE = ele->SCluster()->Seed()->E2x5Right() / ele->SCluster()->Seed()->Energy();
-    pElectron->seedE2x5LeftOverE = ele->SCluster()->Seed()->E2x5Left() / ele->SCluster()->Seed()->Energy();
-    pElectron->seedE2x5TopOverE = ele->SCluster()->Seed()->E2x5Top() / ele->SCluster()->Seed()->Energy();
-    pElectron->seedE2x5BottomOverE = ele->SCluster()->Seed()->E2x5Bottom() / ele->SCluster()->Seed()->Energy();
-    pElectron->seedE2x5MaxOverE = ele->SCluster()->Seed()->E2x5Max() / ele->SCluster()->Seed()->Energy();
-    pElectron->seedE1x3OverE = ele->SCluster()->Seed()->E1x3() / ele->SCluster()->Seed()->Energy();
-    pElectron->seedE3x1OverE = ele->SCluster()->Seed()->E3x1() / ele->SCluster()->Seed()->Energy();
     pElectron->seedE1x5OverE = ele->SCluster()->Seed()->E1x5() / ele->SCluster()->Seed()->Energy();
-    pElectron->seedE2x2OverE = ele->SCluster()->Seed()->E2x2() / ele->SCluster()->Seed()->Energy();
-    pElectron->seedE3x2OverE = ele->SCluster()->Seed()->E3x2() / ele->SCluster()->Seed()->Energy();
-    pElectron->seedE3x3OverE = ele->SCluster()->Seed()->E3x3() / ele->SCluster()->Seed()->Energy();
-    pElectron->seedE4x4OverE = ele->SCluster()->Seed()->E4x4() / ele->SCluster()->Seed()->Energy();
     pElectron->seedE5x5OverE = ele->SCluster()->Seed()->E5x5() / ele->SCluster()->Seed()->Energy();
 
-    pElectron->pfIsoCharged    = computeCommonIso(ele, fPFNoPileUp    , 0.0, 0.4, 0.015,  1);
-    pElectron->pfIsoChargedNoZ = computeCommonIso(ele, fPFNoPileUpNoZ , 0.0, 0.4, 0.015,  1);
-    pElectron->pfIsoNeutral    = computeCommonIso(ele, fPFNoPileUp    , 0.5, 0.4,   0.0,  2);
-    pElectron->pfIsoNeutralNoZ = computeCommonIso(ele, fPFNoPileUpNoZ , 0.5, 0.4,   0.0,  2);
-    pElectron->pfIsoGamma      = computeCommonIso(ele, fPFNoPileUp    , 0.5, 0.4,  0.08,  3);
-    pElectron->pfIsoGammaNoZ   = computeCommonIso(ele, fPFNoPileUpNoZ , 0.5, 0.4,  0.08,  3);
-    pElectron->puIso           = computeNaiveIso(ele, fPFPileUp    , 0.5, 0.4,  0.01);
-    pElectron->puIsoNoZ        = computeNaiveIso(ele, fPFPileUpNoZ , 0.5, 0.4,  0.01);
+    ElectronTools::EElectronEffectiveAreaTarget EffectiveAreaTarget;
+    if(fIsData || fUseGen == ESampleType::kEmbed) EffectiveAreaTarget = ElectronTools::kEleEAData2012;
+    else EffectiveAreaTarget = ElectronTools::kEleEAFall11MC;
+    const Vertex* pv = fVertex;
+    const ElectronCol* goodElectrons = 0;
+    const MuonCol*     goodMuons     = 0;
+
+    pElectron->mvaValID        = fElectronMVAID->MVAValue(ele, pv, fPFCandidates, fPUEnergyDensity, EffectiveAreaTarget, goodElectrons, goodMuons);
+    pElectron->mvaValIDTrig    = 0; //fElectronMVAIDTrig->MVAValue(ele, pv, fPFCandidates, fPUEnergyDensity, EffectiveAreaTarget, goodElectrons, goodMuons);
+    pElectron->mvaValIso       = 0; //fElectronMVAIso->MVAValue(ele, pv, fPFCandidates, fPUEnergyDensity, EffectiveAreaTarget, goodElectrons, goodMuons);
+    pElectron->pfIsoCharged    = computeCommonIso(ele, fPFNoPileUp    , 0.0, 0.4, fabs(ele->SCluster()->Eta()) > 1.479 ? 0.015 : 0.01,  1);
+    pElectron->pfIsoChargedNoZ = computeCommonIso(ele, fPFNoPileUpNoZ , 0.0, 0.4, fabs(ele->SCluster()->Eta()) > 1.479 ? 0.015 : 0.01,  1);
+    pElectron->pfIsoNeutral    = computeCommonIso(ele, fPFNoPileUp    , 0.0, 0.4,   0.0,  2);
+    pElectron->pfIsoNeutralNoZ = computeCommonIso(ele, fPFNoPileUpNoZ , 0.0, 0.4,   0.0,  2);
+    pElectron->pfIsoGamma      = computeCommonIso(ele, fPFNoPileUp    , 0.0, 0.4,  0.08,  3);
+    pElectron->pfIsoGammaNoZ   = computeCommonIso(ele, fPFNoPileUpNoZ , 0.0, 0.4,  fabs(ele->SCluster()->Eta()) > 1.479 ? 0.08 : 0.0,  3);
+    pElectron->puIso           = computeNaiveIso(ele, fPFPileUp    , 0.0, 0.4,  0.01);
+    pElectron->puIsoNoZ        = computeNaiveIso(ele, fPFPileUpNoZ , 0.0, 0.4,  0.01);
     pElectron->pfPx=0; pElectron->pfPy=0;
     for(unsigned int i=0; i<fPFCandidates->GetEntries(); ++i){
       const PFCandidate* pfcand = fPFCandidates->At(i);
@@ -1346,6 +921,15 @@ HttNtupler::fillPFTaus()
       pPFTau->puIso       = computeCommonIso((const ChargedParticle*) pftau,                   fPFPileUp    , 0.5, 0.3, 0.0001, 0);
       pPFTau->puIsoNoZ    = computeCommonIso((const ChargedParticle*) pftau, (PFCandidateCol*)fPFCandidates, 0.5, 0.5, 0.0001, 0);
       pPFTau->puIsoNoPt   = computeCommonIso((const ChargedParticle*) pftau,                   fPFPileUp    ,  0., 0.5,     0., 0);
+      pPFTau->ringIso =  fTauMVAIso->MVAValue(pftau,fPUEnergyDensity->At(0)->Rho());
+      //pPFTau->antiEleID =  fAntiElectronID->MVAValue(pftau);
+     //  pPFTau->antiEleID =  MVAValue(pPFTau->eta,pPFTau->pt,
+// 		  pPFTau->nSignalPFChargedHadrCands,pPFTau->nSignalPFGammaCands,
+// 		  pPFTau->leadChargedHadronPFCand.mvaEPi,
+// 		  pPFTau->hcalOverP, pPFTau->ecalOverP,
+// 		  pPFTau->hasGsf,pPFTau->m,pPFTau->emFraction,
+// 		  pPFTau->gammaDEta2, pPFTau->gammaDPhi2,pPFTau->gammaPtR
+// 		  );
       if(pftau->LeadChargedHadronPFCand() && pftau->LeadChargedHadronPFCand()->Trk()) {
 	pPFTau->isoEtPU = computePFTauIso(pftau, pftau->LeadChargedHadronPFCand()->Trk());
       }
@@ -1379,11 +963,13 @@ HttNtupler::fillJets()
   for(unsigned int i=0; i<fPFJets->GetEntries(); ++i){
     const PFJet* jet = fPFJets->At(i);
     const FourVectorM rawMom = jet->RawMom();
+    if(rawMom.Eta() > 5.2) continue;
     fJetCorrector->setJetEta( rawMom.Eta() );
     fJetCorrector->setJetPt ( rawMom.Pt()  );
     fJetCorrector->setJetPhi( rawMom.Phi() );
     fJetCorrector->setJetE  ( rawMom.E()   );
-    fJetCorrector->setRho   ( fPUEnergyDensity->At(0)->RhoHighEta() );
+    //fJetCorrector->setRho   ( fPUEnergyDensity->At(0)->RhoHighEta() );
+    fJetCorrector->setRho   ( fPUEnergyDensity->At(0)->RhoKt6PFJets() );
     fJetCorrector->setJetA  ( jet->JetArea() );
     fJetCorrector->setJetEMF( -99.0 );        
     double correction = fJetCorrector->getCorrection();
@@ -1407,7 +993,8 @@ HttNtupler::fillJets()
       fJetCorrector->setJetPt ( rawMom.Pt()  );
       fJetCorrector->setJetPhi( rawMom.Phi() );
       fJetCorrector->setJetE  ( rawMom.E()   );
-      fJetCorrector->setRho   ( fPUEnergyDensity->At(0)->RhoHighEta() );
+      //fJetCorrector->setRho   ( fPUEnergyDensity->At(0)->RhoHighEta() );
+      fJetCorrector->setRho   ( fPUEnergyDensity->At(0)->RhoKt6PFJets() );
       fJetCorrector->setJetA  ( jet->JetArea() );
       fJetCorrector->setJetEMF( -99.0 );
       fJetUncertainties->setJetPt ( rawMom.Pt()  );
@@ -1415,7 +1002,8 @@ HttNtupler::fillJets()
       pPFJet->pt          = rawMom.Pt()*fJetCorrector->getCorrection();
       pPFJet->eta         = rawMom.Eta();
       pPFJet->phi         = rawMom.Phi();
-      pPFJet->mass        = jet->Mass();
+      //pPFJet->mass        = jet->Mass();
+      pPFJet->mass        = rawMom.M()*fJetCorrector->getCorrection();
       pPFJet->unc         = fJetUncertainties->getUncertainty(true);
       pPFJet->ptraw       = rawMom.Pt();
       pPFJet->beta        = jet->Beta();
@@ -1429,18 +1017,21 @@ HttNtupler::fillJets()
       pPFJet->tchp        = jet->TrackCountingHighPurBJetTagsDisc();
       pPFJet->csv         = jet->CombinedSecondaryVertexBJetTagsDisc();
       pPFJet->csvMva      = jet->CombinedSecondaryVertexMVABJetTagsDisc();
+      pPFJet->mva          = fJetIDMVA->MVAValue(jet,fVertex,fPrimVerts,fJetCorrector,fPUEnergyDensity);
+      pPFJet->id           = (fJetIDMVA->pass(jet,fVertex,fPrimVerts,fJetCorrector,fPUEnergyDensity) ? 1 : 0) ;
+
       pPFJet->mcFlavor    = jet->MatchedMCFlavor();
       int matchedFlavor   = -999;
-      if( fGenJets ){
-	double dRmin = 0.3;
-	for(unsigned int i=0; i<fGenJets->GetEntries(); ++i){
-	  const GenJet* j = fGenJets->At(i);
-	  if(MathUtils::DeltaR(*jet,*j) < dRmin) {
-	    dRmin = MathUtils::DeltaR(*jet,*j);
-	    matchedFlavor = j->MatchedMCFlavor();
-	  }
-	}
-      }
+//       if( fGenJets ){
+// 	double dRmin = 0.3;
+// 	for(unsigned int i=0; i<fGenJets->GetEntries(); ++i){
+// 	  const GenJet* j = fGenJets->At(i);
+// 	  if(MathUtils::DeltaR(*jet,*j) < dRmin) {
+// 	    dRmin = MathUtils::DeltaR(*jet,*j);
+// 	    matchedFlavor = j->MatchedMCFlavor();
+// 	  }
+// 	}
+//       }
       pPFJet->matchedFlavor = matchedFlavor;
 
       int matchedId       = -999;
@@ -1502,19 +1093,8 @@ HttNtupler::fillSVfit()
     for(unsigned int jdx=0; jdx<fElectrons->GetEntries(); ++jdx){ 
       const Electron* pElectron = fElectrons->At(jdx); if( !looseEleId(pElectron) ){ continue; }
       if( MathUtils::DeltaR(pElectron->Mom(), pMu->Mom()) < 0.3 ){ continue; }
-      TMatrixD lMetMatrix = metSign->getSignificance(fPFJets, fPFCandidates, 0, pMu, pElectron);	
-      double dcaSig3D = -999, dcaSig2D = -999, dca3DErr=-999, dca2DErr=-999;
-      /*for(unsigned int  i=0; i<fDCASigs->GetEntries(); ++i){
-	const DCASig* dca=fDCASigs->At(i);
-	if(dca->Type()!=DCASig::eEMu) continue;
-	if(MathUtils::DeltaR(pElectron->Mom(), dca->GetElectron()->Mom()) > 0.1) continue;
-        if(MathUtils::DeltaR(pMu->Mom(), dca->GetMuon()->Mom()) > 0.1) continue;
-	dcaSig3D = dca->DCASig3D();
-        dcaSig2D = dca->DCASig2D();
-	dca3DErr = dca->DCA3DErr();
-        dca2DErr = dca->DCA2DErr();
-      }*/
-      fillSVfit(fSVfitEMuArr, (Particle*)pMu, EGenType::kMuon, (Particle*)pElectron, EGenType::kElectron, lMetMatrix, dcaSig3D, dcaSig2D, dca3DErr, dca2DErr);
+      TMatrixD lMetMatrix = metSign->getSignificance(fPFJets, fPFCandidates, 0,0, pMu, pElectron);	
+      fillSVfit(fSVfitEMuArr, (Particle*)pMu, EGenType::kMuon, (Particle*)pElectron, EGenType::kElectron, lMetMatrix);
     }
   }
   for(unsigned int idx=0; idx<fPFTaus->GetEntries(); ++idx){ 
@@ -1522,21 +1102,27 @@ HttNtupler::fillSVfit()
     for(unsigned int jdx=0; jdx<fMuons->GetEntries(); ++jdx){
       const Muon* pMu = fMuons->At(jdx); if( !looseMuId(pMu) ){ continue; }
       if( MathUtils::DeltaR(pPFTau->Mom(), pMu->Mom())<0.3 ){ continue; }
-      TMatrixD lMetMatrix = metSign->getSignificance(fPFJets, fPFCandidates, pPFTau, pMu, 0);
-      //std::cout << "fill" << std::endl;	
+      TMatrixD lMetMatrix = metSign->getSignificance(fPFJets, fPFCandidates, pPFTau,0,pMu, 0);
+      std::cout << "fill" << std::endl;	
       fillSVfit(fSVfitMuTauArr, (Particle*)pMu, EGenType::kMuon, (Particle*)pPFTau, EGenType::kTau, lMetMatrix);
     }
     for(unsigned int jdx=0; jdx<fElectrons->GetEntries(); ++jdx){ 
       const Electron* pElectron = fElectrons->At(jdx); if( !looseEleId(pElectron) ){ continue; }
       if( MathUtils::DeltaR(pPFTau->Mom(), pElectron->Mom())<0.3 ){ continue; }
-      TMatrixD lMetMatrix = metSign->getSignificance(fPFJets, fPFCandidates, pPFTau, 0, pElectron);	
+      TMatrixD lMetMatrix = metSign->getSignificance(fPFJets, fPFCandidates, pPFTau, 0,0, pElectron);	
       fillSVfit(fSVfitETauArr, (Particle*)pElectron, EGenType::kElectron, (Particle*)pPFTau, EGenType::kTau, lMetMatrix);
+    }
+    for(unsigned int jdx=0; jdx<fPFTaus->GetEntries(); ++jdx){ 
+      const PFTau* pPFTau2 = fPFTaus->At(idx); if( !looseTauId(pPFTau2) ){ continue; }
+      if( MathUtils::DeltaR(pPFTau->Mom(), pPFTau2->Mom())<0.3 ){ continue; }
+      TMatrixD lMetMatrix = metSign->getSignificance(fPFJets, fPFCandidates, pPFTau, pPFTau2,0,0);	
+      fillSVfit(fSVfitTauTauArr, (Particle*)pPFTau2, EGenType::kTau, (Particle*)pPFTau, EGenType::kTau, lMetMatrix);
     }
   }
 }
 
 void 
-HttNtupler::fillSVfit(TClonesArray*& iArr, Particle* lep1, unsigned int lepId1, Particle* lep2, unsigned int lepId2, TMatrixD iMatrix, double dcaSig3D, double dcaSig2D, double dca3DErr, double dca2DErr) 
+HttNtupler::fillSVfit(TClonesArray*& iArr, Particle* lep1, unsigned int lepId1, Particle* lep2, unsigned int lepId2, TMatrixD iMatrix) 
 {
   TClonesArray& rSVfitArr = *iArr;
   const int index = rSVfitArr.GetEntries();
@@ -1546,23 +1132,24 @@ HttNtupler::fillSVfit(TClonesArray*& iArr, Particle* lep1, unsigned int lepId1, 
   pSVfit->daughter2 = lep2->Mom(); pSVfit->daughterId2 = lepId2;
   pSVfit->cov_00 = iMatrix(0,0)  ; pSVfit->cov_10 = iMatrix(1,0);
   pSVfit->cov_01 = iMatrix(0,1)  ; pSVfit->cov_11 = iMatrix(1,1);
-  pSVfit->dcaSig3D = dcaSig3D;
-  pSVfit->dcaSig2D = dcaSig2D;
-  pSVfit->dcaSig3DErr = dca3DErr;
-  pSVfit->dcaSig2DErr = dca2DErr;
-}
 
-void
-HttNtupler::fillSVfit(TClonesArray*& iArr, Particle* lep1, unsigned int lepId1, Particle* lep2, unsigned int lepId2, TMatrixD iMatrix)
-{
-  TClonesArray& rSVfitArr = *iArr;
-  const int index = rSVfitArr.GetEntries();
-  new(rSVfitArr[index]) TSVfit();
-  TSVfit* pSVfit = (TSVfit*)rSVfitArr[index];
-  pSVfit->daughter1 = lep1->Mom(); pSVfit->daughterId1 = lepId1;
-  pSVfit->daughter2 = lep2->Mom(); pSVfit->daughterId2 = lepId2;
-  pSVfit->cov_00 = iMatrix(0,0)  ; pSVfit->cov_10 = iMatrix(1,0);
-  pSVfit->cov_01 = iMatrix(0,1)  ; pSVfit->cov_11 = iMatrix(1,1);
+  Met MVAMet = fMVAMet->GetMet(false,
+                                lep1->Pt(),lep1->Phi(),lep1->Eta(),
+                                lep2->Pt(),lep2->Phi(),lep2->Eta(),
+                                fPFMet->At(0),
+                                fPFCandidates,fVertex,fPrimVerts,
+                                fPFJets,
+                                fJetCorrector,
+                                fPUEnergyDensity,
+                                int(fPrimVerts->GetEntries()));
+  TMatrixD* MVACov = fMVAMet->GetMetCovariance();
+
+  pSVfit->mvacov_00    = (*MVACov)(0,0);
+  pSVfit->mvacov_10    = (*MVACov)(1,0);
+  pSVfit->mvacov_01    = (*MVACov)(0,1);
+  pSVfit->mvacov_11    = (*MVACov)(1,1);
+  pSVfit->mvaMET       = MVAMet.Pt();
+  pSVfit->mvaMETphi    = MVAMet.Phi();
 }
 
 void 
@@ -1741,63 +1328,6 @@ HttNtupler::computePFElecIso(const Electron* electron, const double dRMax)
     }
   }
   return iso;
-}
-
-bool
-HttNtupler::findLeptonFootprint(const PFCandidate* pfcand)
-{
-  bool isLeptonFootprint = false;
-  for (UInt_t q=0; q < fElectrons->GetEntries() ; ++q) {
-    //consider only electrons that pass ID cuts
-    if(fabs(fElectrons->At(q)->BestTrk()->D0Corrected(*fVertex)) > 0.04) continue;
-    if(fabs(fElectrons->At(q)->BestTrk()->DzCorrected(*fVertex)) > 0.2)  continue;
-    if(fabs(fElectrons->At(q)->SCluster()->Eta())<1.479) {
-      if(fElectrons->At(q)->Pt() > 20) {
-        if(fElectrons->At(q)->CoviEtaiEta()       > 0.01)  continue;
-        if(fabs(fElectrons->At(q)->DeltaEtaSuperClusterTrackAtVtx()) > 0.007) continue;
-        if(fabs(fElectrons->At(q)->DeltaPhiSuperClusterTrackAtVtx()) > 0.8)  continue;
-        if(fElectrons->At(q)->HadronicOverEm()            > 0.15)  continue;
-      } else {
-        if(fElectrons->At(q)->CoviEtaiEta()       > 0.012)  continue;
-        if(fabs(fElectrons->At(q)->DeltaEtaSuperClusterTrackAtVtx()) > 0.007) continue;
-        if(fabs(fElectrons->At(q)->DeltaPhiSuperClusterTrackAtVtx()) > 0.8)  continue;
-        if(fElectrons->At(q)->HadronicOverEm()            > 0.15) continue;
-      }
-    } else {
-      if(fElectrons->At(q)->Pt() > 20) {
-        if(fElectrons->At(q)->CoviEtaiEta()       > 0.03)  continue;
-        if(fabs(fElectrons->At(q)->DeltaEtaSuperClusterTrackAtVtx()) > 0.010) continue;
-        if(fabs(fElectrons->At(q)->DeltaPhiSuperClusterTrackAtVtx()) > 0.8)  continue;
-      } else {
-        if(fElectrons->At(q)->CoviEtaiEta()       > 0.032)  continue;
-        if(fabs(fElectrons->At(q)->DeltaEtaSuperClusterTrackAtVtx()) > 0.010) continue;
-        if(fabs(fElectrons->At(q)->DeltaPhiSuperClusterTrackAtVtx()) > 0.8)  continue;
-      }
-    }
-    //if pf candidate matches an electron passing ID cuts, then veto it
-    if(pfcand->GsfTrk() && fElectrons->At(q)->GsfTrk() && pfcand->GsfTrk() == fElectrons->At(q)->GsfTrk()) isLeptonFootprint = true;
-    if(pfcand->TrackerTrk() && fElectrons->At(q)->TrackerTrk() && pfcand->TrackerTrk() == fElectrons->At(q)->TrackerTrk()) isLeptonFootprint = true;
-    //if pf candidate lies in veto regions of electron passing ID cuts, then veto it
-    if(pfcand->BestTrk() && MathUtils::DeltaR(fElectrons->At(q)->Mom(), pfcand->Mom()) < 0.015) isLeptonFootprint = true;
-    if(pfcand->PFType() == PFCandidate::eGamma && fabs(fElectrons->At(q)->Eta()) < 1.479 && fabs(fElectrons->At(q)->Eta() - pfcand->Eta()) < 0.025) isLeptonFootprint = true;
-    if(pfcand->PFType() == PFCandidate::eGamma && fabs(fElectrons->At(q)->Eta()) >= 1.479 && MathUtils::DeltaR(fElectrons->At(q)->Mom(), pfcand->Mom()) < 0.08) isLeptonFootprint = true;
-  }
-  for (UInt_t q=0; q < fMuons->GetEntries() ; ++q) {
-    // Use tracker track when available
-    const Track *tmpMuTrk=0;
-    if(fMuons->At(q)->HasTrackerTrk())         { tmpMuTrk = fMuons->At(q)->TrackerTrk();    }
-    else if(fMuons->At(q)->HasStandaloneTrk()) { tmpMuTrk = fMuons->At(q)->StandaloneTrk(); }
-    //consider only muons that pass ID cuts
-    if(!(fMuons->At(q)->IsGlobalMuon() || fMuons->At(q)->IsTrackerMuon())) continue;
-    if(!tmpMuTrk || tmpMuTrk->NHits() < 11 ) continue;
-    if( fMuons->At(q)->Ip3dPVErr() <= 0 || fMuons->At(q)->Ip3dPVSignificance() > 4 ) continue;
-    //if pf candidate matches an muon passing ID cuts, then veto it
-    if(pfcand->TrackerTrk() && fMuons->At(q)->TrackerTrk() && pfcand->TrackerTrk() == fMuons->At(q)->TrackerTrk()) isLeptonFootprint = true;
-    //if pf candidate lies in veto regions of muon passing ID cuts, then veto it
-    if(pfcand->BestTrk() && MathUtils::DeltaR(fMuons->At(q)->Mom(), pfcand->Mom()) < 0.015) isLeptonFootprint = true;
-    if(pfcand->PFType() == PFCandidate::eGamma && MathUtils::DeltaR(fMuons->At(q)->Mom(), pfcand->Mom()) < 0.05) isLeptonFootprint = true;
-  }
-  return isLeptonFootprint;
 }
 
 float 
