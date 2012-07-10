@@ -39,10 +39,10 @@
 #include "MitPhysics/Utils/interface/JetIDMVA.h"
 #include "MitPhysics/Utils/interface/MVAMet.h"
 
-//#include "MitHtt/Ntupler/interface/AntiElectronIDMVA.h"
-
 #include "CondFormats/JetMETObjects/interface/FactorizedJetCorrector.h"
 #include "CondFormats/JetMETObjects/interface/JetCorrectionUncertainty.h"
+
+#include "MitHtt/Ntupler/interface/AntiElectronIDMVA.h"
 
 /// forward declarations
 class TString;
@@ -405,23 +405,17 @@ namespace mithep
     ElectronIDMVA* fElectronMVAID;
     /// electron ID MVA for triggered electrons
     ElectronIDMVA* fElectronMVAIDTrig;
-    /// electron isolation MVA
-    ElectronIDMVA* fElectronMVAIso;
     /// muon ID MVA
-    MuonIDMVA* fMuonMVAID;
-    /// muon isolation MVA
-    MuonIDMVA* fMuonMVAIso;
-    /// jet id MVA
     JetIDMVA* fJetIDMVA;
     /// MET MVA
     MVAMet* fMVAMet;
+    /// Tau ring ISO
+    TauIsoMVA * fTauMVAIso;
+    //AntiElectron ID MVA
+    AntiElectronIDMVA * fAntiElectronIDMVA;
     /// list JSON files to be applied
     std::vector<TString> fJSONv;
     /// map of certified runs and lumi sections (for internal use)
-    /// Tau ring ISO
-    TauIsoMVA * fTauMVAIso;
-    /// Antielectron ID BDT
-    //AntiElectronIDMVA *fAntiElectronID;
     RunLumiRangeMap frlrm;
     /// run and lumi information (for internal use)
     RunLumiSet fRunLumiSet;

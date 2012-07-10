@@ -24,8 +24,6 @@ namespace mithep
     
     /// kinematics of the muon
     float pt, eta, phi, ptErr;
-    /// kinematics from standalone muon (-9999. if standalone track does not exist)
-    float staPt, staEta, staPhi;
     /// classic detector based track isolation with isolation cone of 0.3
     float trkIso03;
     /// classic detector based ECAL isolation with isolation cone of 0.3
@@ -34,16 +32,6 @@ namespace mithep
     float hadIso03;
     /// classic detector based HO isolation with isolation cone of 0.3
     float hoIso03;
-    /// classic detector based track isolation with isolation cone of 0.5
-    float trkIso05;
-    /// classic detector based ECAL isolation with isolation cone of 0.5
-    float emIso05;
-    /// classic detector based HCAL isolation with isolation cone of 0.5
-    float hadIso05;
-    /// classic detector based HO isolation with isolation cone of 0.5
-    float hoIso05;
-    /// particle flow isolation with charged component restricted to the hard interaction vertex with isolation cone 0.3 and 0.4
-    float pfIso03, pfIso04;
     /// impact parameter wrt the selected primary vertex along the z-axis and perpendicular to to the z-axis, impact parameter significance
     float d0, dz, d0Sig;
     /// 3d impact parameter and 3d impact parameter significance
@@ -76,26 +64,6 @@ namespace mithep
     TriggerObjects hltMatchBits;
     /// unique track ID (filled from Bambu TrackerTrk()->GetUniqueID())    
     unsigned int trkID;
-    /// muon kink variables
-    float trkKink, globalKink;
-    /// muon segment compatibility based on likelihood of well defined track through chambers
-    float segCompatibility;
-    /// muon calo compatibility value based on calorimeter templates
-    float caloCompatibility;
-    /// energy deposit in hcal
-    float hadEnergy;
-    /// energy deposit in 3x3 hcal
-    float hadS9Energy;
-    /// energy deposit in outer hcal
-    float hoEnergy;
-    /// energy deposit in 3x3 outer hcal
-    float hoS9Energy;
-    /// energy deposit in ecal
-    float emEnergy;
-    /// energy deposit in 3x3 ecal
-    float emS9Energy;
-    /// mva values
-    float mvaValID, mvaValIso;
     /// common isolation from pfNoPileup, ptMin=0.0, dRMax=0.4, dRMin=0.0001, type charged hadron  
     float pfIsoCharged;
     /// common isolation from pfNoPileup, ptMin=0.0, dRMax=0.4, dRMin=0.0001, type charged hadron (no Z restriction)
@@ -116,10 +84,12 @@ namespace mithep
     float pfPx, pfPy;
     /// check if the muon is matched to a PF candidate
     bool matchesPFCand;
+    // total delta beta corrected isolation
+    float pfDeltaBetaIso;
     /// check type of matched PF candidate
     unsigned int matchedPFType;
     
-    ClassDef(TMuon, 7)
+    ClassDef(TMuon, 8)
   };  
 }
 #endif

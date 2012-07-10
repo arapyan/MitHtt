@@ -109,7 +109,7 @@ namespace mithep
     //ring isolation	
     float ringIso;
     // antielectron id bdt
-    //float antiEleID;
+    float antiEleID;
     ClassDef(TPFTau, 1)
   };  
 }

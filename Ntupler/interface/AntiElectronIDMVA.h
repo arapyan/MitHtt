@@ -33,7 +33,9 @@
 
 using namespace std;
 
-class AntiElectronIDMVA {
+namespace mithep
+{
+  class AntiElectronIDMVA {
   public:
 
     AntiElectronIDMVA();
@@ -58,35 +60,35 @@ class AntiElectronIDMVA {
 		    );
 
     /* 
-    where:
+       where:
 
-    TauEta                  = myTau->eta();
-    TauPt                   = myTau->pt();
-    TauSignalPFChargedCands = myTau->signalPFChargedHadrCands().size();
-    TauSignalPFGammaCands   = myTau->signalPFGammaCands().size();
-    TauLeadPFChargedHadrMva = myTau->electronPreIDOutput();
-    TauLeadPFChargedHadrHoP = myTau->leadPFChargedHadrCand()->hcalEnergy()/myTau->leadPFChargedHadrCand()->p();
-    TauLeadPFChargedHadrEoP = myTau->leadPFChargedHadrCand()->ecalEnergy()/myTau->leadPFChargedHadrCand()->p();
-    TauHasGsf               = (myTau->leadPFChargedHadrCand()->gsfTrackRef()).isNonnull();
-    TauVisMass              = myTau->mass();
-    TauEmFraction           = myTau->emFraction();
+       TauEta                  = myTau->eta();
+       TauPt                   = myTau->pt();
+       TauSignalPFChargedCands = myTau->signalPFChargedHadrCands().size();
+       TauSignalPFGammaCands   = myTau->signalPFGammaCands().size();
+       TauLeadPFChargedHadrMva = myTau->electronPreIDOutput();
+       TauLeadPFChargedHadrHoP = myTau->leadPFChargedHadrCand()->hcalEnergy()/myTau->leadPFChargedHadrCand()->p();
+       TauLeadPFChargedHadrEoP = myTau->leadPFChargedHadrCand()->ecalEnergy()/myTau->leadPFChargedHadrCand()->p();
+       TauHasGsf               = (myTau->leadPFChargedHadrCand()->gsfTrackRef()).isNonnull();
+       TauVisMass              = myTau->mass();
+       TauEmFraction           = myTau->emFraction();
   
-    GammasdEta     = new std::vector< float >();
-    GammasdPhi     = new std::vector< float >();
-    GammasPt       = new std::vector< float >();
+       GammasdEta     = new std::vector< float >();
+       GammasdPhi     = new std::vector< float >();
+       GammasPt       = new std::vector< float >();
     
-    for(unsigned int k = 0 ; k < (myTau->signalPFGammaCands()).size() ; k++){
-    reco::PFCandidateRef gamma = (myTau->signalPFGammaCands()).at(k);
-    if( (myTau->leadPFChargedHadrCand()).isNonnull() ){
-        GammasdEta->push_back( gamma->eta() - myTau->leadPFChargedHadrCand()->eta() );
-        GammasdPhi->push_back( gamma->phi() - myTau->leadPFChargedHadrCand()->phi() );
-    }
-    else{
-        GammasdEta->push_back( gamma->eta() - myTau->eta() );
-        GammasdPhi->push_back( gamma->phi() - myTau->phi() );
-    }
-     GammasPt->push_back(  gamma->pt() );
-    }
+       for(unsigned int k = 0 ; k < (myTau->signalPFGammaCands()).size() ; k++){
+       reco::PFCandidateRef gamma = (myTau->signalPFGammaCands()).at(k);
+       if( (myTau->leadPFChargedHadrCand()).isNonnull() ){
+       GammasdEta->push_back( gamma->eta() - myTau->leadPFChargedHadrCand()->eta() );
+       GammasdPhi->push_back( gamma->phi() - myTau->leadPFChargedHadrCand()->phi() );
+       }
+       else{
+       GammasdEta->push_back( gamma->eta() - myTau->eta() );
+       GammasdPhi->push_back( gamma->phi() - myTau->phi() );
+       }
+       GammasPt->push_back(  gamma->pt() );
+       }
     */
 
     double MVAValue(Float_t TauEta,  Float_t TauPt,
@@ -103,7 +105,7 @@ class AntiElectronIDMVA {
     bool   pass    (const mithep::TPFTau * iTau);
     double MVAValue(const mithep::TPFTau * iTau);
     
- private:
+  private:
 
     Bool_t isInitialized_;
     std::string methodName_;
@@ -117,7 +119,7 @@ class AntiElectronIDMVA {
     Float_t TauLeadPFChargedHadrHoP_;
     Float_t TauLeadPFChargedHadrEoP_;
     Float_t TauEmFraction_;
-    
-};
-
+    ClassDef(AntiElectronIDMVA,0)
+  };
+}
 #endif

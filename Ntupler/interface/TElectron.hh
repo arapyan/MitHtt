@@ -30,14 +30,6 @@ namespace mithep
     float emIso03;
     /// classic detector based HCAL isolation with isolation cone of 0.3
     float hadIso03;
-    /// classic detector based track isolation with isolation cone of 0.4
-    float trkIso04;
-    /// classic detector based ECAL isolation with isolation cone of 0.4
-    float emIso04;
-    /// classic detector based HCAL isolation with isolation cone of 0.4
-    float hadIso04;
-    /// particle flow isolation with charged component restricted to the hard interaction vertex with isolation cone 0.3 and 0.4
-    float pfIso03, pfIso04;    // Particle Flow isolation
     /// impact parameter wrt the selected primary vertex along the z-axis and perpendicular to to the z-axis, impact parameter significance
     float d0, dz, d0Sig;
     /// kinematics from super cluster 
@@ -76,8 +68,6 @@ namespace mithep
     unsigned int nExpHitsInner;
     /// number of bremsstahlung cluster (determined from NumberOfClusters-1) 
     float nBrem;
-    /// energy of the seed cluster over pt at vertex and at calorimeter surface, energy of the electron cluster
-    float ESeedClusterOverPIn, ESeedClusterOverPOut, EEleClusterOverPOut;
     /// HLT bits for which the offline reconstructed electron could be matched on trigger level
     TriggerObjects  hltMatchBits;
     // supercluster ID (for matching to photon superclusters)
@@ -90,10 +80,8 @@ namespace mithep
     bool isConv;
     /// indicates whether this is an ECAL barrel electron
     bool isEB;
-    /// additional variables used for MVA id
-    float gsfTrackChi2OverNdof, kfTrackChi2OverNdof, kfTrackNHits, kfTrackNLayers, hcalDepth1OverEcal, hcalDepth2OverEcal, deltaEtaCalo, deltaPhiCalo, R9, scEtaWidth, scPhiWidth, coviEtaiPhi, psOverRaw, seedE1x5OverE, seedE5x5OverE;
     /// mva values
-    float mvaValID, mvaValIDTrig, mvaValIso;
+    float mvaValID, mvaValIDTrig;
     /// common isolation from pfNoPileup, ptMin=0.0, dRMax=0.4, dRMin=0.015, type charged hadron  
     float pfIsoCharged;
     /// common isolation from pfNoPileup, ptMin=0.0, dRMax=0.4, dRMin=0.015, type charged hadron (no Z restriction)
@@ -110,8 +98,8 @@ namespace mithep
     float puIso;
     /// naive isolation from pfPileup ptMin=0.5, dRMax=0.4, dRMin=0.01 (no Z restriction)
     float puIsoNoZ;
-    /// px and py of the matching particle flow candidate
-    float pfPx, pfPy;
+    // total delta beta corrected isolation
+    float pfDeltaBetaIso;
 
     ClassDef(TElectron, 6)
   };

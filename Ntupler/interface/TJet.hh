@@ -30,14 +30,8 @@ namespace mithep
     float unc;
     /// jet area (from Fastjet)
     float area;
-    /// track counting high efficiency btag discriminator
-    float tche;
-    /// track counting high purity btag discriminator
-    float tchp;
     /// combined secondary vertex btag discriminator
     float csv;
-    /// combined secondary vertex MVA discriminator
-    float csvMva;
     /// jet MVA output
     float mva;
     /// pass or fail MVA id
@@ -61,7 +55,7 @@ namespace mithep
     /// HLT bits for which the offline reconstructed jet could be matched on trigger level
     TriggerObjects  hltMatchBits;
     
-    ClassDef(TJet,5)
+    ClassDef(TJet,6)
   };
 }
 #endif
