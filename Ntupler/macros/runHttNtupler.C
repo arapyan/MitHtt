@@ -50,16 +50,20 @@ void runHttNtupler(
   sprintf(output,"%s_%s_ntuple.root",dataset,fileset); 
   
   // muon kinematics
-  const Double_t muPtMin  = 0;
+  const Double_t muPtMin  = 10;
   const Double_t muPtMax  = 7000;
   const Double_t muEtaMin = -3;
   const Double_t muEtaMax =  3;
 
   // electron kinematics
-  const Double_t eleEtMin  = 7;
+  const Double_t eleEtMin  = 10;
   const Double_t eleEtMax  = 7000;
   const Double_t eleEtaMin = -3;
   const Double_t eleEtaMax =  3;
+  
+  //tau kinematics
+  const Double_t  tauPtMin = 18;
+  const Double_t  tauEtaMax = 3;
   
   // jet requirements
   const Double_t jetPtMin = 10;
@@ -86,7 +90,7 @@ void runHttNtupler(
   Dataset *d = NULL;
   d = c->FindDataset(book,dataset,fileset);
   ana->AddDataset(d);
-    
+ 
   //
   // setup ntupler module
   //
@@ -103,6 +107,8 @@ void runHttNtupler(
   mymod->SetEleEtMax(eleEtMax);
   mymod->SetEleEtaMin(eleEtaMin);
   mymod->SetEleEtaMax(eleEtaMax);
+  mymod->SetTauPtMin(tauPtMin);
+  mymod->SetTauEtaMax(tauEtaMax);
   mymod->SetJetPtMin(jetPtMin);
   mymod->SetPhotonEtMin(photonEtMin);
   mymod->SetMinNTracksFit(minNTracksFit);
