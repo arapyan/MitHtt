@@ -216,7 +216,13 @@ enum ETriggerBit {
   kHLT_Ele18_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_MediumIsoPFTau20 = 90,
   kHLT_Ele20_CaloIdVT_TrkIdT_LooseIsoPFTau20 = 91,
   kHLT_Ele20_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_MediumIsoPFTau20 = 92,
-  kHLT_Ele20_CaloIdVT_CaloIsoRhoT_TrkIdT_TrkIsoT_LooseIsoPFTau20 = 93  
+  kHLT_Ele20_CaloIdVT_CaloIsoRhoT_TrkIdT_TrkIsoT_LooseIsoPFTau20 = 93,  
+  
+  //misc
+  kHLT_IsoMu15_L1ETM20 = 94,
+  kHLT_Jet150          = 95,
+  kHLT_Jet190          = 96,
+  kHLT_Jet240          = 97
 };
 
 const unsigned int kNTrigObj = 256;

@@ -42,12 +42,12 @@ namespace mithep
     ~AntiElectronIDMVA(); 
 
     void   Initialize(std::string methodName           = "BDT",
-                      TString oneProng0Pi0_BL      = "/build/pharris/CMSSW_4_4_1/src/MitHtt/NtupleDefs/data/TMVAClassification_v2_X_0BL_BDT.weights.xml",
-                      TString oneProng1pi0wGSF_BL  = "/build/pharris/CMSSW_4_4_1/src/MitHtt/NtupleDefs/data/TMVAClassification_v2_1_1BL_BDT.weights.xml",
-                      TString oneProng1pi0woGSF_BL = "/build/pharris/CMSSW_4_4_1/src/MitHtt/NtupleDefs/data/TMVAClassification_v2_0_1BL_BDT.weights.xml",
-		      TString oneProng0Pi0_EC      = "/build/pharris/CMSSW_4_4_1/src/MitHtt/NtupleDefs/data/TMVAClassification_v2_X_0EC_BDT.weights.xml",
-                      TString oneProng1pi0wGSF_EC  = "/build/pharris/CMSSW_4_4_1/src/MitHtt/NtupleDefs/data/TMVAClassification_v2_1_1EC_BDT.weights.xml",
-                      TString oneProng1pi0woGSF_EC = "/build/pharris/CMSSW_4_4_1/src/MitHtt/NtupleDefs/data/TMVAClassification_v2_0_1EC_BDT.weights.xml"
+                      TString oneProng0Pi0_BL      = "$CMSSW_BASE/src/MitHtt/src/data/AntiElectronMVA/TMVAClassification_v2_X_0BL_BDT.weights.xml",
+                      TString oneProng1pi0wGSF_BL  = "$CMSSW_BASE/src/MitHtt/src/data/AntiElectronMVA/TMVAClassification_v2_1_1BL_BDT.weights.xml",
+                      TString oneProng1pi0woGSF_BL = "$CMSSW_BASE/src/MitHtt/src/data/AntiElectronMVA/TMVAClassification_v2_0_1BL_BDT.weights.xml",
+		      TString oneProng0Pi0_EC      = "$CMSSW_BASE/src/MitHtt/src/data/AntiElectronMVA/TMVAClassification_v2_X_0EC_BDT.weights.xml",
+                      TString oneProng1pi0wGSF_EC  = "$CMSSW_BASE/src/MitHtt/src/data/AntiElectronMVA/TMVAClassification_v2_1_1EC_BDT.weights.xml",
+                      TString oneProng1pi0woGSF_EC = "$CMSSW_BASE/src/MitHtt/src/data/AntiElectronMVA/TMVAClassification_v2_0_1EC_BDT.weights.xml"
                       );
 
     // RECOMMENDED:

@@ -14,7 +14,7 @@ AntiElectronIDMVA::AntiElectronIDMVA():
   for(UInt_t i=0; i<6; ++i) {
     fTMVAReader_[i] = 0;
   }
-  Initialize();
+  //Initialize();
 }
 
 
