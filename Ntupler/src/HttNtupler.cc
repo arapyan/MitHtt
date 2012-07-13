@@ -259,6 +259,7 @@ HttNtupler::Process()
   LoadBranch(fElectronName);
   LoadBranch(fHPSTauName);
   LoadBranch( fConversionName      );
+  LoadBranch( fPhotonName          );
   
   int lLep = 0; 
   for(unsigned int i0 = 0; i0 < fMuons->GetEntries(); i0++) if(looseMuId (fMuons->At(i0))) lLep++;
@@ -319,7 +320,6 @@ HttNtupler::loadBambuBranches()
   LoadBranch( fPFJetName           );
   LoadBranch( fTrigMaskName        );
   LoadBranch( fPFMetName           ); 
-  LoadBranch( fPhotonName          );
   LoadBranch( fPUEnergyDensityName );
   LoadBranch( fPFCandidateName     );
   if( !fIsData ){
