@@ -263,7 +263,7 @@ HttNtupler::Process()
   
   int lLep = 0; 
   for(unsigned int i0 = 0; i0 < fMuons->GetEntries(); i0++) if(looseMuId (fMuons->At(i0))) lLep++;
-  //for(unsigned int i0 = 0; i0 < fElectrons->GetEntries(); i0++) if(looseEleId(fElectrons->At(i0))) lLep++;
+  for(unsigned int i0 = 0; i0 < fElectrons->GetEntries(); i0++) if(looseEleId(fElectrons->At(i0),0)) lLep++;
   for(unsigned int i0 = 0; i0 < fPFTaus->GetEntries(); i0++) if(looseTauId(fPFTaus->At(i0))) lLep++;
   if(lLep < 2) return;
 
@@ -985,7 +985,7 @@ HttNtupler::fillSVfit()
   for(unsigned int idx=0; idx<fMuons->GetEntries(); ++idx){ 
     const Muon* pMu = fMuons->At(idx); if( !looseMuId(pMu) ){ continue; }
     for(unsigned int jdx=0; jdx<fElectrons->GetEntries(); ++jdx){ 
-      const Electron* pElectron = fElectrons->At(jdx); if( !looseEleId(pElectron) ){ continue; }
+      const Electron* pElectron = fElectrons->At(jdx); if( !looseEleId(pElectron,1) ){ continue; }
       if( MathUtils::DeltaR(pElectron->Mom(), pMu->Mom()) < 0.3 ){ continue; }
       TMatrixD lMetMatrix = metSign->getSignificance(fPFJets, fPFCandidates, 0,0, pMu, pElectron);	
       fillSVfit(fSVfitEMuArr, (Particle*)pMu, EGenType::kMuon, (Particle*)pElectron, EGenType::kElectron, lMetMatrix);
@@ -1000,7 +1000,7 @@ HttNtupler::fillSVfit()
       fillSVfit(fSVfitMuTauArr, (Particle*)pMu, EGenType::kMuon, (Particle*)pPFTau, EGenType::kTau, lMetMatrix);
     }
     for(unsigned int jdx=0; jdx<fElectrons->GetEntries(); ++jdx){ 
-      const Electron* pElectron = fElectrons->At(jdx); if( !looseEleId(pElectron) ){ continue; }
+      const Electron* pElectron = fElectrons->At(jdx); if( !looseEleId(pElectron,1) ){ continue; }
       if( MathUtils::DeltaR(pPFTau->Mom(), pElectron->Mom())<0.3 ){ continue; }
       TMatrixD lMetMatrix = metSign->getSignificance(fPFJets, fPFCandidates, pPFTau, 0,0, pElectron);	
       fillSVfit(fSVfitETauArr, (Particle*)pElectron, EGenType::kElectron, (Particle*)pPFTau, EGenType::kTau, lMetMatrix);
@@ -1410,14 +1410,15 @@ HttNtupler::looseTauId(const PFTau* tau)
   return true;
 } 
 bool 
-HttNtupler::looseEleId(const Electron* elec) 
+HttNtupler::looseEleId(const Electron* elec, bool conv) 
 { 
   if( elec->Pt () < fEleEtMin                        ) return false;
   if( elec->Pt () > fEleEtMax                        ) return false;
   if( elec->Eta() < fEleEtaMin                       ) return false;
   if( elec->Eta() > fEleEtaMax                       ) return false;
   if( !fEleTools->PassSpikeRemovalFilter(elec)       ) return false;
-  if( isConversion(elec)                             ) return false;
+  if(conv)
+    if( isConversion(elec)                             ) return false;
   if( fUseGen==ESampleType::kEmbed && !elec->BestTrk()                 ) return false;
   if( elec->BestTrk()->NExpectedHitsInner() > 0      ) return false;
   return true;

@@ -201,8 +201,8 @@ namespace mithep
     bool looseTauId(const PFTau* iTau) ;
     /// does this muon fullfil the loose Muon Id?
     bool looseMuId(const Muon * imu);
-    /// does this electron fullfil the loose electron Id?
-    bool looseEleId(const Electron *iElectron);
+    /// does this electron fullfil the loose electron Id? conv:check if it is a conversion electron
+    bool looseEleId(const Electron *iElectron, bool conv);
     /// fill input information for svfit for a given svfit array
     void fillSVfit(TClonesArray*& iArr, Particle* lep1, unsigned int lepId1, Particle* lep2, unsigned int lepId2, TMatrixD iMatrix, double dcaSig3D, double dcaSig2D, double dca3DErr, double dca2DErr);
     /// fill input information for svfit for a given svfit array
