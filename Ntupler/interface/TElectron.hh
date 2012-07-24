@@ -81,7 +81,7 @@ namespace mithep
     /// indicates whether this is an ECAL barrel electron
     bool isEB;
     /// mva values
-    float mvaValID, mvaValIDTrig;
+    float mvaValID;
     /// common isolation from pfNoPileup, ptMin=0.0, dRMax=0.4, dRMin=0.015, type charged hadron  
     float pfIsoCharged;
     /// common isolation from pfNoPileup, ptMin=0.0, dRMax=0.4, dRMin=0.015, type charged hadron (no Z restriction)

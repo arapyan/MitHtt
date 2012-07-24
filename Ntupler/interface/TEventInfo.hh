@@ -38,11 +38,11 @@ namespace mithep
     /// lumi section
     unsigned int  lumiSec;
     /// number of in-time pileup event per event (for MC only)
-    unsigned int  nPU;  
+    unsigned int  nPU, nPUTrue;  
     /// number of out of time pileup events in following event (for MC only)
-    unsigned int  nPUPlus;
+    unsigned int  nPUPlus, nPUPlusTrue;
     /// number of out of time pileup events previous event (for MC only)
-    unsigned int  nPUMinus;
+    unsigned int  nPUMinus, nPUMinusTrue;
     /// HLT trigger bits that fired for this event
     TriggerBits triggerBits;
     /// coordiantes of the reconstructed primary vertex with highest sum pt squared

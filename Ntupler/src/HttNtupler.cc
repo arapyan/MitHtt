@@ -71,6 +71,7 @@ HttNtupler::HttNtupler(const char *name, const char *title):
   fUseGen         ( 0),
   fPrintTable     (kFALSE),
   fSkipIfHLTFail  (kFALSE),
+  f2012           ( 0),
   fMuPtMin        (10),
   fMuPtMax        (1000),
   fMuEtaMin       (-3),
@@ -121,48 +122,32 @@ HttNtupler::SlaveBegin()
   fJetCorrector = new FactorizedJetCorrector(correctionParameters); 
   // setup jet energy scale uncertainties
   std::string jetCorrectorParams;
-  if(TString(getenv("CMSSW_BASE")).Contains("CMSSW_5")) jetCorrectorParams = std::string(TString::Format("%s/src/MitPhysics/data/Summer12_V7_MC_Uncertainty_AK5PF.txt", getenv("CMSSW_BASE")));
+  
+  if(f2012) jetCorrectorParams = std::string(TString::Format("%s/src/MitPhysics/data/START52_V9_Uncertainty_AK5PF.txt", getenv("CMSSW_BASE")));
   else jetCorrectorParams = std::string(TString::Format("%s/src/MitPhysics/data/START42_V17_AK5PF_Uncertainty.txt", getenv("CMSSW_BASE")));
-//   if(TString(getenv("CMSSW_BASE")).Contains("CMSSW_5")) jetCorrectorParams = std::string(TString::Format("%s/src/MitPhysics/data/START50_V15_Uncertainty_AK5PF.t xt", getenv("CMSSW_BASE")));
-//   else jetCorrectorParams = std::string(TString::Format("%s/src/MitPhysics/data/START42_V12_AK5PF_Uncertainty.txt", getenv("CMSSW_BASE")));
   JetCorrectorParameters param(jetCorrectorParams);
   fJetUncertainties = new JetCorrectionUncertainty(param);
   // initialize tools for electron ID
   fEleTools = new ElectronTools();
   // initialize tools for muon ID
   fMuonTools = new MuonTools();
-
   metSign = new MetSignificance();
  
   std::vector<std::string> weightFilesEleID;
-  weightFilesEleID.push_back(getenv("CMSSW_BASE")+std::string("/src/MitPhysics/data/ElectronMVAWeights/ElectronID_BDTG_EGamma2012NonTrigV0_Cat1.weights.xml"));
-  weightFilesEleID.push_back(getenv("CMSSW_BASE")+std::string("/src/MitPhysics/data/ElectronMVAWeights/ElectronID_BDTG_EGamma2012NonTrigV0_Cat2.weights.xml"));
-  weightFilesEleID.push_back(getenv("CMSSW_BASE")+std::string("/src/MitPhysics/data/ElectronMVAWeights/ElectronID_BDTG_EGamma2012NonTrigV0_Cat3.weights.xml"));
-  weightFilesEleID.push_back(getenv("CMSSW_BASE")+std::string("/src/MitPhysics/data/ElectronMVAWeights/ElectronID_BDTG_EGamma2012NonTrigV0_Cat4.weights.xml"));
-  weightFilesEleID.push_back(getenv("CMSSW_BASE")+std::string("/src/MitPhysics/data/ElectronMVAWeights/ElectronID_BDTG_EGamma2012NonTrigV0_Cat5.weights.xml"));
-  weightFilesEleID.push_back(getenv("CMSSW_BASE")+std::string("/src/MitPhysics/data/ElectronMVAWeights/ElectronID_BDTG_EGamma2012NonTrigV0_Cat6.weights.xml"));
-
- //  std::vector<std::string> weightFilesEleIDTrig;
-//   weightFilesEleIDTrig.push_back(getenv("CMSSW_BASE")+std::string("/src/MitPhysics/data/ElectronMVAWeights/ElectronID_BDTG_EGamma2012TrigV1_Cat1.weights.xml"));
-//   weightFilesEleIDTrig.push_back(getenv("CMSSW_BASE")+std::string("/src/MitPhysics/data/ElectronMVAWeights/ElectronID_BDTG_EGamma2012TrigV1_Cat2.weights.xml"));
-//   weightFilesEleIDTrig.push_back(getenv("CMSSW_BASE")+std::string("/src/MitPhysics/data/ElectronMVAWeights/ElectronID_BDTG_EGamma2012TrigV1_Cat3.weights.xml"));
-//   weightFilesEleIDTrig.push_back(getenv("CMSSW_BASE")+std::string("/src/MitPhysics/data/ElectronMVAWeights/ElectronID_BDTG_EGamma2012TrigV1_Cat4.weights.xml"));
-//   weightFilesEleIDTrig.push_back(getenv("CMSSW_BASE")+std::string("/src/MitPhysics/data/ElectronMVAWeights/ElectronID_BDTG_EGamma2012TrigV1_Cat5.weights.xml"));
-//   weightFilesEleIDTrig.push_back(getenv("CMSSW_BASE")+std::string("/src/MitPhysics/data/ElectronMVAWeights/ElectronID_BDTG_EGamma2012TrigV1_Cat6.weights.xml"));
-
- 
+  weightFilesEleID.push_back(getenv("CMSSW_BASE")+std::string("/src/MitHtt/data/ElectronMVA/Electrons_BDTG_NonTrigV0_Cat1.weights.xml"));
+  weightFilesEleID.push_back(getenv("CMSSW_BASE")+std::string("/src/MitHtt/data/ElectronMVA/Electrons_BDTG_NonTrigV0_Cat2.weights.xml"));
+  weightFilesEleID.push_back(getenv("CMSSW_BASE")+std::string("/src/MitHtt/data/ElectronMVA/Electrons_BDTG_NonTrigV0_Cat3.weights.xml"));
+  weightFilesEleID.push_back(getenv("CMSSW_BASE")+std::string("/src/MitHtt/data/ElectronMVA/Electrons_BDTG_NonTrigV0_Cat4.weights.xml"));
+  weightFilesEleID.push_back(getenv("CMSSW_BASE")+std::string("/src/MitHtt/data/ElectronMVA/Electrons_BDTG_NonTrigV0_Cat5.weights.xml"));
+  weightFilesEleID.push_back(getenv("CMSSW_BASE")+std::string("/src/MitHtt/data/ElectronMVA/Electrons_BDTG_NonTrigV0_Cat6.weights.xml"));
   fElectronMVAID = new ElectronIDMVA();
-  fElectronMVAID->Initialize("BDTG method",ElectronIDMVA::kIDEGamma2012NonTrigV0,kTRUE,weightFilesEleID);
-
-  //fElectronMVAIDTrig = new ElectronIDMVA();
-  //fElectronMVAIDTrig->Initialize("BDTG method",ElectronIDMVA::kIDHWW2012TrigV0,kTRUE,weightFilesEleIDTrig);
-
+  fElectronMVAID->Initialize("BDTG method",ElectronIDMVA::kIDEGamma2012NonTrigV1,kTRUE,weightFilesEleID);
 
   fJetIDMVA  = new JetIDMVA();
-  if(TString(getenv("CMSSW_BASE")).Contains("CMSSW_5")) {
+  if(f2012) {
     fJetIDMVA->Initialize(JetIDMVA::kLoose,
 			  TString(getenv("CMSSW_BASE")+string("/src/MitPhysics/data/mva_JetID_lowpt.weights.xml")),
-                       //TString(getenv("CMSSW_BASE")+string("/src/MitPhysics/data/mva_JetID_highpt.weights.xml")),
+                          //TString(getenv("CMSSW_BASE")+string("/src/MitPhysics/data/mva_JetID_highpt.weights.xml")),
 			  TString(getenv("CMSSW_BASE")+string("/src/MitPhysics/data/TMVAClassification_5x_BDT_fullPlusRMS.weights.xml")),
 			  //JetIDMVA::kBaseline,
 			  JetIDMVA::k52,
@@ -176,13 +161,12 @@ HttNtupler::SlaveBegin()
 			  JetIDMVA::k42,
 			  TString(getenv("CMSSW_BASE")+string("/src/MitPhysics/Utils/python/JetIdParams_cfi.py")));
   }
-
   fTauMVAIso = new TauIsoMVA();
   fTauMVAIso->Initialize(TString(getenv("CMSSW_BASE")+string("/src/MitPhysics/data/SXIsoMVA_BDTG.weights.xml")));
  			 
-				 
+  				 
   fMVAMet    = new MVAMet();
-  if(TString(getenv("CMSSW_BASE")).Contains("CMSSW_5")) {
+  if(f2012) {
     fMVAMet->Initialize(TString(getenv("CMSSW_BASE")+string("/src/MitPhysics/data/mva_JetID_lowpt.weights.xml")),
                    TString(getenv("CMSSW_BASE")+string("/src/MitPhysics/data/mva_JetID_highpt.weights.xml")),
                    TString(getenv("CMSSW_BASE")+string("/src/MitPhysics/Utils/python/JetIdParams_cfi.py")),
@@ -199,7 +183,7 @@ HttNtupler::SlaveBegin()
                    TString(getenv("CMSSW_BASE")+string("/src/MitPhysics/data/gbrmetu1_42.root")),
                    TString(getenv("CMSSW_BASE")+string("/src/MitPhysics/data/gbrmetu2_42.root")));
   }
-
+ 
   fAntiElectronIDMVA = new AntiElectronIDMVA();
   fAntiElectronIDMVA->Initialize("BDT",
 				 TString(getenv("CMSSW_BASE")+string("/src/MitHtt/data/AntiElectronMVA/TMVAClassification_v2_X_0BL_BDT.weights.xml")),
@@ -260,7 +244,7 @@ HttNtupler::Process()
   LoadBranch(fHPSTauName);
   LoadBranch( fConversionName      );
   LoadBranch( fPhotonName          );
-  
+
   int lLep = 0; 
   for(unsigned int i0 = 0; i0 < fMuons->GetEntries(); i0++) if(looseMuId (fMuons->At(i0))) lLep++;
   for(unsigned int i0 = 0; i0 < fElectrons->GetEntries(); i0++) if(looseEleId(fElectrons->At(i0),0)) lLep++;
@@ -269,7 +253,7 @@ HttNtupler::Process()
 
   // load the rest of the relevant Bambu branches
   loadBambuBranches();
- 
+
   // load trigger table
   loadTriggerTable(fTriggerBits);
   // check whether a trigger table is available or not (if required)
@@ -483,11 +467,24 @@ HttNtupler::fillCommon(TriggerBits& trigBits)
 {
   // get pileup information (for MC samples only)
   int npu0 = -1; int npu1 = -1; int npu2 = -1;
+  int npu0m = -1; int npu1m = -1; int npu2m = -1;
   if( !fIsData && fUseGen!=ESampleType::kEmbed ){
     for(unsigned int idx=0; idx<fPileup->GetEntries(); ++idx){
-      if( fPileup->At(idx)->GetBunchCrossing() ==  0 ) npu0 = fPileup->At(idx)->GetPU_NumInteractions();
-      if( fPileup->At(idx)->GetBunchCrossing() ==  1 ) npu1 = fPileup->At(idx)->GetPU_NumInteractions();
-      if( fPileup->At(idx)->GetBunchCrossing() == -1 ) npu2 = fPileup->At(idx)->GetPU_NumInteractions();
+      if( fPileup->At(idx)->GetBunchCrossing() ==  0 ) 
+	{
+	  npu0 = fPileup->At(idx)->GetPU_NumInteractions();
+	  npu0m = fPileup->At(idx)->GetPU_NumMean();
+	}
+      if( fPileup->At(idx)->GetBunchCrossing() ==  1 ) 
+	{
+	  npu1 = fPileup->At(idx)->GetPU_NumInteractions();
+	  npu1m = fPileup->At(idx)->GetPU_NumMean();
+	}
+      if( fPileup->At(idx)->GetBunchCrossing() == -1 ) 
+	{
+	  npu2 = fPileup->At(idx)->GetPU_NumInteractions();
+	  npu2m = fPileup->At(idx)->GetPU_NumMean();
+	}
     }
   }  
   // get beamspot information
@@ -544,6 +541,9 @@ HttNtupler::fillCommon(TriggerBits& trigBits)
   fEventInfo.nPU          = fIsData ? 0 : npu0;
   fEventInfo.nPUPlus      = fIsData ? 0 : npu1;
   fEventInfo.nPUMinus     = fIsData ? 0 : npu2;
+  fEventInfo.nPUTrue      = fIsData ? 0 : npu0m;
+  fEventInfo.nPUPlusTrue  = fIsData ? 0 : npu1m;
+  fEventInfo.nPUMinusTrue = fIsData ? 0 : npu2m;
   fEventInfo.triggerBits  = trigBits;
   fEventInfo.pvx          = fVertex->X();
   fEventInfo.pvy          = fVertex->Y();
@@ -731,7 +731,6 @@ HttNtupler::fillElecs()
     const MuonCol*     goodMuons     = 0;
 
     pElectron->mvaValID        = fElectronMVAID->MVAValue(ele, pv, fPFCandidates, fPUEnergyDensity, EffectiveAreaTarget, goodElectrons, goodMuons);
-    pElectron->mvaValIDTrig    = 0;//fElectronMVAIDTrig->MVAValue(ele, pv, fPFCandidates, fPUEnergyDensity, EffectiveAreaTarget, goodElectrons, goodMuons);
     pElectron->pfIsoCharged    = computeCommonIso(ele, fPFNoPileUp    , 0.0, 0.4, fabs(ele->SCluster()->Eta()) > 1.479 ? 0.015 : 0.01,  1);
     pElectron->pfIsoChargedNoZ = computeCommonIso(ele, fPFNoPileUpNoZ , 0.0, 0.4, fabs(ele->SCluster()->Eta()) > 1.479 ? 0.015 : 0.01,  1);
     pElectron->pfIsoNeutral    = computeCommonIso(ele, fPFNoPileUp    , 0.0, 0.4,   0.0,  2);
@@ -861,12 +860,13 @@ HttNtupler::fillJets()
   for(unsigned int i=0; i<fPFJets->GetEntries(); ++i){
     const PFJet* jet = fPFJets->At(i);
     const FourVectorM rawMom = jet->RawMom();
-    if(rawMom.Eta() > 5.2) continue;
     fJetCorrector->setJetEta( rawMom.Eta() );
     fJetCorrector->setJetPt ( rawMom.Pt()  );
     fJetCorrector->setJetPhi( rawMom.Phi() );
     fJetCorrector->setJetE  ( rawMom.E()   );
-    fJetCorrector->setRho   ( fPUEnergyDensity->At(0)->RhoKt6PFJets() );
+    if(f2012) 
+      fJetCorrector->setRho   ( fPUEnergyDensity->At(0)->RhoKt6PFJets() );
+    fJetCorrector->setRho   ( fPUEnergyDensity->At(0)->RhoRandom() );
     fJetCorrector->setJetA  ( jet->JetArea() );
     fJetCorrector->setJetEMF( -99.0 );        
     double correction = fJetCorrector->getCorrection();
@@ -890,7 +890,9 @@ HttNtupler::fillJets()
       fJetCorrector->setJetPt ( rawMom.Pt()  );
       fJetCorrector->setJetPhi( rawMom.Phi() );
       fJetCorrector->setJetE  ( rawMom.E()   );
-      fJetCorrector->setRho   ( fPUEnergyDensity->At(0)->RhoKt6PFJets() );
+      if(f2012) 
+	fJetCorrector->setRho   ( fPUEnergyDensity->At(0)->RhoKt6PFJets() );
+      fJetCorrector->setRho   ( fPUEnergyDensity->At(0)->RhoRandom() );
       fJetCorrector->setJetA  ( jet->JetArea() );
       fJetCorrector->setJetEMF( -99.0 );
       fJetUncertainties->setJetPt ( rawMom.Pt()  );
@@ -1026,15 +1028,44 @@ HttNtupler::fillSVfit(TClonesArray*& iArr, Particle* lep1, unsigned int lepId1, 
   pSVfit->cov_00 = iMatrix(0,0)  ; pSVfit->cov_10 = iMatrix(1,0);
   pSVfit->cov_01 = iMatrix(0,1)  ; pSVfit->cov_11 = iMatrix(1,1);
 
+
+  double chgfrac1 = 1;
+  double chgfrac2 = 1;
+  if(lepId1 == EGenType::kTau)
+    {
+      double lPtTot = 0;
+      double lChargedPtTot = 0;
+      const PFTau *tau = (PFTau *) lep1;
+      for(unsigned int i0 = 0; i0 < tau->NSignalPFCands(); i0++) {
+	lPtTot += tau->SignalPFCand(i0)->Pt();
+	if(tau->SignalPFCand(i0)->BestTrk() == 0) continue;
+	lChargedPtTot += tau->SignalPFCand(i0)->Pt();
+	chgfrac1 = lChargedPtTot/lPtTot;
+      }
+    }
+
+  if(lepId2 == EGenType::kTau)
+    {
+      double lPtTot = 0;
+      double lChargedPtTot = 0;
+      const PFTau *tau = (PFTau *) lep2;
+      for(unsigned int i0 = 0; i0 < tau->NSignalPFCands(); i0++) {
+	lPtTot += tau->SignalPFCand(i0)->Pt();
+	if(tau->SignalPFCand(i0)->BestTrk() == 0) continue;
+	lChargedPtTot += tau->SignalPFCand(i0)->Pt();
+	chgfrac2 = lChargedPtTot/lPtTot;
+      }
+    }
+
   Met MVAMet = fMVAMet->GetMet(false,
-                                lep1->Pt(),lep1->Phi(),lep1->Eta(),
-                                lep2->Pt(),lep2->Phi(),lep2->Eta(),
-                                fPFMet->At(0),
-                                fPFCandidates,fVertex,fPrimVerts,
-                                fPFJets,
-                                fJetCorrector,
-                                fPUEnergyDensity,
-                                int(fPrimVerts->GetEntries()));
+			       lep1->Pt(),lep1->Phi(),lep1->Eta(),chgfrac1,
+			       lep2->Pt(),lep2->Phi(),lep2->Eta(),chgfrac2,
+			       fPFMet->At(0),
+			       fPFCandidates,fVertex,fPrimVerts,
+			       fPFJets,
+			       fJetCorrector,
+			       fPUEnergyDensity,
+			       int(fPrimVerts->GetEntries()));
   TMatrixD* MVACov = fMVAMet->GetMetCovariance();
 
   pSVfit->mvacov_00    = (*MVACov)(0,0);

@@ -79,6 +79,8 @@ namespace mithep
     /// add generator information to the bacon tree
     void SetUseGen(const int useGen){ fUseGen = useGen; }
     /// consider trigger information  
+    void Set2012(const int flag){ f2012 = flag; }
+     /// set minimum pt for photons
     void SetSkipIfHLTFail(const bool flag){ fSkipIfHLTFail = flag; } 
     /// set minimum pt for muons
     void SetMuPtMin(const double pt){ fMuPtMin = pt; }
@@ -297,6 +299,8 @@ namespace mithep
     bool fPrintTable;
     /// flag whether to skip event processing if HLT does not accept
     bool fSkipIfHLTFail;
+    /// flag whether 2012 or 2011 samples  
+    bool f2012;
     /// minimum pt for muons
     double fMuPtMin;
     /// maximum pt for muons
