@@ -245,11 +245,11 @@ HttNtupler::Process()
   LoadBranch( fConversionName      );
   LoadBranch( fPhotonName          );
 
- //  int lLep = 0; 
-//   for(unsigned int i0 = 0; i0 < fMuons->GetEntries(); i0++) if(looseMuId (fMuons->At(i0))) lLep++;
-//   for(unsigned int i0 = 0; i0 < fElectrons->GetEntries(); i0++) if(looseEleId(fElectrons->At(i0),0)) lLep++;
-//   for(unsigned int i0 = 0; i0 < fPFTaus->GetEntries(); i0++) if(looseTauId(fPFTaus->At(i0))) lLep++;
-//   if(lLep < 2) return;
+   int lLep = 0; 
+   for(unsigned int i0 = 0; i0 < fMuons->GetEntries(); i0++) if(looseMuId (fMuons->At(i0))) lLep++;
+   for(unsigned int i0 = 0; i0 < fElectrons->GetEntries(); i0++) if(looseEleId(fElectrons->At(i0),0)) lLep++;
+   for(unsigned int i0 = 0; i0 < fPFTaus->GetEntries(); i0++) if(looseTauId(fPFTaus->At(i0))) lLep++;
+   if(lLep < 2) return;
 
   // load the rest of the relevant Bambu branches
   loadBambuBranches();
