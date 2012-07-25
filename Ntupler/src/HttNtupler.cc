@@ -245,11 +245,11 @@ HttNtupler::Process()
   LoadBranch( fConversionName      );
   LoadBranch( fPhotonName          );
 
-  int lLep = 0; 
-  for(unsigned int i0 = 0; i0 < fMuons->GetEntries(); i0++) if(looseMuId (fMuons->At(i0))) lLep++;
-  for(unsigned int i0 = 0; i0 < fElectrons->GetEntries(); i0++) if(looseEleId(fElectrons->At(i0),0)) lLep++;
-  for(unsigned int i0 = 0; i0 < fPFTaus->GetEntries(); i0++) if(looseTauId(fPFTaus->At(i0))) lLep++;
-  if(lLep < 2) return;
+ //  int lLep = 0; 
+//   for(unsigned int i0 = 0; i0 < fMuons->GetEntries(); i0++) if(looseMuId (fMuons->At(i0))) lLep++;
+//   for(unsigned int i0 = 0; i0 < fElectrons->GetEntries(); i0++) if(looseEleId(fElectrons->At(i0),0)) lLep++;
+//   for(unsigned int i0 = 0; i0 < fPFTaus->GetEntries(); i0++) if(looseTauId(fPFTaus->At(i0))) lLep++;
+//   if(lLep < 2) return;
 
   // load the rest of the relevant Bambu branches
   loadBambuBranches();
@@ -313,7 +313,8 @@ HttNtupler::loadBambuBranches()
     } else {
       LoadBranch( fMCEvtInfoName     );
       LoadBranch( fPileupName        );
-      LoadBranch( Names::gkGenJetBrn );
+      if(f2012)
+	LoadBranch( Names::gkGenJetBrn );
     }
   }
 }
@@ -866,11 +867,13 @@ HttNtupler::fillJets()
     fJetCorrector->setJetE  ( rawMom.E()   );
     if(f2012) 
       fJetCorrector->setRho   ( fPUEnergyDensity->At(0)->RhoKt6PFJets() );
-    fJetCorrector->setRho   ( fPUEnergyDensity->At(0)->RhoRandom() );
+    else
+      fJetCorrector->setRho   ( fPUEnergyDensity->At(0)->RhoRandom() );
     fJetCorrector->setJetA  ( jet->JetArea() );
     fJetCorrector->setJetEMF( -99.0 );        
     double correction = fJetCorrector->getCorrection();
     double pt = rawMom.Pt()*correction;
+    
     if(pt > fJetPtMin || (jet->TrackCountingHighEffBJetTagsDisc() != -100)){
       // loose jetId for particle flow jets. NOTE: energy fractions are on the raw (i.e. uncorrected energy)
       if(jet->E()==0) continue;
@@ -879,7 +882,7 @@ HttNtupler::fillJets()
       if(jet->NConstituents()                  <  2                          ) continue;
       if(jet->ChargedHadronEnergy()/jet->E() <= 0  && fabs(jet->Eta()) < 2.4 ) continue;
       if(jet->ChargedEmEnergy()/jet->E()  >  0.99  && fabs(jet->Eta()) < 2.4 ) continue;
-      if(jet->ChargedMultiplicity()    < 1         && fabs(jet->Eta()) < 2.4 ) continue;
+      if(jet->ChargedMultiplicity()    < 1  && fabs(jet->Eta()) < 2.4 ) continue;
       TClonesArray& rPFJetArr = *fPFJetArr;
       assert(rPFJetArr.GetEntries() < rPFJetArr.GetSize());
       const int index = rPFJetArr.GetEntries();  
@@ -892,7 +895,8 @@ HttNtupler::fillJets()
       fJetCorrector->setJetE  ( rawMom.E()   );
       if(f2012) 
 	fJetCorrector->setRho   ( fPUEnergyDensity->At(0)->RhoKt6PFJets() );
-      fJetCorrector->setRho   ( fPUEnergyDensity->At(0)->RhoRandom() );
+      else
+	fJetCorrector->setRho   ( fPUEnergyDensity->At(0)->RhoRandom() );
       fJetCorrector->setJetA  ( jet->JetArea() );
       fJetCorrector->setJetEMF( -99.0 );
       fJetUncertainties->setJetPt ( rawMom.Pt()  );
