@@ -3,7 +3,7 @@ Instructions for producing FlatNtuples:
 run.sh takes the datasets in htt.conf and produces ntuples for each channel.
 Look for example in selecEmu.C to see how htt.conf should be formated. 
 
-One needs MitHtt/Ntupler (bacon) and MitHtt/FlatNtupler packages.
+One needs MitHtt/Ntupler (bacon), MitHtt/Utils, MitHtt/data, MitHtt/Common and MitHtt/FlatNtupler packages.
 
 It's a good idea to check the selection for a channel of interest to see the different types of options that can be applied.
 

@@ -449,7 +449,7 @@ void selectEmu(const TString conf,         // input config file
         if(hasJSON && !rlrm.HasRunLumi(rl)) continue;
 
 	// trigger
-	//if(!isemb && !(info->triggerBits[kHLT_Mu8_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL] || info->triggerBits[kHLT_Mu17_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL])) continue;
+	if(!isemb && !(info->triggerBits[kHLT_Mu8_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL] || info->triggerBits[kHLT_Mu17_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL])) continue;
 
         // good primary vertex
         if(!info->hasGoodPV) continue;
@@ -468,7 +468,7 @@ void selectEmu(const TString conf,         // input config file
 
 	  // trigger matching
 	  Bool_t trigmatch = ((info->triggerBits[kHLT_Mu17_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL] && muon->hltMatchBits[kHLT_Mu17_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_MuObj]) || (info->triggerBits[kHLT_Mu8_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL] && muon->hltMatchBits[kHLT_Mu8_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_MuObj]));
-	  //if(!isemb && !trigmatch)			continue;
+	  if(!isemb && !trigmatch)			continue;
 
 	  if(!(muon->typeBits & kGlobal))	continue;
           if(muon->pt < kMuonPt2Min)		continue;
@@ -487,7 +487,7 @@ void selectEmu(const TString conf,         // input config file
 
 	  // trigger matching
 	  Bool_t trigmatch = ((info->triggerBits[kHLT_Mu17_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL] && electron->hltMatchBits[kHLT_Mu17_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_EGObj]) || (info->triggerBits[kHLT_Mu8_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL] && electron->hltMatchBits[kHLT_Mu8_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_EGObj]));
-	  //if(!isemb && !trigmatch)                        continue;
+	  if(!isemb && !trigmatch)                        continue;
 
           if(fabs(electron->eta) > 2.3)		continue;
 
@@ -579,10 +579,10 @@ void selectEmu(const TString conf,         // input config file
 
 	// trigger requirements
 	if(mu->pt  < kMuonPt1Min) {
-          //if(!isemb && !(info->triggerBits[kHLT_Mu8_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL])) continue; // if failed trig1
+          if(!isemb && !(info->triggerBits[kHLT_Mu8_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL])) continue; // if failed trig1
 	}
 	else if(elept < kElePt1Min) {
-	  //if(!isemb && !(info->triggerBits[kHLT_Mu17_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL])) continue; // if failed trig2
+	  if(!isemb && !(info->triggerBits[kHLT_Mu17_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL])) continue; // if failed trig2
 	}
 
 	// same-sign requirements

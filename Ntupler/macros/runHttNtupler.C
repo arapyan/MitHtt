@@ -40,6 +40,7 @@ void runHttNtupler(
     const Int_t   useGen,       // which MC process? 
     const Int_t   nevents,      // number of events to process
     const Bool_t  skipHLTFail,  // skip events if no HLT accept
+    const Int_t  is2012,         // 2012 or 2011 samples
     const char   *json=""       // file with certified runlumis
   )
 {
@@ -47,16 +48,16 @@ void runHttNtupler(
   gDebugLevel = 1;                 // higher level allows more messages to print
  
   char output[100];
-  sprintf(output,"%s_%s_ntuple.root",dataset,fileset); 
+  sprintf(output,"/data/blue/arapyan/ntuples/%s_%s_ntuple.root",dataset,fileset); 
   
   // muon kinematics
-  const Double_t muPtMin  = 10;
+  const Double_t muPtMin  = 3;
   const Double_t muPtMax  = 7000;
   const Double_t muEtaMin = -3;
   const Double_t muEtaMax =  3;
 
   // electron kinematics
-  const Double_t eleEtMin  = 10;
+  const Double_t eleEtMin  = 7;
   const Double_t eleEtMax  = 7000;
   const Double_t eleEtaMin = -3;
   const Double_t eleEtaMax =  3;
@@ -89,7 +90,9 @@ void runHttNtupler(
   Catalog *c = new Catalog(catalogDir);
   Dataset *d = NULL;
   d = c->FindDataset(book,dataset,fileset);
-  ana->AddDataset(d);
+  //ana->AddDataset(d);
+  ana->AddFile("/castor/cern.ch/user/p/paus/filefi/028/s12-h120tt-vbf-v9/FED5F7FE-0597-E111-BE71-485B39800BB5.root");
+  //ana->AddFile("/castor/cern.ch/user/p/paus/filefi/025/f11-h125tt-vbf-v14b-bp/668A54D7-53F8-E011-9D81-E0CB4E29C502.root");
  
   //
   // setup ntupler module
@@ -98,6 +101,7 @@ void runHttNtupler(
   mymod->SetOutputName(output);          // output ntuple file name
   mymod->SetIsData(isData);              // toggle data specific or MC specific procedures
   mymod->SetUseGen(useGen);              // use generator info
+  mymod->Set2012(is2012);               // 2012 samples
   mymod->SetSkipIfHLTFail(skipHLTFail);  // skip to next event if no HLT accept
   mymod->SetMuPtMin(muPtMin);
   mymod->SetMuPtMax(muPtMax);
@@ -116,16 +120,30 @@ void runHttNtupler(
   mymod->SetMaxAbsZ(maxAbsZ);
   mymod->SetMaxRho(maxRho);
 
-
+  
   // Jet corrections
   char* PATH = getenv("CMSSW_BASE"); assert(PATH);
   TString path(TString::Format("%s/src/MitPhysics/data/", PATH));
-  mymod->AddJetCorr(path + "START50_V15_L1FastJet_AK5PF.txt"   );
-  mymod->AddJetCorr(path + "START50_V15_L2Relative_AK5PF.txt"  );
-  mymod->AddJetCorr(path + "START50_V15_L3Absolute_AK5PF.txt"  );
-  if(isData){
-    mymod->AddJetCorr(path + "START50_V15_L2L3Residual_AK5PF.txt");
-  }
+  if(is2012)
+    {
+      mymod->AddJetCorr(path + "START52_V9_L1FastJet_AK5PF.txt"   );
+      mymod->AddJetCorr(path + "START52_V9_L2Relative_AK5PF.txt"  );
+      mymod->AddJetCorr(path + "START52_V9_L3Absolute_AK5PF.txt"  );
+      if(isData || useGen==ESampleType::kEmbed){
+	mymod->AddJetCorr(path + "START52_V9_L2L3Residual_AK5PF.txt");
+      }
+    }
+  else
+    {
+      mymod->AddJetCorr(path + "START42_V17_AK5PF_L1FastJet.txt"   );
+      mymod->AddJetCorr(path + "START42_V17_AK5PF_L2Relative.txt"  );
+      mymod->AddJetCorr(path + "START42_V17_AK5PF_L3Absolute.txt"  );
+      if(isData || useGen==ESampleType::kEmbed){
+	mymod->AddJetCorr(path + "GR_R_42_V23_AK5PF_L2L3Residual.txt");
+      }
+    }
+
+
   if(TString(json).Length() > 0){
     mymod->AddJSON(json);
   }
