@@ -3,6 +3,7 @@
 
 #include "TFile.h"
 #include "TTree.h"
+#include "TH1.h"
 
 #include "MitAna/TreeMod/interface/BaseMod.h"
 #include "MitAna/DataTree/interface/MCEventInfo.h"
@@ -216,6 +217,8 @@ namespace mithep
     TFile* fOutputFile;           
     /// output tree
     TTree* fEventTree;
+    /// histogram to hold number of events
+    TH1* hEvents;
 
     /// name of the output file
     TString fOutputName;     
@@ -473,6 +476,7 @@ namespace mithep
     // open file and configure branches
     fOutputFile    = new TFile( fOutputName, "RECREATE" );
     fEventTree     = new TTree( "Events"   , "Events"   );
+    hEvents        = new TH1F("hEvents","all events",1,-0.5,0.5);
     if( (fIsData!=1) && fUseGen ){ fEventTree->Branch( "Gen", &fGenInfo ); }
     fEventTree->Branch( "Info"       , &fEventInfo      );
     fEventTree->Branch( "Muon"       , &fMuonArr        );

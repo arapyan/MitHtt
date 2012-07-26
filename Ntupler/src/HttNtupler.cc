@@ -215,6 +215,9 @@ HttNtupler::EndRun()
 void 
 HttNtupler::SlaveTerminate()
 {
+  hEvents->Fill(0.0,GetNEventsProcessed());
+  hEvents->SetEntries(GetNEventsProcessed());
+  hEvents->Write();
   fEventTree ->Print(); fOutputFile->Write(); fOutputFile->Close(); cleanup();
   delete fJetCorrector; delete fJetUncertainties; delete fEleTools, delete fMuonTools, delete metSign;delete fElectronMVAID; delete fJetIDMVA; delete fTauMVAIso;delete fMVAMet; delete fAntiElectronIDMVA;
 
@@ -245,11 +248,14 @@ HttNtupler::Process()
   LoadBranch( fConversionName      );
   LoadBranch( fPhotonName          );
 
-   int lLep = 0; 
-   for(unsigned int i0 = 0; i0 < fMuons->GetEntries(); i0++) if(looseMuId (fMuons->At(i0))) lLep++;
-   for(unsigned int i0 = 0; i0 < fElectrons->GetEntries(); i0++) if(looseEleId(fElectrons->At(i0),0)) lLep++;
-   for(unsigned int i0 = 0; i0 < fPFTaus->GetEntries(); i0++) if(looseTauId(fPFTaus->At(i0))) lLep++;
-   if(lLep < 2) return;
+  // increment the number of events that have been processed
+  IncNEventsProcessed();
+
+  int lLep = 0; 
+  for(unsigned int i0 = 0; i0 < fMuons->GetEntries(); i0++) if(looseMuId (fMuons->At(i0))) lLep++;
+  for(unsigned int i0 = 0; i0 < fElectrons->GetEntries(); i0++) if(looseEleId(fElectrons->At(i0),0)) lLep++;
+  for(unsigned int i0 = 0; i0 < fPFTaus->GetEntries(); i0++) if(looseTauId(fPFTaus->At(i0))) lLep++;
+  if(lLep < 2) return;
 
   // load the rest of the relevant Bambu branches
   loadBambuBranches();
@@ -258,8 +264,6 @@ HttNtupler::Process()
   loadTriggerTable(fTriggerBits);
   // check whether a trigger table is available or not (if required)
   if( fSkipIfHLTFail && fTriggerBits==0 ){ return; }
-  // increment the number of events that have been processed
-  IncNEventsProcessed();
   // reset object arrays befor filling
   resetOutputArrays();
   // fill generator information
@@ -1453,7 +1457,7 @@ HttNtupler::looseEleId(const Electron* elec, bool conv)
   if( elec->Eta() > fEleEtaMax                       ) return false;
   if( !fEleTools->PassSpikeRemovalFilter(elec)       ) return false;
   if(conv)
-    if( isConversion(elec)                             ) return false;
+    if( isConversion(elec)                           ) return false;
   if( fUseGen==ESampleType::kEmbed && !elec->BestTrk()                 ) return false;
   if( elec->BestTrk()->NExpectedHitsInner() > 0      ) return false;
   return true;
@@ -1468,8 +1472,6 @@ HttNtupler::looseMuId(const Muon* muon)
   if( muon->BestTrk()->Eta() > fMuEtaMax             ) return false;
   if( muon->BestTrk()->Pt () > fMuPtMax              ) return false;
   if( muon->TrackerTrk()->PtErr()/muon->Pt() > 0.1   ) return false;
-  if( muon->TrackerTrk()->NPixelHits() < 1           ) return false;
-  if( muon->TrackerTrk()->NHits() < 11               ) return false;
   if( muon->NValidHits()          < 1                ) return false;
   if( muon->NMatches()            < 1                ) return false;
   return true;
