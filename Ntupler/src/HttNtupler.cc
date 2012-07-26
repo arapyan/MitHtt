@@ -344,30 +344,60 @@ HttNtupler::fillGenerator()
   assert(fParticles);
   const MCParticle* boson_a=0, *dau1_a=0, *dau2_a=0; 
   const MCParticle* boson_b=0, *dau1_b=0, *dau2_b=0;
-  const MCParticle *top=0, *tbar=0;
+  const MCParticle* top=0, *tbar=0;
+  bool lNext = false;
   for(unsigned int i=0; i<fParticles->GetEntries(); ++i){
     const MCParticle* p = fParticles->At(i);
+    // fill status 3 muon or electron
+    if(p->Status() == 3 && (p->AbsPdgId() == 13 || p->AbsPdgId() == 11) && dau1_a == 0) dau1_a = p;
+    if(p->Status() == 3 && (p->AbsPdgId() == 13 || p->AbsPdgId() == 11) && dau1_a != 0) dau2_a = p;
+    if(p->Status() == 1 && lNext && dau1_a == 0) {dau1_a = p; lNext = false; }
+    if(p->Status() == 1 && lNext && dau1_a != 0) {dau2_a = p; lNext = false; }
+    if(p->Status() == 1 && p->AbsPdgId() == 16 ) { lNext = true; }
     if((p->Status() != 3 && fUseGen != ESampleType::kEmbed) || (fUseGen == ESampleType::kEmbed && p->Status() != 2)) continue;
     // fill boson 
     int id = p->PdgId();
     if((fUseGen==ESampleType::kH)      && (id==25 || id==35 || id==36)) boson_a = p;
+    if((fUseGen==ESampleType::kH)      && (id==25 || id==35 || id==36)) boson_a = p;
     if((fUseGen==ESampleType::kEmbed)  &&  id== 23)                     boson_a = p;
     if((fUseGen==ESampleType::kZ)      &&  id== 23)                     boson_a = p;
+    if((fUseGen==ESampleType::kW)      &&  id== 24)                     boson_a = p;
+    if((fUseGen==ESampleType::kW)      &&  id==-24)                     boson_a = p;
     if((fUseGen==ESampleType::kVV) && (id==23 || abs(id)==24)) { if(!boson_a) { boson_a = p; } else if(!boson_b) boson_b = p; }
-    if(fUseGen==ESampleType::kVttH) { 
-      if(id==25 || id==35 || id==36)  boson_a = p;
-      if(id ==  6)                    top     = p;
-      if(id == -6)                    tbar    = p;
-      if(!(top && tbar) && (id==23 || abs(id)==24))              boson_b = p;
+    if((fUseGen==ESampleType::kHWW) && (id==25 || id==35 || id==36)) {
+      const MCParticle* pHig = p;
+      for(unsigned int i0=0; i0<pHig->NDaughters(); ++i0){
+	const MCParticle* pD = pHig->Daughter(i0);
+	if(pD->PdgId() ==  24) boson_a = pD; 
+	if(pD->PdgId() == -24) boson_b = pD; 
+      }
+    }
+    if((fUseGen==ESampleType::kHZZ) && (id==25 || id==35 || id==36)) {
+      const MCParticle* pHig = p;
+      for(unsigned int i0=0; i0<pHig->NDaughters(); ++i0){
+	const MCParticle* pD = pHig->Daughter(i0);
+	if(pD->PdgId()==23) {
+	  assert(!(boson_a && boson_b));
+	  if(!boson_a)       boson_a = pD; 
+	  else if(!boson_b)  boson_b = pD; 
+	}
+      }
+    }
+    if(fUseGen==ESampleType::kVttH) {
+      if(id==25 || id==35 || id==36)  boson_a = p; 
+      if(id ==  6)                    top     = p; 
+      if(id == -6)                    tbar    = p; 
+      if(!(top && tbar))              boson_b = p; 
     }
   }
+  if(fUseGen==ESampleType::kHZZ && !boson_a && !boson_b) { cout << "Error! no bosons. HZZ" << endl; return;}
   // special treatment for powheg-herwig interface...
   if(!boson_a ) {
     assert(boson_b);
     if(fUseGen==ESampleType::kVttH) {
       while(!boson_a) {
-        boson_a = boson_b->FindDaughter(25);
-        boson_b = boson_b->FindDaughter(boson_b->PdgId());
+	boson_a = boson_b->FindDaughter(25);
+	boson_b = boson_b->FindDaughter(boson_b->PdgId());
       }
     }
     while(boson_a->NDaughters()==1) boson_a = boson_a->FindDaughter(boson_a->PdgId());
@@ -376,25 +406,25 @@ HttNtupler::fillGenerator()
   assert(boson_a);
   // madgraph zz sample has a few one-z events
   if(fUseGen==ESampleType::kVV && !boson_b && boson_a->NDaughters()==5) boson_b = boson_a;
-  if(fUseGen==ESampleType::kVV) assert(boson_b);
-  // get charged daughters of Ws from top quarks
-  if((fUseGen==ESampleType::kVttH) && top && tbar) {
-    const MCParticle *w1 = top->FindDaughter(24,kTRUE);
-    for(UInt_t idau=0; idau<w1->NDaughters(); idau++) {
-      const MCParticle *d = w1->Daughter(idau);
+  if(fUseGen==ESampleType::kVV || fUseGen==ESampleType::kHWW || fUseGen==ESampleType::kHZZ) assert(boson_b);
+  // assign daughters for first boson
+  if(boson_a) fillMCParticles(boson_a,dau1_a,dau2_a);
+  // assign daughters for second boson
+  if((fUseGen==ESampleType::kVttH) && top && tbar) { 
+    // get charged daughters of Ws from top quarks
+    const MCParticle* w1 = top->FindDaughter(24, true); 
+    for(unsigned int idau=0; idau<w1->NDaughters(); ++idau){
+      const MCParticle* d = w1->Daughter(idau);
       if(d->PdgId() == w1->PdgId()) continue;
       (d->Charge() > 0 ) ?  dau1_b = d : dau2_b = d;
     }
-    const MCParticle *w2 = tbar->FindDaughter(-24,kTRUE); assert(w2);
-    for(UInt_t idau=0; idau<w2->NDaughters(); idau++) {
-      const MCParticle *d = w2->Daughter(idau);
+    const MCParticle* w2 = tbar->FindDaughter(-24,kTRUE); assert(w2);
+    for(unsigned idau=0; idau<w2->NDaughters(); ++idau){
+      const MCParticle* d = w2->Daughter(idau);
       if(d->PdgId() == w2->PdgId()) continue;
       (d->Charge() > 0 ) ?  dau1_b = d : dau2_b = d;
     }
   }
-  // assign daughters for first boson
-  else if(boson_a) fillMCParticles(boson_a,dau1_a,dau2_a);
-  // assign daughters for second boson
   else if(boson_b) fillMCParticles(boson_b,dau1_b,dau2_b);
   // madgraph zz sample...
   if(fUseGen==ESampleType::kVV && boson_a->NDaughters()==5) {
@@ -442,25 +472,27 @@ HttNtupler::fillGenerator()
   fGenInfo.vy_b     = boson_b ? boson_b->Rapidity() : 0;
   fGenInfo.vphi_b   = boson_b ? boson_b->Phi()      : 0;
   
-  if(dau1_b != 0) { 
+  if(dau1_a != 0) { 
     FourVectorM lL1;  int lId1 = 0;
-    //lL1  = visibleMCMomentum(dau1_b); 
-    lId1 = pdgId(dau1_b);
-    
-    fGenInfo.pt_1_b   = dau1_b->Pt(); //lL1.Pt(); 
-    fGenInfo.eta_1_b  = dau1_b->Eta(); //lL1.Eta(); 
-    fGenInfo.phi_1_b  = dau1_b->Phi(); //lL1.Phi();
-    fGenInfo.id_1_b   = lId1;
+    if(fUseGen==ESampleType::kZ && fabs(pdgId(dau1_a)) == EGenType::kTauHadr) {
+      lL1  = visibleMCMomentum(dau1_a); 
+      lId1 = EGenType::kTauHadr;
+    }
+    fGenInfo.pt_1_b   = dau1_b ? dau1_b->Pt()	: lL1.Pt(); 
+    fGenInfo.eta_1_b  = dau1_b ? dau1_b->Eta()	: lL1.Eta(); 
+    fGenInfo.phi_1_b  = dau1_b ? dau1_b->Phi()	: lL1.Phi();
+    fGenInfo.id_1_b   = dau1_b ? pdgId(dau1_b)  : lId1;
   } 
-  if(dau2_b != 0) { 
-    FourVectorM lL2; int lId2 = 0;
-    //lL2  = visibleMCMomentum(dau2_a);
-    lId2 = pdgId(dau2_b);
-    
-    fGenInfo.pt_2_b   = dau2_b->Pt(); //lL2.Pt();
-    fGenInfo.eta_2_b  = dau2_b->Eta(); //lL2.Eta(); 
-    fGenInfo.phi_2_b  = dau2_b->Phi(); //lL2.Phi(); 
-    fGenInfo.id_2_b   = lId2;
+  if(dau2_a != 0) { 
+      FourVectorM lL2; int lId2 = 0;
+      if(fUseGen==ESampleType::kZ && fabs(pdgId(dau2_a)) == EGenType::kTauHadr) {
+	lL2  = visibleMCMomentum(dau2_a);
+	lId2 = EGenType::kTauHadr;
+      }
+      fGenInfo.pt_2_b   = dau2_b ? dau2_b->Pt()	 : lL2.Pt();
+      fGenInfo.eta_2_b  = dau2_b ? dau2_b->Eta() : lL2.Eta(); 
+      fGenInfo.phi_2_b  = dau2_b ? dau2_b->Phi() : lL2.Phi(); 
+      fGenInfo.id_2_b   = dau2_b ? pdgId(dau2_b) : lId2;
   }
   fGenInfo.decx   = boson_a->DecayVertex().X();
   fGenInfo.decy   = boson_a->DecayVertex().Y(); 
