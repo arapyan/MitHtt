@@ -217,8 +217,8 @@ namespace mithep
     TFile* fOutputFile;           
     /// output tree
     TTree* fEventTree;
-    /// histogram to hold number of events
-    TH1* hEvents;
+    /// sily tree for number of events
+    TTree* hEventsTree;
 
     /// name of the output file
     TString fOutputName;     
@@ -480,7 +480,7 @@ namespace mithep
     // open file and configure branches
     fOutputFile    = new TFile( fOutputName, "RECREATE" );
     fEventTree     = new TTree( "Events"   , "Events"   );
-    hEvents        = new TH1F("hEvents","all events",1,-0.5,0.5);
+    hEventsTree        = new TTree("hEvents","all events");
     if( (fIsData!=1) && fUseGen ){ fEventTree->Branch( "Gen", &fGenInfo ); }
     fEventTree->Branch( "Info"       , &fEventInfo      );
     fEventTree->Branch( "Muon"       , &fMuonArr        );
@@ -494,6 +494,7 @@ namespace mithep
     fEventTree->Branch( "SVfitETau"  , &fSVfitETauArr   );
     fEventTree->Branch( "SVfitMuTau" , &fSVfitMuTauArr  );
     fEventTree->Branch( "SVfitTauTau" , &fSVfitTauTauArr  );
+    hEventsTree->Branch( "Nevt" , &fIsData  );
   }
 
   inline void
