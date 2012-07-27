@@ -35,6 +35,7 @@ HttNtupler::HttNtupler(const char *name, const char *title):
   BaseMod        (name,title),
   fOutputFile    ( 0),
   fEventTree     ( 0),
+  hEventsTree     ( 0),
   fOutputName    ("ntuple.root"),
   fBeamSpotName  (Names::gkBeamSpotBrn),
   fPrimVtxName   (Names::gkPVBrn),
@@ -217,9 +218,6 @@ HttNtupler::EndRun()
 void 
 HttNtupler::SlaveTerminate()
 {
-  hEvents->Fill(0.0,GetNEventsProcessed());
-  hEvents->SetEntries(GetNEventsProcessed());
-  hEvents->Write();
   fEventTree ->Print(); fOutputFile->Write(); fOutputFile->Close(); cleanup();
   delete fJetCorrector; delete fJetUncertainties; delete fEleTools, delete fMuonTools, delete metSign;delete fElectronMVAID; delete fJetIDMVA; delete fTauMVAIso;delete fMVAMet; delete fAntiElectronIDMVA;
 
@@ -257,7 +255,13 @@ HttNtupler::Process()
   for(unsigned int i0 = 0; i0 < fMuons->GetEntries(); i0++)     if(looseMuId (fMuons->At(i0)      ,lLepHigh)) lLep++;
   for(unsigned int i0 = 0; i0 < fElectrons->GetEntries(); i0++) if(looseEleId(fElectrons->At(i0),0,lLepHigh)) lLep++;
   for(unsigned int i0 = 0; i0 < fPFTaus->GetEntries(); i0++)    if(looseTauId(fPFTaus->At(i0)     )) lLep++;
-  if(lLep < 2 || lLepHigh == 0) return;
+  if(lLep < 2 || lLepHigh == 0) 
+    {
+      hEventsTree->Fill();
+      return;
+    }
+
+  hEventsTree->Fill();
 
   // load the rest of the relevant Bambu branches
   loadBambuBranches();
