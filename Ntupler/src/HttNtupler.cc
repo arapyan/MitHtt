@@ -76,7 +76,9 @@ HttNtupler::HttNtupler(const char *name, const char *title):
   fMuPtMax        (1000),
   fMuEtaMin       (-3),
   fMuEtaMax       ( 3),
+  fMuHighPtMin    (10),
   fEleEtMin       (10),
+  fEleHighEtMin   (15),
   fEleEtMax       (1000),
   fEleEtaMin      (-3),
   fEleEtaMax      ( 3),
@@ -251,11 +253,11 @@ HttNtupler::Process()
   // increment the number of events that have been processed
   IncNEventsProcessed();
 
-  int lLep = 0; 
-  for(unsigned int i0 = 0; i0 < fMuons->GetEntries(); i0++) if(looseMuId (fMuons->At(i0))) lLep++;
-  for(unsigned int i0 = 0; i0 < fElectrons->GetEntries(); i0++) if(looseEleId(fElectrons->At(i0),0)) lLep++;
-  for(unsigned int i0 = 0; i0 < fPFTaus->GetEntries(); i0++) if(looseTauId(fPFTaus->At(i0))) lLep++;
-  if(lLep < 2) return;
+  int lLep = 0;  int lLepHigh = 0;
+  for(unsigned int i0 = 0; i0 < fMuons->GetEntries(); i0++)     if(looseMuId (fMuons->At(i0)      ,lLepHigh)) lLep++;
+  for(unsigned int i0 = 0; i0 < fElectrons->GetEntries(); i0++) if(looseEleId(fElectrons->At(i0),0,lLepHigh)) lLep++;
+  for(unsigned int i0 = 0; i0 < fPFTaus->GetEntries(); i0++)    if(looseTauId(fPFTaus->At(i0)     )) lLep++;
+  if(lLep < 2 || lLepHigh == 0) return;
 
   // load the rest of the relevant Bambu branches
   loadBambuBranches();
@@ -1024,10 +1026,15 @@ HttNtupler::fillPhotons()
 void 
 HttNtupler::fillSVfit() 
 { 
+  //Reset caching
+  //fMVAMet->reset();
+  metSign->reset();
+
+  int lNHigh = 0;
   for(unsigned int idx=0; idx<fMuons->GetEntries(); ++idx){ 
-    const Muon* pMu = fMuons->At(idx); if( !looseMuId(pMu) ){ continue; }
+    const Muon* pMu = fMuons->At(idx); if( !looseMuId(pMu,lNHigh) ){ continue; }
     for(unsigned int jdx=0; jdx<fElectrons->GetEntries(); ++jdx){ 
-      const Electron* pElectron = fElectrons->At(jdx); if( !looseEleId(pElectron,1) ){ continue; }
+      const Electron* pElectron = fElectrons->At(jdx); if( !looseEleId(pElectron,1,lNHigh) ){ continue; }
       if( MathUtils::DeltaR(pElectron->Mom(), pMu->Mom()) < 0.3 ){ continue; }
       TMatrixD lMetMatrix = metSign->getSignificance(fPFJets, fPFCandidates, 0,0, pMu, pElectron);	
       fillSVfit(fSVfitEMuArr, (Particle*)pMu, EGenType::kMuon, (Particle*)pElectron, EGenType::kElectron, lMetMatrix);
@@ -1036,13 +1043,13 @@ HttNtupler::fillSVfit()
   for(unsigned int idx=0; idx<fPFTaus->GetEntries(); ++idx){ 
     const PFTau* pPFTau = fPFTaus->At(idx); if( !looseTauId(pPFTau) ){ continue; }
     for(unsigned int jdx=0; jdx<fMuons->GetEntries(); ++jdx){
-      const Muon* pMu = fMuons->At(jdx); if( !looseMuId(pMu) ){ continue; }
+      const Muon* pMu = fMuons->At(jdx); if( !looseMuId(pMu,lNHigh) ){ continue; }
       if( MathUtils::DeltaR(pPFTau->Mom(), pMu->Mom())<0.3 ){ continue; }
       TMatrixD lMetMatrix = metSign->getSignificance(fPFJets, fPFCandidates, pPFTau,0,pMu, 0);
       fillSVfit(fSVfitMuTauArr, (Particle*)pMu, EGenType::kMuon, (Particle*)pPFTau, EGenType::kTau, lMetMatrix);
     }
     for(unsigned int jdx=0; jdx<fElectrons->GetEntries(); ++jdx){ 
-      const Electron* pElectron = fElectrons->At(jdx); if( !looseEleId(pElectron,1) ){ continue; }
+      const Electron* pElectron = fElectrons->At(jdx); if( !looseEleId(pElectron,1,lNHigh) ){ continue; }
       if( MathUtils::DeltaR(pPFTau->Mom(), pElectron->Mom())<0.3 ){ continue; }
       TMatrixD lMetMatrix = metSign->getSignificance(fPFJets, fPFCandidates, pPFTau, 0,0, pElectron);	
       fillSVfit(fSVfitETauArr, (Particle*)pElectron, EGenType::kElectron, (Particle*)pPFTau, EGenType::kTau, lMetMatrix);
@@ -1067,7 +1074,6 @@ HttNtupler::fillSVfit(TClonesArray*& iArr, Particle* lep1, unsigned int lepId1, 
   pSVfit->daughter2 = lep2->Mom(); pSVfit->daughterId2 = lepId2;
   pSVfit->cov_00 = iMatrix(0,0)  ; pSVfit->cov_10 = iMatrix(1,0);
   pSVfit->cov_01 = iMatrix(0,1)  ; pSVfit->cov_11 = iMatrix(1,1);
-
 
   double chgfrac1 = 1;
   double chgfrac2 = 1;
@@ -1481,7 +1487,7 @@ HttNtupler::looseTauId(const PFTau* tau)
   return true;
 } 
 bool 
-HttNtupler::looseEleId(const Electron* elec, bool conv) 
+HttNtupler::looseEleId(const Electron* elec, bool conv,int &iNHigh) 
 { 
   if( elec->Pt () < fEleEtMin                        ) return false;
   if( elec->Pt () > fEleEtMax                        ) return false;
@@ -1492,11 +1498,12 @@ HttNtupler::looseEleId(const Electron* elec, bool conv)
     if( isConversion(elec)                           ) return false;
   if( fUseGen==ESampleType::kEmbed && !elec->BestTrk()                 ) return false;
   if( elec->BestTrk()->NExpectedHitsInner() > 0      ) return false;
+  if( elec->Pt()            > fEleHighEtMin          ) iNHigh++;
   return true;
 }
 
 bool 
-HttNtupler::looseMuId(const Muon* muon) 
+HttNtupler::looseMuId(const Muon* muon,int &iNHigh) 
 { 
   if( muon->TrackerTrk() == 0                        ) return false;
   if( muon->BestTrk()->Pt () < fMuPtMin              ) return false;
@@ -1506,6 +1513,7 @@ HttNtupler::looseMuId(const Muon* muon)
   if( muon->TrackerTrk()->PtErr()/muon->Pt() > 0.1   ) return false;
   if( muon->NValidHits()          < 1                ) return false;
   if( muon->NMatches()            < 1                ) return false;
+  if( muon->Pt()            > fMuHighPtMin           ) iNHigh++;
   return true;
 }
 

@@ -203,9 +203,9 @@ namespace mithep
     /// does this tau fullfil the loose tau Id?
     bool looseTauId(const PFTau* iTau) ;
     /// does this muon fullfil the loose Muon Id?
-    bool looseMuId(const Muon * imu);
+    bool looseMuId(const Muon * imu,int &iNHigh);
     /// does this electron fullfil the loose electron Id? conv:check if it is a conversion electron
-    bool looseEleId(const Electron *iElectron, bool conv);
+    bool looseEleId(const Electron *iElectron, bool conv,int &iNHigh);
     /// fill input information for svfit for a given svfit array
     void fillSVfit(TClonesArray*& iArr, Particle* lep1, unsigned int lepId1, Particle* lep2, unsigned int lepId2, TMatrixD iMatrix, double dcaSig3D, double dcaSig2D, double dca3DErr, double dca2DErr);
     /// fill input information for svfit for a given svfit array
@@ -306,6 +306,8 @@ namespace mithep
     bool f2012;
     /// minimum pt for muons
     double fMuPtMin;
+    /// max minimum supercluster Et for electrons
+    double fMuHighPtMin;
     /// maximum pt for muons
     double fMuPtMax;
     /// minimum eta for muons
@@ -314,6 +316,8 @@ namespace mithep
     double fMuEtaMax;
     /// minimum supercluster Et for electrons
     double fEleEtMin;
+    /// max minimum supercluster Et for electrons
+    double fEleHighEtMin;
     /// maximum supercluster Et for electrons
     double fEleEtMax;
     /// minimum supercluster eta for electrons

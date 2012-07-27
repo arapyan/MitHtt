@@ -52,16 +52,33 @@ MetSignificance::addJets(std::vector<metsig::SigInputObj>& fSig, const mithep::P
 }
 
 void 
-MetSignificance::addCandidates(std::vector<metsig::SigInputObj>& fSig,const mithep::PFCandidateCol* iCands, const mithep::PFJetCol* iJets, const mithep::Particle* iCan1, const mithep::Particle* iCan2) 
+MetSignificance::addCandidates(const mithep::PFCandidateCol* iCands, const mithep::PFJetCol* iJets) 
 { 
+  fCandSig.clear();
   for(unsigned int i0 = 0; i0 < iCands->GetEntries(); i0++) { 
     const mithep::PFCandidate* pCand = iCands->At(i0);
-    if(iCan1 != 0) {if(MathUtils::DeltaR(pCand->Mom(),iCan1->Mom()) < fDRLepJetMin) continue;}
-    if(iCan2 != 0) {if(MathUtils::DeltaR(pCand->Mom(),iCan2->Mom()) < fDRLepJetMin) continue;}
     //if(filter(pCand,iMuons    ,fDRCandMin)) continue;
     //if(filter(pCand,iElectrons,fDRCandMin)) continue;
     if(filter(pCand           ,iJets))      continue;
-    add(pCand,fSig);
+    std::pair<metsig::SigInputObj,mithep::FourVector> pCandSig;
+    pCandSig.first  = fMetRes->evalPF(pCand);
+    pCandSig.second = pCand->Mom();
+    fCandSig.push_back(pCandSig);
+  }
+}
+
+void 
+MetSignificance::subtractCandidates(std::vector<metsig::SigInputObj>& fSig,const mithep::PFCandidateCol* iCands, const mithep::PFJetCol* iJets, const mithep::Particle* iCan1, const mithep::Particle* iCan2) 
+{ 
+  for(unsigned int i0 = 0; i0 < fCandSig.size(); i0++) { 
+    //const mithep::PFCandidate* pCand = iCands->At(i0);
+    if(iCan1 != 0) {if(MathUtils::DeltaR(fCandSig[i0].second,iCan1->Mom()) < fDRLepJetMin) continue;}
+    if(iCan2 != 0) {if(MathUtils::DeltaR(fCandSig[i0].second,iCan2->Mom()) < fDRLepJetMin) continue;}
+    //if(filter(pCand,iMuons    ,fDRCandMin)) continue;
+    //if(filter(pCand,iElectrons,fDRCandMin)) continue;
+    //if(filter(pCand           ,iJets))      continue;
+    //add(pCand,fSig);
+    fSig.push_back(fCandSig[i0].first);
   }
 }
 
@@ -111,9 +128,14 @@ MetSignificance::add(const mithep::Electron *iElectron,std::vector<metsig::SigIn
 
 TMatrixD MetSignificance::getSignificance(const PFJetCol *iJets, const PFCandidateCol *iCands, const mithep::PFTau *iTau, const mithep::PFTau *jTau, const mithep::Muon *iMuon, const mithep::Electron *iElectron)
 {
+  if(fComputeBase) { 
+    addCandidates(iCands,iJets);
+    fComputeBase = false;
+  }
   std::vector<metsig::SigInputObj> fSig;
-  addJets      (fSig,iJets       ,(mithep::Particle*) iMuon,(mithep::Particle*) iElectron);
-  addCandidates(fSig,iCands,iJets,(mithep::Particle*) iMuon,(mithep::Particle*) iElectron);//iMuons,iElectrons);
+  //addJets      (fSig,iJets       ,0,0);//(mithep::Particle*) iMuon,(mithep::Particle*) iElectron);
+  addJets           (fSig,iJets       ,(mithep::Particle*) iMuon,(mithep::Particle*) iElectron);
+  subtractCandidates(fSig,iCands,iJets,(mithep::Particle*) iMuon,(mithep::Particle*) iElectron);
   if(iTau      != 0) addTau        (fSig,iTau);
   if(jTau      != 0) addTau        (fSig,iTau);
   if(iMuon     != 0) add (iMuon,    fSig);
