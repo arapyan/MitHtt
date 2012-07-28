@@ -44,56 +44,22 @@
 // lepton ID helper functions
 #include "MitHtt/Utils/LeptonIDCuts.hh"
 
+// scale factros
+#include "MitHtt/Utils/DataMC.hh"
+
 // event-based MVA
-//#include "MitHtt/Utils/HttMVA.hh" 
+#include "MitHtt/Utils/HttMVA.hh" 
 
 #endif
 
-//=== FUNCTION DECLARATIONS ======================================================================================
 const Double_t pi = 3.14159265358979;
-TRandom1 randm(0xDEADBEEF);
-enum { kNo, kDown, kUp };                     // systematic variations 
-
-// Initialize k-factors
-TH1D* kfFHPInit(Int_t mH);
-
-// Get k-factor
-Double_t kfFHPValue(Double_t pt, TH1D* hKF);
-
-// Is jet b-tagged?
-Bool_t isbtagged(mithep::TJet *jet, Int_t isdata, UInt_t btageff, UInt_t mistag);
-
-// Get higgs mass point from sample name
-Int_t higgsmass(TString basename)
-{
-  stringstream ss(basename(TRegexp("[0-9][0-9]*"),3).Data());
-  Int_t mass;
-  ss >> mass;
-  if(basename.Contains("-gf-")) assert(mass>85 && mass<1200);
-  return mass;
-}
-
-// Get unfolding weights for embedded
-Double_t embUnfoldWgt(Double_t pt1, Double_t eta1, Double_t pt2, Double_t eta2);
-
-// Lepton id scale factors
-Double_t eleIDscale(Double_t elept, Double_t eleeta);
-Double_t muIDscale(Double_t mupt, Double_t mueta);
-
-// Trigger scale factors/efficiencies
-Double_t eleTrigScale(Double_t elept, Double_t eleeta);
-Double_t muTrigScale(Double_t mupt, Double_t mueta);
-Double_t eleTrigEff(Double_t elept, Double_t eleeta);
-Double_t muTrigEff(Double_t mupt, Double_t mueta);
-
-// Get number of entries in unskimmed tree
-Double_t unskimmedEntries(TString skimname);
 
 //=== MAIN MACRO =================================================================================================
 
 void selectEmu(const TString conf,         // input config file
                const TString outputDir,    // output directory
 	       const Double_t lumi,        // luminosity pb^-1
+	       const Int_t is2012,          //2012 or 2011 data 
                const UInt_t btageff=0,     // b-tag efficiency scale factor uncertainty
                const UInt_t jetunc=0,      // jet energy uncertainties
                const UInt_t mistag=0,      // b mistag rate scale factor uncertainty
@@ -177,17 +143,20 @@ void selectEmu(const TString conf,         // input config file
   const Double_t kJetPtMin   = 30;
   const Double_t kBJetPtMin  = 20;
   
-  Bool_t doKFactors = kFALSE;      // not needed in Summer12
-
+  Bool_t doKFactors = kTRUE;
+  if(is2012)
+    doKFactors = kFALSE;      // not needed in Summer12
+      
   Bool_t doNpuRwgt = kTRUE;
-
+  
   // Access samples and fill histograms
   TFile *infile=0;
-  TTree *eventTree=0;  
+  TTree *eventTree=0;
+  TTree *lTree = 0;
 
   //vbf MVA
-  //HttMVA *vbfMVA = new HttMVA();
-  //vbfMVA->Initialize("BDTG method", "/home/vdutta/cms/cmssw/new/CMSSW_4_4_1/src/MitHtt/Emu/Selection/MVAVBF_v3/weights/TMVA_BDTG.weights.xml", HttMVA::kVBF2);   // vbf mva
+  HttMVA *vbfMVA = new HttMVA();
+  vbfMVA->Initialize("BDTG method", getenv("CMSSW_BASE")+std::string("/src/MitHtt/data/VBFMVA/EMu/TMVA_BDTG.weights.xml"), HttMVA::kVBF2);   // vbf mva
        
   // Data structures to store info from TTrees
   mithep::TEventInfo *info  = new mithep::TEventInfo();
@@ -240,6 +209,7 @@ void selectEmu(const TString conf,         // input config file
     float lPhi1        = 0; outtree.Branch("phi_1"      ,&lPhi1          ,"lPhi1/F"    ); //Phi 
     float lEta1        = 0; outtree.Branch("eta_1"      ,&lEta1          ,"lEta1/F"    ); //Eta 
     float lM1          = 0; outtree.Branch("m_1"        ,&lM1            ,"lM1/F"      ); //Mass 
+    int   lq1          = 0; outtree.Branch("q_1"        ,&lq1            ,"lq1/I"      );  //charge
     float lIso1        = 0; outtree.Branch("iso_1"      ,&lIso1          ,"lIso1/F"    ); //Delta Beta iso value 
     float lD01         = 0; outtree.Branch("d0_1"       ,&lD01           ,"lD01/F"     );//d0 with respect to primary vertex
     float lDZ1         = 0; outtree.Branch("dZ_1"       ,&lDZ1           ,"lDZ1/F"     );//dZ with respect to primary vertex
@@ -252,6 +222,7 @@ void selectEmu(const TString conf,         // input config file
     float lPhi2        = 0; outtree.Branch("phi_2"      ,&lPhi2          ,"lPhi2/F"    );//Phi
     float lEta2        = 0; outtree.Branch("eta_2"      ,&lEta2          ,"lEta2/F"    );//Eta
     float lM2          = 0; outtree.Branch("m_2"        ,&lM2            ,"lM2/F"      );//Mass (visible mass for hadronic Tau)
+    int   lq2          = 0; outtree.Branch("q_2"        ,&lq2            ,"lq2/I"      );  //charge
     float lIso2        = 0; outtree.Branch("iso_2"      ,&lIso2          ,"lIso2/F"    );//MVA iso for hadronic Tau, Delta Beta for muon
     float lD02         = 0; outtree.Branch("d0_2"       ,&lD02           ,"lD02/F"     );//d0 with respect to primary vertex
     float lDZ2         = 0; outtree.Branch("dZ_2"       ,&lDZ2           ,"lDZ2/F"     );//dZ with respect to primary vertex
@@ -349,28 +320,23 @@ void selectEmu(const TString conf,         // input config file
       assert(infile);
 
       TString sfname    = samp->fnamev[ifile];
-      TString basename = sfname(sfname.Last('/')+1,sfname.Last('.') - sfname.Last('/') - 1);
-
+    
       // which corrections to apply where
       Bool_t isdata     = !(samp->typev[ifile]==eMC);
-      //Bool_t is52mc     = sfname.Contains("s12-");
       Bool_t isemb      = snamev[isam].Contains("emb");
-      //Bool_t isfall11   = sfname.Contains("f11");
-      Bool_t issamesign = snamev[isam].Contains("ss-fakes");
       Bool_t doRecoil   = (sfname.Contains("ztt") || sfname.Contains("-zll") || sfname.Contains("zjets") || snamev[isam].Contains("_sm_") || snamev[isam].Contains("_mssm_")) && !isemb;
       Bool_t reallyDoKf = doKFactors && sfname.Contains("-gf-");
       Bool_t ismadz     = sfname.Contains("-zll") || sfname.Contains("-zjets"); // madgraph z samples
       Bool_t ismadzmm   = snamev[isam].Contains("zmm") && (sfname.Contains("-zll") || sfname.Contains("-zjets")); // madgraph z samples
-      //Bool_t istrainingsample = sfname.Contains("-zjets"); 
       Bool_t ismssm     = sfname.Contains("-ggh-") || sfname.Contains("-bbh-");
       Bool_t doIdScale  = !isdata;
       Bool_t doTrigScale= !isdata;
-      Bool_t getGen     = doRecoil || reallyDoKf || ismadz ||isemb || ismssm;
+      Bool_t getGen     = !isdata; //doRecoil || reallyDoKf || ismadz ||isemb || ismssm;
       Bool_t doJetUnc   = (jetunc!=kNo);
 
       // PU reweighting
       TString pileupReweightFile;
-      if(sfname.Contains("f11")) {
+      if(!is2012) {
 	cout << "Fall11 sample!" << endl;
 	pileupReweightFile = "$CMSSW_BASE/src/MitHtt/data/pileup/PUWeights_Fall11toFull2011_PixelLumi_50bins.root"; //"/data/smurf/sixie/Pileup/weights/PileupReweighting.Fall11_To_Full2011.root";
       } else pileupReweightFile = "$CMSSW_BASE/src/MitHtt/data/pileup/PUWeights_S12To2012_5089ipb.root";
@@ -395,11 +361,12 @@ void selectEmu(const TString conf,         // input config file
       }
 
       // k-factors
-      TH1D *hKFactors = (reallyDoKf) ? kfFHPInit(higgsmass(basename)) : 0;
+      TH1D *hKFactors = (reallyDoKf) ? kfFHPInit(higgsmass(sfname)) : 0;
 
       // Get the TTree
       eventTree = (TTree*)infile->Get("Events"); assert(eventTree);
-
+      lTree =  (TTree*)infile->Get("hEvents"); assert(lTree);
+      
       // Set branch address to structures that will store the info  
       eventTree->SetBranchAddress("Info",     &info);        TBranch *infoBr     = eventTree->GetBranch("Info");
       eventTree->SetBranchAddress("Muon",     &muonArr);     TBranch *muonBr     = eventTree->GetBranch("Muon");
@@ -416,8 +383,7 @@ void selectEmu(const TString conf,         // input config file
       // get weights for MC
       Double_t weight=1,treeEntries=-1; // (weight is only initialized for each *file*)
       if(!isdata) {
-	if(sfname.Contains("_skim.root")) treeEntries = unskimmedEntries(sfname); // get entries from unskimmed file
-	else                              treeEntries = (Double_t)eventTree->GetEntries();
+	treeEntries = (Double_t)lTree->GetEntries();
 	assert(treeEntries>0);
         weight = lumi*(samp->xsecv[ifile])/treeEntries;                           // (assumes you've merged filesets)
 	if(isemb)  weight=1.0;
@@ -432,8 +398,8 @@ void selectEmu(const TString conf,         // input config file
 
       // loop over events
       for(UInt_t ientry=0; ientry<eventTree->GetEntries(); ientry++) {
-	if(ientry%1000000 == 0) cout << "processing " << ientry << endl;
-        infoBr->GetEntry(ientry);
+	if(ientry%100000 == 0) cout << "processing " << ientry << endl;
+	infoBr->GetEntry(ientry);
 	//cout << info->runNum << " " << info->lumiSec << " " << info->evtNum << endl;
 
 	if(getGen)  genBr->GetEntry(ientry);
@@ -449,7 +415,13 @@ void selectEmu(const TString conf,         // input config file
         if(hasJSON && !rlrm.HasRunLumi(rl)) continue;
 
 	// trigger
-	if(!isemb && !(info->triggerBits[kHLT_Mu8_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL] || info->triggerBits[kHLT_Mu17_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL])) continue;
+	if(is2012)
+	  {
+	    if(!isemb && !(info->triggerBits[kHLT_Mu8_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL] || info->triggerBits[kHLT_Mu17_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL])) continue;
+	  }
+	else
+	   if(!isemb && !(info->triggerBits[kHLT_Mu8_Ele17_CaloIdL] || info->triggerBits[kHLT_Mu17_Ele8_CaloIdL])) continue;
+	    
 
         // good primary vertex
         if(!info->hasGoodPV) continue;
@@ -466,31 +438,38 @@ void selectEmu(const TString conf,         // input config file
           const mithep::TMuon *muon = (mithep::TMuon*)((*muonArr)[i]);
 	  looseMuonsv.push_back(muon);
 
+	  Bool_t trigmatch = kFALSE;
 	  // trigger matching
-	  Bool_t trigmatch = ((info->triggerBits[kHLT_Mu17_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL] && muon->hltMatchBits[kHLT_Mu17_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_MuObj]) || (info->triggerBits[kHLT_Mu8_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL] && muon->hltMatchBits[kHLT_Mu8_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_MuObj]));
+	  if(is2012)
+	    trigmatch = ((info->triggerBits[kHLT_Mu17_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL] && muon->hltMatchBits[kHLT_Mu17_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_MuObj]) || (info->triggerBits[kHLT_Mu8_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL] && muon->hltMatchBits[kHLT_Mu8_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_MuObj]));
+	  else
+	    trigmatch = ((info->triggerBits[kHLT_Mu17_Ele8_CaloIdL] && muon->hltMatchBits[kHLT_Mu17_Ele8_CaloIdL_MuObj]) || (info->triggerBits[kHLT_Mu8_Ele17_CaloIdL] && muon->hltMatchBits[kHLT_Mu8_Ele17_CaloIdL_MuObj]));
 	  if(!isemb && !trigmatch)			continue;
-
 	  if(!(muon->typeBits & kGlobal))	continue;
-          if(muon->pt < kMuonPt2Min)		continue;
+	  if(muon->pt < kMuonPt2Min)		continue;
 	  if(fabs(muon->eta) > 2.1)		continue;
-          if(passTightPFMuonID(muon,0))  goodMuonsv.push_back(muon);
-          //if(passTightPFMuonID(muon) && passMuonIsoPU(muon))  goodMuonsv.push_back(muon);
-        }
-	
-        // loop through electrons 
+	  if(passTightPFMuonID(muon,0))  goodMuonsv.push_back(muon);
+	  //if(passTightPFMuonID(muon) && passMuonIsoPU(muon))  goodMuonsv.push_back(muon);
+	}
+       
+	// loop through electrons 
         vector<const mithep::TElectron*> goodElectronsv;   
         electronArr->Clear();
         electronBr->GetEntry(ientry);
-
+	
         for(Int_t i=0; i<electronArr->GetEntriesFast(); i++) {
 	  const mithep::TElectron *electron = (mithep::TElectron*)((*electronArr)[i]);
 
 	  // trigger matching
-	  Bool_t trigmatch = ((info->triggerBits[kHLT_Mu17_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL] && electron->hltMatchBits[kHLT_Mu17_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_EGObj]) || (info->triggerBits[kHLT_Mu8_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL] && electron->hltMatchBits[kHLT_Mu8_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_EGObj]));
+	  Bool_t trigmatch = kFALSE;
+	  if(is2012)
+	    trigmatch = ((info->triggerBits[kHLT_Mu17_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL] && electron->hltMatchBits[kHLT_Mu17_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_EGObj]) || (info->triggerBits[kHLT_Mu8_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL] && electron->hltMatchBits[kHLT_Mu8_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_EGObj]));
+	  else
+	    trigmatch = ((info->triggerBits[kHLT_Mu17_Ele8_CaloIdL] && electron->hltMatchBits[kHLT_Mu17_Ele8_CaloIdL_EGObj]) || (info->triggerBits[kHLT_Mu8_Ele17_CaloIdL] && electron->hltMatchBits[kHLT_Mu8_Ele17_CaloIdL_EGObj]));
 	  if(!isemb && !trigmatch)                        continue;
 
           if(fabs(electron->eta) > 2.3)		continue;
-
+	  
 	  // track matching against muons
           Bool_t hasMuonTrack=kFALSE;
           for(UInt_t imu=0; imu<goodMuonsv.size(); imu++) {
@@ -501,11 +480,12 @@ void selectEmu(const TString conf,         // input config file
 	  // clean against loose muons
           Bool_t matchLooseMuon=kFALSE;
 	  for(UInt_t imu=0;imu<looseMuonsv.size();imu++) {
-	    const mithep::TMuon *mu = looseMuonsv[imu];
-	    if(toolbox::deltaR(electron->eta,electron->phi,mu->eta,mu->phi) < 0.3) matchLooseMuon=kTRUE;
+	    if(fabs(looseMuonsv[imu]->phi) > 2.3) continue; 
+	    if(toolbox::deltaR(electron->eta,electron->phi,looseMuonsv[imu]->eta,looseMuonsv[imu]->phi) < 0.3) matchLooseMuon=kTRUE;
 	  }
-	  if(matchLooseMuon)			continue;
 	  
+	  if(matchLooseMuon)			continue;
+	 
 	  if(pass2012EleMVAID(electron, kMedium,0))  goodElectronsv.push_back(electron);
         }
 
@@ -579,19 +559,25 @@ void selectEmu(const TString conf,         // input config file
 
 	// trigger requirements
 	if(mu->pt  < kMuonPt1Min) {
-          if(!isemb && !(info->triggerBits[kHLT_Mu8_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL])) continue; // if failed trig1
+	  if(is2012)
+	    {
+	      if(!isemb && !(info->triggerBits[kHLT_Mu8_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL])) continue; // if failed trig1
+	    }
+	  else
+	    {
+	      if(!isemb && !(info->triggerBits[kHLT_Mu8_Ele17_CaloIdL])) continue; // if failed trig1
+	    }
 	}
 	else if(elept < kElePt1Min) {
-	  if(!isemb && !(info->triggerBits[kHLT_Mu17_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL])) continue; // if failed trig2
+	  if(is2012)
+	    {
+	      if(!isemb && !(info->triggerBits[kHLT_Mu17_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL])) continue; // if failed trig2
+	    }
+	  else
+	    {
+	      if(!isemb && !(info->triggerBits[kHLT_Mu17_Ele8_CaloIdL])) continue; // if failed trig2
+	    }
 	}
-
-	// same-sign requirements
-	if(issamesign) {
-	  if(mu->q != ele->q) continue;
-	}
-	else {
-	  if(mu->q == ele->q) continue;
-	} 
 
 	// lepton 4-vectors
         TLorentzVector lep1, lep2, dilep;
@@ -646,7 +632,7 @@ void selectEmu(const TString conf,         // input config file
 	    }
           }		    
         }
-
+   
 	// dijet system
         TLorentzVector jv1, jv2, dijet;
 	Int_t nCentralJets=0;
@@ -698,35 +684,23 @@ void selectEmu(const TString conf,         // input config file
 
 	// lepton ID corrections
 	Double_t idscale = 1;
-	if(doIdScale) idscale = muIDscale(mu->pt,mu->eta)*eleIDscale(elept,ele->eta);
+	if(doIdScale) idscale = muIDscaleEmu(mu->pt,mu->eta,is2012)*eleIDscaleEmu(elept,ele->eta,is2012);
 
 	// trigger scale factor for MC
 	Double_t trigscale = 1;
-	if(doTrigScale && !isemb) trigscale=muTrigScale(mu->pt,mu->eta)*eleTrigScale(elept,ele->eta);
-	if(doTrigScale && isemb) trigscale=muTrigEff(mu->pt,mu->eta)*eleTrigEff(elept,ele->eta);
-
+	if(doTrigScale && !isemb) trigscale=muTrigScaleEmu(mu->pt,mu->eta,is2012)*eleTrigScaleEmu(elept,ele->eta,is2012);
+	
+	
 	// embedding weight for embedded sample
 	Double_t embWgt = 1;
         Double_t pt1=0, eta1=0, phi1=0, pt2=0, eta2=0, phi2=0;
-	if(doRecoil) {
-	  if(gen->id_1_a == EGenType::kTauElectron && gen->id_2_a == EGenType::kTauMuon)
-	    {
-	      pt1 = gen->pt_1_a;
-	      pt2 = gen->pt_2_a;
-	      eta1 = gen->eta_1_a;
-	      eta2 = gen->eta_2_a;
-	      phi1 = gen->phi_1_a;
-	      phi2 = gen->phi_2_a;
-	    }
-	  else
-	    {
-	      pt1 = gen->pt_2_a;
-	      pt2 = gen->pt_1_a;
-	      eta1 = gen->eta_2_a;
-	      eta2 = gen->eta_1_a;
-	      phi1 = gen->phi_2_a;
-	      phi2 = gen->phi_1_a;
-	    }
+	if(!isdata && !isemb) {
+	  pt1 = gen->pt_1_a;
+	  pt2 = gen->pt_2_a;
+	  eta1 = gen->eta_1_a;
+	  eta2 = gen->eta_2_a;
+	  phi1 = gen->phi_1_a;
+	  phi2 = gen->phi_2_a;
 	}
 	if(isemb)    {
 	  if(gen->pt_1_a > gen->pt_2_a) {
@@ -766,7 +740,7 @@ void selectEmu(const TString conf,         // input config file
 	lPUWeight	 = npuWgt;
 	lEffWeight	 = trigscale*idscale;
 	lWeight		 = weight*kf*npuWgt*trigscale*idscale*embWgt/lumi;
-	lMass		 = (ismssm)? gen->vmass_a: 0;
+	lMass		 = gen->vmass_a;
 	lMassUp		 = 0;
 	lMassDown	 = 0;
 	lMVis		 = dilep.M();
@@ -774,6 +748,7 @@ void selectEmu(const TString conf,         // input config file
 	lPhi1		 = ele->phi;
 	lEta1		 = ele->eta;
 	lM1		 = 0.000511;
+	lq1              = ele->q;  
 	lIso1		 = eleIsoPU(ele);
 	lD01		 = ele->d0;
 	lDZ1		 = ele->dz;
@@ -784,6 +759,7 @@ void selectEmu(const TString conf,         // input config file
         lPhi2		 = mu->phi;
         lEta2		 = mu->eta;
         lM2		 = 0.105658369;
+	lq2              = mu->q;
         lIso2		 = muonIsoPU(mu);
         lD02		 = mu->d0;
         lDZ2		 = mu->dz;
@@ -823,7 +799,6 @@ void selectEmu(const TString conf,         // input config file
 	lMJJ		 = (njets>1) ? dijet.M() : 0;
 	lJDEta		 = (njets>1) ? fabs(jet1->eta - jet2->eta) : 0;
 	lNJetInGap	 = (njets>1) ? nCentralJets : 0;
-	lMVA		 = 0.0;//vbfMVA->MVAValue(lMJJ, lJDEta, lJDPhi, lDiJetPt, lPtH, lHDJetPhi, lVisJetEta, lPtVis);
 	lJDPhi		 = (njets>1) ? toolbox::deltaPhi(jet1->phi,jet2->phi) : 0;
 	lDiJetPt	 = (njets>1) ? dijet.Pt()  : 0;
         lDiJetPhi	 = (njets>1) ? dijet.Phi() : 0;
@@ -831,6 +806,7 @@ void selectEmu(const TString conf,         // input config file
 	lVisJetEta	 = (njets>1) ? TMath::Min(fabs(dilep.Eta()-jet1->eta),fabs(dilep.Eta()-jet2->eta)) : 0;
 	lPtVis		 = dilep.Pt();
 	lPtH		 = higgs.Pt();
+	lMVA		 = vbfMVA->MVAValue(lMJJ, lJDEta, lJDPhi, lDiJetPt, lPtH, lHDJetPhi, lVisJetEta, lPtVis);
 	lNBTag		 = nbjets;
 	lNJets		 = njets;
 	lGenPt1		 = pt1;
@@ -841,7 +817,6 @@ void selectEmu(const TString conf,         // input config file
         lGenPhi2         = phi2;
 
 	outtree.Fill();
-
       }
 
       printf("%8.2f +/- %-8.2f\n",nsel,sqrt(nselvar));
@@ -849,7 +824,7 @@ void selectEmu(const TString conf,         // input config file
 
       delete infile;
       if(corrector && doRecoil) {cout << "recoil corrections used" << endl; delete corrector;}
-      infile=0, eventTree=0;    
+      infile=0, eventTree=0, lTree=0;    
     }
     outfile.Write();
     outfile.Close();
@@ -870,6 +845,7 @@ void selectEmu(const TString conf,         // input config file
   delete jetArr;
   delete pvArr;
   delete svfitArr;
+  delete vbfMVA;
   //delete fitter;
 
 
@@ -886,441 +862,3 @@ void selectEmu(const TString conf,         // input config file
 }
 
 
-//=== FUNCTION DEFINITIONS ======================================================================================
-//----------------------------------------------------------------------------------------
-TH1D* kfFHPInit(Int_t mH)
-{
-  TH1D *kfhist=0; 
-  char kfilename[100];
-  sprintf(kfilename, "$CMSSW_BASE/src/MitHtt/Utils/HiggsKFactors/weight_ptH_%d.root", mH);
-  cout << "Getting k-factors from " << kfilename << endl;
-  TFile *kfile = TFile::Open(kfilename); assert(kfile->IsOpen());
-  TDirectory *kfdir = (TDirectory*)kfile->FindObjectAny("powheg_weight");
-  char kfhistname[100];
-  sprintf(kfhistname, "weight_hqt_fehipro_fit_%d", mH);
-  cout << "kfactor histogram: " << kfhistname << endl;
-  kfhist = (TH1D*)(kfdir->Get(kfhistname)); assert(kfhist);
-  return kfhist;
-} 
-//--------------------------------------------------------------------------------------------------
-Double_t kfFHPValue(Double_t pt, TH1D* hKF)
-{ 
-  return hKF->Interpolate(pt);
-}
-//----------------------------------------------------------------------------------------
-Bool_t isbtagged(mithep::TJet *jet, Int_t isdata, UInt_t btageff, UInt_t mistag)
-{
-
-  //          mistag                         scale factor
-  // TCHEM  0.0175 \pm .0003 \pm .0038      1.21 \pm .02 \pm .17
-  //          btag eff.                      scale factor
-  // TCHEM  0.63 \pm 0.01                   0.93 \pm 0.02 \pm 0.07
-
-  // new scale factors
-  // TCHEM	btag eff: 0.96 \pm 0.04		mistag rate: 0.0286 \pm 0.0003		mistag scale factor: 1.20 \pm 0.14
-  // CSVM	btag eff: 0.97 \pm 0.04		mistag rate: 0.0152 \pm 0.0002		mistag scale factor: 1.10 \pm 0.11
-
-  Bool_t btagged;
-  Double_t demoteProb=0; // ~probability to demote from tagged
-  if(btageff==kNo)        demoteProb = fabs(1-0.97); //1-0.93;  // SF = 0.93 -> 0.07 = (prob to demote from tagged status)
-  else if(btageff==kDown) demoteProb = fabs(1-0.97+0.04); //1-0.93+0.07;
-  else if(btageff==kUp)   demoteProb = fabs(1-0.97-0.04); //1-0.93-0.07;
-  Double_t promoteProb=0; // ~probability to promote to tagged
-  if(mistag==kNo)         promoteProb = fabs(1.10-1)*0.0152/(1-0.0152); //(1.21-1)*0.0145/(1-0.0145);  // (1-SF)*mistag = (prob. to promote to tagged status)*(1-mistag)
-  else if(mistag==kDown)  promoteProb = fabs(1.10-1+0.11)*0.0152/(1-0.0152);
-  else if(mistag==kUp)    promoteProb = fabs(1.10-1-0.11)*0.0152/(1-0.0152);
-
-  UInt_t jetflavor = 0;
-                   
-  if(isdata == 1) {
-    if(jet->csv>0.679) btagged = kTRUE;
-    else               btagged = kFALSE;
-  } else { // MC
-    //if(isdata == 0)jetflavor = abs(jet->mcFlavor);
-    jetflavor = abs(jet->matchedId);
-    if(jetflavor==5) {
-      if(jet->csv>0.679) {
-      if(randm.Uniform()>demoteProb) btagged = kTRUE;  // leave it tagged
-      else                           btagged = kFALSE; // demote it
-      } else                           btagged = kFALSE; // leave it untagged
-    } else { // not bjet
-      if(jet->csv>0.679)                   btagged = kTRUE;  // leave it tagged
-      else if(randm.Uniform()<promoteProb) btagged = kTRUE;  // promote to tagged
-      else                                 btagged = kFALSE; // leave it untagged
-    }
-  }
-
-  return btagged;
-}  
-//----------------------------------------------------------------------------------------
-Double_t embUnfoldWgt(Double_t pt1, Double_t eta1, Double_t pt2, Double_t eta2)
-{
-  TFile *unfFile1   = TFile::Open("data/unfold/v8/Unfold2D_1.root"); assert(unfFile1->IsOpen());
-  TH2F  *unfWeight1 = (TH2F*) unfFile1->FindObjectAny("UnfoldDen1");
-  TFile *unfFile2   = TFile::Open("data/unfold/v8/Unfold2D_2.root"); assert(unfFile2->IsOpen());
-  TH2F  *unfWeight2 = (TH2F*) unfFile2->FindObjectAny("UnfoldDen2");
-  double weight1 = unfWeight1->GetBinContent(unfWeight1->GetXaxis()->FindBin(eta1),unfWeight1->GetYaxis()->FindBin(pt1));
-  double weight2 = unfWeight2->GetBinContent(unfWeight2->GetXaxis()->FindBin(eta2),unfWeight2->GetYaxis()->FindBin(pt2));
-  unfFile1->Close();
-  unfFile2->Close();
-  return weight1*weight2;
-}
-//----------------------------------------------------------------------------------------
-Double_t muIDscale(Double_t mupt, Double_t mueta)
-{
-  if((fabs(mueta) > 2.1) || (mupt < 10)) { cout << "mu kinematics out of range" << endl; assert(0); }
-  /*else if(mupt > 20) {
-    if(fabs(mueta) < 1.479)     return 0.9930;
-    else                          return 0.9981;
-  }
-  else if(mupt > 15) {
-    if(fabs(mueta) < 1.479)     return 0.9455;
-    else                          return 0.9604;
-  }
-  else {
-    if(fabs(mueta) < 1.479)     return 0.9226;
-    else                          return 0.9856;
-  }*/
-  /*if(mupt > 20) {
-    if(fabs(mueta) < 1.479)   return 0.9918;
-    else                      return 0.9942;
-  }
-  else if(mupt > 15) {
-    if(fabs(mueta) < 1.479)   return 0.9951;
-    else                      return 1.0024;
-  }
-  else {
-    if(fabs(mueta) < 1.479)   return 0.9912;
-    else                      return 1.0364;
-  }*/
-  if(mupt > 20) {
-    if(fabs(mueta) < 1.5)   return 0.9900;
-    else                      return 0.9924;
-  }
-  else if(mupt > 15) {
-    if(fabs(mueta) < 1.5)   return 0.9875;
-    else                      return 0.9891;
-  }
-  else {
-    if(fabs(mueta) < 1.5)   return 0.9851;
-    else                      return 0.9956;
-  }
-}
-//----------------------------------------------------------------------------------------    
-Double_t eleIDscale(Double_t elept, Double_t eleeta)
-{
-  if((fabs(eleeta) > 2.3) || (elept < 10)) { cout << "ele kinematics out of range" << endl; assert(0); }
-  /*else if(elept > 20) {
-    if(fabs(eleeta) < 1.479) return 0.9896;
-    else                       return 1.0532;
-  }
-  else if(elept > 15) {
-    if(fabs(eleeta) < 1.479) return 0.9783;
-    else                       return 1.0623;
-  }
-  else {
-    if(fabs(eleeta) < 1.479) return 1.1134;
-    else                       return 1.1946;
-  }*/
-  /*if(elept > 20) {
-    if(fabs(eleeta) < 0.8) return 0.9590;
-    else if(fabs(eleeta) < 1.479) return 0.9544;
-    else                     return 0.9684;
-  }
-  else if(elept > 15) {
-    if(fabs(eleeta) < 0.8) return 0.9256;
-    else if(fabs(eleeta) < 1.479) return 0.8530;
-    else                     return 0.8376;
-  }
-  else {
-    if(fabs(eleeta) < 0.8) return 0.8401;
-    else if(fabs(eleeta) < 1.479) return 0.8374;
-    else                     return 0.7217;
-  }*/
-  if(elept > 20) {
-    if(fabs(eleeta) < 0.8) return 0.9562;
-    else if(fabs(eleeta) < 1.479) return 0.9507;
-    else                     return 0.9584;
-  }
-  else if(elept > 15) {
-    if(fabs(eleeta) < 0.8) return 0.9030;
-    else if(fabs(eleeta) < 1.479) return 0.8623;
-    else                     return 0.7935;
-  }
-  else {
-    if(fabs(eleeta) < 0.8) return 0.8500;
-    else if(fabs(eleeta) < 1.479) return 0.8995;
-    else                     return 0.6683;
-  }
-}
-//----------------------------------------------------------------------------------------
-Double_t eleTrigScale(Double_t elept, Double_t eleeta)
-{
-  if((fabs(eleeta) > 2.3) || (elept < 10)) { cout << "ele kinematics out of range" << endl; assert(0); }
-  /*else if(elept > 30) {
-    if(fabs(eleeta) < 1.479) return 1.0031;
-    else                       return 1.0078;
-  }
-  else if(elept > 20) {
-    if(fabs(eleeta) < 1.479) return 1.0012;
-    else                       return 1.0040;
-  }
-  else if(elept > 15) {
-    if(fabs(eleeta) < 1.479) return 1.0026;
-    else                       return 1.0504;
-  }
-  else {
-    if(fabs(eleeta) < 1.479) return 0.9769;
-    else                       return 0.9696;
-  }*/
-  // MVA ID + DB Iso
-  /*else if(elept > 30) {
-    if(fabs(eleeta) < 0.8)        return 0.9992;
-    else if(fabs(eleeta) < 1.479) return 0.9892;
-    else                          return 0.9688;
-  } 
-  else if(elept > 25) {
-    if(fabs(eleeta) < 0.8)        return 0.9697;
-    else if(fabs(eleeta) < 1.479) return 0.9840;
-    else                          return 1.0100;
-  } 
-  else if(elept > 20) {
-    if(fabs(eleeta) < 0.8)        return 0.9773;
-    else if(fabs(eleeta) < 1.479) return 0.9642;
-    else                          return 1.0148;
-  } 
-  else if(elept > 15) {
-    if(fabs(eleeta) < 0.8)        return 0.9915;
-    else if(fabs(eleeta) < 1.479) return 0.9955;
-    else                          return 1.0693;
-  } 
-  else {
-    if(fabs(eleeta) < 0.8)        return 0.9910;
-    else if(fabs(eleeta) < 1.479) return 0.8252;
-    else                          return 0.9612;
-  }*/
-  else if(elept > 30) {
-    if(fabs(eleeta) < 0.8)        return 1.0047;
-    else if(fabs(eleeta) < 1.479) return 0.9981;
-    else                          return 0.9829;
-  } 
-  else if(elept > 25) {
-    if(fabs(eleeta) < 0.8)        return 1.0009;
-    else if(fabs(eleeta) < 1.479) return 1.0202;
-    else                          return 0.9920;
-  } 
-  else if(elept > 20) {
-    if(fabs(eleeta) < 0.8)        return 0.9777;
-    else if(fabs(eleeta) < 1.479) return 0.9646;
-    else                          return 0.9663;
-  } 
-  else if(elept > 15) {
-    if(fabs(eleeta) < 0.8)        return 1.0116;
-    else if(fabs(eleeta) < 1.479) return 0.9866;
-    else                          return 0.9742;
-  } 
-  else {
-    if(fabs(eleeta) < 0.8)        return 0.9824;
-    else if(fabs(eleeta) < 1.479) return 0.8795;
-    else                          return 0.8638;
-  }
-}
-//----------------------------------------------------------------------------------------
-Double_t muTrigScale(Double_t mupt, Double_t mueta)
-{
-  if((fabs(mueta) > 2.1) || (mupt < 10)) { cout << "mu kinematics out of range" << endl; assert(0); }
-  /*else if(mupt > 30) {
-    if(fabs(mueta) < 1.479) return 0.9922;
-    else                      return 1.0550;
-  }
-  else if(mupt > 20) {
-    if(fabs(mueta) < 1.479) return 0.9936;
-    else                      return 1.0358;
-  }
-  else if(mupt > 15) {
-    if(fabs(mueta) < 1.479) return 0.9918;
-    else                      return 1.0712;
-  }
-  else {
-    if(fabs(mueta) < 1.479)  return 1.0052;
-    else                       return 1.0277;
-  }*/
-  //TPFID + DB iso
-  /*else if(mupt > 30) {
-    if(fabs(mueta) < 0.8)        return 1.0666;
-    else if(fabs(mueta) < 1.2)   return 1.1177;
-    else                         return 1.1247;
-  }
-  else if(mupt > 25) {
-    if(fabs(mueta) < 0.8)        return 0.9958;
-    else if(fabs(mueta) < 1.2)   return 1.0635;
-    else                         return 1.0185;
-  }
-  else if(mupt > 20) {
-    if(fabs(mueta) < 0.8)        return 1.0087;
-    else if(fabs(mueta) < 1.2)   return 0.9794;
-    else                         return 0.9610;
-  }
-  else if(mupt > 15) {
-    if(fabs(mueta) < 0.8)        return 0.9977;
-    else if(fabs(mueta) < 1.2)   return 1.0389;
-    else                         return 1.0218;
-  } 
-  else {
-    if(fabs(mueta) < 0.8)        return 1.0032;
-    else if(fabs(mueta) < 1.2)   return 0.9939;
-    else                         return 0.9828;
-  }*/
-  else if(mupt > 30) {
-    if(fabs(mueta) < 0.8)        return 1.0670;
-    else if(fabs(mueta) < 1.2)   return 1.0926;
-    else                         return 1.1180;
-  }
-  else if(mupt > 25) {
-    if(fabs(mueta) < 0.8)        return 0.9933;
-    else if(fabs(mueta) < 1.2)   return 1.0224;
-    else                         return 0.9755;
-  }
-  else if(mupt > 20) {
-    if(fabs(mueta) < 0.8)        return 1.0014;
-    else if(fabs(mueta) < 1.2)   return 0.9588;
-    else                         return 0.9883;
-  }
-  else if(mupt > 15) {
-    if(fabs(mueta) < 0.8)        return 0.9969;
-    else if(fabs(mueta) < 1.2)   return 1.0325;
-    else                         return 1.0063;
-  } 
-  else {
-    if(fabs(mueta) < 0.8)        return 0.9928;
-    else if(fabs(mueta) < 1.2)   return 1.0088;
-    else                         return 0.9743;
-  }
-}
-//----------------------------------------------------------------------------------------
-Double_t muTrigEff(Double_t mupt, Double_t mueta)
-{
-  if((fabs(mueta) > 2.1) || (mupt < 10)) { cout << "mu kinematics out of range" << endl; assert(0); }
-  /*else if(mupt > 30) {
-    if(fabs(mueta) < 0.8)        return 0.9789;
-    else if(fabs(mueta) < 1.2)   return 0.9278;
-    else                         return 0.9215;
-  }
-  else if(mupt > 25) {
-    if(fabs(mueta) < 0.8)        return 0.9607;
-    else if(fabs(mueta) < 1.2)   return 0.9623;
-    else                         return 0.9085;
-  }
-  else if(mupt > 20) {
-    if(fabs(mueta) < 0.8)        return 0.9848;
-    else if(fabs(mueta) < 1.2)   return 0.9231;
-    else                         return 0.9023;
-  }
-  else if(mupt > 15) {
-    if(fabs(mueta) < 0.8)        return 0.9738;
-    else if(fabs(mueta) < 1.2)   return 0.9286;
-    else                         return 0.9476;
-  } 
-  else {
-    if(fabs(mueta) < 0.8)        return 0.9794;
-    else if(fabs(mueta) < 1.2)   return 0.9609;
-    else                         return 0.9363;
-  }*/
-  else if(mupt > 30) {
-    if(fabs(mueta) < 0.8)        return 0.9726;
-    else if(fabs(mueta) < 1.2)   return 0.9111;
-    else                         return 0.9075;
-  }
-  else if(mupt > 25) {
-    if(fabs(mueta) < 0.8)        return 0.9621;
-    else if(fabs(mueta) < 1.2)   return 0.9489;
-    else                         return 0.9035;
-  }
-  else if(mupt > 20) {
-    if(fabs(mueta) < 0.8)        return 0.9794;
-    else if(fabs(mueta) < 1.2)   return 0.9161;
-    else                         return 0.9291;
-  }
-  else if(mupt > 15) {
-    if(fabs(mueta) < 0.8)        return 0.9777;
-    else if(fabs(mueta) < 1.2)   return 0.9319;
-    else                         return 0.9459;
-  } 
-  else {
-    if(fabs(mueta) < 0.8)        return 0.9716;
-    else if(fabs(mueta) < 1.2)   return 0.9458;
-    else                         return 0.9100;
-  }
-}
-//----------------------------------------------------------------------------------------
-Double_t eleTrigEff(Double_t elept, Double_t eleeta)
-{
-  if((fabs(eleeta) > 2.3) || (elept < 10)) { cout << "ele kinematics out of range" << endl; assert(0); }
-  /*else if(elept > 30) {
-    if(fabs(eleeta) < 0.8)        return 0.9992;
-    else if(fabs(eleeta) < 1.479) return 0.9892;
-    else                          return 0.9688;
-  } 
-  else if(elept > 25) {
-    if(fabs(eleeta) < 0.8)        return 0.9697;
-    else if(fabs(eleeta) < 1.479) return 0.9840;
-    else                          return 1.0100;
-  } 
-  else if(elept > 20) {
-    if(fabs(eleeta) < 0.8)        return 0.9209;
-    else if(fabs(eleeta) < 1.479) return 0.9580;
-    else                          return 0.9464;
-  } 
-  else if(elept > 15) {
-    if(fabs(eleeta) < 0.8)        return 0.9279;
-    else if(fabs(eleeta) < 1.479) return 0.9568;
-    else                          return 0.9565;
-  } 
-  else {
-    if(fabs(eleeta) < 0.8)        return 0.9618;
-    else if(fabs(eleeta) < 1.479) return 0.9813;
-    else                          return 0.9677;
-  }*/
-  else if(elept > 30) {
-    if(fabs(eleeta) < 0.8)        return 0.9661;
-    else if(fabs(eleeta) < 1.479) return 0.9795;
-    else                          return 0.9751;
-  } 
-  else if(elept > 25) {
-    if(fabs(eleeta) < 0.8)        return 0.9468;
-    else if(fabs(eleeta) < 1.479) return 0.9796;
-    else                          return 0.9550;
-  } 
-  else if(elept > 20) {
-    if(fabs(eleeta) < 0.8)        return 0.9213;
-    else if(fabs(eleeta) < 1.479) return 0.9496;
-    else                          return 0.9228;
-  } 
-  else if(elept > 15) {
-    if(fabs(eleeta) < 0.8)        return 0.9023;
-    else if(fabs(eleeta) < 1.479) return 0.9299;
-    else                          return 0.8869;
-  } 
-  else {
-    if(fabs(eleeta) < 0.8)        return 0.7925;
-    else if(fabs(eleeta) < 1.479) return 0.7472;
-    else                          return 0.7378;
-  }
-}
-//----------------------------------------------------------------------------------------
-Double_t unskimmedEntries(TString skimname)
-{
-  Double_t entries;
-  
-  skimname.ReplaceAll("_emu_skim.root","_ntuple.root");
-  skimname.ReplaceAll("_emunod0_skim.root","_ntuple.root");
-  TFile unskimmed(skimname);
-  assert(unskimmed.IsOpen());
-  TTree *tree = 0;
-  unskimmed.GetObject("Events",tree);
-  assert(tree);
-  entries = (Double_t)tree->GetEntries();
-  unskimmed.Close();
-
-  return entries;
-}
