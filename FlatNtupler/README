@@ -1,16 +1,131 @@
-Instructions for producing FlatNtuples:
+1.One needs the head of MitHtt to run.
 
+MitHtt/Ntupler (bacon and basic definitions)
+MitHtt/FlatNtupler (selection)
+MitHtt/data
+MitHtt/Utils       (vbf mva, lepton id, scale factors, etc.)
+MitHtt/Common      (common tools)
+
+2.FlatNtuples
+ 
 run.sh takes the datasets in htt.conf and produces ntuples for each channel.
 Look for example in selecEmu.C to see how htt.conf should be formated. 
 
-One needs MitHtt/Ntupler (bacon), MitHtt/Utils, MitHtt/data, MitHtt/Common and MitHtt/FlatNtupler packages.
+The following cuts are not applied to help with different studies 
+1)charge requirement
+2)the lowest pt threshold only (between 2012 and 2011). Can be made looser if desired.
+3) Lepton isolation. The isolation variable is saved. There is also a flag indicating whether the "default" isolation would pass.
 
-It's a good idea to check the selection for a channel of interest to see the different types of options that can be applied.
+3.The definition of the variables in the ntuple
+//Bookeeping
+  run        //Run
+  lLumi      //Lumi
+  lEvt       //Event
+  
+//Event Variables
+  npv        //NPV
+  npu        //NPU
+  rho        //Rho
 
-On going work:
+//Event Weights
+ mcweight //MC Weight(xs/nevents * additional wieght(ie pt weight for gghiggs))
+ puweight //Pielup Weight
+ effweight//Effieiency Scale factor (all components multiplied in)
+ weight   //mcweight*puweight*effweight
+   
+//Mass variables
+ mass     //Generator level mass of the boson (or the first boson)
+ mass_Up  //High Energy scale shape
+ mass_Down//Low Energy Scale Shape
+ m_vis    //visible mass
+ 
+//First lepton :  muon for mu Tau, electron for e Tau, electron for e mu, Leading (in pT) Tau for Tau Tau
+  pt_1, eta_1, m_1, q_1 //pt,eta,mass,charge 
+  iso_1   //Delta Beta iso value (or ring iso in case of tau) 
+  d0_1    //d0 with respect to primary vertex
+  dZ_1    //dZ with respect to primary vertex
+  passiso_1 //pass? default iso 
+  mt_1    //mT of  first lepton wrt to met
+  mtMVA_1 //mT of  first lepton wrt to MVA met
 
-1) Create a flag for 2011/2012 differences in trigger, efficiencies, cuts, etc.
-2) selectEmu---add 2011 trigger, add vbf MVA
-3) selectTauTau  ---- trigger efficiencies
-4) selecMuTau    ---- triggers, trigger scale efficiencies, vbf mva 
-5) select ETau   ---- triggers, trigger scale efficiencies, vbf mva
+//Second lepton :  hadronic Tau for mu Tau had for e Tau, Muon for e mu, Trailing (in pT)  Tau for Tau Tau
+    pt_2, eta_2, m_2, q_2 //pt,eta,mass,charge	
+  iso_2   ///MVA iso for hadronic Tau, Delta Beta for muon
+  d0_2    //d0 with respect to primary vertex
+  dZ_2    //dZ with respect to primary vertex
+  passiso_2//pass? default isolation
+  mt_2     //mT of 2nd lepton wrt to MVA met
+  mtMVA_2  //mT of  second lepton wrt to MVA met
+
+//Met related variables
+  met     //pfmet
+  metphi  //pfmet Phi
+  mvamet   //mvamet
+  mvametphi //mvamet Phi
+  pzetavis //pZeta Visible
+  pzetamiss //pZeta Missing
+  pzetamvamiss //pZeta MVA Missing
+//MET covariance matrices
+  metcov00  //pf met covariance matrix 00 
+  metcov01  //pf met covariance matrix 01 
+  metcov10  //pf met covariance matrix 10 
+  metcov11  //pf met covariance matrix 11 
+//MVAMet covariance matrices
+  mvacov00  //mva met covariance matrix 00 
+  mvacov01  //mva met covariance matrix 01 
+  mvacov10  //mva met covariance matrix 10 
+  mvacov11  //mva met covariance matrix 11 
+ 
+//First Jet   : leading jet after applying Jet energy corrections (excluding hadronic Tau)
+ jpt_1  //Jet Pt after corrections
+ jeta_1 //Jet Eta
+ jphi_1 //Jet Phi     
+ jptunc_1 //Jet Unc (relative to Jet corrected pT)
+ jmva_1 //Jet MVA id value
+ jpass_1//Whether Jet pass PU Id Loose WP
+
+//Second Jet  : 2nd leading jet (in pt) afer applying Jet energy corrections (excluding Tau)
+ jpt_2  //Jet Pt after corrections
+ jeta_2 //Jet Eta
+ jphi_2 //Jet Phi     
+ jptunc_2 //Jet Unc (relative to Jet corrected pT)
+ jmva_2 //Jet MVA id value
+ jpass_2//Whether Jet pass PU Id Loose WP
+    
+//B Tagged Jet : leading btagged jet (in pt) passing btag wp (pt > 20 + cvs medium)
+  bpt   //Corrected BTag Pt
+  beta  //Btag Eta
+  bphi  //Btag Phi
+  
+/Di Jet kinematic variables for VBF selection ==> Two leading pT Jets 
+  mjj   //Mass Di Jet system  
+  jdeta //|jeta_1-jeta_2| 
+  njetingap //# of Jets between two jets
+  mva   //VBF MVA value
+
+//Useful Variables that go into the VBF MVA
+  jdphi //Delta Phi between two leading jets
+  dijetpt //Pt of the di jet system
+  dijetphi //Phi of the di jet system
+  hdijetphi //Phi of the di jet system - Higgs system phi
+  visjeteta //TMath::Min(eta_vis - jeta,eta_vis,jeta2);
+  ptvis     //Pt Vis
+  pth       //Pt of the higgs system
+ 
+  nbtag  //number of btags passing btag id ( pt > 20 )
+
+  njets  //number of jets passing jet id ( pt > 30 )
+   
+
+    //generator lepton pt, eta, phi
+    genlpt_1, genphi_1, genleta_1,genlpt_2,genlphi_2,genleta_2
+    
+    npt20jets    //number of jets above 20
+  
+    btagArray;  // array to hold b-tag values for pt-20 jets
+    jptArray   // array to hold jet pt values
+    jetaArra    // array to hold jet eta values
+
+   
+    
+
