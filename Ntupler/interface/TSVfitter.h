@@ -3,7 +3,6 @@
 
 #include "TSVfit.h"
 #include "TObject.h"
-#include "TMatrixD.h"
 #include "TLorentzVector.h"
 
 /**
@@ -29,7 +28,7 @@ namespace mithep
     ~TSVfitter(){}
     /// do the fit 
     TLorentzVector fit(TSVfit* fit, double met, double metPhi);
-    TLorentzVector fit(TMatrixD lMM, mithep::FourVectorM dau1, mithep::FourVectorM dau2, double iMet, double iMetPhi);
+    double integrate(TSVfit* fit, double met, double metPhi, int id);
     //return additional variables
     float          fittedMET()    {return fFittedMET;}
     float          measMET()      {return fMeasMET;}
@@ -40,13 +39,13 @@ namespace mithep
 
   protected:
     float fMassUnc;         //Uncertainty
-    int fstatus;            //valid solution?
+    int fstatus;             //valid solution?
     float fFittedMET;       //Best fit MET
     float fMeasMET;         //Original MET
     float fFittedMETPhi;    //Best fit MET phi
     float fMeasMETPhi;      //Original MET phi
     /// root class definition
-    ClassDef(TSVfitter,1)
+    ClassDef(TSVfitter,2)
   };  
 }
 #endif
