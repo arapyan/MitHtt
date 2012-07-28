@@ -646,7 +646,7 @@ void selectTauTau(const TString conf,         // input config file
 	lPUWeight	 = npuWgt;
 	lEffWeight	 = trigscale*idscale;
 	lWeight		 = weight*kf*npuWgt*trigscale*idscale*embWgt/lumi;
-	lMass		 = (ismssm)? gen->vmass_a: 0;
+	lMass		 = gen->vmass_a;
 	lMassUp		 = 0;
 	lMassDown	 = 0;
 	lMVis		 = dilep.M();
