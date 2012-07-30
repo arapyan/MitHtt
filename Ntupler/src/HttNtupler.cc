@@ -74,10 +74,10 @@ HttNtupler::HttNtupler(const char *name, const char *title):
   fSkipIfHLTFail  (kFALSE),
   f2012           ( 0),
   fMuPtMin        (10),
+  fMuHighPtMin    (10),
   fMuPtMax        (1000),
   fMuEtaMin       (-3),
   fMuEtaMax       ( 3),
-  fMuHighPtMin    (10),
   fEleEtMin       (10),
   fEleHighEtMin   (15),
   fEleEtMax       (1000),
@@ -480,25 +480,21 @@ HttNtupler::fillGenerator()
   
   if(dau1_a != 0) { 
     FourVectorM lL1;  int lId1 = 0;
-    if(fUseGen==ESampleType::kZ && fabs(pdgId(dau1_a)) == EGenType::kTauHadr) {
-      lL1  = visibleMCMomentum(dau1_a); 
-      lId1 = EGenType::kTauHadr;
-    }
+    lL1  = visibleMCMomentum(dau1_a); 
+    lId1 =  pdgId(dau1_a);
     fGenInfo.pt_1_b   = dau1_b ? dau1_b->Pt()	: lL1.Pt(); 
     fGenInfo.eta_1_b  = dau1_b ? dau1_b->Eta()	: lL1.Eta(); 
     fGenInfo.phi_1_b  = dau1_b ? dau1_b->Phi()	: lL1.Phi();
     fGenInfo.id_1_b   = dau1_b ? pdgId(dau1_b)  : lId1;
   } 
   if(dau2_a != 0) { 
-      FourVectorM lL2; int lId2 = 0;
-      if(fUseGen==ESampleType::kZ && fabs(pdgId(dau2_a)) == EGenType::kTauHadr) {
-	lL2  = visibleMCMomentum(dau2_a);
-	lId2 = EGenType::kTauHadr;
-      }
-      fGenInfo.pt_2_b   = dau2_b ? dau2_b->Pt()	 : lL2.Pt();
-      fGenInfo.eta_2_b  = dau2_b ? dau2_b->Eta() : lL2.Eta(); 
-      fGenInfo.phi_2_b  = dau2_b ? dau2_b->Phi() : lL2.Phi(); 
-      fGenInfo.id_2_b   = dau2_b ? pdgId(dau2_b) : lId2;
+    FourVectorM lL2; int lId2 = 0;
+    lL2  = visibleMCMomentum(dau2_a);
+    lId2 = pdgId(dau2_a);
+    fGenInfo.pt_2_b   = dau2_b ? dau2_b->Pt()  : lL2.Pt();
+    fGenInfo.eta_2_b  = dau2_b ? dau2_b->Eta() : lL2.Eta(); 
+    fGenInfo.phi_2_b  = dau2_b ? dau2_b->Phi() : lL2.Phi(); 
+    fGenInfo.id_2_b   = dau2_b ? pdgId(dau2_b) : lId2;
   }
   fGenInfo.decx   = boson_a->DecayVertex().X();
   fGenInfo.decy   = boson_a->DecayVertex().Y(); 
