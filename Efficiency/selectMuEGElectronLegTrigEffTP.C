@@ -58,19 +58,6 @@ void selectMuEGElectronLegTrigEffTP(const TString conf,              // input fi
   // Settings 
   //============================================================================================================== 
 
-  //*****************************************************************************************
-  //Setup MVA
-  //*****************************************************************************************
-  mithep::ElectronIDMVA *electronIDMVANoIPInfo = new mithep::ElectronIDMVA();
-  electronIDMVANoIPInfo->Initialize("BDTG method",        
-                              "/home/vdutta/cms/cmssw/023_2/CMSSW_4_2_4_patch1/src/MitPhysics/data/ElectronMVAWeights/Subdet0LowPt_NoIPInfo_BDTG.weights.xml",
-                              "/home/vdutta/cms/cmssw/023_2/CMSSW_4_2_4_patch1/src/MitPhysics/data/ElectronMVAWeights/Subdet1LowPt_NoIPInfo_BDTG.weights.xml",
-                              "/home/vdutta/cms/cmssw/023_2/CMSSW_4_2_4_patch1/src/MitPhysics/data/ElectronMVAWeights/Subdet2LowPt_NoIPInfo_BDTG.weights.xml",
-                              "/home/vdutta/cms/cmssw/023_2/CMSSW_4_2_4_patch1/src/MitPhysics/data/ElectronMVAWeights/Subdet0HighPt_NoIPInfo_BDTG.weights.xml",
-                              "/home/vdutta/cms/cmssw/023_2/CMSSW_4_2_4_patch1/src/MitPhysics/data/ElectronMVAWeights/Subdet1HighPt_NoIPInfo_BDTG.weights.xml",
-                              "/home/vdutta/cms/cmssw/023_2/CMSSW_4_2_4_patch1/src/MitPhysics/data/ElectronMVAWeights/Subdet2HighPt_NoIPInfo_BDTG.weights.xml",
-                              mithep::ElectronIDMVA::kNoIPInfo );
-  
   // mass region
   Double_t massLo;
   Double_t massHi;
@@ -179,6 +166,8 @@ void selectMuEGElectronLegTrigEffTP(const TString conf,              // input fi
       if(xsec>0) { weight = lumi*xsec/(Double_t)eventTree->GetEntries(); }      
     }
 
+    cout << "Total Events = " << eventTree->GetEntries() << endl;
+
     // loop over events
     for(UInt_t ientry=0; ientry<eventTree->GetEntries(); ientry++) {
       infoBr->GetEntry(ientry);
@@ -205,8 +194,7 @@ void selectMuEGElectronLegTrigEffTP(const TString conf,              // input fi
       //********************************************************************************
       // Tag & Probe Trigger Requirement
       //********************************************************************************
-      ULong_t  tnpTrigger = kHLT_Mu8 | kHLT_Mu15 | kHLT_Mu30 | kHLT_IsoMu17 | kHLT_IsoMu24 | kHLT_IsoMu30 ;
-      if(!(info->triggerBits & tnpTrigger)) continue;      
+      if(!(info->triggerBits[kHLT_IsoMu24])) continue;      
       
       // good vertex requirement
       if(!(info->hasGoodPV)) continue;
@@ -224,74 +212,59 @@ void selectMuEGElectronLegTrigEffTP(const TString conf,              // input fi
 
       Int_t NElectrons = 0;
       Int_t NMuons = 0;
-      const mithep::TElectron *selectedElectron;
-      const mithep::TMuon *selectedMuon;
+      const mithep::TElectron *selectedElectron = 0;
+      const mithep::TMuon *selectedMuon = 0;
       for(Int_t i=0; i<muonArr->GetEntriesFast(); i++) {
         const mithep::TMuon *tag = (mithep::TMuon*)((*muonArr)[i]);
         
 	if(matchGen) {
-	  Bool_t match1 = (toolbox::deltaR(tag->eta, tag->phi, gen->eta_1, gen->phi_1) < 0.5);
-	  Bool_t match2 = (toolbox::deltaR(tag->eta, tag->phi, gen->eta_2, gen->phi_2) < 0.5);
+	  Bool_t match1 = (toolbox::deltaR(tag->eta, tag->phi, gen->eta_1_a, gen->phi_1_a) < 0.5);
+	  Bool_t match2 = (toolbox::deltaR(tag->eta, tag->phi, gen->eta_2_a, gen->phi_2_a) < 0.5);
 	  if(!match1 && !match2)
 	    continue;
+          if(fnamev[ifile].Contains("zjets") && (fabs(gen->id_1_a)<15 || fabs(gen->id_1_a)>19)) continue;
 	}
 	
         //********************************************************************************
         // Tag Requirement
         //********************************************************************************
-	if(tag->pt        < 20)  continue;
+	if(tag->pt        < 10)  continue;
 	if(fabs(tag->eta) > 2.1) continue;
-	if(!(passMuonID(tag) && passMuonIsoPU(tag)))     continue;
+	if(!(passTightPFMuonID(tag) && passMuonIsoPU(tag)))     continue;
 
-        if(!((info->triggerBits & kHLT_IsoMu17) && (tag->hltMatchBits & kHLT_IsoMu17_MuObj)) &&
-           !((info->triggerBits & kHLT_IsoMu24) && (tag->hltMatchBits & kHLT_IsoMu24_MuObj)) &&
-           !((info->triggerBits & kHLT_IsoMu30) && (tag->hltMatchBits & kHLT_IsoMu30_MuObj)) &&
-           !((info->triggerBits & kHLT_Mu8)     && (tag->hltMatchBits & kHLT_Mu8_MuObj)) &&
-           !((info->triggerBits & kHLT_Mu15)    && (tag->hltMatchBits & kHLT_Mu15_MuObj)) &&
-           !((info->triggerBits & kHLT_Mu30)    && (tag->hltMatchBits & kHLT_Mu30_MuObj)) &&
-           !((info->triggerBits & kHLT_Mu30)    && (tag->hltMatchBits & kHLT_Mu40_MuObj))
+        if(//!((info->triggerBits & kHLT_IsoMu17) && (tag->hltMatchBits & kHLT_IsoMu17_MuObj)) &&
+           !((info->triggerBits[kHLT_IsoMu24]) && (tag->hltMatchBits[kHLT_IsoMu24_MuObj]))
+           //!((info->triggerBits & kHLT_IsoMu30) && (tag->hltMatchBits & kHLT_IsoMu30_MuObj)) &&
+           //!((info->triggerBits & kHLT_Mu8)     && (tag->hltMatchBits & kHLT_Mu8_MuObj)) &&
+           //!((info->triggerBits & kHLT_Mu15)    && (tag->hltMatchBits & kHLT_Mu15_MuObj)) &&
+           //!((info->triggerBits & kHLT_Mu30)    && (tag->hltMatchBits & kHLT_Mu30_MuObj)) &&
+           //!((info->triggerBits & kHLT_Mu30)    && (tag->hltMatchBits & kHLT_Mu40_MuObj))
           )
           continue;   
 
         NMuons++;
         selectedMuon = tag;
       }
-	
+
       for(Int_t j=0; j<electronArr->GetEntriesFast(); j++) {
 	  
 	const mithep::TElectron *probe = (mithep::TElectron*)((*electronArr)[j]);
 
 	if(matchGen) {
-	  Bool_t match1 = (toolbox::deltaR(probe->eta, probe->phi, gen->eta_1, gen->phi_1) < 0.5);
-	  Bool_t match2 = (toolbox::deltaR(probe->eta, probe->phi, gen->eta_2, gen->phi_2) < 0.5);
+	  Bool_t match1 = (toolbox::deltaR(probe->eta, probe->phi, gen->eta_1_a, gen->phi_1_a) < 0.5);
+	  Bool_t match2 = (toolbox::deltaR(probe->eta, probe->phi, gen->eta_2_a, gen->phi_2_a) < 0.5);
 	  if(!match1 && !match2)
 	    continue;
 	  }
 
-	if (!(passEleIsoPU(probe) && passEleMVAID(probe, 
-                                        electronIDMVANoIPInfo->MVAValue(
-                                          probe->pt,probe->scEta,
-                                          probe->sigiEtaiEta,
-                                          probe->deltaEtaIn,
-                                          probe->deltaPhiIn, 
-                                          probe->HoverE,
-                                          probe->d0,
-                                          probe->dz,
-                                          probe->fBrem,
-                                          probe->EoverP,
-                                          probe->ESeedClusterOverPOut,
-                                          TMath::Sqrt(probe->sigiPhiiPhi),
-                                          probe->nBrem, 
-                                          (1.0/(probe->scEt * TMath::CosH(probe->scEta)) - 1/probe->p),
-                                          probe->ESeedClusterOverPIn,
-                                          probe->ip3d,
-                                          probe->ip3dSig )))) continue; 
+	if(!(pass2012EleMVAID(probe, kMedium) && passEleIsoPU(probe))) continue;
 	 	  
 	NElectrons++;
 	selectedElectron = probe;
       }
 
       if(!(NElectrons==1 && NMuons==1)) continue;
+      if(selectedElectron->pt < 10.0) continue;
       if(selectedElectron->q == selectedMuon->q) continue;
       if (toolbox::deltaR(selectedElectron->eta, selectedElectron->phi, selectedMuon->eta, selectedMuon->phi) < 0.5) continue;
 	  
@@ -313,7 +286,7 @@ void selectMuEGElectronLegTrigEffTP(const TString conf,              // input fi
       nProbes ++;
 	  
       Bool_t pass = kFALSE;
-      if(info->runNum >= 150000 && info->runNum <= 170053) pass = pass || ( ((info->triggerBits & kHLT_Mu8_Ele17_CaloIdL))
+      /*if(info->runNum >= 150000 && info->runNum <= 170053) pass = pass || ( ((info->triggerBits & kHLT_Mu8_Ele17_CaloIdL))
                                                                                // && (selectedElectron->hltMatchBits & kHLTObject_Ele17_CaloIdL)
       );                                                                 
       if(info->runNum >  170053) pass = pass || ( ((info->triggerBits & kHLT_Mu8_Ele17_CaloIdT_CaloIsoVL))
@@ -325,19 +298,33 @@ void selectMuEGElectronLegTrigEffTP(const TString conf,              // input fi
       );                                                                 
       if(info->runNum >  173199                          ) pass = pass || ( ((info->triggerBits & kHLT_Mu17_Ele8_CaloIdT_CaloIsoVL))       
                                                                           //&& (selectedElectron->hltMatchBits & kHLTObject_Ele17_CaloIdT_CaloIsoVL)
-      );
+      );*/
+      pass = (//(info->triggerBits[kHLT_Mu17_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL] &&
+		selectedElectron->hltMatchBits[kHLT_Mu17_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_EGObj]
+		||
+		//(info->triggerBits[kHLT_Mu8_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL] &&
+		selectedElectron->hltMatchBits[kHLT_Mu8_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_EGObj]);
 
-      if(typev[ifile]==eMC) 
-	pass = (((info->triggerBits & kHLT_Mu17_Ele8_CaloIdL) && (selectedElectron->hltMatchBits & kHLT_Mu17_Ele8_CaloIdL_EGObj))
-               || 
-               ((info->triggerBits & kHLT_Mu8_Ele17_CaloIdL) && (selectedElectron->hltMatchBits & kHLT_Mu8_Ele17_CaloIdL_EGObj))) ;
+      /*if(typev[ifile]==eMC) 
+	pass = (((info->triggerBits[kHLT_Mu17_Ele8_CaloIdL]) && (selectedElectron->hltMatchBits[kHLT_Mu17_Ele8_CaloIdL_EGObj]))
+        	|| 
+        	((info->triggerBits[kHLT_Mu8_Ele17_CaloIdL]) && (selectedElectron->hltMatchBits[kHLT_Mu8_Ele17_CaloIdL_EGObj]))
+		||
+		((info->triggerBits[kHLT_Mu17_Ele8_CaloIdT_CaloIsoVL]) && (selectedElectron->hltMatchBits[kHLT_Mu17_Ele8_CaloIdT_CaloIsoVL_EGObj]))
+		||
+		((info->triggerBits[kHLT_Mu8_Ele17_CaloIdT_CaloIsoVL]) && (selectedElectron->hltMatchBits[kHLT_Mu8_Ele17_CaloIdT_CaloIsoVL_EGObj]))
+		||
+		(info->triggerBits[kHLT_Mu17_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL] && selectedElectron->hltMatchBits[kHLT_Mu17_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_EGObj])
+                ||
+                (info->triggerBits[kHLT_Mu8_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL] && selectedElectron->hltMatchBits[kHLT_Mu8_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_EGObj])) ;*/
 
       if(selectedElectron->pt < 10) pass=kFALSE;
 
       if(selectedElectron->pt < 20) {
-        if(!(info->triggerBits & (kHLT_Mu17_Ele8_CaloIdL | kHLT_Mu17_Ele8_CaloIdT_CaloIsoVL))) pass = kFALSE;
+        //if(!(info->triggerBits[kHLT_Mu17_Ele8_CaloIdL] || info->triggerBits[kHLT_Mu17_Ele8_CaloIdT_CaloIsoVL] || info->triggerBits[kHLT_Mu17_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL])) pass = kFALSE;
+	if(!selectedElectron->hltMatchBits[kHLT_Mu17_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_EGObj]) pass = kFALSE;
       }
-	  
+
       // Fill tree
       data.mass    = 90;
       data.pt      = selectedElectron->pt;
