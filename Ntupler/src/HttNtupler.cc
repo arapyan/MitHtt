@@ -218,7 +218,8 @@ HttNtupler::EndRun()
 void 
 HttNtupler::SlaveTerminate()
 {
-  fEventTree ->Print(); fOutputFile->Write(); fOutputFile->Close(); cleanup();
+  //fEventTree ->Print(); 
+  fOutputFile->Write(); fOutputFile->Close(); cleanup();
   delete fJetCorrector; delete fJetUncertainties; delete fEleTools, delete fMuonTools, delete metSign;delete fElectronMVAID; delete fJetIDMVA; delete fTauMVAIso;delete fMVAMet; delete fAntiElectronIDMVA;
 
   // dump json file
@@ -236,6 +237,24 @@ HttNtupler::Terminate()
 void 
 HttNtupler::Process()
 {
+  if( GetEventHeader()->EvtNum() != 805786) return;
+  //&&  GetEventHeader()->EvtNum() != 736101  &&  GetEventHeader()->EvtNum() != 736256 &&  
+  //  GetEventHeader()->EvtNum() != 736259  &&  GetEventHeader()->EvtNum() != 736271  &&  GetEventHeader()->EvtNum() != 736340 && 
+  //  GetEventHeader()->EvtNum() != 736878  &&  GetEventHeader()->EvtNum() != 805786  &&  GetEventHeader()->EvtNum() != 805927 && 
+  //  GetEventHeader()->EvtNum() != 738252  &&  GetEventHeader()->EvtNum() != 738255  &&  GetEventHeader()->EvtNum() != 738288 && 
+  //  GetEventHeader()->EvtNum() != 800093  &&  GetEventHeader()->EvtNum() != 808146  &&  GetEventHeader()->EvtNum() != 808312 && 
+  //  GetEventHeader()->EvtNum() != 808397  ) return;
+  
+  //if( GetEventHeader()->EvtNum() != 428845  &&  GetEventHeader()->EvtNum() != 428969  &&  GetEventHeader()->EvtNum() != 443757 &&  
+  //    GetEventHeader()->EvtNum() != 405013  &&  GetEventHeader()->EvtNum() != 405684  &&  GetEventHeader()->EvtNum() != 405816 && 
+  //    GetEventHeader()->EvtNum() != 1580182 &&  GetEventHeader()->EvtNum() != 1580273 &&  GetEventHeader()->EvtNum() != 475228 && 
+  //    GetEventHeader()->EvtNum() != 476242  &&  GetEventHeader()->EvtNum() != 580574  &&  GetEventHeader()->EvtNum() != 580588 && 
+  //    GetEventHeader()->EvtNum() != 582714  &&  GetEventHeader()->EvtNum() != 632295  &&  GetEventHeader()->EvtNum() != 766956) return;  
+//if( GetEventHeader()->EvtNum() != 428838 &&  GetEventHeader()->EvtNum() != 21832 &&  GetEventHeader()->EvtNum() != 21717 &&  
+//     GetEventHeader()->EvtNum() != 21790) return;  
+  //if( GetEventHeader()->EvtNum() != 20401 &&  GetEventHeader()->EvtNum() != 20509  &&  GetEventHeader()->EvtNum() != 20550 &&  GetEventHeader()->EvtNum() != 20611 
+  //    &&  GetEventHeader()->EvtNum() != 20645 &&  GetEventHeader()->EvtNum() != 20688) return;     
+      //&&  GetEventHeader()->EvtNum() != 21717 &&  GetEventHeader()->EvtNum() != 21790) return;  
   // check for run and lumi ranges
   RunLumiRangeMap::RunLumiPairType rl(GetEventHeader()->RunNum(), GetEventHeader()->LumiSec());
   if( fJSONv.size()>0 && !frlrm.HasRunLumi(rl) ){ return; } // not certified run? Skip to next event...
@@ -559,6 +578,8 @@ HttNtupler::fillCommon(TriggerBits& trigBits)
     if(!bestPV){ bestPV = pv; }
   }
   if(!bestPV) bestPV = fPrimVerts->At(0); fVertex = bestPV;
+  //bestPV = fPrimVerts->At(0);
+  //fVertex = fPrimVerts->At(0);
   // calculate track MET
   double trkMetx=0, trkMety=0, trkSumET=0;
   for(unsigned int i=0; i<fPFCandidates->GetEntries(); ++i){
@@ -1084,10 +1105,10 @@ HttNtupler::fillSVfit(TClonesArray*& iArr, Particle* lep1, unsigned int lepId1, 
       const PFTau *tau = (PFTau *) lep1;
       for(unsigned int i0 = 0; i0 < tau->NSignalPFCands(); i0++) {
 	lPtTot += tau->SignalPFCand(i0)->Pt();
-	if(tau->SignalPFCand(i0)->BestTrk() == 0) continue;
+	if(tau->SignalPFCand(i0)->Charge() == 0) continue;
 	lChargedPtTot += tau->SignalPFCand(i0)->Pt();
-	chgfrac1 = lChargedPtTot/lPtTot;
       }
+      chgfrac1 = lChargedPtTot/lPtTot;
     }
 
   if(lepId2 == EGenType::kTau)
@@ -1097,12 +1118,11 @@ HttNtupler::fillSVfit(TClonesArray*& iArr, Particle* lep1, unsigned int lepId1, 
       const PFTau *tau = (PFTau *) lep2;
       for(unsigned int i0 = 0; i0 < tau->NSignalPFCands(); i0++) {
 	lPtTot += tau->SignalPFCand(i0)->Pt();
-	if(tau->SignalPFCand(i0)->BestTrk() == 0) continue;
+	if(tau->SignalPFCand(i0)->Charge() == 0) continue;
 	lChargedPtTot += tau->SignalPFCand(i0)->Pt();
-	chgfrac2 = lChargedPtTot/lPtTot;
       }
+      chgfrac2 = lChargedPtTot/lPtTot;
     }
-
   Met MVAMet = fMVAMet->GetMet(false,
 			       lep1->Pt(),lep1->Phi(),lep1->Eta(),chgfrac1,
 			       lep2->Pt(),lep2->Phi(),lep2->Eta(),chgfrac2,
@@ -1111,7 +1131,38 @@ HttNtupler::fillSVfit(TClonesArray*& iArr, Particle* lep1, unsigned int lepId1, 
 			       fPFJets,
 			       fJetCorrector,
 			       fPUEnergyDensity,
-			       int(fPrimVerts->GetEntries()));
+			       int(fPrimVerts->GetEntries()));//,lVerbose);
+  //For debuggin
+  //Met MVAMet = fMVAMet->GetMet(false,
+  //				   0,10000,1000,1,//lep1->Pt(),lep1->Phi(),lep1->Eta(),chgfrac1,
+  //			   0,10000,1000,1,//lep2->Pt(),lep2->Phi(),lep2->Eta(),chgfrac2,
+  //			   fPFMet->At(0),
+  //fPFCandidates,fVertex,fPrimVerts,
+  //fPFJets,
+  //fJetCorrector,
+  //fPUEnergyDensity,
+  //int(fPrimVerts->GetEntries()));
+
+  //Met MVAMetMu = fMVAMet->GetMet(false,
+  //lep1->Pt(),lep1->Phi(),lep1->Eta(),chgfrac1,
+  //0,10000,10000,1,//lep2->Pt(),lep2->Phi(),lep2->Eta(),chgfrac2,
+  //fPFMet->At(0),
+  //fPFCandidates,fVertex,fPrimVerts,
+  //			   fPFJets,
+  //			   fJetCorrector,
+  //			   fPUEnergyDensity,
+  //			   int(fPrimVerts->GetEntries()));
+
+  //Met MVAMetTau = fMVAMet->GetMet(false,
+  //0,2000,1000,1,//lep1->Pt(),lep1->Phi(),lep1->Eta(),chgfrac1,
+  //lep2->Pt(),lep2->Phi(),lep2->Eta(),chgfrac2,
+  //fPFMet->At(0),
+  //			 fPFCandidates,fVertex,fPrimVerts,
+  //			 fPFJets,
+  //			 fJetCorrector,
+  //			 fPUEnergyDensity,
+  //			 int(fPrimVerts->GetEntries()));
+  
   TMatrixD* MVACov = fMVAMet->GetMetCovariance();
 
   pSVfit->mvacov_00    = (*MVACov)(0,0);
@@ -1120,6 +1171,12 @@ HttNtupler::fillSVfit(TClonesArray*& iArr, Particle* lep1, unsigned int lepId1, 
   pSVfit->mvacov_11    = (*MVACov)(1,1);
   pSVfit->mvaMET       = MVAMet.Pt();
   pSVfit->mvaMETphi    = MVAMet.Phi();
+  //if(iArr == fSVfitMuTauArr) std::cout << GetEventHeader()->RunNum() << " -- "<< GetEventHeader()->LumiSec() << " -- " << GetEventHeader()->EvtNum() << " -- " << lep1->Pt() << " -- " << lep2->Pt() << " -- " << MVAMet.Pt() << " -- " << MVAMet.Phi() << std::endl;
+  //if(iArr == fSVfitMuTauArr && GetEventHeader()->EvtNum() == 428838) 
+  //std::cout << " Leptons      : " << GetEventHeader()->RunNum() << " -- "<< GetEventHeader()->LumiSec() << " -- " << GetEventHeader()->EvtNum() << " -- " << lep1->Pt() << " -- " << lep2->Pt() << " -- " << MVAMetFree.Pt() << " -- " << MVAMetFree.Phi() << std::endl;
+  //std::cout << " No Leptons   : " << GetEventHeader()->RunNum() << " -- "<< GetEventHeader()->LumiSec() << " -- " << GetEventHeader()->EvtNum() << " -- " << lep1->Pt() << " -- " << lep2->Pt() << " -- " << MVAMet.Pt() << " -- " << MVAMet.Phi() << std::endl;
+  //std::cout << " Mu Leptons   : " << GetEventHeader()->RunNum() << " -- "<< GetEventHeader()->LumiSec() << " -- " << GetEventHeader()->EvtNum() << " -- " << lep1->Pt() << " -- " << lep2->Pt() << " -- " << MVAMetMu.Pt() << " -- " << MVAMetMu.Phi() << std::endl;
+  //std::cout << " Tau Leptons   : " << GetEventHeader()->RunNum() << " -- "<< GetEventHeader()->LumiSec() << " -- " << GetEventHeader()->EvtNum() << " -- " << lep1->Pt() << " -- " << lep2->Pt() << " -- " << MVAMetTau.Pt() << " -- " << MVAMetTau.Phi() << std::endl;
 }
 
 void 
@@ -1484,6 +1541,8 @@ HttNtupler::looseTauId(const PFTau* tau)
   if( !tau->DiscriminationByLooseElectronRejection() ) return false;
   if( !tau->DiscriminationByLooseMuonRejection()     ) return false;
   if( !tau->DiscriminationByDecayModeFinding()       ) return false;
+  //if( !tau->DiscriminationByLooseMVAIsolation()      ) return false;
+  //if( !tau->DiscriminationByLooseIsolation()         ) return false;
   return true;
 } 
 bool 
