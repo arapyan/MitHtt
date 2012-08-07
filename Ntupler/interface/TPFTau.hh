@@ -39,7 +39,9 @@ namespace mithep
     };
 
     /// default constructor
-    TPFTau(){}
+    TPFTau():
+    hpsDiscriminators(0)
+    {}
     /// default destructor
     ~TPFTau(){} 
     

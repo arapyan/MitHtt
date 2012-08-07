@@ -238,23 +238,7 @@ void
 HttNtupler::Process()
 {
   if( GetEventHeader()->EvtNum() != 805786) return;
-  //&&  GetEventHeader()->EvtNum() != 736101  &&  GetEventHeader()->EvtNum() != 736256 &&  
-  //  GetEventHeader()->EvtNum() != 736259  &&  GetEventHeader()->EvtNum() != 736271  &&  GetEventHeader()->EvtNum() != 736340 && 
-  //  GetEventHeader()->EvtNum() != 736878  &&  GetEventHeader()->EvtNum() != 805786  &&  GetEventHeader()->EvtNum() != 805927 && 
-  //  GetEventHeader()->EvtNum() != 738252  &&  GetEventHeader()->EvtNum() != 738255  &&  GetEventHeader()->EvtNum() != 738288 && 
-  //  GetEventHeader()->EvtNum() != 800093  &&  GetEventHeader()->EvtNum() != 808146  &&  GetEventHeader()->EvtNum() != 808312 && 
-  //  GetEventHeader()->EvtNum() != 808397  ) return;
   
-  //if( GetEventHeader()->EvtNum() != 428845  &&  GetEventHeader()->EvtNum() != 428969  &&  GetEventHeader()->EvtNum() != 443757 &&  
-  //    GetEventHeader()->EvtNum() != 405013  &&  GetEventHeader()->EvtNum() != 405684  &&  GetEventHeader()->EvtNum() != 405816 && 
-  //    GetEventHeader()->EvtNum() != 1580182 &&  GetEventHeader()->EvtNum() != 1580273 &&  GetEventHeader()->EvtNum() != 475228 && 
-  //    GetEventHeader()->EvtNum() != 476242  &&  GetEventHeader()->EvtNum() != 580574  &&  GetEventHeader()->EvtNum() != 580588 && 
-  //    GetEventHeader()->EvtNum() != 582714  &&  GetEventHeader()->EvtNum() != 632295  &&  GetEventHeader()->EvtNum() != 766956) return;  
-//if( GetEventHeader()->EvtNum() != 428838 &&  GetEventHeader()->EvtNum() != 21832 &&  GetEventHeader()->EvtNum() != 21717 &&  
-//     GetEventHeader()->EvtNum() != 21790) return;  
-  //if( GetEventHeader()->EvtNum() != 20401 &&  GetEventHeader()->EvtNum() != 20509  &&  GetEventHeader()->EvtNum() != 20550 &&  GetEventHeader()->EvtNum() != 20611 
-  //    &&  GetEventHeader()->EvtNum() != 20645 &&  GetEventHeader()->EvtNum() != 20688) return;     
-      //&&  GetEventHeader()->EvtNum() != 21717 &&  GetEventHeader()->EvtNum() != 21790) return;  
   // check for run and lumi ranges
   RunLumiRangeMap::RunLumiPairType rl(GetEventHeader()->RunNum(), GetEventHeader()->LumiSec());
   if( fJSONv.size()>0 && !frlrm.HasRunLumi(rl) ){ return; } // not certified run? Skip to next event...
@@ -630,7 +614,7 @@ HttNtupler::fillMuons()
   for(unsigned int i=0; i<fMuons->GetEntries(); ++i){
     const Muon* mu=fMuons->At(i); 
     if(!mu->HasTrk()) continue; 
-
+   
     TClonesArray& rMuonArr = *fMuonArr; 
     assert(rMuonArr.GetEntries() < rMuonArr.GetSize());
     const int index = rMuonArr.GetEntries();  
@@ -906,9 +890,6 @@ HttNtupler::fillPFTaus()
       if( pftau->DiscriminationByTightCombinedIsolationDBSumPtCorr()  ) pPFTau->hpsDiscriminators |= TPFTau::kTightCombIso;
       // HLT matching
       pPFTau->hltMatchBits = matchHLT(pftau->Eta(), pftau->Phi(), pftau->Pt());
-      for(unsigned int itrig=0; itrig<fTriggerNamesv.size(); ++itrig){
-	if( pPFTau->hltMatchBits[fTriggerObjIds1v[itrig]] && !pPFTau->hltMatchBits[fTriggerObjIds2v[itrig]]) pPFTau->hltMatchBits[fTriggerIdsv[itrig]] = false;
-      }
     }
   }
 }
@@ -1132,36 +1113,7 @@ HttNtupler::fillSVfit(TClonesArray*& iArr, Particle* lep1, unsigned int lepId1, 
 			       fJetCorrector,
 			       fPUEnergyDensity,
 			       int(fPrimVerts->GetEntries()));//,lVerbose);
-  //For debuggin
-  //Met MVAMet = fMVAMet->GetMet(false,
-  //				   0,10000,1000,1,//lep1->Pt(),lep1->Phi(),lep1->Eta(),chgfrac1,
-  //			   0,10000,1000,1,//lep2->Pt(),lep2->Phi(),lep2->Eta(),chgfrac2,
-  //			   fPFMet->At(0),
-  //fPFCandidates,fVertex,fPrimVerts,
-  //fPFJets,
-  //fJetCorrector,
-  //fPUEnergyDensity,
-  //int(fPrimVerts->GetEntries()));
 
-  //Met MVAMetMu = fMVAMet->GetMet(false,
-  //lep1->Pt(),lep1->Phi(),lep1->Eta(),chgfrac1,
-  //0,10000,10000,1,//lep2->Pt(),lep2->Phi(),lep2->Eta(),chgfrac2,
-  //fPFMet->At(0),
-  //fPFCandidates,fVertex,fPrimVerts,
-  //			   fPFJets,
-  //			   fJetCorrector,
-  //			   fPUEnergyDensity,
-  //			   int(fPrimVerts->GetEntries()));
-
-  //Met MVAMetTau = fMVAMet->GetMet(false,
-  //0,2000,1000,1,//lep1->Pt(),lep1->Phi(),lep1->Eta(),chgfrac1,
-  //lep2->Pt(),lep2->Phi(),lep2->Eta(),chgfrac2,
-  //fPFMet->At(0),
-  //			 fPFCandidates,fVertex,fPrimVerts,
-  //			 fPFJets,
-  //			 fJetCorrector,
-  //			 fPUEnergyDensity,
-  //			 int(fPrimVerts->GetEntries()));
   
   TMatrixD* MVACov = fMVAMet->GetMetCovariance();
 
@@ -1171,12 +1123,6 @@ HttNtupler::fillSVfit(TClonesArray*& iArr, Particle* lep1, unsigned int lepId1, 
   pSVfit->mvacov_11    = (*MVACov)(1,1);
   pSVfit->mvaMET       = MVAMet.Pt();
   pSVfit->mvaMETphi    = MVAMet.Phi();
-  //if(iArr == fSVfitMuTauArr) std::cout << GetEventHeader()->RunNum() << " -- "<< GetEventHeader()->LumiSec() << " -- " << GetEventHeader()->EvtNum() << " -- " << lep1->Pt() << " -- " << lep2->Pt() << " -- " << MVAMet.Pt() << " -- " << MVAMet.Phi() << std::endl;
-  //if(iArr == fSVfitMuTauArr && GetEventHeader()->EvtNum() == 428838) 
-  //std::cout << " Leptons      : " << GetEventHeader()->RunNum() << " -- "<< GetEventHeader()->LumiSec() << " -- " << GetEventHeader()->EvtNum() << " -- " << lep1->Pt() << " -- " << lep2->Pt() << " -- " << MVAMetFree.Pt() << " -- " << MVAMetFree.Phi() << std::endl;
-  //std::cout << " No Leptons   : " << GetEventHeader()->RunNum() << " -- "<< GetEventHeader()->LumiSec() << " -- " << GetEventHeader()->EvtNum() << " -- " << lep1->Pt() << " -- " << lep2->Pt() << " -- " << MVAMet.Pt() << " -- " << MVAMet.Phi() << std::endl;
-  //std::cout << " Mu Leptons   : " << GetEventHeader()->RunNum() << " -- "<< GetEventHeader()->LumiSec() << " -- " << GetEventHeader()->EvtNum() << " -- " << lep1->Pt() << " -- " << lep2->Pt() << " -- " << MVAMetMu.Pt() << " -- " << MVAMetMu.Phi() << std::endl;
-  //std::cout << " Tau Leptons   : " << GetEventHeader()->RunNum() << " -- "<< GetEventHeader()->LumiSec() << " -- " << GetEventHeader()->EvtNum() << " -- " << lep1->Pt() << " -- " << lep2->Pt() << " -- " << MVAMetTau.Pt() << " -- " << MVAMetTau.Phi() << std::endl;
 }
 
 void 
@@ -1253,21 +1199,22 @@ HttNtupler::matchHLT(const double eta, const double phi, const double pt)
 	  bool match = true;
 	  if( to->Pt() < fTriggerObjMinPt1v[itrig] ) match=false;
 	  if( MathUtils::DeltaR(phi, eta, to->Phi(), to->Eta()) > hltMatchR ) match=false;
-	  if( hltMatchPtFrac>0 && (fabs(pt-to->Pt() )>hltMatchPtFrac*(to->Pt())) ) match=false;
+	  //if( hltMatchPtFrac>0 && (fabs(pt-to->Pt() )>hltMatchPtFrac*(to->Pt())) ) match=false;
 	  if( match ) {toBits[fTriggerObjIds1v[itrig]] = true; }
 	}
 	if( fTriggerObjNames2v[itrig].Length()>0 && fTriggerObjNames2v[itrig].CompareTo(to->ModuleName())==0 ){
 	  bool match = true;
 	  if( to->Pt() < fTriggerObjMinPt2v[itrig] ) match=false;
 	  if( MathUtils::DeltaR(phi, eta, to->Phi(), to->Eta()) > hltMatchR ) match=false;
-	  if( hltMatchPtFrac>0 && (fabs(pt - to->Pt())>hltMatchPtFrac*(to->Pt())) ) match=false;
+	  //if( hltMatchPtFrac>0 && (fabs(pt - to->Pt())>hltMatchPtFrac*(to->Pt())) ) match=false;
 	  if( match ) {toBits[fTriggerObjIds2v[itrig]] = true; }
+ 
 	}
 	if( fTriggerObjNames1v[itrig].Length()==0 && fTriggerObjNames2v[itrig].Length()==0 ){
 	  bool match = true;
 	  if( to->Pt() < fTriggerObjMinPt1v[itrig] ) match=false;
 	  if( MathUtils::DeltaR(phi,eta,to->Phi(),to->Eta()) > hltMatchR ) match=false;
-	  if( hltMatchPtFrac>0 && (fabs(pt - to->Pt())>hltMatchPtFrac*(to->Pt())) ) match=false;
+	  //if( hltMatchPtFrac>0 && (fabs(pt - to->Pt())>hltMatchPtFrac*(to->Pt())) ) match=false;
 	  if( match ) {toBits[fTriggerObjIds1v[itrig]] = true; }
 	}
       }

@@ -102,9 +102,9 @@ typedef std::bitset<kNTrigBit> TriggerBits;
 */
 enum ETriggerBit {    
   /* MuEG                       --------------------------------------------------------------------------------------------- */
-  kHLT_Mu11_Ele8                                                                        = 0,  // MC
+  //kHLT_Mu11_Ele8                                                                        = 0,  // MC
   kHLT_Mu17_Ele8_CaloIdL                                                                = 0,  // data
-  kHLT_Mu8_Ele8                                                                         = 1,  // MC
+  //kHLT_Mu8_Ele8                                                                         = 1,  // MC
   kHLT_Mu8_Ele17_CaloIdL                                                                = 1,  // data
   kHLT_Mu8_Photon20_CaloIdVT_IsoT                                                       = 2,  // data
   kHLT_Mu15_Photon20_CaloIdL                                                            = 3,  // data
