@@ -48,10 +48,10 @@ void runHttNtupler(
   gDebugLevel = 1;                 // higher level allows more messages to print
  
   char output[100];
-  sprintf(output,"%s_%s_ntuple.root",dataset,fileset); 
+  sprintf(output,"/data/blue/arapyan/sync2012/%s_%s_ntuple.root",dataset,fileset); 
   
   // muon kinematics
-  const Double_t muPtMin  = 7;
+  const Double_t muPtMin  = 2;  
   const Double_t muPtMax  = 7000;
   const Double_t muEtaMin = -2.5;
   const Double_t muEtaMax =  2.5;
@@ -63,11 +63,11 @@ void runHttNtupler(
   const Double_t eleEtaMax =  2.7;
   
   //tau kinematics
-  const Double_t  tauPtMin = 18;
-  const Double_t  tauEtaMax = 2.7;
+  const Double_t  tauPtMin = 15;   //18
+  const Double_t  tauEtaMax = 2.5; //2.7
   
   // jet requirements
-  const Double_t jetPtMin = 10;
+  const Double_t jetPtMin = 18; //10
 
   // photon requirements
   const Double_t photonEtMin = 9;
@@ -90,9 +90,9 @@ void runHttNtupler(
   Catalog *c = new Catalog(catalogDir);
   Dataset *d = NULL;
   d = c->FindDataset(book,dataset,fileset);
-  ana->AddDataset(d);
-  //ana->AddFile("/castor/cern.ch/user/p/paus/filefi/028/s12-h120tt-vbf-v9/FED5F7FE-0597-E111-BE71-485B39800BB5.root");
- // ana->AddFile("/castor/cern.ch/user/p/paus/filefi/025/24F6F6E7-F4F2-E011-A393-00248C55CC3C.root"); 
+  //ana->AddDataset(d);
+  ana->AddFile("/castor/cern.ch/user/p/paus/filefi/028/s12-h120tt-vbf-v9/FED5F7FE-0597-E111-BE71-485B39800BB5.root");
+  //ana->AddFile("/castor/cern.ch/user/p/paus/filefi/025/f11-h125tt-vbf-v14b-bp/668A54D7-53F8-E011-9D81-E0CB4E29C502.root"); 
   //ana->AddFile("/castor/cern.ch/user/p/paus/filefi/025/s12-wjets-v9/0043D63C-AD91-E111-91E9-001A64789504.root"); 
   //
   // setup ntupler module
@@ -713,7 +713,7 @@ void runHttNtupler(
   mymod->AddTrigger("HLT_IsoMu15_eta2p1_TightIsoPFTau20_v5",kHLT_IsoMu15_eta2p1_TightIsoPFTau20,"hltSingleMuIsoL1s14L3IsoFiltered15eta2p1",kHLT_IsoMu15_eta2p1_TightIsoPFTau20_MuObj,0,"hltPFTauTightIso20TrackTightIso",kHLT_IsoMu15_eta2p1_MediumIsoPFTau20_TauObj,0);//auto
   mymod->AddTrigger("HLT_IsoMu15_eta2p1_TightIsoPFTau20_v6",kHLT_IsoMu15_eta2p1_TightIsoPFTau20,"hltSingleMuIsoL1s14L3IsoFiltered15eta2p1",kHLT_IsoMu15_eta2p1_TightIsoPFTau20_MuObj,0,"hltPFTauTightIso20TrackTightIso",kHLT_IsoMu15_eta2p1_MediumIsoPFTau20_TauObj,0);//auto
 
-  mymod->AddTrigger("HLT_IsoMu18_eta2p1_LooseIsoPFTau20_v0",kHLT_IsoMu18_eta2p1_LooseIsoPFTau20,"hltL3crIsoL1sMu16Eta2p1L1f0L2f16QL3f18QL3crIsoFiltered10",kHLT_IsoMu18_eta2p1_LooseIsoPFTau20_MuObj, 0,"hltPFTau20IsoMuVertex",kHLT_IsoMu18_eta2p1_LooseIsoPFTau20_TauObj, 0);
+  mymod->AddTrigger("HLT_IsoMu18_eta2p1_LooseIsoPFTau20",kHLT_IsoMu18_eta2p1_LooseIsoPFTau20,"hltL3crIsoL1sMu16Eta2p1L1f0L2f16QL3f18QL3crIsoFiltered10",kHLT_IsoMu18_eta2p1_LooseIsoPFTau20_MuObj, 0,"hltPFTau20IsoMuVertex",kHLT_IsoMu18_eta2p1_LooseIsoPFTau20_TauObj, 0);
   mymod->AddTrigger("HLT_IsoMu18_eta2p1_LooseIsoPFTau20_v4",kHLT_IsoMu18_eta2p1_LooseIsoPFTau20,"hltL3crIsoL1sMu16Eta2p1L1f0L2f16QL3f18QL3crIsoFiltered10",kHLT_IsoMu18_eta2p1_LooseIsoPFTau20_MuObj,0,"hltPFTau20IsoMuVertex",kHLT_IsoMu18_eta2p1_LooseIsoPFTau20_TauObj,0);//auto
   mymod->AddTrigger("HLT_IsoMu18_eta2p1_LooseIsoPFTau20_v5",kHLT_IsoMu18_eta2p1_LooseIsoPFTau20,"hltL3crIsoL1sMu16Eta2p1L1f0L2f16QL3f18QL3crIsoFiltered10",kHLT_IsoMu18_eta2p1_LooseIsoPFTau20_MuObj,0,"hltPFTau20IsoMuVertex",kHLT_IsoMu18_eta2p1_LooseIsoPFTau20_TauObj,0);//auto
   mymod->AddTrigger("HLT_IsoMu18_eta2p1_LooseIsoPFTau20_v6",kHLT_IsoMu18_eta2p1_LooseIsoPFTau20,"hltL3crIsoL1sMu16Eta2p1L1f0L2f16QL3f18QL3crIsoFiltered10",kHLT_IsoMu18_eta2p1_LooseIsoPFTau20_MuObj,0,"hltPFTau20IsoMuVertex",kHLT_IsoMu18_eta2p1_LooseIsoPFTau20_TauObj,0);//auto
@@ -851,7 +851,7 @@ void runHttNtupler(
   mymod->AddTrigger("HLT_Jet240_v9",kHLT_Jet240,"",kHLT_Jet240_JetObj);//auto
 
 
-  mymod->SetPrintHLT(kFALSE); // print HLT table at start of analysis?
+  mymod->SetPrintHLT(kTRUE); // print HLT table at start of analysis?
   
   ana->AddSuperModule(mymod); 
     
