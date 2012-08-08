@@ -236,9 +236,7 @@ HttNtupler::Terminate()
 
 void 
 HttNtupler::Process()
-{
-  if( GetEventHeader()->EvtNum() != 805786) return;
-  
+{  
   // check for run and lumi ranges
   RunLumiRangeMap::RunLumiPairType rl(GetEventHeader()->RunNum(), GetEventHeader()->LumiSec());
   if( fJSONv.size()>0 && !frlrm.HasRunLumi(rl) ){ return; } // not certified run? Skip to next event...
