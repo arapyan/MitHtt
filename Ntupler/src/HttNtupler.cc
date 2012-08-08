@@ -614,12 +614,6 @@ HttNtupler::fillMuons()
   for(unsigned int i=0; i<fMuons->GetEntries(); ++i){
     const Muon* mu=fMuons->At(i); 
     if(!mu->HasTrk()) continue; 
-   
-    TClonesArray& rMuonArr = *fMuonArr; 
-    assert(rMuonArr.GetEntries() < rMuonArr.GetSize());
-    const int index = rMuonArr.GetEntries();  
-    new(rMuonArr[index]) TMuon();
-    TMuon* pMuon = (TMuon*)rMuonArr[index];
 
     // use tracker tracks for kinematics when available
     const Track* muTrk=0;
@@ -628,6 +622,12 @@ HttNtupler::fillMuons()
     else if(mu->HasStandaloneTrk()) { muTrk = mu->StandaloneTrk(); }
     if((muTrk->Eta() < fMuEtaMin) || (muTrk->Eta() > fMuEtaMax)) continue;
     if((muTrk->Pt () > fMuPtMax ) || (muTrk->Pt () < fMuPtMin) ) continue;
+   
+    TClonesArray& rMuonArr = *fMuonArr; 
+    assert(rMuonArr.GetEntries() < rMuonArr.GetSize());
+    const int index = rMuonArr.GetEntries();  
+    new(rMuonArr[index]) TMuon();
+    TMuon* pMuon = (TMuon*)rMuonArr[index];
 
     pMuon->pt       = muTrk->Pt();
     pMuon->eta      = muTrk->Eta();
