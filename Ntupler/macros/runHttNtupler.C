@@ -51,10 +51,10 @@ void runHttNtupler(
   sprintf(output,"/data/blue/arapyan/sync2012/%s_%s_ntuple.root",dataset,fileset); 
   
   // muon kinematics
-  const Double_t muPtMin  = 2;  
+  const Double_t muPtMin  = 3;  
   const Double_t muPtMax  = 7000;
-  const Double_t muEtaMin = -2.5;
-  const Double_t muEtaMax =  2.5;
+  const Double_t muEtaMin = -2.4;
+  const Double_t muEtaMax =  2.4;
 
   // electron kinematics
   const Double_t eleEtMin  = 7;
@@ -90,8 +90,8 @@ void runHttNtupler(
   Catalog *c = new Catalog(catalogDir);
   Dataset *d = NULL;
   d = c->FindDataset(book,dataset,fileset);
-  //ana->AddDataset(d);
-  ana->AddFile("/castor/cern.ch/user/p/paus/filefi/028/s12-h120tt-vbf-v9/FED5F7FE-0597-E111-BE71-485B39800BB5.root");
+  ana->AddDataset(d);
+  //ana->AddFile("/castor/cern.ch/user/p/paus/filefi/028/s12-h120tt-vbf-v9/FED5F7FE-0597-E111-BE71-485B39800BB5.root");
   //ana->AddFile("/castor/cern.ch/user/p/paus/filefi/025/f11-h125tt-vbf-v14b-bp/668A54D7-53F8-E011-9D81-E0CB4E29C502.root"); 
   //ana->AddFile("/castor/cern.ch/user/p/paus/filefi/025/s12-wjets-v9/0043D63C-AD91-E111-91E9-001A64789504.root"); 
   //
