@@ -25,16 +25,16 @@ enum EWorkingPoint {
 Bool_t passMuonID(const mithep::TMuon *muon);
 Bool_t passPFMuonID(const mithep::TMuon *muon);
 Bool_t passTightPFMuonID(const mithep::TMuon *muon, Bool_t mutau);
-Bool_t passMuonIsoPU(const mithep::TMuon *muon);
+Bool_t passMuonIsoPU(const mithep::TMuon *muon, Bool_t mutau);
 Bool_t passMuonIsoPUTauHad(const mithep::TMuon *muon);
 Bool_t passEleID(const mithep::TElectron *electron);
 Bool_t passLooseEleID(const mithep::TElectron *electron);
 Bool_t passEleMVAID(const mithep::TElectron *electron, Double_t mvaValue);
 Bool_t pass2012EleMVAID(const mithep::TElectron *electron, EWorkingPoint WP, Bool_t etau);
-Bool_t passWP95(const mithep::TElectron *ele);
+Bool_t passEleIdVeto(const mithep::TElectron *ele);
 Bool_t passEleNonTrigMVA(const mithep::TElectron *electron, EWorkingPoint WP);
 Bool_t passEleIso(const mithep::TElectron *electron);
-Bool_t passEleIsoPU(const mithep::TElectron *electron);
+Bool_t passEleIsoPU(const mithep::TElectron *electron, Bool_t xtau);
 Bool_t passEleIsoPUTauHad(const mithep::TElectron *electron);
 Bool_t isSoftMuon(const mithep::TMuon *muon);
 Bool_t isMuonFO(const mithep::TMuon *muon, const Int_t ver=1);
@@ -68,12 +68,9 @@ Bool_t passMuonID(const mithep::TMuon *muon)
 //--------------------------------------------------------------------------------------------------
 Bool_t passPFMuonID(const mithep::TMuon *muon)
 {
-  if(fabs(muon->eta) > 2.1)        return kFALSE;
-
-  if(fabs(muon->dz)       > 0.1)   return kFALSE;
-  if(!(muon->typeBits & kGlobal))  return kFALSE;
-  if(fabs(muon->d0)>0.02)           return kFALSE;
+  if(!(muon->typeBits & kGlobal || muon->typeBits & kTracker))  return kFALSE;
   if(!(muon->matchesPFCand && muon->matchedPFType==3)) return kFALSE;
+  if(fabs(muon->dz)> 0.2)   return kFALSE;
 
   return kTRUE;
 
@@ -105,14 +102,14 @@ Bool_t passTightPFMuonID(const mithep::TMuon *muon,Bool_t mutau)
   
 }
 //----------------------------------------------------------------------------------------
-Bool_t passMuonIsoPU(const mithep::TMuon *muon)
+Bool_t passMuonIsoPU(const mithep::TMuon *muon,Bool_t xtau)
 {
   Double_t chargedIso = muon->pfIsoCharged;
   Double_t neutralIso = max(muon->pfIsoNeutral + muon->pfIsoGamma - 0.5 * muon->puIso, 0.0);
 
   Double_t totalIso = chargedIso+neutralIso;
 
-  if(fabs(muon->eta)<1.479) return (totalIso<0.15*(muon->pt));
+  if(fabs(muon->eta)<1.479 && !xtau) return (totalIso<0.15*(muon->pt));
   else                      return (totalIso<0.10*(muon->pt));
 }
 //--------------------------------------------------------------------------------------------------
@@ -360,7 +357,7 @@ Bool_t pass2012EleMVAID(const mithep::TElectron *electron, EWorkingPoint WP, Boo
 
 ////////////////////////////////////////////////////
 // VBTF WP95 Electron ID
-Bool_t passWP95(const mithep::TElectron *ele)
+Bool_t passEleIdVeto(const mithep::TElectron *ele)
 {
   if(fabs(ele->scEta) < 1.479)
   {
@@ -376,7 +373,7 @@ Bool_t passWP95(const mithep::TElectron *ele)
     return (fabs(ele->sigiEtaiEta) < 0.03 &&
 	    fabs(ele->deltaEtaIn)  < 0.01 &&
 	    fabs(ele->deltaPhiIn)  < 0.7  &&
-	    fabs(ele->HoverE)      < 0.07);
+	    fabs(ele->HoverE)      < 999);
   }
 }
 //--------------------------------------------------------------------------------------------------
@@ -410,7 +407,7 @@ Bool_t passEleNonTrigMVA(const mithep::TElectron *electron, EWorkingPoint WP)
   return kFALSE;
 }
 //-------------------------------------------------------------------------------------------------
-Bool_t passEleIsoPU(const mithep::TElectron *electron)
+Bool_t passEleIsoPU(const mithep::TElectron *electron, Bool_t xtau)
 {
   Double_t chargedIso = electron->pfIsoCharged;
   Double_t neutralIso = max(electron->pfIsoNeutral + electron->pfIsoGamma - 0.5 * electron->puIso, 0.0);
@@ -418,7 +415,7 @@ Bool_t passEleIsoPU(const mithep::TElectron *electron)
   Double_t totalIso = chargedIso+neutralIso;
 
   // barrel/endcap dependent requirments      
-  if(fabs(electron->scEta)<1.479) {
+  if(fabs(electron->scEta)<1.479 && !xtau) {
     if(totalIso > 0.15*(electron->pt)) return kFALSE;
   } else {
     if(totalIso > 0.10*(electron->pt)) return kFALSE;
