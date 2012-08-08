@@ -380,6 +380,7 @@ void selectEmu(const TString conf,         // input config file
         genBr = eventTree->GetBranch("Gen");
       }
 
+
       // get weights for MC
       Double_t weight=1,treeEntries=-1; // (weight is only initialized for each *file*)
       if(!isdata) {
@@ -396,6 +397,7 @@ void selectEmu(const TString conf,         // input config file
 
       cout << eventTree->GetEntries() << " events" << endl;
 
+      unsigned int evtt = 21585;
       // loop over events
       for(UInt_t ientry=0; ientry<eventTree->GetEntries(); ientry++) {
 	if(ientry%100000 == 0) cout << "processing " << ientry << endl;
@@ -413,81 +415,79 @@ void selectEmu(const TString conf,         // input config file
 	// certified run selection
         mithep::RunLumiRangeMap::RunLumiPairType rl(info->runNum, info->lumiSec);
         if(hasJSON && !rlrm.HasRunLumi(rl)) continue;
-
+	
 	// trigger
 	if(is2012)
 	  {
 	    if(!isemb && !(info->triggerBits[kHLT_Mu8_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL] || info->triggerBits[kHLT_Mu17_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL])) continue;
 	  }
 	else
-	   if(!isemb && !(info->triggerBits[kHLT_Mu8_Ele17_CaloIdL] || info->triggerBits[kHLT_Mu17_Ele8_CaloIdL])) continue;
-	    
-
-        // good primary vertex
-        if(!info->hasGoodPV) continue;
+	  if(!isemb && !(info->triggerBits[kHLT_Mu8_Ele17_CaloIdL] || info->triggerBits[kHLT_Mu17_Ele8_CaloIdL] || info->triggerBits[kHLT_Mu8_Ele17_CaloIdT_CaloIsoVL] || info->triggerBits[kHLT_Mu17_Ele8_CaloIdT_CaloIsoVL])) continue;
+      
+	// good primary vertex
+	if(!info->hasGoodPV) continue;
 	pvArr->Clear();
 	pvBr->GetEntry(ientry);	
 
-        // loop through muons
-        vector<const mithep::TMuon*> goodMuonsv;
-        vector<const mithep::TMuon*> looseMuonsv;
-        muonArr->Clear();
-        muonBr->GetEntry(ientry);
+	// loop through muons
+	vector<const mithep::TMuon*> goodMuonsv;
+	vector<const mithep::TMuon*> looseMuonsv;
+	muonArr->Clear();
+	muonBr->GetEntry(ientry);
 
-        for(Int_t i=0; i<muonArr->GetEntriesFast(); i++) {
-          const mithep::TMuon *muon = (mithep::TMuon*)((*muonArr)[i]);
+	for(Int_t i=0; i<muonArr->GetEntriesFast(); i++) {
+	  const mithep::TMuon *muon = (mithep::TMuon*)((*muonArr)[i]);
 	  looseMuonsv.push_back(muon);
 
 	  Bool_t trigmatch = kFALSE;
 	  // trigger matching
 	  if(is2012)
 	    trigmatch = ((info->triggerBits[kHLT_Mu17_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL] && muon->hltMatchBits[kHLT_Mu17_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_MuObj]) || (info->triggerBits[kHLT_Mu8_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL] && muon->hltMatchBits[kHLT_Mu8_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_MuObj]));
-	  else
-	    trigmatch = ((info->triggerBits[kHLT_Mu17_Ele8_CaloIdL] && muon->hltMatchBits[kHLT_Mu17_Ele8_CaloIdL_MuObj]) || (info->triggerBits[kHLT_Mu8_Ele17_CaloIdL] && muon->hltMatchBits[kHLT_Mu8_Ele17_CaloIdL_MuObj]));
+	  else trigmatch = ((info->triggerBits[kHLT_Mu17_Ele8_CaloIdL] && muon->hltMatchBits[kHLT_Mu17_Ele8_CaloIdL_MuObj]) || (info->triggerBits[kHLT_Mu8_Ele17_CaloIdL] && muon->hltMatchBits[kHLT_Mu8_Ele17_CaloIdL_MuObj]) || (info->triggerBits[kHLT_Mu17_Ele8_CaloIdT_CaloIsoVL] && muon->hltMatchBits[kHLT_Mu17_Ele8_CaloIdT_CaloIsoVL_MuObj]) || (info->triggerBits[kHLT_Mu8_Ele17_CaloIdT_CaloIsoVL] && muon->hltMatchBits[kHLT_Mu8_Ele17_CaloIdT_CaloIsoVL_MuObj]));
+	 
 	  if(!isemb && !trigmatch)			continue;
 	  if(!(muon->typeBits & kGlobal))	continue;
 	  if(muon->pt < kMuonPt2Min)		continue;
 	  if(fabs(muon->eta) > 2.1)		continue;
-	  if(passTightPFMuonID(muon,0))  goodMuonsv.push_back(muon);
-	  //if(passTightPFMuonID(muon) && passMuonIsoPU(muon))  goodMuonsv.push_back(muon);
+	  //if(passTightPFMuonID(muon,0))  goodMuonsv.push_back(muon);
+	  if(passTightPFMuonID(muon,0) && passMuonIsoPU(muon,0))  goodMuonsv.push_back(muon);
 	}
        
 	// loop through electrons 
-        vector<const mithep::TElectron*> goodElectronsv;   
-        electronArr->Clear();
-        electronBr->GetEntry(ientry);
+	vector<const mithep::TElectron*> goodElectronsv;   
+	electronArr->Clear();
+	electronBr->GetEntry(ientry);
 	
-        for(Int_t i=0; i<electronArr->GetEntriesFast(); i++) {
+	for(Int_t i=0; i<electronArr->GetEntriesFast(); i++) {
 	  const mithep::TElectron *electron = (mithep::TElectron*)((*electronArr)[i]);
 
 	  // trigger matching
 	  Bool_t trigmatch = kFALSE;
 	  if(is2012)
 	    trigmatch = ((info->triggerBits[kHLT_Mu17_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL] && electron->hltMatchBits[kHLT_Mu17_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_EGObj]) || (info->triggerBits[kHLT_Mu8_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL] && electron->hltMatchBits[kHLT_Mu8_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_EGObj]));
-	  else
-	    trigmatch = ((info->triggerBits[kHLT_Mu17_Ele8_CaloIdL] && electron->hltMatchBits[kHLT_Mu17_Ele8_CaloIdL_EGObj]) || (info->triggerBits[kHLT_Mu8_Ele17_CaloIdL] && electron->hltMatchBits[kHLT_Mu8_Ele17_CaloIdL_EGObj]));
+	  else trigmatch = ((info->triggerBits[kHLT_Mu17_Ele8_CaloIdL] && electron->hltMatchBits[kHLT_Mu17_Ele8_CaloIdL_EGObj]) || (info->triggerBits[kHLT_Mu17_Ele8_CaloIdT_CaloIsoVL] && electron->hltMatchBits[kHLT_Mu17_Ele8_CaloIdT_CaloIsoVL_EGObj]) || (info->triggerBits[kHLT_Mu8_Ele17_CaloIdL] && electron->hltMatchBits[kHLT_Mu8_Ele17_CaloIdL_EGObj]) || (info->triggerBits[kHLT_Mu8_Ele17_CaloIdT_CaloIsoVL] && electron->hltMatchBits[kHLT_Mu8_Ele17_CaloIdT_CaloIsoVL_EGObj]));
 	  if(!isemb && !trigmatch)                        continue;
 
-          if(fabs(electron->eta) > 2.3)		continue;
+	  if(fabs(electron->eta) > 2.3)		continue;
 	  
 	  // track matching against muons
-          Bool_t hasMuonTrack=kFALSE;
-          for(UInt_t imu=0; imu<goodMuonsv.size(); imu++) {
-            if(electron->trkID == goodMuonsv[imu]->trkID) hasMuonTrack=kTRUE;
-          }
-          if(hasMuonTrack)			continue;
+	  Bool_t hasMuonTrack=kFALSE;
+	  for(UInt_t imu=0; imu<goodMuonsv.size(); imu++) {
+	    if(electron->trkID == goodMuonsv[imu]->trkID) hasMuonTrack=kTRUE;
+	  }
+	  if(hasMuonTrack)			continue;
 
 	  // clean against loose muons
-          Bool_t matchLooseMuon=kFALSE;
+	  Bool_t matchLooseMuon=kFALSE;
 	  for(UInt_t imu=0;imu<looseMuonsv.size();imu++) {
-	    if(fabs(looseMuonsv[imu]->phi) > 2.3) continue; 
+	    //if(fabs(looseMuonsv[imu]->phi) > 2.3) continue; 
 	    if(toolbox::deltaR(electron->eta,electron->phi,looseMuonsv[imu]->eta,looseMuonsv[imu]->phi) < 0.3) matchLooseMuon=kTRUE;
 	  }
 	  
 	  if(matchLooseMuon)			continue;
-	 
-	  if(pass2012EleMVAID(electron, kMedium,0))  goodElectronsv.push_back(electron);
-        }
+	  if(pass2012EleMVAID(electron, kMedium,0) && passEleIsoPU(electron,0))  goodElectronsv.push_back(electron);
+	  
+	}
 
 	//----------------------------------------------------------------------------------------
 
@@ -496,40 +496,39 @@ void selectEmu(const TString conf,         // input config file
 	const mithep::TMuon *mu	   = goodMuonsv[0];
 	const mithep::TElectron *ele = goodElectronsv[0];
 
-        // SVFit
-        svfitArr->Clear();
-        svfitBr->GetEntry(ientry);
+	// SVFit
+	svfitArr->Clear();
+	svfitBr->GetEntry(ientry);
 
-        Double_t met=info->pfMET, metphi=info->pfMETphi;
+	Double_t met=info->pfMET, metphi=info->pfMETphi;
 	Double_t mvamet =0, mvametphi = 0;
-        Double_t cov_00=0, cov_01=0, cov_10=0, cov_11=0;
-        Double_t mvacov_00=0, mvacov_01=0, mvacov_10=0, mvacov_11=0;
-        mithep::FourVectorM dau1, dau2;
+	Double_t cov_00=0, cov_01=0, cov_10=0, cov_11=0;
+	Double_t mvacov_00=0, mvacov_01=0, mvacov_10=0, mvacov_11=0;
+	mithep::FourVectorM dau1, dau2;
 
-        for(Int_t i = 0; i < svfitArr->GetEntriesFast(); i++) {
-          mithep::TSVfit *svfit = (mithep::TSVfit*) svfitArr->At(i);
-          Int_t id = 0;
-          if(toolbox::deltaR(ele->eta,ele->phi,svfit->daughter1.Eta(),svfit->daughter1.Phi()) < 0.01           ) id = 1;
-          if(toolbox::deltaR(mu->eta,mu->phi,svfit->daughter1.Eta(),svfit->daughter1.Phi())   < 0.01 && id == 0) id = 2;
-          if(id == 0) continue;
-          if(toolbox::deltaR(ele->eta,ele->phi,svfit->daughter2.Eta(),svfit->daughter2.Phi()) < 0.01 && id == 2) id = 3;
-          if(toolbox::deltaR(mu->eta,mu->phi,svfit->daughter2.Eta(),svfit->daughter2.Phi())   < 0.01 && id == 1) id = 4;
-          if(id < 3) continue;
-          mvamet    = svfit->mvaMET;
+	for(Int_t i = 0; i < svfitArr->GetEntriesFast(); i++) {
+	  mithep::TSVfit *svfit = (mithep::TSVfit*) svfitArr->At(i);
+	  Int_t id = 0;
+	  if(toolbox::deltaR(ele->eta,ele->phi,svfit->daughter1.Eta(),svfit->daughter1.Phi()) < 0.01           ) id = 1;
+	  if(toolbox::deltaR(mu->eta,mu->phi,svfit->daughter1.Eta(),svfit->daughter1.Phi())   < 0.01 && id == 0) id = 2;
+	  if(id == 0) continue;
+	  if(toolbox::deltaR(ele->eta,ele->phi,svfit->daughter2.Eta(),svfit->daughter2.Phi()) < 0.01 && id == 2) id = 3;
+	  if(toolbox::deltaR(mu->eta,mu->phi,svfit->daughter2.Eta(),svfit->daughter2.Phi())   < 0.01 && id == 1) id = 4;
+	  if(id < 3) continue;
+	  mvamet    = svfit->mvaMET;
 	  mvametphi = svfit->mvaMETphi;
-          cov_00 = svfit->cov_00;
-          cov_01 = svfit->cov_01;
-          cov_10 = svfit->cov_10;
-          cov_11 = svfit->cov_11;
-          mvacov_00 = svfit->mvacov_00;
-          mvacov_01 = svfit->mvacov_01;
-          mvacov_10 = svfit->mvacov_10;
-          mvacov_11 = svfit->mvacov_11;
-          dau1 = svfit->daughter1;
-          dau2 = svfit->daughter2;
-        }
-        if(cov_00==0 && cov_01==0 && cov_10==0 && cov_11==0) continue;
-
+	  cov_00 = svfit->cov_00;
+	  cov_01 = svfit->cov_01;
+	  cov_10 = svfit->cov_10;
+	  cov_11 = svfit->cov_11;
+	  mvacov_00 = svfit->mvacov_00;
+	  mvacov_01 = svfit->mvacov_01;
+	  mvacov_10 = svfit->mvacov_10;
+	  mvacov_11 = svfit->mvacov_11;
+	  dau1 = svfit->daughter1;
+	  dau2 = svfit->daughter2;
+	}
+	if(cov_00==0 && cov_01==0 && cov_10==0 && cov_11==0) continue;
 	Double_t elept = ele->pt;
 	if(isemb && elescale==kNo) {
 	  elept = 1.03*ele->pt;
@@ -546,13 +545,13 @@ void selectEmu(const TString conf,         // input config file
 	}
 	if(elescale==kDown) {
 	  if(isemb) {
-            elept = 1.015*ele->pt;
-            met -= 0.015*ele->pt;
-          } else {
-            elept = 0.99*ele->pt;
-            met += 0.01*ele->pt;
-          }
-        }
+	    elept = 1.015*ele->pt;
+	    met -= 0.015*ele->pt;
+	  } else {
+	    elept = 0.99*ele->pt;
+	    met += 0.01*ele->pt;
+	  }
+	}
 
 	if(mu->pt < kMuonPt2Min  || elept < kElePt2Min) continue;
 	if(mu->pt < kMuonPt1Min  && elept < kElePt1Min) continue;
@@ -580,26 +579,26 @@ void selectEmu(const TString conf,         // input config file
 	}
 
 	// lepton 4-vectors
-        TLorentzVector lep1, lep2, dilep;
+	TLorentzVector lep1, lep2, dilep;
 	lep1.SetPtEtaPhiM(elept, ele->eta, ele->phi, 0.000511);
 	lep2.SetPtEtaPhiM(mu->pt, mu->eta, mu->phi, 0.105658369);
 	dilep = lep1+lep2;
 
-        // loop through jets      
-        jetArr->Clear();
-        jetBr->GetEntry(ientry);
-        UInt_t njets = 0, nbjets = 0;
-        const mithep::TJet *jet1=0, *jet2=0, *bjet=0;
+	// loop through jets      
+	jetArr->Clear();
+	jetBr->GetEntry(ientry);
+	UInt_t njets = 0, nbjets = 0;
+	const mithep::TJet *jet1=0, *jet2=0, *bjet=0;
 	btagArray.Reset();	jptArray.Reset();	jetaArray.Reset();	npt20jets=0;
-        for(Int_t i=0; i<jetArr->GetEntriesFast(); i++) {
+	for(Int_t i=0; i<jetArr->GetEntriesFast(); i++) {
 	  mithep::TJet *jet = (mithep::TJet*)((*jetArr)[i]);
 
 	  if(doJetUnc) jet->pt *= (jetunc==kDown) ? (1-jet->unc) : (1+jet->unc);
 
-          if(toolbox::deltaR(jet->eta,jet->phi,lep1.Eta(),lep1.Phi()) < 0.5) continue;
-          if(toolbox::deltaR(jet->eta,jet->phi,lep2.Eta(),lep2.Phi()) < 0.5) continue;
+	  if(toolbox::deltaR(jet->eta,jet->phi,lep1.Eta(),lep1.Phi()) < 0.5) continue;
+	  if(toolbox::deltaR(jet->eta,jet->phi,lep2.Eta(),lep2.Phi()) < 0.5) continue;
 
-          if(fabs(jet->eta) > 5) continue;
+	  if(fabs(jet->eta) > 5) continue;
 	  if(!jet->id) continue;
 
 	  // look for b-jets
@@ -619,39 +618,39 @@ void selectEmu(const TString conf,         // input config file
 	  }
 
 	  // look for jets
-          if(jet->pt > kJetPtMin) {
-            assert(njets<kMaxPt20Jets);
-            jptArray.AddAt(jet->pt,njets);
-            jetaArray.AddAt(jet->eta,njets);
-  	    njets++;
+	  if(jet->pt > kJetPtMin) {
+	    assert(njets<kMaxPt20Jets);
+	    jptArray.AddAt(jet->pt,njets);
+	    jetaArray.AddAt(jet->eta,njets);
+	    njets++;
 	    if(!jet1 || jet->pt > jet1->pt) { // jet1 is highest pt, jet2 next highest
 	      jet2 = jet1;
 	      jet1 = jet;
 	    } else if(!jet2 || jet->pt > jet2->pt) {
 	      jet2 = jet;
 	    }
-          }		    
-        }
+	  }		    
+	}
    
 	// dijet system
-        TLorentzVector jv1, jv2, dijet;
+	TLorentzVector jv1, jv2, dijet;
 	Int_t nCentralJets=0;
 	if(njets>1) {
 	  jv1.SetPtEtaPhiM(jet1->pt,jet1->eta,jet1->phi,jet1->mass);
 	  jv2.SetPtEtaPhiM(jet2->pt,jet2->eta,jet2->phi,jet2->mass);
-          dijet = jv1+jv2;
-          for(Int_t i=2; i<jetArr->GetEntriesFast(); i++) {
-            mithep::TJet *jet = (mithep::TJet*)((*jetArr)[i]);
+	  dijet = jv1+jv2;
+	  for(Int_t i=2; i<jetArr->GetEntriesFast(); i++) {
+	    mithep::TJet *jet = (mithep::TJet*)((*jetArr)[i]);
 	    if(!(jet->pt > kJetPtMin && fabs(jet->eta)<5 && jet->id==1)) continue;
 	    if(jet1->eta > jet2->eta && jet->eta > jet2->eta && jet->eta < jet1->eta) nCentralJets++;
 	    else if(jet2->eta > jet1->eta && jet->eta > jet1->eta && jet->eta < jet2->eta) nCentralJets++;
 	  }
-        }
+	}
 
 	// recoil corrections
 	Double_t pU1      = 0;  //--
 	Double_t pU2      = 0;  //--
-        if(doRecoil) corrector->CorrectAll(met, metphi, gen->vpt_a, gen->vphi_a, dilep.Pt(), dilep.Phi(), pU1, pU2, 0, 0, njets);
+	if(doRecoil) corrector->CorrectAll(met, metphi, gen->vpt_a, gen->vphi_a, dilep.Pt(), dilep.Phi(), pU1, pU2, 0, 0, njets);
 
 	// calculate projection variables
 	TVector3 l1,l2,metv,mvametv;
@@ -670,9 +669,9 @@ void selectEmu(const TString conf,         // input config file
 	met4v.SetPtEtaPhiM(met,0,metphi,0);
 	higgs = dilep+met4v;
 
-        // get k-factor if necessary
-        Double_t kf=1;
-        if(reallyDoKf) kf = kfFHPValue(gen->vpt_a, hKFactors);
+	// get k-factor if necessary
+	Double_t kf=1;
+	if(reallyDoKf) kf = kfFHPValue(gen->vpt_a, hKFactors);
 
 	// do vertex reweighting
 	Double_t npuWgt = 1;
@@ -693,7 +692,7 @@ void selectEmu(const TString conf,         // input config file
 	
 	// embedding weight for embedded sample
 	Double_t embWgt = 1;
-        Double_t pt1=0, eta1=0, phi1=0, pt2=0, eta2=0, phi2=0;
+	Double_t pt1=0, eta1=0, phi1=0, pt2=0, eta2=0, phi2=0;
 	if(!isdata && !isemb) {
 	  pt1 = gen->pt_1_a;
 	  pt2 = gen->pt_2_a;
@@ -707,16 +706,16 @@ void selectEmu(const TString conf,         // input config file
 	    pt1 = gen->pt_1_a;
 	    eta1 = gen->eta_1_a;
 	    phi1 = gen->phi_1_a;
-            pt2 = gen->pt_2_a;
-            eta2 = gen->eta_2_a;
+	    pt2 = gen->pt_2_a;
+	    eta2 = gen->eta_2_a;
 	    phi2 = gen->phi_2_a;
 	  } else {
-            pt2 = gen->pt_1_a;
-            eta2 = gen->eta_1_a;
-            phi2 = gen->phi_1_a;
-            pt1 = gen->pt_2_a;
-            eta1 = gen->eta_2_a;
-            phi1 = gen->phi_2_a;
+	    pt2 = gen->pt_1_a;
+	    eta2 = gen->eta_1_a;
+	    phi2 = gen->phi_1_a;
+	    pt1 = gen->pt_2_a;
+	    eta1 = gen->eta_2_a;
+	    phi1 = gen->phi_2_a;
 	  }
 	  embWgt=info->embWeight;
 	  //embWgt=info->embWeight*embUnfoldWgt(pt1,eta1,pt2,eta2);
@@ -728,7 +727,7 @@ void selectEmu(const TString conf,         // input config file
 	if(corrector && (gen->vmass_a < 50)) nlowmass += weight*kf*npuWgt*trigscale*idscale*embWgt;
 
 	// passing events in whole sample 
-        nSelEvents += weight*kf*npuWgt*trigscale*idscale*embWgt;
+	nSelEvents += weight*kf*npuWgt*trigscale*idscale*embWgt;
 
 	lRun		 = info->runNum;
 	lLumi		 = info->lumiSec;
@@ -752,19 +751,19 @@ void selectEmu(const TString conf,         // input config file
 	lIso1		 = eleIsoPU(ele);
 	lD01		 = ele->d0;
 	lDZ1		 = ele->dz;
-	lPassIso1	 = passEleIsoPU(ele);
+	lPassIso1	 = passEleIsoPU(ele,0);
 	lMt1		 = sqrt(2.0*(elept*met*(1.0-cos(toolbox::deltaPhi(ele->phi,metphi)))));
 	lMVAMt1		 = sqrt(2.0*(elept*mvamet*(1.0-cos(toolbox::deltaPhi(ele->phi,mvametphi)))));
-        lPt2		 = mu->pt;
-        lPhi2		 = mu->phi;
-        lEta2		 = mu->eta;
-        lM2		 = 0.105658369;
+	lPt2		 = mu->pt;
+	lPhi2		 = mu->phi;
+	lEta2		 = mu->eta;
+	lM2		 = 0.105658369;
 	lq2              = mu->q;
-        lIso2		 = muonIsoPU(mu);
-        lD02		 = mu->d0;
-        lDZ2		 = mu->dz;
-        lPassIso2	 = passMuonIsoPU(mu);
-        lMt2		 = sqrt(2.0*(mu->pt*met*(1.0-cos(toolbox::deltaPhi(mu->phi,metphi)))));
+	lIso2		 = muonIsoPU(mu);
+	lD02		 = mu->d0;
+	lDZ2		 = mu->dz;
+	lPassIso2	 = passMuonIsoPU(mu,0);
+	lMt2		 = sqrt(2.0*(mu->pt*met*(1.0-cos(toolbox::deltaPhi(mu->phi,metphi)))));
 	lMt2		 = sqrt(2.0*(mu->pt*mvamet*(1.0-cos(toolbox::deltaPhi(mu->phi,mvametphi)))));
 	lMet		 = met;
 	lMetPhi		 = metphi;
@@ -774,35 +773,35 @@ void selectEmu(const TString conf,         // input config file
 	lPZetaMiss	 = projMet;
 	lPZetaMVAMiss    = projMVAMet;
 	lMetCov00	 = cov_00;
-        lMetCov01	 = cov_01;
-        lMetCov10	 = cov_10;
-        lMetCov11	 = cov_11;
-        lMVACov00	 = mvacov_00;
-        lMVACov01	 = mvacov_01;
-        lMVACov10	 = mvacov_10;
-        lMVACov11	 = mvacov_11;
+	lMetCov01	 = cov_01;
+	lMetCov10	 = cov_10;
+	lMetCov11	 = cov_11;
+	lMVACov00	 = mvacov_00;
+	lMVACov01	 = mvacov_01;
+	lMVACov10	 = mvacov_10;
+	lMVACov11	 = mvacov_11;
 	lJPt1		 = (jet1) ? jet1->pt  : 0;
-        lJEta1		 = (jet1) ? jet1->eta : 0;
-        lJPhi1		 = (jet1) ? jet1->phi : 0;
-        lJPtUnc1	 = (jet1) ? jet1->unc : 0;
+	lJEta1		 = (jet1) ? jet1->eta : 0;
+	lJPhi1		 = (jet1) ? jet1->phi : 0;
+	lJPtUnc1	 = (jet1) ? jet1->unc : 0;
 	lJMVA1		 = (jet1) ? jet1->mva : 0;
 	lJPass1		 = (jet1) ? jet1->id  : 0;
-        lJPt2		 = (jet2) ? jet2->pt  : 0;
-        lJEta2		 = (jet2) ? jet2->eta : 0;
-        lJPhi2		 = (jet2) ? jet2->phi : 0;
-        lJPtUnc2	 = (jet2) ? jet2->unc : 0;
-        lJMVA2		 = (jet2) ? jet2->mva : 0;
-        lJPass2		 = (jet2) ? jet2->id  : 0;
+	lJPt2		 = (jet2) ? jet2->pt  : 0;
+	lJEta2		 = (jet2) ? jet2->eta : 0;
+	lJPhi2		 = (jet2) ? jet2->phi : 0;
+	lJPtUnc2	 = (jet2) ? jet2->unc : 0;
+	lJMVA2		 = (jet2) ? jet2->mva : 0;
+	lJPass2		 = (jet2) ? jet2->id  : 0;
 	lBTagPt		 = (bjet) ? bjet->pt  : 0;
-        lBTagEta	 = (bjet) ? bjet->eta : 0;
-        lBTagPhi	 = (bjet) ? bjet->phi : 0;
+	lBTagEta	 = (bjet) ? bjet->eta : 0;
+	lBTagPhi	 = (bjet) ? bjet->phi : 0;
 	lMJJ		 = (njets>1) ? dijet.M() : 0;
 	lJDEta		 = (njets>1) ? fabs(jet1->eta - jet2->eta) : 0;
 	lNJetInGap	 = (njets>1) ? nCentralJets : 0;
 	lJDPhi		 = (njets>1) ? toolbox::deltaPhi(jet1->phi,jet2->phi) : 0;
 	lDiJetPt	 = (njets>1) ? dijet.Pt()  : 0;
-        lDiJetPhi	 = (njets>1) ? dijet.Phi() : 0;
-        lHDJetPhi	 = (njets>1) ? toolbox::deltaPhi(dijet.Phi(),higgs.Phi()) : 0;
+	lDiJetPhi	 = (njets>1) ? dijet.Phi() : 0;
+	lHDJetPhi	 = (njets>1) ? toolbox::deltaPhi(dijet.Phi(),higgs.Phi()) : 0;
 	lVisJetEta	 = (njets>1) ? TMath::Min(fabs(dilep.Eta()-jet1->eta),fabs(dilep.Eta()-jet2->eta)) : 0;
 	lPtVis		 = dilep.Pt();
 	lPtH		 = higgs.Pt();
@@ -810,11 +809,13 @@ void selectEmu(const TString conf,         // input config file
 	lNBTag		 = nbjets;
 	lNJets		 = njets;
 	lGenPt1		 = pt1;
-        lGenEta1	 = eta1;
+	lGenEta1	 = eta1;
 	lGenPhi1	 = phi1;
-        lGenPt2          = pt2;
-        lGenEta2         = eta2;
-        lGenPhi2         = phi2;
+	lGenPt2          = pt2;
+	lGenEta2         = eta2;
+	lGenPhi2         = phi2;
+
+	//if(lq1 + lq2 != 0) continue;
 
 	outtree.Fill();
       }

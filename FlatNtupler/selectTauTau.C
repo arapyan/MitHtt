@@ -722,6 +722,10 @@ void selectTauTau(const TString conf,         // input config file
         lGenEta2         = eta2;
         lGenPhi2         = phi2;
 
+        //if(lq1 == lq2) continue;
+        //if(!(lPassIso1 == 1 && lPassIso2 ==1)) continue;
+        //if(!(lPt1 > 40 && lPt2 > 40)) continue;
+
 	outtree.Fill();
 
       }
