@@ -53,6 +53,8 @@ namespace mithep
     float pfMET, pfMETphi, pfSumET;
     /// track MET 
     float trkMET, trkMETphi, trkSumET;
+    /// MVA MET
+    float mvaMET, mvaMETphi, mvaCov00, mvaCov11, mvaCov10, mvaCov01;
     /// mean energy density in the event (due to pileup, from L1Fastjet algorithm)
     float rho, rhoHighEta;
     /// does a reconstructed primary vertex exist that fullfills minimal selection criteria

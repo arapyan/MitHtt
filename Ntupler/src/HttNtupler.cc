@@ -602,6 +602,16 @@ HttNtupler::fillCommon(TriggerBits& trigBits)
   fEventInfo.trkMET       = trkMet.Pt();
   fEventInfo.trkMETphi    = trkMet.Phi();
   fEventInfo.trkSumET     = trkSumET;
+  
+  Met       mvaMet = fMVAMet->GetMet(fMuons,fElectrons,fPFTaus,fPFCandidates,fPFJets,0,fPrimVerts,fPFMet,fJetCorrector,fPUEnergyDensity);
+  TMatrixD* MVACov = fMVAMet->GetMetCovariance();
+
+  fEventInfo.mvaMET       = mvaMet.Pt();
+  fEventInfo.mvaMETphi    = mvaMet.Phi();
+  fEventInfo.mvaCov00     = (*MVACov)(0,0);
+  fEventInfo.mvaCov10     = (*MVACov)(1,0);
+  fEventInfo.mvaCov01     = (*MVACov)(0,1);
+  fEventInfo.mvaCov11     = (*MVACov)(1,1);
   fEventInfo.embWeight    = (fUseGen==ESampleType::kEmbed) ? fEmbedWeight->At(fEmbedWeight->GetEntries()-1)->Weight() : 1;  
 }
 
@@ -1184,7 +1194,7 @@ HttNtupler::matchHLT(const double eta, const double phi, const double pt)
   TriggerObjects toBits=0;
   if( !HasHLTInfo() ) return toBits;  
   const double hltMatchR      = 0.5;
-  const double hltMatchPtFrac = 0.5;
+  //const double hltMatchPtFrac = 0.5;
   const TriggerTable* hltTable = GetHLTTable(); assert(hltTable);
   for(unsigned int itrig=0; itrig<fTriggerNamesv.size(); ++itrig){
     const TriggerName* trigname = hltTable->Get(fTriggerNamesv[itrig].Data()); if(!trigname) continue;
