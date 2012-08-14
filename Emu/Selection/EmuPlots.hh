@@ -33,11 +33,11 @@ void makePlot(TString outdirName, TString format, TString name, TString title, T
     histv[ism_vbf]->Add(histv[ism_gf]);
     histv[ism_vbf]->Add(histv[ism_vtth]);
   }
-  if(ytitle.Contains("dN")) histv[0]->Scale(1.,"width");
+  if(!makeLog && ytitle.Contains("dN")) histv[0]->Scale(1.,"width");
   plot->AddHist1D(histv[0],samplev[0]->label,"E");
   for(UInt_t isam=1; isam<samplev.size(); isam++) {
     if((isam==izmm) || (isam==iewk_7TeV) || (isam==ittbar_7TeV) || (useFR && isam==issfake) || (!useFR && isam==ifake)) continue;
-    if(ytitle.Contains("dN")) histv[isam]->Scale(1.,"width");
+    if(!makeLog && ytitle.Contains("dN")) histv[isam]->Scale(1.,"width");
     if(snamev[isam].Contains("htt_vbf")) {
       if(!makeLog) {
 	histv[isam]->Scale(5.);
