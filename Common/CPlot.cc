@@ -26,39 +26,10 @@ fRebin(1),
 fLeg(0),
 fShowStats(0),
 fStatsX(0.68),
-fStatsY(0.90),
-fRooPlot(0)
+fStatsY(0.90)
 {
   sCount++;
 }
-
-CPlot::CPlot(TString name, RooPlot* frame, TString title, TString xtitle, TString ytitle):
-fStack(0),
-fName(name),
-fTitle(title),
-fXTitle(xtitle),
-fYTitle(ytitle),
-fXmin(0),
-fXmax(0),
-fYmin(0),
-fYmax(0),
-fLogx(0),
-fLogy(0),
-fGridx(0),
-fGridy(0),
-fRebin(1),
-fLeg(0),
-fShowStats(0),
-fStatsX(0.68),
-fStatsY(0.90),
-fRooPlot(frame) 
-{
-  fRooPlot->SetTitle(title);
-  fRooPlot->GetXaxis()->SetTitle(xtitle);
-  fRooPlot->GetYaxis()->SetTitle(ytitle);
-  sCount++;
-}
-
 
 //--------------------------------------------------------------------------------------------------
 void CPlot::AddHist1D(TH1F *h, TString drawopt, int color, int linesty, int fillsty, int linecolor)
@@ -679,13 +650,9 @@ void CPlot::Draw(TCanvas *c, bool doSave, TString format)
   c->SetLogy(0);
   c->SetLogx(0);
   
-  if(!fItems.size() && !fRooPlot)
+  if(!fItems.size())
     return;   
   
-  if(fRooPlot) {        
-    fRooPlot->Draw();   
-  }
-      
   int nHist1D=0, nHist2D=0, nGraph=0, nProf=0;
   for(uint i=0; i<fItems.size(); i++) {
     if(fItems[i].hist1D != 0) nHist1D++;

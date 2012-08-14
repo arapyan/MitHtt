@@ -34,11 +34,6 @@
 #include <TBox.h>
 #include <vector>
 
-#include "RooGlobalFunc.h"
-#include "RooPlot.h"
-
-using namespace RooFit;
-
 class CPlotItem {
 public:
   CPlotItem():hist1D(0),hist2D(0),graph(0),prof(0),drawopt(""){}
@@ -55,7 +50,6 @@ class CPlot {
 public:
   CPlot();
   CPlot(TString name, TString title, TString xtitle, TString ytitle);
-  CPlot(TString name, RooPlot* frame, TString title, TString xtitle, TString ytitle);
   ~CPlot(){}
   
   static TString sOutDir;  // output directory
@@ -183,8 +177,6 @@ protected:
   double fStatsX, fStatsY;              // x,y coordinates of top left corner of stats box
   
   vector<TLegendEntry*> fStackEntries;  // pointer to legend entry objects for histograms in a stack
-  
-  RooPlot *fRooPlot;
   
   static int sCount;                    // number of CPlot instances
 };
