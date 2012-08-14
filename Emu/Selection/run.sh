@@ -3,9 +3,9 @@
 #enum { kNo, kDown, kUp }; jet and btagging uncertainties
 
 lumi=5065
-ntupledir=.
+ntupledir=/data/blue/vdutta/htt/selections/ichep12/2012/
 plotdir=.
-root -b -q -l selectEmu.C+\(\"emu.conf\",\"$ntupledir\",$lumi,0,0,0,0\) 
+#root -b -q -l selectEmu.C+\(\"emu.conf\",\"$ntupledir\",$lumi,0,0,0,0\) 
 root -b -q -l plotEmu.C+\(\"emu.conf\",\"$ntupledir/ntuples\",\"$plotdir\",\"png\",$lumi,0,0\)
 
 #------------------------------------------------------------------------------------------------------------
