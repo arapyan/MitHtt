@@ -48,7 +48,7 @@ void runHttNtupler(
   gDebugLevel = 1;                 // higher level allows more messages to print
  
   char output[100];
-  sprintf(output,"/data/blue/arapyan/sync2012/%s_%s_ntuple.root",dataset,fileset); 
+  sprintf(output,"%s_%s_ntuple.root",dataset,fileset); 
   
   // muon kinematics
   const Double_t muPtMin  = 3;  
@@ -851,7 +851,7 @@ void runHttNtupler(
   mymod->AddTrigger("HLT_Jet240_v9",kHLT_Jet240,"",kHLT_Jet240_JetObj);//auto
 
 
-  mymod->SetPrintHLT(kTRUE); // print HLT table at start of analysis?
+  mymod->SetPrintHLT(kFALSE); // print HLT table at start of analysis?
   
   ana->AddSuperModule(mymod); 
     
