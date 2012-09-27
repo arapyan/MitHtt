@@ -173,10 +173,10 @@ HttNtupler::SlaveBegin()
     fMVAMet->Initialize(TString(getenv("CMSSW_BASE")+string("/src/MitPhysics/data/mva_JetID_lowpt.weights.xml")),
                    TString(getenv("CMSSW_BASE")+string("/src/MitPhysics/data/mva_JetID_highpt.weights.xml")),
                    TString(getenv("CMSSW_BASE")+string("/src/MitPhysics/Utils/python/JetIdParams_cfi.py")),
-                   TString(getenv("CMSSW_BASE")+string("/src/MitPhysics/data/gbrmet_52.root")),
-                   TString(getenv("CMSSW_BASE")+string("/src/MitPhysics/data/gbrmetphi_52.root")),
-                   TString(getenv("CMSSW_BASE")+string("/src/MitPhysics/data/gbrmetu1cov_52.root")),
-                   TString(getenv("CMSSW_BASE")+string("/src/MitPhysics/data/gbrmetu2cov_52.root")));
+                   TString(getenv("CMSSW_BASE")+string("/src/MitPhysics/data/gbrmet_53.root")),
+                   TString(getenv("CMSSW_BASE")+string("/src/MitPhysics/data/gbrmetphi_53.root")),
+                   TString(getenv("CMSSW_BASE")+string("/src/MitPhysics/data/gbru1cov_53.root")),
+                   TString(getenv("CMSSW_BASE")+string("/src/MitPhysics/data/gbru2cov_53.root")));
   } else {
     fMVAMet->Initialize(TString(getenv("CMSSW_BASE")+string("/src/MitPhysics/data/mva_JetID_lowpt.weights.xml")),
                    TString(getenv("CMSSW_BASE")+string("/src/MitPhysics/data/mva_JetID_highpt.weights.xml")),
@@ -255,7 +255,14 @@ HttNtupler::Process()
   int lLep = 0;  int lLepHigh = 0;
   for(unsigned int i0 = 0; i0 < fMuons->GetEntries(); i0++)     if(looseMuId (fMuons->At(i0)      ,lLepHigh)) lLep++;
   for(unsigned int i0 = 0; i0 < fElectrons->GetEntries(); i0++) if(looseEleId(fElectrons->At(i0),0,lLepHigh)) lLep++;
-  for(unsigned int i0 = 0; i0 < fPFTaus->GetEntries(); i0++)    if(looseTauId(fPFTaus->At(i0)     )) lLep++;
+  for(unsigned int i0 = 0; i0 < fPFTaus->GetEntries(); i0++)  
+    {
+      if(looseTauId(fPFTaus->At(i0)     )) 
+	{
+	  lLepHigh++;
+	  lLep++;
+	}
+    }
   if(lLep < 2 || lLepHigh == 0) 
     {
       hEventsTree->Fill();
@@ -1519,12 +1526,11 @@ HttNtupler::looseEleId(const Electron* elec, bool conv,int &iNHigh)
 bool 
 HttNtupler::looseMuId(const Muon* muon,int &iNHigh) 
 { 
-  if( muon->TrackerTrk() == 0                        ) return false;
+  if( muon->HasTrk() == 0                        ) return false;
   if( muon->BestTrk()->Pt () < fMuPtMin              ) return false;
   if( muon->BestTrk()->Eta() < fMuEtaMin             ) return false;
   if( muon->BestTrk()->Eta() > fMuEtaMax             ) return false;
   if( muon->BestTrk()->Pt () > fMuPtMax              ) return false;
-  if( muon->TrackerTrk()->PtErr()/muon->Pt() > 0.1   ) return false;
   if( muon->NValidHits()          < 1                ) return false;
   if( muon->NMatches()            < 1                ) return false;
   if( muon->Pt()            > fMuHighPtMin           ) iNHigh++;

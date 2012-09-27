@@ -223,14 +223,16 @@ enum ETriggerBit {
   //additional MuTau 2012
   kHLT_IsoMu17_eta2p1_LooseIsoPFTau20 = 96,
   kHLT_Mu17_eta2p1_LooseIsoPFTau20   = 97,
-  
-  
-  
+   
   //misc
   kHLT_IsoMu15_L1ETM20 = 98,
   kHLT_Jet150          = 99,
   kHLT_Jet190          = 100,
-  kHLT_Jet240          = 101
+  kHLT_Jet240          = 101,
+
+  //additional 2012 Tau+Tau
+  kHLT_DoubleMediumIsoPFTau30_Trk5_eta2p1_Jet30 = 102,
+  kHLT_DoubleMediumIsoPFTau25_Trk5_eta2p1_Jet30 = 103
 };
 
 const unsigned int kNTrigObj = 256;
@@ -409,7 +411,11 @@ enum ETriggerObject {
   kHLT_Ele22_eta2p1_WP90Rho_LooseIsoPFTau20_EleObj = 148,
   kHLT_Ele22_eta2p1_WP90Rho_LooseIsoPFTau20_TauObj = 149,
   kHLT_Ele22_eta2p1_WP90NoIso_LooseIsoPFTau20_EleObj = 150, 
-  kHLT_Ele22_eta2p1_WP90NoIso_LooseIsoPFTau20_TauObj = 151
+  kHLT_Ele22_eta2p1_WP90NoIso_LooseIsoPFTau20_TauObj = 151,
+
+  //Tau Tau, additional 2012
+  kHLT_DoubleMediumIsoPFTau30_Trk5_eta2p1_Jet30Obj = 152,
+  kHLT_DoubleMediumIsoPFTau25_Trk5_eta2p1_Jet30Obj = 153
 };
 
 #endif
