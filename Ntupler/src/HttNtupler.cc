@@ -683,6 +683,7 @@ HttNtupler::fillMuons()
     pMuon->nMatch          = mu->NMatches();
     pMuon->hltMatchBits    = matchHLT(muTrk->Eta(),muTrk->Phi(),muTrk->Pt());
     pMuon->trkID           = mu->HasTrackerTrk() ? mu->TrackerTrk()->GetUniqueID() :  0;
+    pMuon->nTkLayersHit    = mu->NTrkLayersHit();
 
     pMuon->pfIsoCharged    = computeCommonIso(mu, fPFNoPileUp    , 0.0, 0.4, 0.0001,  1);
     pMuon->pfIsoChargedNoZ = computeCommonIso(mu, fPFNoPileUpNoZ , 0.0, 0.4, 0.0001,  1);
