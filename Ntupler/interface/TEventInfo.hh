@@ -38,11 +38,13 @@ namespace mithep
     /// lumi section
     unsigned int  lumiSec;
     /// number of in-time pileup event per event (for MC only)
-    unsigned int  nPU, nPUTrue;  
+    unsigned int  nPU;  
     /// number of out of time pileup events in following event (for MC only)
-    unsigned int  nPUPlus, nPUPlusTrue;
+    unsigned int  nPUPlus;
     /// number of out of time pileup events previous event (for MC only)
-    unsigned int  nPUMinus, nPUMinusTrue;
+    unsigned int  nPUMinus;
+    /// poisson mean from which npu was thrown
+    float nPUTrue, nPUPlusTrue, nPUMinusTrue;
     /// HLT trigger bits that fired for this event
     TriggerBits triggerBits;
     /// coordiantes of the reconstructed primary vertex with highest sum pt squared
@@ -62,7 +64,7 @@ namespace mithep
     /// embedding weight (for embedding sample only) 
     float embWeight;
 
-    ClassDef(TEventInfo, 1)
+    ClassDef(TEventInfo, 2)
   };
 }
 #endif

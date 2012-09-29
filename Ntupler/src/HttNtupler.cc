@@ -514,7 +514,7 @@ HttNtupler::fillCommon(TriggerBits& trigBits)
 {
   // get pileup information (for MC samples only)
   int npu0 = -1; int npu1 = -1; int npu2 = -1;
-  int npu0m = -1; int npu1m = -1; int npu2m = -1;
+  float npu0m = -1; float npu1m = -1; float npu2m = -1;
   if( !fIsData && fUseGen!=ESampleType::kEmbed ){
     for(unsigned int idx=0; idx<fPileup->GetEntries(); ++idx){
       if( fPileup->At(idx)->GetBunchCrossing() ==  0 ) 
