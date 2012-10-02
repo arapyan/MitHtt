@@ -137,7 +137,7 @@ TMatrixD MetSignificance::getSignificance(const PFJetCol *iJets, const PFCandida
   addJets           (fSig,iJets       ,(mithep::Particle*) iMuon,(mithep::Particle*) iElectron);
   subtractCandidates(fSig,iCands,iJets,(mithep::Particle*) iMuon,(mithep::Particle*) iElectron);
   if(iTau      != 0) addTau        (fSig,iTau);
-  if(jTau      != 0) addTau        (fSig,iTau);
+  if(jTau      != 0) addTau        (fSig,jTau);
   if(iMuon     != 0) add (iMuon,    fSig);
   if(iElectron != 0) add (iElectron,fSig);
   
