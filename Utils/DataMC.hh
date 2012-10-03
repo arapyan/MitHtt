@@ -3,6 +3,7 @@
 
 #include "TTree.h"
 #include "TBranch.h"
+#include "TRandom1.h"
 #include "TH1D.h"
 #include "TH2D.h"
 
@@ -323,5 +324,113 @@ double efficiency(double m, double m0, double sigma, double alpha,
                                    1/TMath::Power(absAlpha - b,n-1)) / (1 - n)) / area;
   }
 }
+// double mutaueff(bool run, double pt, double eta, bool is2012)
+// {
+//   double m0,sigma, alpha,n,norm;
+//   if(is2012)
+//     {
+//       if(run <193686)
+// 	{
+// 	  if(fabs(eta) < 1.5)
+// 	    {
+// 	      m0 = 18.52262128;
+// 	      sigma = 1.85879597;
+// 	      alpha = 3.48843815;
+// 	      n = 1.15491294;
+// 	      norm = 1.02489024;
+// 	    }
+// 	  else
+// 	    {
+// 	      m0 = 18.90119559;
+// 	      sigma = 0.14025596;
+// 	      alpha = 0.14482632;
+// 	      n = 1.56126508;
+// 	      norm = 0.81188198;
+// 	    }
+// 	}
+//       else
+// 	{
+// 	  if(fabs(eta) < 1.5)
+// 	    {
+// 	      m0 = 17.92648563;
+// 	      sigma = 1.96846742;
+// 	      alpha = 4.46406075;
+// 	      n = 1.02023992;
+// 	      norm = 1.52260575;
+// 	    }
+// 	  else
+// 	    {
+// 	      m0 = 18.59856420;
+// 	      sigma = 2.49132550;
+// 	      alpha = 10.99643595;
+// 	      n = 1.50651123;
+// 	      norm = 0.87952970;
+// 	    }
+// 	}    
+//     }
+//   else
+//     {
+//       if(fabs(eta) < 1.5)
+// 	{
+// 	  m0 = 13.9694;
+// 	  sigma = 0.084835;
+// 	  alpha = 0.057743;
+// 	  n = 1.50674
+// 	  norm = 0.984976;
+// 	}
+//       else
+// 	{
+// 	  m0 = 14.435;
+// 	  sigma = 1.34952;
+// 	  alpha = 2.43996;
+// 	  n = 1.03631;
+// 	  norm = 1.79081;
+// 	}
+//     }
+//   return efficiency(pt,m0,sigma,alpha,n,norm); 
+// }
+// double mutauratio(bool run, double pt, double eta, bool is2012)
+// {
+//   double m0,sigma, alpha,n,norm;
+//   if(is2012)
+//     {
+//       if(fabs(eta) < 1.5)
+// 	{
+// 	  m0 = 14.435;
+// 	  sigma = 1.34952;
+// 	  alpha = 2.43996;
+// 	  n = 1.03631;
+// 	  norm = 1.79081;
+// 	}
+//       else
+// 	{
+// 	  m0 = 14.435;
+// 	  sigma = 1.34952;
+// 	  alpha = 2.43996;
+// 	  n = 1.03631;
+// 	  norm = 1.79081;
+// 	}
+//     }
+//   else
+//     {
+//       if(fabs(eta) < 1.5)
+// 	{
+// 	  m0 = 14.435;
+// 	  sigma = 1.34952;
+// 	  alpha = 2.43996;
+// 	  n = 1.03631;
+// 	  norm = 1.79081;
+// 	}
+//       else
+// 	{
+// 	  m0 = 14.435;
+// 	  sigma = 1.34952;
+// 	  alpha = 2.43996;
+// 	  n = 1.03631;
+// 	  norm = 1.79081;
+// 	}
+//     }
+//   return mutaueff(bool run, double pt, double eta, bool is2012)/efficiency(pt,m0,sigma,alpha,n,norm);
+// }
 
 #endif
