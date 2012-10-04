@@ -55,10 +55,10 @@ const Double_t pi = 3.14159265358979;
 
 //=== MAIN MACRO =================================================================================================
 
-void selectETau(const TString conf,         // input config file
-		const TString outputDir,    // output directory
-		const Double_t lumi,        // luminosity pb^-1
-		const Int_t is2012,          //2012 or 2011 data
+void selectETau(const TString conf="htt.conf",         // input config file
+		const TString outputDir="tmp",    // output directory
+		const Double_t lumi=4.9,        // luminosity pb^-1
+		const Int_t is2012=true,          //2012 or 2011 data
 		const UInt_t btageff=0,     // b-tag efficiency scale factor uncertainty
 		const UInt_t jetunc=0,      // jet energy uncertainties
 		const UInt_t mistag=0,      // b mistag rate scale factor uncertainty
@@ -151,8 +151,10 @@ void selectETau(const TString conf,         // input config file
 
   //vbf MVA
   HttMVA *vbfMVA = new HttMVA();
-  vbfMVA->Initialize("BDTG method", getenv("CMSSW_BASE")+std::string("/src/MitHtt/data/VBFMVA/MuTau/VBFMVA_BDTG.weights.xml"), HttMVA::kVBF2);   // vbf mva
- 
+  //vbfMVA->Initialize("BDTG method", getenv("CMSSW_BASE")+std::string("/src/MitHtt/data/VBFMVA/MuTau/VBFMVA_BDTG.weights.xml"), HttMVA::kVBF2);   // vbf mva
+  if(!is2012) vbfMVA->Initialize("BDTG method", getenv("CMSSW_BASE")+std::string("/src/MitHtt/data/VBFMVA/MuTau/VBFMVA_BDTG_HCP_42X.weights.xml"), HttMVA::kVBF3);   // vbf mva
+  if(is2012)  vbfMVA->Initialize("BDTG method", getenv("CMSSW_BASE")+std::string("/src/MitHtt/data/VBFMVA/MuTau/VBFMVA_BDTG_HCP_52X.weights.xml"), HttMVA::kVBF3);   // vbf mva 
+
   // Data structures to store info from TTrees
   mithep::TEventInfo *info  = new mithep::TEventInfo();
   mithep::TGenInfo *gen     = new mithep::TGenInfo();
@@ -189,7 +191,6 @@ void selectETau(const TString conf,         // input config file
       // which corrections to apply where
       Bool_t isdata     = !(samp->typev[ifile]==eMC);
       Bool_t isemb      = snamev[isam].Contains("emb");
-      Bool_t doRecoil   = (sfname.Contains("ztt") || sfname.Contains("-zll") || sfname.Contains("zjets") || snamev[isam].Contains("_sm_") || snamev[isam].Contains("_mssm_")) && !isemb;
       Bool_t reallyDoKf = doKFactors && sfname.Contains("-gf-");
       Bool_t ismadz     = sfname.Contains("-zll") || sfname.Contains("-zjets"); // madgraph z samples
       Bool_t ismadzmm   = snamev[isam].Contains("zmm") && (sfname.Contains("-zll") || sfname.Contains("-zjets")); // madgraph z samples 
@@ -198,6 +199,12 @@ void selectETau(const TString conf,         // input config file
       Bool_t doTrigScale= !isdata;
       Bool_t getGen     =  sfname.Contains("wjets") || doRecoil || reallyDoKf || ismadz ||isemb || ismssm;
       Bool_t doJetUnc   = (jetunc!=kNo);
+      
+      Int_t  doRecoil   = (sfname.Contains("ztt") || sfname.Contains("-zll") || sfname.Contains("zjets")) && !isemb;
+      if((snamev[isam].Contains("wjets") || snamev[isam].Contains("w1jets") ||  snamev[isam].Contains("w2jets") || snamev[isam].Contains("w3jets") || snamev[isam].Contains("w4jets") ) && !isemb) doRecoil = 2;
+      if((snamev[isam].Contains("_sm_") || snamev[isam].Contains("_mssm_")) && !isemb) doRecoil = 3;
+      Bool_t getGen     = sfname.Contains("wjets") || (doRecoil > 0) || reallyDoKf || ismadz ||isemb || ismssm;
+
       out->doRecoil = doRecoil;
       
       // PU reweighting

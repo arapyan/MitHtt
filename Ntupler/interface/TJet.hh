@@ -52,10 +52,18 @@ namespace mithep
     int matchedId;
     /// pdgId of matched GenJet parton flavor
     int matchedFlavor;
+    /// pdgId of matched GenJet parton flavor
+    float genpt,geneta,genphi;
     /// HLT bits for which the offline reconstructed jet could be matched on trigger level
     TriggerObjects  hltMatchBits;
+    /// Quark Likelihood
+    float  quark;
+    /// Gluon Likelhiood
+    float  gluon;
+    /// PU Likelhiood
+    float  pu;
     
-    ClassDef(TJet,6)
+    ClassDef(TJet,7)
   };
 }
 #endif

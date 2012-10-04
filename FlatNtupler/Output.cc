@@ -93,9 +93,11 @@ Output::Output(TString name):
   fGenPt1(0),
   fGenPhi1(0),
   fGenEta1(0),
+  fGenId1(0),
   fGenPt2(0),
   fGenPhi2(0),
   fGenEta2(0),
+  fGenId2(0),
   doRecoil(0),
   npt20jets(0),
   fOutputFile(0),
@@ -105,10 +107,14 @@ Output::Output(TString name):
   jptArray.Set(50);
   jetaArray.Set(50);
 
-  if(doRecoil)
+  if(doRecoil > 0)
      {
        cout << "doing recoil corrections" << endl;
-       corrector = new RecoilCorrector("$CMSSW_BASE/src/MitHtt/Utils/recoilfits/recoilfit_datamm52X_v2_njet.root");
+       if(doRecoil == 1) corrector = new RecoilCorrector("$CMSSW_BASE/src/MitHtt/Utils/recoilfits/recoilfit_zmm53X_20pv_njet.root");
+       if(doRecoil == 2) corrector = new RecoilCorrector("$CMSSW_BASE/src/MitHtt/Utils/recoilfits/recoilfit_wjets53X_20pv_njet.root");
+       if(doRecoil == 3) corrector = new RecoilCorrector("$CMSSW_BASE/src/MitHtt/Utils/recoilfits/recoilfit_higgs53X_20pv_njet.root");
+       corrector->addMCFile      ("files/recoilfit_zmm53X_20pv_njet.root");
+       corrector->addDataFile    ("files/recoilfit_datamm53X_20pv_njet.root");
      }
   setupOutput(name);
 }
@@ -207,9 +213,12 @@ void Output::setupOutput(TString name) {
   fEventTree->Branch("genlpt_1",&fGenPt1,"fJGenPt1/F");
   fEventTree->Branch("genlphi_1",&fGenPhi1,"fGenPhi1/F");
   fEventTree->Branch("genleta_1",&fGenEta1,"fGenEta1/F");
+  fEventTree->Branch("genlid_1",&fGenId1 ,"fGenId1/I");
   fEventTree->Branch("genlpt_2",&fGenPt2,"fJGenPt2/F");
   fEventTree->Branch("genlphi_2",&fGenPhi2,"fGenPhi2/F");
   fEventTree->Branch("genleta_2",&fGenEta2,"fGenEta2/F");
+  fEventTree->Branch("genlid_2",&fGenId2 ,"fGenId2/I");
+  fEventTree->Branch("genmatch",&fGenMatch ,"fGenMatch/I");
   fEventTree->Branch("vbfmva",&fMVA,"fMVA/F");
   fEventTree->Branch("njetingap",&fNJetInGap,"fNJetInGap/F");
   fEventTree->Branch("npt20jets",&npt20jets);
@@ -233,7 +242,7 @@ void Output::fillMuon(const mithep::TMuon *muon, double iso, bool passiso)
   fEta1 = muon->eta;
   fM1  = 105.658369e-3;
   fq1 = muon->q;
-  fIso1 = iso;
+  fIso1 = iso/muon->pt;
   fD01 = muon->d0;
   fDZ1 = muon->dz;
   fPassIso1 = passiso;
@@ -248,7 +257,7 @@ void Output::fillElectron(const mithep::TElectron *ele, bool first, double iso, 
       fEta1 = ele->eta;
       fM1  = 0.000511;
       fq1 = ele->q;
-      fIso1 = iso;
+      fIso1 = iso/ele->pt;
       fD01 = ele->d0;
       fDZ1 = ele->dz;
       fPassIso1 = passiso;
@@ -260,7 +269,7 @@ void Output::fillElectron(const mithep::TElectron *ele, bool first, double iso, 
       fEta2 = ele->eta;
       fM2  = 0.000511;
       fq2 = ele->q;
-      fIso2 = iso;
+      fIso2 = iso/ele->pt;
       fD02 = ele->d0;
       fDZ2 = ele->dz;
       fPassIso2 = passiso;
@@ -342,21 +351,38 @@ void Output::fillJets(const mithep::TJet *jet1,const mithep::TJet *jet2, const m
 void Output::fillGen(mithep::TGenInfo *gen)
 {
   if(gen->pt_1_a > gen->pt_2_a) {
-    fGenPt1 = gen->pt_1_a;
+    fGenPt1  = gen->pt_1_a;
     fGenEta1 = gen->eta_1_a;
     fGenPhi1 = gen->phi_1_a;
-    fGenPt2 = gen->pt_2_a;
+    fGenId1  = gen->id_1_a; 
+    fGenPt2  = gen->pt_2_a;
     fGenEta2 = gen->eta_2_a;
     fGenPhi2 = gen->phi_2_a;
+    fGenId2  = gen->id_2_a; 
   } else {
-    fGenPt2 = gen->pt_1_a;
+    fGenPt2  = gen->pt_1_a;
     fGenEta2 = gen->eta_1_a;
     fGenPhi2 = gen->phi_1_a;
-    fGenPt1 = gen->pt_2_a;
+    fGenId2  = gen->id_1_a; 
+    fGenPt1  = gen->pt_2_a;
     fGenEta1 = gen->eta_2_a;
     fGenPhi1 = gen->phi_2_a;
+    fGenId1  = gen->id_2_a; 
   } 
-  fMass = gen->vmass_a;
+  int lNTauMatch = 0;
+  int lNLepMatch = 0;
+  fGenMatch = 0;
+  if(toolbox::deltaR(fEta1,fPhi1,fGenEta1,fGenPhi1) < 0.3) (fabs(fGenId1) > 14) ? lNTauMatch++ : lNLepMatch++;
+  if(toolbox::deltaR(fEta1,fPhi1,fGenEta2,fGenPhi2) < 0.3) (fabs(fGenId2) > 14) ? lNTauMatch++ : lNLepMatch++;
+  if(toolbox::deltaR(fEta2,fPhi2,fGenEta1,fGenPhi1) < 0.3) (fabs(fGenId1) > 14) ? lNTauMatch++ : lNLepMatch++;
+  if(toolbox::deltaR(fEta2,fPhi2,fGenEta2,fGenPhi2) < 0.3) (fabs(fGenId2) > 14) ? lNTauMatch++ : lNLepMatch++;
+  if(lNLepMatch == 2                   ) fGenMatch = 1;
+  if(lNTauMatch == 1 && lNLepMatch == 1) fGenMatch = 2;
+  if(lNTauMatch == 2                   ) fGenMatch = 3;
+  if(lNLepMatch == 1 && lNTauMatch == 0) fGenMatch = 4;
+  if(lNLepMatch == 0 && lNTauMatch == 1) fGenMatch = 5;
+
+  fMass  = gen->vmass_a;
   fgenpt = gen->vpt_a;
   fgenphi = gen->vphi_a;
 }
@@ -387,10 +413,15 @@ void Output::fillEvent(mithep::TEventInfo *info, HttMVA *vbfmva, int npv)
   dijet = jv1+jv2;
   
   // recoil corrections
- //  Double_t pU1      = 0;  //--
-//   Double_t pU2      = 0;  //--
-  //if(corrector) corrector->CorrectAll(fMet, fMetPhi, fgenpt, fgenphi, dilep.Pt(), dilep.Phi(), pU1, pU2, 0, 0, fNJets);
-  
+  double pU1         = 0;  //--
+  double pU2         = 0;  //--
+  double lMVAMet     = fMVAMet;
+  double lMVAMetPhi  = fMVAMetPhi;
+  if(corrector && doRecoil != 2) corrector->CorrectType2(lMVAMet, lMVAMetPhi, fgenpt, fgenphi, dilep.Pt(), dilep.Phi(), pU1, pU2, 0, 0, fNJets);
+  if(corrector && doRecoil == 2) corrector->CorrectType2(lMVAMet, lMVAMetPhi, fgenpt, fgenphi, lep1 .Pt(), lep1 .Phi(), pU1, pU2, 0, 0, fNJets);
+  fMVAMet            = lMVAMet;
+  fMVAMetPhi         = lMVAMetPhi;
+
   // calculate projection variables
   TVector3 l1,l2,metv,mvametv;
   l1.SetPtEtaPhi(fPt1,0,fPhi1);
@@ -424,7 +455,6 @@ void Output::fillEvent(mithep::TEventInfo *info, HttMVA *vbfmva, int npv)
   fPtVis	 = dilep.Pt();
   fPtH		 = higgs.Pt();
   fMVA		 = (vbfmva)  ? vbfmva->MVAValue(fMJJ, fJDEta, fJDPhi, fDiJetPt, fPtH, fHDJetPhi, fVisJetEta, fPtVis) : 0;
- 
   fEventTree->Fill();
 } 
 

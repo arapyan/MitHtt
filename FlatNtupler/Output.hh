@@ -158,11 +158,14 @@ public:
   float fGenPt1;  //pT leading
   float fGenPhi1; //Phi leading
   float fGenEta1; //Eta leading
+  int   fGenId1;  //Pdg Id leading
   float fGenPt2;  //pT sub-leading
   float fGenPhi2; //Phi sub-leading
   float fGenEta2; //Eta sub-leading
- 
-  bool  doRecoil; //Recoil corrections  
+  int   fGenId2;  //Pdg Id leading
+  int   fGenMatch; //Matched to ll/l+Tau/Tau+Tau/l+Jet/Tau+Jet/None of above (1/2/3/4/5/0)
+
+  int    doRecoil; //Recoil corrections  
   
   UInt_t npt20jets;
   TArrayF btagArray;

@@ -33,7 +33,8 @@ public:
     kIPMetNjets = 7,   // 6 + jet multiplicity
     kIPMetJets = 8,    // 7 + jet kinematics
     kVBF = 9,          // VBF
-    kVBF2 = 10
+    kVBF2 = 10,
+    kVBF3 = 11
   };
 
   void     Initialize(TString methodName, TString weightFile, HttMVA::MVAType type);

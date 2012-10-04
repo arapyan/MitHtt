@@ -78,6 +78,7 @@ Bool_t passPFMuonID(const mithep::TMuon *muon)
 //--------------------------------------------------------------------------------------------------
 Bool_t passTightPFMuonID(const mithep::TMuon *muon,Bool_t mutau)
 {
+  //std::cout << bool(muon->typeBits & kGlobal) << " -- " << fabs(muon->dz) << " -- " << fabs(muon->d0) << " -- " << muon->matchesPFCand << " -- " << muon->matchedPFType << std::endl; 
   if(!(muon->typeBits & kGlobal))  return kFALSE;
 
   if(mutau)
@@ -96,7 +97,8 @@ Bool_t passTightPFMuonID(const mithep::TMuon *muon,Bool_t mutau)
   if(muon->nPixHits       < 1)     return kFALSE;
   if(muon->nTkHits        < 6)    return kFALSE;
   
-  if(!(muon->matchesPFCand && muon->matchedPFType==3)) return kFALSE;
+  //if(!(muon->matchesPFCand && muon->matchedPFType==3)) return kFALSE;
+  if(!(muon->matchesPFCand )) return kFALSE;
 
   return kTRUE;
   

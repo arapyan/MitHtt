@@ -75,6 +75,11 @@ void HttMVA::Initialize(TString methodName, TString weightFile, HttMVA::MVAType 
     fTMVAReader->AddVariable( "dPhi_hj",         &fMVAVar_DPhiHjj   );
     fTMVAReader->AddVariable( "C1",              &fMVAVar_DEtaVisJet);
     fTMVAReader->AddVariable( "C2",              &fMVAVar_PtVis     );
+  } else if(type==kVBF3) {
+    fTMVAReader->AddVariable( "mjj",             &fMVAVar_Mjj       );
+    fTMVAReader->AddVariable( "dEta",            &fMVAVar_DEtajj    );
+    fTMVAReader->AddVariable( "C1",              &fMVAVar_DEtaVisJet);
+    fTMVAReader->AddVariable( "C2",              &fMVAVar_PtVis     );
   } else if(type==kMet) {
     fTMVAReader->AddVariable( "projvis",         &fMVAVar_ProjVis   );
     fTMVAReader->AddVariable( "projmet",         &fMVAVar_ProjMet   );
