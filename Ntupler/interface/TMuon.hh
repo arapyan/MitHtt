@@ -87,9 +87,8 @@ namespace mithep
     // total delta beta corrected isolation
     float pfDeltaBetaIso;
     /// check type of matched PF candidate
+    float nTkLayersHit;
     unsigned int matchedPFType;
-
-    //float nTkLayersHit;
     ClassDef(TMuon, 9)
   };  
 }

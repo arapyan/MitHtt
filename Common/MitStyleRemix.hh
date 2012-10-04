@@ -70,7 +70,7 @@ void InitHist(TH1 *hist, const char *xtit, const char *ytit, EColor color)
   hist->SetLabelFont  (42   ,"X");
   hist->SetMarkerStyle(20);
   hist->SetMarkerColor(color);
-  hist->SetMarkerSize (0.6);
+  hist->SetMarkerSize (0.2);
   // Strangely enough this cannot be set anywhere else??
   hist->GetYaxis()->SetTitleFont(42);
   hist->GetXaxis()->SetTitleFont(42);
@@ -134,7 +134,7 @@ void SetStyle()
   // Various
   MITStyle->SetMarkerStyle(20);
   MITStyle->SetMarkerColor(kBlack);
-  MITStyle->SetMarkerSize (1.4);
+  MITStyle->SetMarkerSize (0.4);
 
   MITStyle->SetTitleBorderSize(0);
   MITStyle->SetTitleFillColor (0);

@@ -266,8 +266,7 @@ void selectMuTau(const TString conf="test.conf",         // input config file
 
       // loop over events
       for(UInt_t ientry=0; ientry<eventTree->GetEntriesFast(); ientry++) {
-	if(ientry%1000000 == 0) cout << "processing " << float(ientry)/float(eventTree->GetEntriesFast()) << endl;
-	if(ientry/ eventTree->GetEntriesFast() ) break;
+	if(ientry%10000 == 0) cout << "processing " << float(ientry)/float(eventTree->GetEntriesFast()) << endl;
         infoBr->GetEntry(ientry);
 	
 	if(getGen) genBr->GetEntry(ientry);
@@ -366,7 +365,6 @@ void selectMuTau(const TString conf="test.conf",         // input config file
         }
 	
 	if(!(leadMu && leadTau)) continue;
-	
 	// Di-muon veto
 	//
 	Bool_t diMuon = kFALSE;
@@ -393,9 +391,7 @@ void selectMuTau(const TString conf="test.conf",         // input config file
 		  }
 	      }
 	  }
-
 	if(diMuon) continue;
-
 	out->fillMuon(leadMu,muonIsoPU(leadMu),passMuonIsoPU(leadMu,1));
 	out->fillTau(leadTau,0,leadTau->ringIso > 0.795);
 	
@@ -415,7 +411,6 @@ void selectMuTau(const TString conf="test.conf",         // input config file
 	 
 	  out->fillCov(svfit);
         }
-       
         //if(cov_00==0 && cov_01==0 && cov_10==0 && cov_11==0) continue;
 
         // loop through jets      
@@ -448,7 +443,6 @@ void selectMuTau(const TString conf="test.conf",         // input config file
 		bjet = jet; // leading b-jet
 	    }
 	  }
-
 	  // look for jets
           if(jet->pt > kJetPtMin) {
             assert(njets<50);
@@ -475,8 +469,7 @@ void selectMuTau(const TString conf="test.conf",         // input config file
         }
 	
 	out->fillJets(jet1,jet2,bjet,njets,nbjets,npt20jets,nCentralJets);
-
-        // get k-factor if necessary
+	// get k-factor if necessary
         Double_t kf=1;
         if(reallyDoKf) kf = kfFHPValue(gen->vpt_a, hKFactors);
 
@@ -487,7 +480,6 @@ void selectMuTau(const TString conf="test.conf",         // input config file
 	  Int_t npuxbin = puWeights->GetXaxis()->FindFixBin(TMath::Min(double(info->nPU), 59.499));
 	  npuWgt = puWeights->GetBinContent(npuxbin);
 	}
-
 	// lepton ID corrections
 	Double_t idscale = 1;
 	if(doIdScale) idscale = muIDscaleMuTau(leadMu->pt,leadMu->eta,is2012);
@@ -503,13 +495,11 @@ void selectMuTau(const TString conf="test.conf",         // input config file
 	if(doTrigScale && !isemb && !is2012) 
 	  trigscale = tautrigscale->eff(leadTau->pt,leadTau->eta) * mutrigscale->eff(leadMu->pt,leadMu->eta);
 	
-	
 	// embedding weight for embedded sample
 	Double_t embWgt = 1;
    
 	if(!isdata) out->fillGen(gen);
 	if(isemb)  embWgt=info->embWeight;
-
 	out->fMCWeight	 = weight*kf*embWgt/lumi;
 	out->fPUWeight	 = npuWgt;
 	out->fEffWeight	 = trigscale*idscale;
@@ -519,7 +509,6 @@ void selectMuTau(const TString conf="test.conf",         // input config file
 	nsel    += weight*kf*npuWgt*trigscale*idscale*embWgt;
 	nselvar += weight*weight*kf*kf*npuWgt*npuWgt*trigscale*trigscale*idscale*idscale*embWgt*embWgt;
 	if(doRecoil && (gen->vmass_a < 50)) nlowmass += weight*kf*npuWgt*trigscale*idscale*embWgt;
-
 	// passing events in whole sample 
         nSelEvents += weight*kf*npuWgt*trigscale*idscale*embWgt;
       }

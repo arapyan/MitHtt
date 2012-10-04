@@ -1,6 +1,17 @@
 #include "Output.hh"
 #include "MitHtt/Common/MyTools.hh"        // miscellaneous helper functions
 
+Double_t deltaR(Double_t eta1, Double_t phi1, Double_t eta2, Double_t phi2)
+{
+  const Double_t pi = 3.14159265358979;
+  Double_t dphi = fabs(phi1-phi2);
+  dphi = TMath::Min(dphi,2*pi-dphi);
+    
+  Double_t deta = eta1-eta2;
+  
+  return sqrt(dphi*dphi + deta*deta);
+}
+
 Output::Output(TString name):
   fRun(0),
   fLumi(0),
@@ -350,6 +361,7 @@ void Output::fillJets(const mithep::TJet *jet1,const mithep::TJet *jet2, const m
 
 void Output::fillGen(mithep::TGenInfo *gen)
 {
+
   if(gen->pt_1_a > gen->pt_2_a) {
     fGenPt1  = gen->pt_1_a;
     fGenEta1 = gen->eta_1_a;
@@ -372,16 +384,17 @@ void Output::fillGen(mithep::TGenInfo *gen)
   int lNTauMatch = 0;
   int lNLepMatch = 0;
   fGenMatch = 0;
-  if(toolbox::deltaR(fEta1,fPhi1,fGenEta1,fGenPhi1) < 0.3) (fabs(fGenId1) > 14) ? lNTauMatch++ : lNLepMatch++;
-  if(toolbox::deltaR(fEta1,fPhi1,fGenEta2,fGenPhi2) < 0.3) (fabs(fGenId2) > 14) ? lNTauMatch++ : lNLepMatch++;
-  if(toolbox::deltaR(fEta2,fPhi2,fGenEta1,fGenPhi1) < 0.3) (fabs(fGenId1) > 14) ? lNTauMatch++ : lNLepMatch++;
-  if(toolbox::deltaR(fEta2,fPhi2,fGenEta2,fGenPhi2) < 0.3) (fabs(fGenId2) > 14) ? lNTauMatch++ : lNLepMatch++;
+  
+  if(deltaR(fEta1,fPhi1,fGenEta1,fGenPhi1) < 0.3) {if(fabs(fGenId1) > 14)  {lNTauMatch++;} else{lNLepMatch++;}}
+  if(deltaR(fEta1,fPhi1,fGenEta2,fGenPhi2) < 0.3) {if(fabs(fGenId2) > 14)  {lNTauMatch++;} else {lNLepMatch++;}}
+  if(deltaR(fEta2,fPhi2,fGenEta1,fGenPhi1) < 0.3) {if(fabs(fGenId1) > 14)  {lNTauMatch++;} else {lNLepMatch++;}}
+  if(deltaR(fEta2,fPhi2,fGenEta2,fGenPhi2) < 0.3) {if(fabs(fGenId2) > 14)  {lNTauMatch++;} else {lNLepMatch++;}}
   if(lNLepMatch == 2                   ) fGenMatch = 1;
   if(lNTauMatch == 1 && lNLepMatch == 1) fGenMatch = 2;
   if(lNTauMatch == 2                   ) fGenMatch = 3;
   if(lNLepMatch == 1 && lNTauMatch == 0) fGenMatch = 4;
   if(lNLepMatch == 0 && lNTauMatch == 1) fGenMatch = 5;
-
+ 
   fMass  = gen->vmass_a;
   fgenpt = gen->vpt_a;
   fgenphi = gen->vphi_a;
