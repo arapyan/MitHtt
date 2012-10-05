@@ -146,7 +146,8 @@ HttNtupler::SlaveBegin()
   fElectronMVAID = new ElectronIDMVA();
   fElectronMVAID->Initialize("BDTG method",ElectronIDMVA::kIDEGamma2012NonTrigV1,kTRUE,weightFilesEleID);
 
-  fJetIDMVA  = new JetIDMVA();
+  fJetIDMVA   = new JetIDMVA();
+  fQGJetIDMVA = new JetIDMVA();
   if(f2012) {
     fJetIDMVA->Initialize(JetIDMVA::kLoose,
 			  TString(getenv("CMSSW_BASE")+string("/src/MitPhysics/data/mva_JetID_lowpt.weights.xml")),
@@ -155,6 +156,7 @@ HttNtupler::SlaveBegin()
 			  //JetIDMVA::kBaseline,
 			  JetIDMVA::k52,
 			  TString(getenv("CMSSW_BASE")+string("/src/MitPhysics/Utils/python/JetIdParams_cfi.py")));
+
   } else {
     fJetIDMVA->Initialize(JetIDMVA::kLoose,
 			  TString(getenv("CMSSW_BASE")+string("/src/MitPhysics/data/mva_JetID_lowpt.weights.xml")),
@@ -164,6 +166,12 @@ HttNtupler::SlaveBegin()
 			  JetIDMVA::k42,
 			  TString(getenv("CMSSW_BASE")+string("/src/MitPhysics/Utils/python/JetIdParams_cfi.py")));
   }
+  fQGJetIDMVA->Initialize(JetIDMVA::kLoose,
+			  TString(getenv("CMSSW_BASE")+string("/src/MitPhysics/data/mva_JetID_lowpt.weights.xml")),
+			  TString(getenv("CMSSW_BASE")+string("/src/MitPhysics/data/QG.weights.xml")),
+			  JetIDMVA::kQGP,
+			  TString(getenv("CMSSW_BASE")+string("/src/MitPhysics/Utils/python/JetIdParams_cfi.py")));
+  
   fTauMVAIso = new TauIsoMVA();
   fTauMVAIso->Initialize(TString(getenv("CMSSW_BASE")+string("/src/MitPhysics/data/SXIsoMVA_BDTG.weights.xml")));
  			 
@@ -360,6 +368,17 @@ HttNtupler::fillGenerator()
   const MCParticle* boson_b=0, *dau1_b=0, *dau2_b=0;
   const MCParticle* top=0, *tbar=0;
   bool lNext = false;
+  bool lCountPartons = false;
+  int  lNPartons = 0;
+  if((fUseGen==ESampleType::kW)) { 
+    for(unsigned int i=0; i<fParticles->GetEntries(); ++i) { 
+      const MCParticle* p = fParticles->At(i);
+      if(p->Status() != 3) continue;
+      int id = fabs(p->PdgId());
+      if((lCountPartons)                 && (id == 1 || id == 2 || id == 3 || id == 4 || id == 5 || id == 6 || id == 21)) lNPartons++;
+      if((fUseGen==ESampleType::kW)      &&  id  == 24)  lCountPartons = true;  // Start counting partons after we find the W
+    } 
+  }
   for(unsigned int i=0; i<fParticles->GetEntries(); ++i){
     const MCParticle* p = fParticles->At(i);
     // fill status 3 muon or electron
@@ -463,6 +482,7 @@ HttNtupler::fillGenerator()
     fGenInfo.x_2    = fMCEvtInfo->X2();
     fGenInfo.weight = fMCEvtInfo->Weight();
   }
+  fGenInfo.npartons = lNPartons;
   fGenInfo.id_a     = pdgId(boson_a);
   fGenInfo.vmass_a  = boson_a->Mass();
   fGenInfo.vpt_a    = boson_a->Pt();
@@ -972,11 +992,18 @@ HttNtupler::fillJets()
       pPFJet->chgHadrfrac = jet->ChargedHadronEnergy()/jet->E();
       pPFJet->neuHadrfrac = jet->NeutralHadronEnergy()/jet->E();
       pPFJet->csv         = jet->CombinedSecondaryVertexBJetTagsDisc();
-      pPFJet->mva          = fJetIDMVA->MVAValue(jet,fVertex,fPrimVerts,fJetCorrector,fPUEnergyDensity);
-      pPFJet->id           = (fJetIDMVA->pass(jet,fVertex,fPrimVerts,fJetCorrector,fPUEnergyDensity) ? 1 : 0) ;
+      pPFJet->mva         = fJetIDMVA->MVAValue(jet,fVertex,fPrimVerts,fJetCorrector,fPUEnergyDensity);
+      pPFJet->id          = (fJetIDMVA->pass(jet,fVertex,fPrimVerts,fJetCorrector,fPUEnergyDensity) ? 1 : 0) ;
+      // Double_t *pQGVals   = fQGJetIDMVA->QGValue(jet,fVertex,fPrimVerts,fJetCorrector,fPUEnergyDensity,false);
+      //pPFJet->quark       = pQGVals[0];
+      //pPFJet->gluon       = pQGVals[1];
+      //pPFJet->pu          = pQGVals[2];
 
       pPFJet->mcFlavor    = jet->MatchedMCFlavor();
-      int matchedFlavor   = -999;
+      int   matchedFlavor = -999;
+      float genpt         = -999;
+      float geneta        = -999;
+      float genphi        = -999;
       if( fGenJets ){
 	double dRmin = 0.3;
 	for(unsigned int i=0; i<fGenJets->GetEntries(); ++i){
@@ -984,11 +1011,16 @@ HttNtupler::fillJets()
 	  if(MathUtils::DeltaR(*jet,*j) < dRmin) {
 	    dRmin = MathUtils::DeltaR(*jet,*j);
 	    matchedFlavor = j->MatchedMCFlavor();
+	    genpt         = j->Pt();
+	    geneta        = j->Phi();
+	    genphi        = j->Eta();
 	  }
 	}
       }
       pPFJet->matchedFlavor = matchedFlavor;
-
+      // pPFJet->genpt         = genpt;
+      //pPFJet->geneta        = geneta;
+      //pPFJet->genphi        = genphi;
       int matchedId       = -999;
       if (fParticles) {
         Double_t dRmin = 0.3;

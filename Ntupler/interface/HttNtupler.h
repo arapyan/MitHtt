@@ -416,8 +416,10 @@ namespace mithep
     ElectronIDMVA* fElectronMVAID;
     /// electron ID MVA for triggered electrons
     ElectronIDMVA* fElectronMVAIDTrig;
-    /// muon ID MVA
+    /// Jet ID MVA
     JetIDMVA* fJetIDMVA;
+    /// Quark Gluon ID MVA
+    JetIDMVA* fQGJetIDMVA;
     /// MET MVA
     MVAMet* fMVAMet;
     /// Tau ring ISO

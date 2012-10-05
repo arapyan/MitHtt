@@ -13,6 +13,7 @@ namespace mithep
       ~TGenInfo(){}
       
       Float_t weight;				// event weight
+      Float_t npartons;                         // Number of additional partons
       Int_t   pid_1, pid_2;			// parton ID
       Float_t pdf_1, pdf_2;                     // pdf/x
       Float_t x_1, x_2;                         // parton momentum fraction
@@ -29,7 +30,7 @@ namespace mithep
       Float_t pt_2_b, eta_2_b, phi_2_b;  
       Float_t decx, decy, decz;			// boson decay vertex
       	  
-    ClassDef(TGenInfo,2)
+    ClassDef(TGenInfo,3)
   };
 }
 #endif
