@@ -47,6 +47,8 @@
 // event-based MVA
 #include "MitHtt/Utils/HttMVA.hh" 
 
+#include "MitHtt/Utils/TriggerRatio.h"
+
 #include "Output.hh"
 
 #endif
@@ -197,9 +199,8 @@ void selectETau(const TString conf="htt.conf",         // input config file
       Bool_t ismssm     = sfname.Contains("-ggh-") || sfname.Contains("-bbh-");
       Bool_t doIdScale  = !isdata;
       Bool_t doTrigScale= !isdata;
-      Bool_t getGen     =  sfname.Contains("wjets") || doRecoil || reallyDoKf || ismadz ||isemb || ismssm;
+      //Bool_t getGen     =  sfname.Contains("wjets") || doRecoil || reallyDoKf || ismadz ||isemb || ismssm;
       Bool_t doJetUnc   = (jetunc!=kNo);
-      
       Int_t  doRecoil   = (sfname.Contains("ztt") || sfname.Contains("-zll") || sfname.Contains("zjets")) && !isemb;
       if((snamev[isam].Contains("wjets") || snamev[isam].Contains("w1jets") ||  snamev[isam].Contains("w2jets") || snamev[isam].Contains("w3jets") || snamev[isam].Contains("w4jets") ) && !isemb) doRecoil = 2;
       if((snamev[isam].Contains("_sm_") || snamev[isam].Contains("_mssm_")) && !isemb) doRecoil = 3;
@@ -212,7 +213,7 @@ void selectETau(const TString conf="htt.conf",         // input config file
       if(!is2012) {
 	cout << "Fall11 sample!" << endl;
 	pileupReweightFile = "$CMSSW_BASE/src/MitHtt/data/pileup/PUWeights_Fall11toFull2011_PixelLumi_50bins.root";
-      } else pileupReweightFile = "$CMSSW_BASE/src/MitHtt/data/pileup/PUWeights_S12To2012_5089ipb.root";
+      }  else pileupReweightFile = "$CMSSW_BASE/src/MitHtt/data/pileup/PUWeights_S1253XTo2012_12ifb.root";
       TH1F *puWeights = 0;
       TFile *pufile = new TFile(pileupReweightFile.Data());
       puWeights = (TH1F*)pufile->Get("puWeights");
@@ -231,7 +232,7 @@ void selectETau(const TString conf="htt.conf",         // input config file
 
       // Get the TTree
       eventTree = (TTree*)infile->Get("Events"); assert(eventTree);
-      lTree =  (TTree*)infile->Get("Events"); assert(lTree);
+      lTree =  (TTree*)infile->Get("hEvents"); assert(lTree);
 
       // Set branch address to structures that will store the info  
       eventTree->SetBranchAddress("Info",  &info);        TBranch *infoBr     = eventTree->GetBranch("Info");
@@ -261,19 +262,21 @@ void selectETau(const TString conf="htt.conf",         // input config file
       Double_t nlowmass=0; // low mass z events (below 50)
 
       cout << eventTree->GetEntries() << " events" << endl;
-
+      int lNEvents = 0;
       // loop over events
       for(UInt_t ientry=0; ientry<eventTree->GetEntries(); ientry++) {
-	if(ientry%1000000 == 0) cout << "processing " << ientry << endl;
-        infoBr->GetEntry(ientry);
+	if(ientry%100000 == 0) cout << "processing " << float(ientry)/float(eventTree->GetEntriesFast()) << endl;
+  
 	//cout << info->runNum << " " << info->lumiSec << " " << info->evtNum << endl;
-	if(getGen)  genBr->GetEntry(ientry);
+	if(getGen)  genBr->GetEntry(ientry);	
+	if((fabs(gen->id_1_a) + fabs(gen->id_2_a) == 36 && (fabs(gen->id_1_a) == 17 || fabs(gen->id_2_a) == 17)) && gen->pt_1_b > 20 && gen->pt_2_b > 20)  lNEvents++;
 
 	// skip non-tau events in madgraph sample
 	if(ismadz && !ismadzmm && (fabs(gen->id_1_a)<15 || fabs(gen->id_1_a)>19)) continue;
 
         // skip non-mumu events in madgraph sample for zmm
-        if(ismadzmm && (fabs(gen->id_1_a)>14 && fabs(gen->id_1_a)<20)) continue;
+        if(ismadzmm && (fabs(gen->id_1_a)>14 && fabs(gen->id_1_a)<20)) continue; 
+	infoBr->GetEntry(ientry);
 
 	// certified run selection
         mithep::RunLumiRangeMap::RunLumiPairType rl(info->runNum, info->lumiSec);
@@ -291,12 +294,39 @@ void selectETau(const TString conf="htt.conf",         // input config file
 	pvArr->Clear();
 	pvBr->GetEntry(ientry);	
 	
-	
+	// loop through electrons
+        vector<const mithep::TElectron*> looseElev;
+	vector<const mithep::TElectron*> goodElev;
+        eleArr->Clear();
+        eleBr->GetEntry(ientry);
+    
+	const mithep::TElectron *leadEle = NULL;
+        for(Int_t i=0; i<eleArr->GetEntriesFast(); i++) {
+          const mithep::TElectron *ele = (mithep::TElectron*)((*eleArr)[i]);
+	  
+	  Bool_t trigmatch = kFALSE;
+	  // trigger matching
+	  if(is2012)
+	    trigmatch = ((info->triggerBits[kHLT_Ele20_CaloIdVT_CaloIsoRhoT_TrkIdT_TrkIsoT_LooseIsoPFTau20] && ele->hltMatchBits[kHLT_Ele20_CaloIdVT_CaloIsoRhoT_TrkIdT_TrkIsoT_LooseIsoPFTau20_EleObj]) || (info->triggerBits[kHLT_Ele22_eta2p1_WP90Rho_LooseIsoPFTau20] && ele->hltMatchBits[kHLT_Ele22_eta2p1_WP90Rho_LooseIsoPFTau20_EleObj]) ||(info->triggerBits[kHLT_Ele20_CaloIdVT_TrkIdT_LooseIsoPFTau20] && ele->hltMatchBits[kHLT_Ele20_CaloIdVT_TrkIdT_LooseIsoPFTau20_EleObj]) || (info->triggerBits[kHLT_Ele22_eta2p1_WP90NoIso_LooseIsoPFTau20] && ele->hltMatchBits[kHLT_Ele22_eta2p1_WP90NoIso_LooseIsoPFTau20_EleObj]) );
+	  else
+	    trigmatch = ((info->triggerBits[kHLT_Ele15_CaloIdVT_TrkIdT_LooseIsoPFTau15] && ele->hltMatchBits[kHLT_Ele15_CaloIdVT_TrkIdT_LooseIsoPFTau15_EleObj]) || (info->triggerBits[kHLT_Ele15_CaloIdVT_TrkIdT_TightIsoPFTau20] && ele->hltMatchBits[kHLT_Ele15_CaloIdVT_TrkIdT_TightIsoPFTau20_EleObj]) ||(info->triggerBits[kHLT_Ele18_CaloIdVT_TrkIdT_MediumIsoPFTau20] && ele->hltMatchBits[kHLT_Ele18_CaloIdVT_TrkIdT_MediumIsoPFTau20_EleObj]) ||  (info->triggerBits[kHLT_Ele18_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_MediumIsoPFTau20] && ele->hltMatchBits[kHLT_Ele18_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_MediumIsoPFTau20_EleObj]) ||(info->triggerBits[kHLT_Ele20_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_MediumIsoPFTau20] && ele->hltMatchBits[kHLT_Ele20_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_MediumIsoPFTau20_EleObj]));
+	 
+	  if(!isemb && !trigmatch)     continue;
+          if(ele->pt < kElePtMin)		continue;
+	  if(fabs(ele->eta) > 2.1)		continue;
+	  if(!(pass2012EleMVAID(ele,kMedium,1))) continue;
+	  if(!(passEleIsoPU(ele,1)))  continue;
+	  goodElev.push_back(ele);
+	  double pIso = eleIsoPU(ele);
+	  if(!leadEle || (ele->pt > leadEle->pt && (pIso < eleIsoPU(leadEle) || pIso < 0.1)) || ( pIso  > eleIsoPU(leadEle) && ( eleIsoPU(leadEle)  > 0.1))) 
+	    leadEle = ele;
+        }
+       	
         // loop through HPSTaus
         
 	tauArr->Clear();
 	tauBr->GetEntry(ientry);
-
+	const mithep::TPFTau *leadTau = NULL;
 	vector<const mithep::TPFTau*> goodHPSTaus;
 	for(Int_t i = 0; i < tauArr->GetEntries(); i++)
 	  {
@@ -320,66 +350,20 @@ void selectETau(const TString conf="htt.conf",         // input config file
 	    if(!isemb && !trigmatch)     continue;
 	
 	    // Tau Isolation
-	    if(!(tau->ringIso > 0.795)) continue;
+	    //if(!(tau->ringIso > 0.795)) continue;
 		     
 	    if(!(tau->hcalOverP + tau->ecalOverP > 0.2 ||
 	       tau->nSignalPFChargedHadrCands > 1 ||
 		 tau->nSignalPFGammaCands > 0)) continue;
 	    
+	    if(toolbox::deltaR(tau->eta, tau->phi, leadEle->eta, leadEle->phi) > 0.3) continue;
 	    goodHPSTaus.push_back(tau);
+	    if(!leadTau || (tau->pt > leadTau->pt && (tau->ringIso > leadTau->ringIso || tau->ringIso > 0.795)) || (tau->ringIso > leadTau->ringIso && (leadTau->ringIso < 0.795)) )
+	      leadTau = tau;
           }	
 	
 	if(goodHPSTaus.size()<1) continue;
 	
-	// loop through electrons
-        vector<const mithep::TElectron*> looseElev;
-	vector<const mithep::TElectron*> goodElev;
-        eleArr->Clear();
-        eleBr->GetEntry(ientry);
-    
-        for(Int_t i=0; i<eleArr->GetEntriesFast(); i++) {
-          const mithep::TElectron *ele = (mithep::TElectron*)((*eleArr)[i]);
-	  
-	  Bool_t trigmatch = kFALSE;
-	  // trigger matching
-	  if(is2012)
-	    trigmatch = ((info->triggerBits[kHLT_Ele20_CaloIdVT_CaloIsoRhoT_TrkIdT_TrkIsoT_LooseIsoPFTau20] && ele->hltMatchBits[kHLT_Ele20_CaloIdVT_CaloIsoRhoT_TrkIdT_TrkIsoT_LooseIsoPFTau20_EleObj]) || (info->triggerBits[kHLT_Ele22_eta2p1_WP90Rho_LooseIsoPFTau20] && ele->hltMatchBits[kHLT_Ele22_eta2p1_WP90Rho_LooseIsoPFTau20_EleObj]) ||(info->triggerBits[kHLT_Ele20_CaloIdVT_TrkIdT_LooseIsoPFTau20] && ele->hltMatchBits[kHLT_Ele20_CaloIdVT_TrkIdT_LooseIsoPFTau20_EleObj]) || (info->triggerBits[kHLT_Ele22_eta2p1_WP90NoIso_LooseIsoPFTau20] && ele->hltMatchBits[kHLT_Ele22_eta2p1_WP90NoIso_LooseIsoPFTau20_EleObj]) );
-	  else
-	    trigmatch = ((info->triggerBits[kHLT_Ele15_CaloIdVT_TrkIdT_LooseIsoPFTau15] && ele->hltMatchBits[kHLT_Ele15_CaloIdVT_TrkIdT_LooseIsoPFTau15_EleObj]) || (info->triggerBits[kHLT_Ele15_CaloIdVT_TrkIdT_TightIsoPFTau20] && ele->hltMatchBits[kHLT_Ele15_CaloIdVT_TrkIdT_TightIsoPFTau20_EleObj]) ||(info->triggerBits[kHLT_Ele18_CaloIdVT_TrkIdT_MediumIsoPFTau20] && ele->hltMatchBits[kHLT_Ele18_CaloIdVT_TrkIdT_MediumIsoPFTau20_EleObj]) ||  (info->triggerBits[kHLT_Ele18_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_MediumIsoPFTau20] && ele->hltMatchBits[kHLT_Ele18_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_MediumIsoPFTau20_EleObj]) ||(info->triggerBits[kHLT_Ele20_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_MediumIsoPFTau20] && ele->hltMatchBits[kHLT_Ele20_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_MediumIsoPFTau20_EleObj]));
-	 
-	  if(!isemb && !trigmatch)     continue;
-          if(ele->pt < kElePtMin)		continue;
-	  if(fabs(ele->eta) > 2.1)		continue;
-	  if(!(pass2012EleMVAID(ele,kMedium,1))) continue;
-	  if(!(passEleIsoPU(ele,1)))  continue;
-	  goodElev.push_back(ele);
-        }
-       
-	//Find the best electron + tau pair
-	const mithep::TElectron *leadEle = NULL;
-	const mithep::TPFTau *leadTau = NULL;
-	Double_t maxSumPt = 0;
-	
-	for(unsigned int i = 0; i < goodElev.size(); i++)
-	  {
-	    for(unsigned int j = 0; j < goodHPSTaus.size(); j++)
-	      {
-		const mithep::TElectron *elec = goodElev[i];
-		const mithep::TPFTau *tauc = goodHPSTaus[j];
-		Double_t sumPt = elec->pt + tauc->pt;
-		Double_t dR = toolbox::deltaR(tauc->eta, tauc->phi, elec->eta, elec->phi);
-		
-		if(dR > 0.3)
-		  {
-		    if((!leadEle && !leadTau) || (sumPt > maxSumPt))
-		      {
-			leadEle = elec;
-			leadTau = tauc;
-		      }
-		  }
-	      }
-	  }
-
 	Bool_t diElectron = kFALSE;
 	for(Int_t i = 0; i < eleArr->GetEntries(); i++)
 	  {
@@ -489,6 +473,12 @@ void selectETau(const TString conf="htt.conf",         // input config file
         // get k-factor if necessary
         Double_t kf=1;
         if(reallyDoKf) kf = kfFHPValue(gen->vpt_a, hKFactors);
+	
+	//W+Jets
+	if(doRecoil == 2 && is2012 && gen->npartons == 1) kf  *= 0.286696;
+	if(doRecoil == 2 && is2012 && gen->npartons == 2) kf  *= 0.101601;
+	if(doRecoil == 2 && is2012 && gen->npartons == 3) kf  *= 0.114912;
+	if(doRecoil == 2 && is2012 && gen->npartons == 4) kf  *= 0.159457;
 
 	// do vertex reweighting
 	Double_t npuWgt = 1;
@@ -507,8 +497,13 @@ void selectETau(const TString conf="htt.conf",         // input config file
 	//-------------------------to be fixed
 	// trigger scale factor for MC
 	Double_t trigscale = 1;
-	if(doTrigScale && !isemb) trigscale=fMuTrigSF->GetBinContent(fMuTrigSF->FindBin(leadEle->pt, leadEle->eta))*fTauTrigSF->GetBinContent(fTauTrigSF->FindBin(leadTau->pt, leadTau->eta));
+	if(doTrigScale && !isemb && !is2012) trigscale=fMuTrigSF->GetBinContent(fMuTrigSF->FindBin(leadEle->pt, leadEle->eta))*fTauTrigSF->GetBinContent(fTauTrigSF->FindBin(leadTau->pt, leadTau->eta));
 	
+	mithep::TrigEffRatio * tautrigscale = mithep::getTauETrigEffR12();
+	mithep::TrigEffRatio * eletrigscale  = mithep::getElectronTrigEffR12();
+
+	if(doTrigScale && !isemb && !is2012) 
+	  trigscale = tautrigscale->eff(leadTau->pt,leadTau->eta) * eletrigscale->eff(leadEle->pt,leadEle->eta);
 
 	Double_t embWgt = 1;
 	if(!isdata) out->fillGen(gen);
@@ -528,7 +523,7 @@ void selectETau(const TString conf="htt.conf",         // input config file
 	// passing events in whole sample 
         nSelEvents += weight*kf*npuWgt*trigscale*idscale*embWgt;
       }
-
+      cout << " total good events " << lNEvents << endl;
       printf("%8.2f +/- %-8.2f\n",nsel,sqrt(nselvar));
       if(nlowmass > 0) printf("           ---> selected events with z mass < 50:  %10.3f (out of %15.3f)\n",nlowmass,nsel);
 
