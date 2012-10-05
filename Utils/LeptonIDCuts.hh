@@ -104,15 +104,16 @@ Bool_t passTightPFMuonID(const mithep::TMuon *muon,Bool_t mutau)
   
 }
 //----------------------------------------------------------------------------------------
-Bool_t passMuonIsoPU(const mithep::TMuon *muon,Bool_t xtau)
+Bool_t passMuonIsoPU(const mithep::TMuon *muon,Int_t xtau)
 {
   Double_t chargedIso = muon->pfIsoCharged;
   Double_t neutralIso = max(muon->pfIsoNeutral + muon->pfIsoGamma - 0.5 * muon->puIso, 0.0);
-
+  
   Double_t totalIso = chargedIso+neutralIso;
-
+  if(xtau == 2) return (totalIso<0.15*(muon->pt));
+  
   if(fabs(muon->eta)<1.479 && !xtau) return (totalIso<0.15*(muon->pt));
-  else                      return (totalIso<0.10*(muon->pt));
+  return (totalIso<0.10*(muon->pt));
 }
 //--------------------------------------------------------------------------------------------------
 Bool_t passMuonIsoPUTauHad(const mithep::TMuon *muon)

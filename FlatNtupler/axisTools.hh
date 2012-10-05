@@ -55,7 +55,7 @@ void loadfMap() {
   fMap.push_back("m_sv2");      fNBins.push_back(30); fXMin.push_back(0);    fXMax.push_back(300); fXAxis.push_back("m_{#tau#tau}  (GeV/c^{2})");  fYAxis.push_back("Events/10 GeV/c^{2}");
   fMap.push_back("nopumass");   fNBins.push_back(60); fXMin.push_back(0);    fXMax.push_back(300); fXAxis.push_back("m_{#tau#tau}  (GeV/c^{2})");  fYAxis.push_back("Events/10 GeV/c^{2}");
   fMap.push_back("pumass");     fNBins.push_back(60); fXMin.push_back(0);    fXMax.push_back(300); fXAxis.push_back("m_{#tau#tau}  (GeV/c^{2})");  fYAxis.push_back("Events/10 GeV/c^{2}");
-  fMap.push_back("m_vis");    fNBins.push_back(20); fXMin.push_back(-10);    fXMax.push_back(200); fXAxis.push_back("m_{vis}  (GeV/c^{2})");  fYAxis.push_back("Events/7.5 GeV/c^{2}");
+  fMap.push_back("m_vis");    fNBins.push_back(20); fXMin.push_back(0);    fXMax.push_back(200); fXAxis.push_back("m_{vis}  (GeV/c^{2})");  fYAxis.push_back("Events/7.5 GeV/c^{2}");
   fMap.push_back("mjj");      fNBins.push_back(25); fXMin.push_back(0);    fXMax.push_back(1500); fXAxis.push_back("m_{jj}  (GeV/c^{2})");  fYAxis.push_back("Events/60 GeV/c^{2}");
   fMap.push_back("pt_vis/u1");      fNBins.push_back(20); fXMin.push_back(0);    fXMax.push_back(2);   fXAxis.push_back("m_{#tau} (GeV/c^{2})");  fYAxis.push_back("Events/0.05 GeV/c^{2}");
   fMap.push_back("jpfiga06_1");      fNBins.push_back(40); fXMin.push_back(0.);   fXMax.push_back(10.);   fXAxis.push_back("jet 04 charged isolation");                    fYAxis.push_back("Events/0.25");

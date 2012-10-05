@@ -55,14 +55,14 @@ const Double_t pi = 3.14159265358979;
 
 //=== MAIN MACRO =================================================================================================
 
-void selectMuTau(const TString conf="test.conf",         // input config file
-		 const TString outputDir="tmp",    // output directory
-		 const Double_t lumi=10.,        // luminosity pb^-1
-		 const Int_t is2012=true,          //2012 or 2011 data 
-		 const UInt_t btageff=0,     // b-tag efficiency scale factor uncertainty
-		 const UInt_t jetunc=0,      // jet energy uncertainties
-		 const UInt_t mistag=0,      // b mistag rate scale factor uncertainty
-		 const UInt_t elescale=0     // electron energy scale/resolution uncertainty
+void selectMuTau(const TString conf="test.conf",  // input config file
+		 const TString outputDir="tmp",   // output directory
+		 const Double_t lumi=1.,          // luminosity pb^-1
+		 const Int_t is2012=true,         //2012 or 2011 data 
+		 const UInt_t btageff=0,          // b-tag efficiency scale factor uncertainty
+		 const UInt_t jetunc=0,           // jet energy uncertainties
+		 const UInt_t mistag=0,           // b mistag rate scale factor uncertainty
+		 const UInt_t elescale=0          // electron energy scale/resolution uncertainty
 		 ) {
   gBenchmark->Start("selectMuTau");
   
@@ -214,7 +214,7 @@ void selectMuTau(const TString conf="test.conf",         // input config file
       if(!is2012) {
 	cout << "Fall11 sample!" << endl;
 	pileupReweightFile = "$CMSSW_BASE/src/MitHtt/data/pileup/PUWeights_Fall11toFull2011_PixelLumi_50bins.root";
-      } else pileupReweightFile = "$CMSSW_BASE/src/MitHtt/data/pileup/PUWeights_S12To2012_5089ipb.root";
+      } else pileupReweightFile = "$CMSSW_BASE/src/MitHtt/data/pileup/PUWeights_S1253XTo2012_12ifb.root";
       TH1F *puWeights = 0;
       TFile *pufile = new TFile(pileupReweightFile.Data());
       puWeights = (TH1F*)pufile->Get("puWeights");
@@ -233,7 +233,7 @@ void selectMuTau(const TString conf="test.conf",         // input config file
 
       // Get the TTree
       eventTree = (TTree*)infile->Get("Events"); assert(eventTree);
-      lTree =  (TTree*)infile->Get("Events"); assert(lTree);
+      lTree =  (TTree*)infile->Get("hEvents"); assert(lTree);
       
       // Set branch address to structures that will store the info  
       eventTree->SetBranchAddress("Info",  &info);           TBranch *infoBr     = eventTree->GetBranch("Info");
@@ -263,17 +263,19 @@ void selectMuTau(const TString conf="test.conf",         // input config file
       Double_t nlowmass=0; // low mass z events (below 50)
 
       cout << eventTree->GetEntries() << " events" << endl;
-
+      int lNEvents = 0;
       // loop over events
       for(UInt_t ientry=0; ientry<eventTree->GetEntriesFast(); ientry++) {
-	if(ientry%10000 == 0) cout << "processing " << float(ientry)/float(eventTree->GetEntriesFast()) << endl;
-        infoBr->GetEntry(ientry);
-	
+	if(ientry%100000 == 0) cout << "processing " << float(ientry)/float(eventTree->GetEntriesFast()) << endl;
+
 	if(getGen) genBr->GetEntry(ientry);
-
+	//if((fabs(gen->id_1_a) + fabs(gen->id_2_a) == 36 && ) && gen->pt_1_b > 20 && gen->pt_2_b > 20)  lNEvents++;
+	if((fabs(gen->id_1_a) + fabs(gen->id_2_a) == 36 && (fabs(gen->id_1_a) == 17 || fabs(gen->id_2_a) == 17)) && gen->pt_1_b > 20 && gen->pt_2_b > 20)  lNEvents++;
+	
 	// skip non-tau events in madgraph sample
+	infoBr->GetEntry(ientry);
 	if(ismadz && !ismadzmm && (fabs(gen->id_1_a)<15 || fabs(gen->id_1_a)>19)) continue;
-
+	
         // skip non-mumu events in madgraph sample for zmm
         if(ismadzmm && (fabs(gen->id_1_a)>14 && fabs(gen->id_1_a)<20)) continue;
 	
@@ -283,14 +285,15 @@ void selectMuTau(const TString conf="test.conf",         // input config file
 	
 	// trigger
  	if(is2012)
- 	  {
+	  {
  	    if(!isemb && !(info->triggerBits[kHLT_IsoMu18_eta2p1_LooseIsoPFTau20] || info->triggerBits[kHLT_IsoMu17_eta2p1_LooseIsoPFTau20] || info->triggerBits[kHLT_Mu18_eta2p1_LooseIsoPFTau20] || info->triggerBits[kHLT_Mu17_eta2p1_LooseIsoPFTau20])) continue;
- 	  }
+	  }
  	else
- 	  if(!isemb && !(info->triggerBits[kHLT_IsoMu12_LooseIsoPFTau10] || info->triggerBits[kHLT_IsoMu15_LooseIsoPFTau15] || info->triggerBits[kHLT_IsoMu15_eta2p1_LooseIsoPFTau20])) continue;
+	  if(!isemb && !(info->triggerBits[kHLT_IsoMu12_LooseIsoPFTau10] || info->triggerBits[kHLT_IsoMu15_LooseIsoPFTau15] || info->triggerBits[kHLT_IsoMu15_eta2p1_LooseIsoPFTau20])) continue;
 	
         //+ good primary vertex
         if(!info->hasGoodPV) continue;
+	
 	pvArr->Clear();
 	pvBr->GetEntry(ientry);	
 
@@ -308,7 +311,7 @@ void selectMuTau(const TString conf="test.conf",         // input config file
          
 	    // Tau ID
 	    if(!(passtauIdMu(tau))) continue;
-	  
+	    
 		// Tau Kinematics
 	    if(!(tau->pt > kTauPtMin && fabs(tau->eta) < 2.3)) continue;
 	       
@@ -327,7 +330,7 @@ void selectMuTau(const TString conf="test.conf",         // input config file
 	    
 	    if(!(tau->hcalOverP + tau->ecalOverP > 0.2 ||
 		 tau->nSignalPFChargedHadrCands > 1 ||
-	    	 tau->nSignalPFGammaCands > 0)) continue;
+		 tau->nSignalPFGammaCands > 0)) continue;
 	    
 	    goodHPSTaus.push_back(tau);
 	    if(!leadTau || (tau->pt > leadTau->pt && (tau->ringIso > leadTau->ringIso || tau->ringIso > 0.795)) || (tau->ringIso > leadTau->ringIso && (leadTau->ringIso < 0.795)) )
@@ -344,8 +347,9 @@ void selectMuTau(const TString conf="test.conf",         // input config file
 
         for(Int_t i=0; i<muonArr->GetEntriesFast(); i++) {
           const mithep::TMuon *muon = (mithep::TMuon*)((*muonArr)[i]);
+	  //if(toolbox::deltaR(muon->eta, muon->phi, leadTau->eta, leadTau->phi) > 0.3) continue;
+	
 	  if(!passTightPFMuonID(muon,1)) continue;
-	  
 	  Bool_t trigmatch = kFALSE;
 	  // trigger matching
 	  if(is2012)
@@ -353,17 +357,17 @@ void selectMuTau(const TString conf="test.conf",         // input config file
 	  else
 	    trigmatch = ((info->triggerBits[kHLT_IsoMu12_LooseIsoPFTau10] && muon->hltMatchBits[kHLT_IsoMu12_LooseIsoPFTau10_MuObj]) || (info->triggerBits[kHLT_IsoMu15_LooseIsoPFTau15] && muon->hltMatchBits[kHLT_IsoMu15_LooseIsoPFTau15_MuObj]) ||(info->triggerBits[kHLT_IsoMu15_eta2p1_LooseIsoPFTau20] && muon->hltMatchBits[kHLT_IsoMu15_eta2p1_LooseIsoPFTau20_MuObj]));
 	   
-	  if(!isemb && !trigmatch)     continue;
+	  if(!isemb && !trigmatch)              continue;
 	  
 	  if(muon->pt < kMuPtMin)		continue;
 	  if(fabs(muon->eta) > 2.1)		continue;
-	  if(!(passMuonIsoPU(muon,0))) continue;
-	  
+	  if(!(passMuonIsoPU(muon,3)))          continue;
+ 
+	  double pIso = muonIsoPU(muon);
 	  goodMuonsv.push_back(muon);
-	  if(!leadMu || muon->pt > leadMu->pt)
+	  if(!leadMu || (muon->pt > leadMu->pt && (pIso < muonIsoPU(leadMu) || pIso < 0.1)) || ( pIso  > muonIsoPU(leadMu) && ( muonIsoPU(leadMu)  > 0.1))) 
 	    leadMu = muon;
-        }
-	
+	}
 	if(!(leadMu && leadTau)) continue;
 	// Di-muon veto
 	//
@@ -391,6 +395,7 @@ void selectMuTau(const TString conf="test.conf",         // input config file
 		  }
 	      }
 	  }
+	
 	if(diMuon) continue;
 	out->fillMuon(leadMu,muonIsoPU(leadMu),passMuonIsoPU(leadMu,1));
 	out->fillTau(leadTau,0,leadTau->ringIso > 0.795);
@@ -472,6 +477,12 @@ void selectMuTau(const TString conf="test.conf",         // input config file
 	// get k-factor if necessary
         Double_t kf=1;
         if(reallyDoKf) kf = kfFHPValue(gen->vpt_a, hKFactors);
+	
+	//W+Jets
+	if(doRecoil == 2 && is2012 && gen->npartons == 1) kf  *= 0.286696;
+	if(doRecoil == 2 && is2012 && gen->npartons == 2) kf  *= 0.101601;
+	if(doRecoil == 2 && is2012 && gen->npartons == 3) kf  *= 0.114912;
+	if(doRecoil == 2 && is2012 && gen->npartons == 4) kf  *= 0.159457;
 
 	// do vertex reweighting
 	Double_t npuWgt = 1;
@@ -512,7 +523,7 @@ void selectMuTau(const TString conf="test.conf",         // input config file
 	// passing events in whole sample 
         nSelEvents += weight*kf*npuWgt*trigscale*idscale*embWgt;
       }
-
+      cout << " total good events " << lNEvents << endl;
       printf("%8.2f +/- %-8.2f\n",nsel,sqrt(nselvar));
       if(nlowmass > 0) printf("           ---> selected events with z mass < 50:  %10.3f (out of %15.3f)\n",nlowmass,nsel);
 

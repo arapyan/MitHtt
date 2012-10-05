@@ -20,11 +20,11 @@ int fQCDId = 4;
 
 void drawSpec(TTree **iTree,TH1F **iH,TH1F **iHSS,TH1F **iHMT,TH1F **iHNMT,int iN,std::string iVar,std::string iCut) { 
   for(int i0 = 0; i0 < iN; i0++) {
-    
     iH   [i0]   = draw(iVar,iTree[i0],i0,iCut+"*(q_1*q_2 < 0)*(mt_1 < 40)"," Main");
     iHSS [i0]   = draw(iVar,iTree[i0],i0,iCut+"*(q_1*q_2 > 0)*(mt_1 < 40)"," Same Sign");
-    iHMT [i0]   = draw(iVar,iTree[i0],i0,iCut+"*(q_1*q_2 < 0)*(mt_1 > 70)"," m_{T} > 70 GeV");
+    iHMT [i0]   = draw(iVar,iTree[i0],i0,iCut+"*              (mt_1 > 70)"," m_{T} > 70 GeV");
     iHNMT[i0]   = draw(iVar,iTree[i0],i0,iCut+"*(q_1*q_2 < 0)*(mt_1 >  0)"," No m_{T} Cut");
+    cout << "====> " << fString[i0] << " -- " << iH[i0]->Integral() << endl;
   }
   //Comput MT Scale Factor
   TH1F *lMTMC = (TH1F*) iHMT[0]->Clone("mTTmp"); clear(lMTMC);
@@ -58,7 +58,7 @@ void drawSpec(TTree **iTree,TH1F **iH,TH1F **iHSS,TH1F **iHMT,TH1F **iHNMT,int i
   draw(iHMT ,iN,iVar+"C",iVar,5);
   draw(iHNMT,iN,iVar+"D",iVar,5);
 }
-void plotHadTau(std::string iVar="pt_2",std::string iCut="(pt_2 > 0)",int iTauId = 2,float iLumi=1200) { //"TMath::Min(abs(phi_1-metphi),2.*TMath::Pi()-abs(phi_1-metphi))",int iId = 0) { 
+void plotHadTau(std::string iVar="eta_2",std::string iCut="(pt_2 > 0)",int iTauId = 2,float iLumi=1200) { //"TMath::Min(abs(phi_1-metphi),2.*TMath::Pi()-abs(phi_1-metphi))",int iId = 0) { 
   SetStyle();
   loadfMap();
   std::stringstream lNameId; //lNameId << "Flat_" << lTauId << "_";
@@ -71,7 +71,7 @@ void plotHadTau(std::string iVar="pt_2",std::string iCut="(pt_2 > 0)",int iTauId
   TH1F**lHMT  = new TH1F*[lN]; 
   TH1F**lHNMT = new TH1F*[lN]; 
   fString = new std::string[lN]; fWeights = new std::string[lN]; fColor = new int[lN];
-  lTree[0]  = load(lName+"ztt-mad_select.root");        fString[0] = "Z#rightarrow#tau#tau ";          fColor[0] = 796;//kOrange-3;
+  lTree[0]  = load(lName+"Xztt-mad_select.root");        fString[0] = "Z#rightarrow#tau#tau ";          fColor[0] = 796;//kOrange-3;
   lTree[1]  = load(lName+"ttbar-8TeV_select.root");     fString[1] = "t#bar{t}";                       fColor[1] = 592;//kRed+4;
   lTree[2]  = load(lName+"wjets_select.root");          fString[2] = "W+Jets";                         fColor[2] = 634;//kBlue-5;
   lTree[3]  = load(lName+"zmm_select.root");            fString[3] = "Z#rightarrow#tau#tau fakes";     fColor[3] = kBlue;
@@ -81,9 +81,9 @@ void plotHadTau(std::string iVar="pt_2",std::string iCut="(pt_2 > 0)",int iTauId
   
   std::stringstream lLumi; lLumi << iLumi;
   for(int i0 = 0; i0 < lN;   i0++) fWeights[i0]   = "(pt_1 > 20 && pt_2 > 20 && iso_1 < 0.1 && iso_2 > 0.795)*"+iCut;
-  for(int i0 = 0; i0 < lN-1; i0++) if(i0 != fQCDId) fWeights[i0]  += "*weight*"+lLumi.str();
+  for(int i0 = 0; i0 < lN-1; i0++) if(i0 != fQCDId) fWeights[i0]  += "*weight*"+lLumi.str();//effweight*puweight*"+lLumi.str();
   //Z Scale Factors
-  fWeights[0]  += "*1.01";
+  fWeights[0]  += "*1000.*1.01";
   fWeights[3]  += "*1.01";
   
   //if(lTauId == 1) fWeights[0] += "*(abs(id1_l) + abs(id2_l) > 30)";
