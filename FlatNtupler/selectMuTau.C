@@ -503,7 +503,7 @@ void selectMuTau(const TString conf="test.conf",  // input config file
 	mithep::TrigEffRatio * tautrigscale = mithep::getTauMTrigEffR12();
 	mithep::TrigEffRatio * mutrigscale  = mithep::getMuonTrigEffR12();
 	
-	if(doTrigScale && !isemb && !is2012) 
+	if(doTrigScale && !isemb && is2012) 
 	  trigscale = tautrigscale->eff(leadTau->pt,leadTau->eta) * mutrigscale->eff(leadMu->pt,leadMu->eta);
 	
 	// embedding weight for embedded sample

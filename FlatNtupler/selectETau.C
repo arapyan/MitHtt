@@ -494,7 +494,6 @@ void selectETau(const TString conf="htt.conf",         // input config file
 	if(doIdScale) idscale = eleIDscaleETau(leadEle->pt,leadEle->eta,is2012);
 	setupTrigScale(is2012);
 
-	//-------------------------to be fixed
 	// trigger scale factor for MC
 	Double_t trigscale = 1;
 	if(doTrigScale && !isemb && !is2012) trigscale=fMuTrigSF->GetBinContent(fMuTrigSF->FindBin(leadEle->pt, leadEle->eta))*fTauTrigSF->GetBinContent(fTauTrigSF->FindBin(leadTau->pt, leadTau->eta));
@@ -502,7 +501,7 @@ void selectETau(const TString conf="htt.conf",         // input config file
 	mithep::TrigEffRatio * tautrigscale = mithep::getTauETrigEffR12();
 	mithep::TrigEffRatio * eletrigscale  = mithep::getElectronTrigEffR12();
 
-	if(doTrigScale && !isemb && !is2012) 
+	if(doTrigScale && !isemb && is2012) 
 	  trigscale = tautrigscale->eff(leadTau->pt,leadTau->eta) * eletrigscale->eff(leadEle->pt,leadEle->eta);
 
 	Double_t embWgt = 1;
