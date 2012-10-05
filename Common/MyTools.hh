@@ -62,8 +62,7 @@ Double_t toolbox::deltaR(Double_t eta1, Double_t phi1, Double_t eta2, Double_t p
 {
   const Double_t pi = 3.14159265358979;
   Double_t dphi = fabs(phi1-phi2);
-  while (dphi>pi)
-    dphi = fabs(dphi - 2.0*pi);
+  dphi = TMath::Min(dphi,2*pi-dphi);
     
   Double_t deta = eta1-eta2;
   
