@@ -57,9 +57,9 @@ const Double_t pi = 3.14159265358979;
 
 //=== MAIN MACRO =================================================================================================
 
-void selectETau(const TString conf="htt.conf",         // input config file
+void selectETau(const TString conf="mutau.conf",         // input config file
 		const TString outputDir="tmp",    // output directory
-		const Double_t lumi=4.9,        // luminosity pb^-1
+		const Double_t lumi=1.,        // luminosity pb^-1
 		const Int_t is2012=true,          //2012 or 2011 data
 		const UInt_t btageff=0,     // b-tag efficiency scale factor uncertainty
 		const UInt_t jetunc=0,      // jet energy uncertainties
@@ -299,29 +299,30 @@ void selectETau(const TString conf="htt.conf",         // input config file
 	vector<const mithep::TElectron*> goodElev;
         eleArr->Clear();
         eleBr->GetEntry(ientry);
-    
+
 	const mithep::TElectron *leadEle = NULL;
         for(Int_t i=0; i<eleArr->GetEntriesFast(); i++) {
-          const mithep::TElectron *ele = (mithep::TElectron*)((*eleArr)[i]);
-	  
+	  const mithep::TElectron *ele = (mithep::TElectron*)((*eleArr)[i]);
+	
 	  Bool_t trigmatch = kFALSE;
 	  // trigger matching
 	  if(is2012)
 	    trigmatch = ((info->triggerBits[kHLT_Ele20_CaloIdVT_CaloIsoRhoT_TrkIdT_TrkIsoT_LooseIsoPFTau20] && ele->hltMatchBits[kHLT_Ele20_CaloIdVT_CaloIsoRhoT_TrkIdT_TrkIsoT_LooseIsoPFTau20_EleObj]) || (info->triggerBits[kHLT_Ele22_eta2p1_WP90Rho_LooseIsoPFTau20] && ele->hltMatchBits[kHLT_Ele22_eta2p1_WP90Rho_LooseIsoPFTau20_EleObj]) ||(info->triggerBits[kHLT_Ele20_CaloIdVT_TrkIdT_LooseIsoPFTau20] && ele->hltMatchBits[kHLT_Ele20_CaloIdVT_TrkIdT_LooseIsoPFTau20_EleObj]) || (info->triggerBits[kHLT_Ele22_eta2p1_WP90NoIso_LooseIsoPFTau20] && ele->hltMatchBits[kHLT_Ele22_eta2p1_WP90NoIso_LooseIsoPFTau20_EleObj]) );
 	  else
 	    trigmatch = ((info->triggerBits[kHLT_Ele15_CaloIdVT_TrkIdT_LooseIsoPFTau15] && ele->hltMatchBits[kHLT_Ele15_CaloIdVT_TrkIdT_LooseIsoPFTau15_EleObj]) || (info->triggerBits[kHLT_Ele15_CaloIdVT_TrkIdT_TightIsoPFTau20] && ele->hltMatchBits[kHLT_Ele15_CaloIdVT_TrkIdT_TightIsoPFTau20_EleObj]) ||(info->triggerBits[kHLT_Ele18_CaloIdVT_TrkIdT_MediumIsoPFTau20] && ele->hltMatchBits[kHLT_Ele18_CaloIdVT_TrkIdT_MediumIsoPFTau20_EleObj]) ||  (info->triggerBits[kHLT_Ele18_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_MediumIsoPFTau20] && ele->hltMatchBits[kHLT_Ele18_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_MediumIsoPFTau20_EleObj]) ||(info->triggerBits[kHLT_Ele20_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_MediumIsoPFTau20] && ele->hltMatchBits[kHLT_Ele20_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_MediumIsoPFTau20_EleObj]));
-	 
+	  
 	  if(!isemb && !trigmatch)     continue;
-          if(ele->pt < kElePtMin)		continue;
+	  if(ele->pt < kElePtMin)		continue;
 	  if(fabs(ele->eta) > 2.1)		continue;
 	  if(!(pass2012EleMVAID(ele,kMedium,1))) continue;
-	  if(!(passEleIsoPU(ele,1)))  continue;
+	  
+	  if(!(passEleIsoPU(ele,2)))  continue;
 	  goodElev.push_back(ele);
 	  double pIso = eleIsoPU(ele);
-	  if(!leadEle || (ele->pt > leadEle->pt && (pIso < eleIsoPU(leadEle) || pIso < 0.1)) || ( pIso  > eleIsoPU(leadEle) && ( eleIsoPU(leadEle)  > 0.1))) 
+	  if(!leadEle || (ele->pt > leadEle->pt && (pIso < eleIsoPU(leadEle) || pIso < 0.1)) || ( pIso  < eleIsoPU(leadEle) && ( eleIsoPU(leadEle)  > 0.1))) 
 	    leadEle = ele;
         }
-       	
+       	if(!leadEle) continue;
         // loop through HPSTaus
         
 	tauArr->Clear();
@@ -332,7 +333,8 @@ void selectETau(const TString conf="htt.conf",         // input config file
 	  {
 	    const mithep::TPFTau *tau = dynamic_cast<mithep::TPFTau *>(tauArr->At(i));
 	    assert(tau);
-          
+	    if(toolbox::deltaR(tau->eta, tau->phi, leadEle->eta, leadEle->phi) < 0.3) continue;
+	    
 	    // Tau ID
 	    if(!tauIdElectron(tau)) continue;
 	    if(!(tauIdElectronMVA(tau,tau->antiEleID))) continue;
@@ -355,13 +357,11 @@ void selectETau(const TString conf="htt.conf",         // input config file
 	    if(!(tau->hcalOverP + tau->ecalOverP > 0.2 ||
 	       tau->nSignalPFChargedHadrCands > 1 ||
 		 tau->nSignalPFGammaCands > 0)) continue;
-	    
-	    if(toolbox::deltaR(tau->eta, tau->phi, leadEle->eta, leadEle->phi) > 0.3) continue;
+
 	    goodHPSTaus.push_back(tau);
 	    if(!leadTau || (tau->pt > leadTau->pt && (tau->ringIso > leadTau->ringIso || tau->ringIso > 0.795)) || (tau->ringIso > leadTau->ringIso && (leadTau->ringIso < 0.795)) )
 	      leadTau = tau;
           }	
-	
 	if(goodHPSTaus.size()<1) continue;
 	
 	Bool_t diElectron = kFALSE;
@@ -402,11 +402,11 @@ void selectETau(const TString conf="htt.conf",         // input config file
         for(Int_t i = 0; i < svfitArr->GetEntriesFast(); i++) {
           mithep::TSVfit *svfit = (mithep::TSVfit*) svfitArr->At(i);
           Int_t id = 0;
-          if(toolbox::deltaR(leadTau->eta,leadTau->phi,svfit->daughter1.Eta(),svfit->daughter1.Phi()) < 0.01           ) id = 1;
-          if(toolbox::deltaR(leadEle->eta,leadEle->phi,svfit->daughter1.Eta(),svfit->daughter1.Phi())   < 0.01 && id == 0) id = 2;
+	  if(toolbox::deltaR(leadTau->eta,leadTau->phi,svfit->daughter1.Eta(),svfit->daughter1.Phi()) < 0.01           ) id = 1;
+          if(toolbox::deltaR(leadEle->eta,leadEle->phi,svfit->daughter1.Eta(),svfit->daughter1.Phi()) < 0.01 && id == 0) id = 2;
           if(id == 0) continue;
-          if(toolbox::deltaR(leadTau->eta,leadTau->phi,svfit->daughter2.Eta(),svfit->daughter2.Phi()) < 0.01 && id == 2) id = 3;
-          if(toolbox::deltaR(leadEle->eta,leadEle->phi,svfit->daughter2.Eta(),svfit->daughter2.Phi())   < 0.01 && id == 1) id = 4;
+	  if(toolbox::deltaR(leadTau->eta,leadTau->phi,svfit->daughter2.Eta(),svfit->daughter2.Phi()) < 0.01 && id == 2) id = 3;
+          if(toolbox::deltaR(leadEle->eta,leadEle->phi,svfit->daughter2.Eta(),svfit->daughter2.Phi()) < 0.01 && id == 1) id = 4;
           if(id < 3) continue;
 	  out->fillCov(svfit);
         }

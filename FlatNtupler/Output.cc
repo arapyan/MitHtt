@@ -420,8 +420,8 @@ void Output::fillEvent(mithep::TEventInfo *info, HttMVA *vbfmva, int npv)
   double pU2         = 0;  //--
   double lMVAMet     = fMVAMet;
   double lMVAMetPhi  = fMVAMetPhi;
-  if(corrector && doRecoil != 2) corrector->CorrectType2(lMVAMet, lMVAMetPhi, fgenpt, fgenphi, dilep.Pt(), dilep.Phi(), pU1, pU2, 0, 0, fNJets);
-  if(corrector && doRecoil == 2) corrector->CorrectType2(lMVAMet, lMVAMetPhi, fgenpt, fgenphi, lep1 .Pt(), lep1 .Phi(), pU1, pU2, 0, 0, fNJets);
+  //if(corrector && doRecoil != 2) corrector->CorrectType2(lMVAMet, lMVAMetPhi, fgenpt, fgenphi, dilep.Pt(), dilep.Phi(), pU1, pU2, 0, 0, fNJets);
+  //if(corrector && doRecoil == 2) corrector->CorrectType2(lMVAMet, lMVAMetPhi, fgenpt, fgenphi, lep1 .Pt(), lep1 .Phi(), pU1, pU2, 0, 0, fNJets);
   fMVAMet            = lMVAMet;
   fMVAMetPhi         = lMVAMetPhi;
 

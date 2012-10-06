@@ -110,7 +110,7 @@ Bool_t passMuonIsoPU(const mithep::TMuon *muon,Int_t xtau)
   Double_t neutralIso = max(muon->pfIsoNeutral + muon->pfIsoGamma - 0.5 * muon->puIso, 0.0);
   
   Double_t totalIso = chargedIso+neutralIso;
-  if(xtau == 2) return (totalIso<0.15*(muon->pt));
+  if(xtau == 2) return (totalIso<0.3*(muon->pt));
   
   if(fabs(muon->eta)<1.479 && !xtau) return (totalIso<0.15*(muon->pt));
   return (totalIso<0.10*(muon->pt));
@@ -410,12 +410,13 @@ Bool_t passEleNonTrigMVA(const mithep::TElectron *electron, EWorkingPoint WP)
   return kFALSE;
 }
 //-------------------------------------------------------------------------------------------------
-Bool_t passEleIsoPU(const mithep::TElectron *electron, Bool_t xtau)
+Bool_t passEleIsoPU(const mithep::TElectron *electron, int xtau)
 {
   Double_t chargedIso = electron->pfIsoCharged;
   Double_t neutralIso = max(electron->pfIsoNeutral + electron->pfIsoGamma - 0.5 * electron->puIso, 0.0);
 
   Double_t totalIso = chargedIso+neutralIso;
+  if(xtau == 2) return (totalIso<0.3*(electron->pt));
 
   // barrel/endcap dependent requirments      
   if(fabs(electron->scEta)<1.479 && !xtau) {

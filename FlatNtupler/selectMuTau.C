@@ -55,7 +55,7 @@ const Double_t pi = 3.14159265358979;
 
 //=== MAIN MACRO =================================================================================================
 
-void selectMuTau(const TString conf="test.conf",  // input config file
+void selectMuTau(const TString conf="mutau.conf",  // input config file
 		 const TString outputDir="tmp",   // output directory
 		 const Double_t lumi=1.,          // luminosity pb^-1
 		 const Int_t is2012=true,         //2012 or 2011 data 
@@ -365,7 +365,7 @@ void selectMuTau(const TString conf="test.conf",  // input config file
  
 	  double pIso = muonIsoPU(muon);
 	  goodMuonsv.push_back(muon);
-	  if(!leadMu || (muon->pt > leadMu->pt && (pIso < muonIsoPU(leadMu) || pIso < 0.1)) || ( pIso  > muonIsoPU(leadMu) && ( muonIsoPU(leadMu)  > 0.1))) 
+	  if(!leadMu || (muon->pt > leadMu->pt && (pIso < muonIsoPU(leadMu) || pIso < 0.1)) || ( pIso  < muonIsoPU(leadMu) && ( muonIsoPU(leadMu)  > 0.1))) 
 	    leadMu = muon;
 	}
 	if(!(leadMu && leadTau)) continue;
