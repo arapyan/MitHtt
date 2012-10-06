@@ -168,7 +168,9 @@ void selectMuTau(const TString conf="mutau.conf",  // input config file
   TClonesArray *tauArr      = new TClonesArray("mithep::TPFTau");
   
   Bool_t hasData = (samplev[0]->fnamev.size()>0);
-  
+  mithep::TrigEffRatio * tautrigscale = mithep::getTauMTrigEffR12();
+  mithep::TrigEffRatio * mutrigscale  = mithep::getMuonTrigEffR12();
+
   setupTrigScale(is2012);
   // loop over samples
   for(UInt_t isam=0; isam<samplev.size(); isam++) {
@@ -494,7 +496,6 @@ void selectMuTau(const TString conf="mutau.conf",  // input config file
 	// lepton ID corrections
 	Double_t idscale = 1;
 	if(doIdScale) idscale = muIDscaleMuTau(leadMu->pt,leadMu->eta,is2012);
-	
 	
 	// trigger scale factor for MC
 	Double_t trigscale = 1;

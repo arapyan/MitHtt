@@ -157,6 +157,10 @@ void selectETau(const TString conf="mutau.conf",         // input config file
   if(!is2012) vbfMVA->Initialize("BDTG method", getenv("CMSSW_BASE")+std::string("/src/MitHtt/data/VBFMVA/MuTau/VBFMVA_BDTG_HCP_42X.weights.xml"), HttMVA::kVBF3);   // vbf mva
   if(is2012)  vbfMVA->Initialize("BDTG method", getenv("CMSSW_BASE")+std::string("/src/MitHtt/data/VBFMVA/MuTau/VBFMVA_BDTG_HCP_52X.weights.xml"), HttMVA::kVBF3);   // vbf mva 
 
+  setupTrigScale(is2012);
+  mithep::TrigEffRatio * tautrigscale = mithep::getTauETrigEffR12();
+  mithep::TrigEffRatio * eletrigscale  = mithep::getElectronTrigEffR12();
+
   // Data structures to store info from TTrees
   mithep::TEventInfo *info  = new mithep::TEventInfo();
   mithep::TGenInfo *gen     = new mithep::TGenInfo();
@@ -492,15 +496,11 @@ void selectETau(const TString conf="mutau.conf",         // input config file
 	Double_t idscale = 1;
 	
 	if(doIdScale) idscale = eleIDscaleETau(leadEle->pt,leadEle->eta,is2012);
-	setupTrigScale(is2012);
 
 	// trigger scale factor for MC
 	Double_t trigscale = 1;
 	if(doTrigScale && !isemb && !is2012) trigscale=fMuTrigSF->GetBinContent(fMuTrigSF->FindBin(leadEle->pt, leadEle->eta))*fTauTrigSF->GetBinContent(fTauTrigSF->FindBin(leadTau->pt, leadTau->eta));
 	
-	mithep::TrigEffRatio * tautrigscale = mithep::getTauETrigEffR12();
-	mithep::TrigEffRatio * eletrigscale  = mithep::getElectronTrigEffR12();
-
 	if(doTrigScale && !isemb && is2012) 
 	  trigscale = tautrigscale->eff(leadTau->pt,leadTau->eta) * eletrigscale->eff(leadEle->pt,leadEle->eta);
 

@@ -179,13 +179,15 @@ void selectTauTau(const TString conf,         // input config file
       // which corrections to apply where
       Bool_t isdata     = !(samp->typev[ifile]==eMC);
       Bool_t isemb      = snamev[isam].Contains("emb");
-      Bool_t doRecoil   = (sfname.Contains("ztt") || sfname.Contains("-zll") || sfname.Contains("zjets") || snamev[isam].Contains("_sm_") || snamev[isam].Contains("_mssm_")) && !isemb;
       Bool_t reallyDoKf = doKFactors && sfname.Contains("-gf-");
       Bool_t ismadz     = sfname.Contains("-zll") || sfname.Contains("-zjets"); // madgraph z samples
       Bool_t ismadzmm   = snamev[isam].Contains("zmm") && (sfname.Contains("-zll") || sfname.Contains("-zjets")); // madgraph z samples 
       Bool_t ismssm     = sfname.Contains("-ggh-") || sfname.Contains("-bbh-");
       Bool_t doIdScale  = !isdata;
       Bool_t doTrigScale= !isdata;
+      Int_t  doRecoil   = (sfname.Contains("ztt") || sfname.Contains("-zll") || sfname.Contains("zjets")) && !isemb;
+      if((snamev[isam].Contains("wjets") || snamev[isam].Contains("w1jets") ||  snamev[isam].Contains("w2jets") || snamev[isam].Contains("w3jets") || snamev[isam].Contains("w4jets") ) && !isemb) doRecoil = 2;
+      if((snamev[isam].Contains("_sm_") || snamev[isam].Contains("_mssm_")) && !isemb) doRecoil = 3;
       Bool_t getGen     = sfname.Contains("wjets") || doRecoil || reallyDoKf || ismadz ||isemb || ismssm;
       Bool_t doJetUnc   = (jetunc!=kNo);
 
@@ -196,7 +198,7 @@ void selectTauTau(const TString conf,         // input config file
       if(!is2012) {
 	cout << "Fall11 sample!" << endl;
 	pileupReweightFile = "$CMSSW_BASE/src/MitHtt/data/pileup/PUWeights_Fall11toFull2011_PixelLumi_50bins.root";
-      } else pileupReweightFile = "$CMSSW_BASE/src/MitHtt/data/pileup/PUWeights_S12To2012_5089ipb.root";
+      } else pileupReweightFile = "$CMSSW_BASE/src/MitHtt/data/pileup/PUWeights_S1253XTo2012_12ifb.root";
       TH1F *puWeights = 0;
       TFile *pufile = new TFile(pileupReweightFile.Data());
       puWeights = (TH1F*)pufile->Get("puWeights");
@@ -250,11 +252,11 @@ void selectTauTau(const TString conf,         // input config file
 
       // loop over events
       for(UInt_t ientry=0; ientry<eventTree->GetEntries(); ientry++) {
-	if(ientry%1000000 == 0) cout << "processing " << ientry << endl;
+	if(ientry%100000 == 0) cout << "processing " << float(ientry)/float(eventTree->GetEntriesFast()) << endl;
+	if(getGen)  genBr->GetEntry(ientry);
         infoBr->GetEntry(ientry);
 	//cout << info->runNum << " " << info->lumiSec << " " << info->evtNum << endl;
-	if(getGen)  genBr->GetEntry(ientry);
-
+       
 	// skip non-tau events in madgraph sample
 	if(ismadz && !ismadzmm && (fabs(gen->id_1_a)<15 || fabs(gen->id_1_a)>19)) continue;
 
@@ -263,12 +265,10 @@ void selectTauTau(const TString conf,         // input config file
 
 	// certified run selection
         mithep::RunLumiRangeMap::RunLumiPairType rl(info->runNum, info->lumiSec);
-        //if(hasJSON && !rlrm.HasRunLumi(rl)) continue;
-        if(info->runNum ==194314 && info->evtNum==88871102)
-          cout << "Hey man" << endl;
-
+        if(hasJSON && !rlrm.HasRunLumi(rl)) continue;
+       
 	// trigger
-	if(!isemb && !(info->triggerBits[kHLT_DoubleMediumIsoPFTau30_Trk5_eta2p1_Jet30] || info->triggerBits[kHLT_DoubleMediumIsoPFTau25_Trk5_eta2p1_Jet30])) continue;
+	if(!isemb && isdata && !(info->triggerBits[kHLT_DoubleMediumIsoPFTau30_Trk5_eta2p1_Jet30] || info->triggerBits[kHLT_DoubleMediumIsoPFTau25_Trk5_eta2p1_Jet30])) continue;
 
         // good primary vertex
         if(!info->hasGoodPV) continue;
@@ -290,66 +290,37 @@ void selectTauTau(const TString conf,         // input config file
           
 	    // Tau ID
 	    if(!(passtautauId(tau,0))) continue;
-	      
+	    if(!(tauIdElectronMVA(tau,tau->antiEleID))) continue;
+
 		// Tau Kinematics
 	    if(!(tau->pt > kTauPtMin && fabs(tau->eta) < 2.1)) continue;
 	    
-            if(info->runNum ==194314 && info->evtNum==88871102)
-             cout << tau->pt << endl;
-
-   
 	    //Tau HLT
 	    Bool_t trigmatch = ((info->triggerBits[kHLT_DoubleMediumIsoPFTau25_Trk5_eta2p1_Jet30] && tau->hltMatchBits[kHLT_DoubleMediumIsoPFTau25_Trk5_eta2p1_Jet30Obj]) || (info->triggerBits[kHLT_DoubleMediumIsoPFTau30_Trk5_eta2p1_Jet30] && tau->hltMatchBits[kHLT_DoubleMediumIsoPFTau30_Trk5_eta2p1_Jet30Obj]));
 	   
-            if(info->runNum ==194314 && info->evtNum==88871102)
-              cout << tau->pt << endl;
-	    
-	    if(info->runNum ==194314 && info->evtNum==88871102)
-	      {
-		cout << info->triggerBits[kHLT_DoubleMediumIsoPFTau25_Trk5_eta2p1_Jet30] << endl;
-		cout << info->triggerBits[kHLT_DoubleMediumIsoPFTau30_Trk5_eta2p1_Jet30] << endl;
-	      }
-	    if(!isemb && !trigmatch)     continue;
-	    if(info->runNum ==194314 && info->evtNum==88871102)
-	      cout << tau->pt << endl;
+            if(isdata && !isemb && !trigmatch)     continue;
 	    // Tau Isolation
-	    if(!(tau->ringIso > 0.884)) continue;
+	    //if(!(tau->ringIso > 0.884)) continue;
             //  if(!(tau->ringIso > 0.921)) continue;
-              if(info->runNum ==194314 && info->evtNum==88871102)
-                cout << tau->pt << endl;
-  
-
 	    if(!(tau->hcalOverP + tau->ecalOverP > 0.2 ||
-	       tau->nSignalPFChargedHadrCands > 1 ||
+		 tau->nSignalPFChargedHadrCands > 1 ||
 	    	 tau->nSignalPFGammaCands > 0)) continue;
 	    
 	    goodHPSTaus.push_back(tau);
-	    if(!leadTau || tau->pt > leadTau->pt)
+	    if(!leadTau || tau->ringIso > leadTau->ringIso)
 	      {
 		subTau = leadTau;
 		leadTau = tau;
-	      } else if(!subTau || tau->pt > subTau->pt) {
+	      } else if(!subTau || tau->ringIso > subTau->ringIso) {
 	      subTau = tau;
 	    }
           }	
          
-        if(info->runNum ==194314 && info->evtNum==88871102)
-          cout << "Hey man" << endl;
-        if(!(leadTau && subTau)) continue;
+	if(!(leadTau && subTau)) continue;
  	//if(goodHPSTaus.size()<2) continue;
-        if(info->runNum ==194314 && info->evtNum==88871102)
-           cout << "Hey man 2 taus" << endl;
-        if(!(passtautauId(leadTau,1))) continue; 
-        if(info->runNum ==194314 && info->evtNum==88871102)
-          cout << "Hey man ttta" << endl;
-	if(!(tauIdElectronMVA(subTau,subTau->antiEleID))) continue;
-
-	if(info->runNum ==194314 && info->evtNum==88871102)
-	  cout << "Hey man" << endl;
-	//if(!(passtautauId(subTau,1))) continue;
-        if(info->runNum ==194314 && info->evtNum==88871102)
-          cout << "Hey ggg" << endl;
-        out->fillTau(leadTau,1,leadTau->ringIso > 0.884);
+	//if(!(passtautauId(leadTau,1))) continue; 
+        //if(!(tauIdElectronMVA(subTau,subTau->antiEleID))) continue;
+	out->fillTau(leadTau,1,leadTau->ringIso > 0.884);
 	out->fillTau(subTau,0,subTau->ringIso > 0.884);
 
 	// SVFit
@@ -441,30 +412,38 @@ void selectTauTau(const TString conf,         // input config file
 	  npuWgt = puWeights->GetBinContent(npuxbin);
 	}
 
+	//W+Jets
+	if(doRecoil == 2 && is2012 && gen->npartons == 1) kf  *= 0.286696;
+	if(doRecoil == 2 && is2012 && gen->npartons == 2) kf  *= 0.101601;
+	if(doRecoil == 2 && is2012 && gen->npartons == 3) kf  *= 0.114912;
+	if(doRecoil == 2 && is2012 && gen->npartons == 4) kf  *= 0.159457;
+
 	// lepton ID corrections
 	Double_t idscale = 1;
 	
 	// trigger scale factor for MC
 	Double_t trigscale = 1;
+	if(doTrigScale)
+	  trigscale =  eff2012IsoTau5fb(leadTau->pt,leadTau->eta)*eff2012IsoTau5fb(subTau->pt,subTau->eta);
+	if(doTrigScale && jet1) trigscale *= eff2012Jet5fb(jet1->pt,jet1->eta);
 
 	// embedding weight for embedded sample
 	Double_t embWgt = 1;
       	if(!isdata) out->fillGen(gen);
 	if(isemb)  embWgt=info->embWeight;
 
-	// events passing selection in this file
+	out->fMCWeight	 = weight*kf*embWgt/lumi;
+	out->fPUWeight	 = npuWgt;
+	out->fEffWeight	 = trigscale*idscale;
+	out->fWeight	 = weight*kf*npuWgt*trigscale*idscale*embWgt/lumi;
+ 	out->fillEvent(info,0,pvArr->GetEntriesFast());
+        // events passing selection in this file
 	nsel    += weight*kf*npuWgt*trigscale*idscale*embWgt;
 	nselvar += weight*weight*kf*kf*npuWgt*npuWgt*trigscale*trigscale*idscale*idscale*embWgt*embWgt;
 	if(doRecoil && (gen->vmass_a < 50)) nlowmass += weight*kf*npuWgt*trigscale*idscale*embWgt;
 
 	// passing events in whole sample 
         nSelEvents += weight*kf*npuWgt*trigscale*idscale*embWgt;
-	
-	out->fMCWeight	 = weight*kf*embWgt/lumi;
-	out->fPUWeight	 = npuWgt;
-	out->fEffWeight	 = trigscale*idscale;
-	out->fWeight	 = weight*kf*npuWgt*trigscale*idscale*embWgt/lumi;
-	out->fillEvent(info,0,pvArr->GetEntriesFast());
       }
 
       printf("%8.2f +/- %-8.2f\n",nsel,sqrt(nselvar));

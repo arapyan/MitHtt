@@ -63,11 +63,12 @@ void plotHadTau(std::string iVar="eta_2",std::string iCut="(pt_2 > 0)",int iTauI
   loadfMap();
   std::stringstream lNameId; //lNameId << "Flat_" << lTauId << "_";
   const int lN = 6;
-  std::string lName = "tmp/ntuples/"+lNameId.str();
+  std::string lName = "/data/blue/arapyan/httprod/tmp/ntuples/"+lNameId.str();
   
   TTree **lTree = new TTree*[lN]; 
   TH1F**lH    = new TH1F*[lN]; 
-  TH1F**lHSS  = new TH1F*[lN]; 
+  TH1F**lHSS  = new TH1F*[lN];
+  TH1F**lHIso = new TH1F*[lN];
   TH1F**lHMT  = new TH1F*[lN]; 
   TH1F**lHNMT = new TH1F*[lN]; 
   fString = new std::string[lN]; fWeights = new std::string[lN]; fColor = new int[lN];
