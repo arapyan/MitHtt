@@ -501,6 +501,7 @@ void selectETau(const TString conf="etau.conf",         // input config file
 	
 	if(doTrigScale && !isemb && is2012) 
 	  trigscale = tautrigscale->eff(leadTau->pt,leadTau->eta) * eletrigscale->eff(leadEle->pt,leadEle->eta);
+	if(isnan(trigscale) || isinf(trigscale)) trigscale = 1.;
 	
 	Double_t embWgt = 1;
 	if(!isdata) out->fillGen(gen);
