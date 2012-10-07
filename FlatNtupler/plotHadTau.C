@@ -114,18 +114,15 @@ void drawSpec(TTree **iTree,TH1F **iH,TH1F **iHSS,TH1F **iHMT,TH1F **iHNMT,int i
   draw(iHMT ,iN,iVar+"C",iVar,5);
   draw(iHNMT,iN,iVar+"D",iVar,5);
 }
-void plotHadTau(std::string iVar="m_vis",std::string iCut="(pt_1 > 24 && iso_1 < 0.1 && iso_2 >  0.785 )",int iTauId = 2,float iLumi=12000) { //"TMath::Min(abs(phi_1-metphi),2.*TMath::Pi()-abs(phi_1-metphi))",int iId = 0) { 
+void plotHadTau(std::string iVar="m_vis",std::string iCut="(pt_1 > 24 && iso_1 < 0.1 && iso_2 > 0.7895  )",int iTauId = 2,float iLumi=12000) { 
   SetStyle();
   loadfMap();
   std::stringstream lNameId; //lNameId << "Flat_" << lTauId << "_";
   const int lN = 6;
-<<<<<<< plotHadTau.C
   std::string lName = "etau2/ntuples/"+lNameId.str();
   //std::string lName  = "/data/blue/arapyan/httprod/hpstau/mutau/ntuples/";//etau2/ntuples/"+lNameId.str();
   //std::string lName1 = "tmp/ntuples/";
-=======
-  std::string lName = "/data/blue/arapyan/httprod/tmp/ntuples/"+lNameId.str();
->>>>>>> 1.3
+  // std::string lName = "/data/blue/arapyan/httprod/tmp/ntuples/"+lNameId.str();
   
   TTree **lTree = new TTree*[lN]; 
   TH1F**lH    = new TH1F*[lN]; 
@@ -137,7 +134,7 @@ void plotHadTau(std::string iVar="m_vis",std::string iCut="(pt_1 > 24 && iso_1 <
   fString = new std::string[lN]; fWeights = new std::string[lN]; fColor = new int[lN];
   lTree[0]  = load(lName+"ztt-mad_select.root");        fString[0] = "Z#rightarrow#tau#tau ";          fColor[0] = 796;//kOrange-3;
   lTree[1]  = load(lName+"ttbar-8TeV_select.root");     fString[1] = "t#bar{t}";                       fColor[1] = 592;//kRed+4;
-  lTree[2]  = load(lName+"wjets_select.root");          fString[2] = "W+Jets";                         fColor[2] = 634;//kBlue-5;
+  lTree[2]  = load(lName+"Xwjets_select.root");          fString[2] = "W+Jets";                         fColor[2] = 634;//kBlue-5;
   lTree[3]  = load(lName+"zmm_select.root");            fString[3] = "Z#rightarrow#tau#tau fakes";     fColor[3] = kBlue;
   lTree[4]  = load(lName+"data_select.root");           fString[4] = "QCD";                            fColor[4] = 606;//kBlue+3;
   //lTree[5]  = load(lName+"f11-h120tt-gf.root");         fString[5] = "Higgs ";                         fColor[5] = kRed-4;

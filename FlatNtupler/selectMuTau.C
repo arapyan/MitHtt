@@ -481,10 +481,11 @@ void selectMuTau(const TString conf="mutau.conf",  // input config file
         if(reallyDoKf) kf = kfFHPValue(gen->vpt_a, hKFactors);
 	
 	//W+Jets
-	if(doRecoil == 2 && is2012 && gen->npartons == 1) kf  *= 0.286696;
-	if(doRecoil == 2 && is2012 && gen->npartons == 2) kf  *= 0.101601;
-	if(doRecoil == 2 && is2012 && gen->npartons == 3) kf  *= 0.114912;
-	if(doRecoil == 2 && is2012 && gen->npartons == 4) kf  *= 0.159457;
+	if(doRecoil == 2 && is2012 && gen->npartons == 1) kf  *= 0.286696*treeEntries/36445097.;
+	if(doRecoil == 2 && is2012 && gen->npartons == 2) kf  *= 0.101601*treeEntries/36445097.;
+	if(doRecoil == 2 && is2012 && gen->npartons == 3) kf  *= 0.114912*treeEntries/36445097.;
+	if(doRecoil == 2 && is2012 && gen->npartons == 4) kf  *= 0.159457*treeEntries/36445097.;
+
 
 	// do vertex reweighting
 	Double_t npuWgt = 1;

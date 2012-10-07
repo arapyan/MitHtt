@@ -57,8 +57,8 @@ const Double_t pi = 3.14159265358979;
 
 //=== MAIN MACRO =================================================================================================
 
-void selectETau(const TString conf="mutau.conf",         // input config file
-		const TString outputDir="tmp",    // output directory
+void selectETau(const TString conf="etau.conf",         // input config file
+		const TString outputDir="etau2",    // output directory
 		const Double_t lumi=1.,        // luminosity pb^-1
 		const Int_t is2012=true,          //2012 or 2011 data
 		const UInt_t btageff=0,     // b-tag efficiency scale factor uncertainty
@@ -268,9 +268,9 @@ void selectETau(const TString conf="mutau.conf",         // input config file
       cout << eventTree->GetEntries() << " events" << endl;
       int lNEvents = 0;
       // loop over events
+      // Start loop
       for(UInt_t ientry=0; ientry<eventTree->GetEntries(); ientry++) {
 	if(ientry%100000 == 0) cout << "processing " << float(ientry)/float(eventTree->GetEntriesFast()) << endl;
-  
 	//cout << info->runNum << " " << info->lumiSec << " " << info->evtNum << endl;
 	if(getGen)  genBr->GetEntry(ientry);	
 	if((fabs(gen->id_1_a) + fabs(gen->id_2_a) == 36 && (fabs(gen->id_1_a) == 17 || fabs(gen->id_2_a) == 17)) && gen->pt_1_b > 20 && gen->pt_2_b > 20)  lNEvents++;
@@ -426,13 +426,11 @@ void selectETau(const TString conf="mutau.conf",         // input config file
 	  mithep::TJet *jet = (mithep::TJet*)((*jetArr)[i]);
 
 	  if(doJetUnc) jet->pt *= (jetunc==kDown) ? (1-jet->unc) : (1+jet->unc);
-
+	  
           if(toolbox::deltaR(jet->eta,jet->phi,leadTau->eta,leadTau->phi) < 0.5) continue;
           if(toolbox::deltaR(jet->eta,jet->phi,leadEle->eta,leadEle->phi) < 0.5) continue;
-
           if(fabs(jet->eta) > 5) continue;
 	  if(!jet->id) continue;
-
 	  // look for b-jets
 	  Int_t btagopt = 0;
 	  if(isdata||isemb) btagopt = 1;
@@ -448,7 +446,6 @@ void selectETau(const TString conf="mutau.conf",         // input config file
 		bjet = jet; // leading b-jet
 	    }
 	  }
-
 	  // look for jets
           if(jet->pt > kJetPtMin) {
             assert(njets<50);
@@ -474,16 +471,18 @@ void selectETau(const TString conf="mutau.conf",         // input config file
 	  }
         }
 
+	out->fillJets(jet1,jet2,bjet,njets,nbjets,npt20jets,nCentralJets);
         // get k-factor if necessary
         Double_t kf=1;
         if(reallyDoKf) kf = kfFHPValue(gen->vpt_a, hKFactors);
 	
 	//W+Jets
-	if(doRecoil == 2 && is2012 && gen->npartons == 1) kf  *= 0.286696;
-	if(doRecoil == 2 && is2012 && gen->npartons == 2) kf  *= 0.101601;
-	if(doRecoil == 2 && is2012 && gen->npartons == 3) kf  *= 0.114912;
-	if(doRecoil == 2 && is2012 && gen->npartons == 4) kf  *= 0.159457;
+	if(doRecoil == 2 && is2012 && gen->npartons == 1) kf  *= 0.286696*treeEntries/36445097.;
+	if(doRecoil == 2 && is2012 && gen->npartons == 2) kf  *= 0.101601*treeEntries/36445097.;
+	if(doRecoil == 2 && is2012 && gen->npartons == 3) kf  *= 0.114912*treeEntries/36445097.;
+	if(doRecoil == 2 && is2012 && gen->npartons == 4) kf  *= 0.159457*treeEntries/36445097.;
 
+	
 	// do vertex reweighting
 	Double_t npuWgt = 1;
 	if(!isdata && !isemb && doNpuRwgt) {
@@ -496,18 +495,16 @@ void selectETau(const TString conf="mutau.conf",         // input config file
 	Double_t idscale = 1;
 	
 	if(doIdScale) idscale = eleIDscaleETau(leadEle->pt,leadEle->eta,is2012);
-
 	// trigger scale factor for MC
 	Double_t trigscale = 1;
 	if(doTrigScale && !isemb && !is2012) trigscale=fMuTrigSF->GetBinContent(fMuTrigSF->FindBin(leadEle->pt, leadEle->eta))*fTauTrigSF->GetBinContent(fTauTrigSF->FindBin(leadTau->pt, leadTau->eta));
 	
 	if(doTrigScale && !isemb && is2012) 
 	  trigscale = tautrigscale->eff(leadTau->pt,leadTau->eta) * eletrigscale->eff(leadEle->pt,leadEle->eta);
-
+	
 	Double_t embWgt = 1;
 	if(!isdata) out->fillGen(gen);
 	if(isemb)  embWgt=info->embWeight;
-
 	out->fMCWeight	 = weight*kf*embWgt/lumi;
 	out->fPUWeight	 = npuWgt;
 	out->fEffWeight	 = trigscale*idscale;
