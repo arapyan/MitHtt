@@ -69,7 +69,27 @@ void drawDifference(TH1* iH0,TH1 *iH1,TH1 *iHH=0,TH1 *iHL=0) {
 void clear(TH1F *iH) { 
   for(int i0 = 0; i0 < iH->GetNbinsX()+1; i0++) iH->SetBinContent(i0,0);
 }
-
+void makeDataCard(TFile *iFile,TH1F** iH,TH1F** iHH,TH1F** iHL,const int iN,std::string iDirName,std::string* iHistName) { 
+  iFile->cd();
+  TDirectory* lTD = iFile->mkdir(iDirName.c_str());
+  iFile->cd(lTD->GetPath());
+  for(int i0 = 0; i0 < iN; i0++) { 
+    iH[i0]->SetFillStyle(1001);
+    iH[i0]->SetLineWidth(1); iH[i0]->SetLineColor(kBlack);
+    std::string pName = iHistName[i0];
+    iH[i0]->SetName (pName.c_str()); 
+    iH[i0]->SetTitle(pName.c_str());
+    iH[i0]->Write();
+    cout << "===> " << i0 << endl;
+    if(iHH[i0] == 0 || iHL[i0] == 0) continue;
+    iHH[i0]->SetName ((pName+std::string("_CMS_scale_tUp")  ).c_str());
+    iHH[i0]->SetTitle((pName+std::string("_CMS_scale_tUp")  ).c_str());
+    iHL[i0]->SetName ((pName+std::string("_CMS_scale_tDown")).c_str());
+    iHL[i0]->SetTitle((pName+std::string("_CMS_scale_tDown")).c_str());
+    iHL[i0]->Write();
+    iHH[i0]->Write();
+  }
+}
 void draw(TH1F** iH,const int iN,std::string iName,std::string iFName,int iHiggs=-1) { 
   TCanvas *lC0 = new TCanvas(("XX"+iName).c_str(),("XX"+iName).c_str(),fId,fYId,400,400); if(fId + 400 > 1100) fYId = (fYId + 400) % 1000; fId = (fId + 400) % 1100; 
   TLegend *lL = new TLegend(0.6,0.65,0.9,0.9); lL->SetFillColor(0); lL->SetBorderSize(0);

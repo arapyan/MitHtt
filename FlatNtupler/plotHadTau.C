@@ -15,10 +15,10 @@
 #include "plotTools.hh"
 #include "../Common/MitStyleRemix.hh"
 
-int fWId   = 2;
-int fQCDId = 4;
+int fWId   ;//= 2;
+int fQCDId ;//= 4;
 
-void drawVBFSpec(TTree **iTree,TH1F **iH,TH1F **iHSS,TH1F **iHMT,TH1F **iHLIS,TH1F **iHTIS,int iN,std::string iVar,std::string iCut) { 
+void drawVBFSpec(TTree **iTree,TH1F **iH,TH1F **iHSS,TH1F **iHMT,TH1F **iHLIS,TH1F **iHTIS,int iN,std::string iVar,std::string iCut,TFile * iFile = 0,std::string iDirName="",bool *iUseScale,TH1F** iHHigh,TH1F** iHLow) { 
   for(int i0 = 0; i0 < iN; i0++) {
     iH   [i0]   = draw(iVar,iTree[i0],i0,iCut+"*(q_1*q_2 < 0)*(mt_1 < 40)*(iso_1 < 0.1 && iso_2 >  0.78)*(vbfmva > 0.95 && njetingap == 0)"," Main");
     iHSS [i0]   = draw(iVar,iTree[i0],i0,iCut+"*(q_1*q_2 > 0)*(mt_1 < 40)*(iso_1 < 0.3 && iso_2 > -0.50)*(vbfmva > 0.95)"," Same Sign");
@@ -26,6 +26,12 @@ void drawVBFSpec(TTree **iTree,TH1F **iH,TH1F **iHSS,TH1F **iHMT,TH1F **iHLIS,TH
     iHLIS[i0]   = draw(iVar,iTree[i0],i0,iCut+"*(q_1*q_2 > 0)*(mt_1 < 40)*(iso_1 < 0.3 && iso_2 > -0.5)"                  ," 2 Jet Loose Iso SS Cut");
     iHTIS[i0]   = draw(iVar,iTree[i0],i0,iCut+"*(q_1*q_2 > 0)*(mt_1 < 40)*(iso_1 < 0.1 && iso_2 > 0.78 && njetingap == 0)"," 2 Jet Tight Iso SS Cut");
     cout << "====> " << fString[i0] << " -- " << iH[i0]->Integral() << endl;
+    if(iFile == 0    ) continue;
+    iHHigh[i0]   = 0;
+    iHLow[i0]    = 0;
+    if(!iUseScale[i0]) continue;
+    iHHigh[i0]   = draw(iVar+"High",iTree[i0],i0,iCut+"*(q_1*q_2 < 0)*(mt_1 < 40)"," Main");
+    iHLow [i0]   = draw(iVar+"Low" ,iTree[i0],i0,iCut+"*(q_1*q_2 < 0)*(mt_1 < 40)"," Same Sign");
   }
   //Comput MT Scale Factor
   TH1F *lMTMC = (TH1F*) iHMT[0]->Clone("mTTmp"); clear(lMTMC);
@@ -66,6 +72,7 @@ void drawVBFSpec(TTree **iTree,TH1F **iH,TH1F **iHSS,TH1F **iHMT,TH1F **iHLIS,TH
   iHTIS[fQCDId]->Scale(iHSS[fQCDId]->Integral()/iHTIS[fQCDId]->Integral());
   iH   [fQCDId] = iHTIS[fQCDId];
   for(int i0 = 0; i0 < iH[iN-1]->GetNbinsX()+1; i0++) if(iH[iN-1]->GetXaxis()->GetBinCenter(i0) > 80 && iH[iN-1]->GetXaxis()->GetBinCenter(i0) < 130) iH[iN-1]->SetBinContent(i0,0);
+  if(iFile !=0) makeDataCard(iFile,iH,iHHigh,iHLow,iN,iDirName,fString);
   //Draw the plot
   draw(iH    ,iN,iVar+"A",iVar,5);
   draw(iHSS  ,iN,iVar+"B",iVar,5);
@@ -73,13 +80,20 @@ void drawVBFSpec(TTree **iTree,TH1F **iH,TH1F **iHSS,TH1F **iHMT,TH1F **iHLIS,TH
   draw(iHLIS ,iN,iVar+"D",iVar,5);
   draw(iHTIS ,iN,iVar+"E",iVar,5);
 }
-void drawSpec(TTree **iTree,TH1F **iH,TH1F **iHSS,TH1F **iHMT,TH1F **iHNMT,int iN,std::string iVar,std::string iCut) { 
+void drawSpec(TTree **iTree,TH1F **iH,TH1F **iHSS,TH1F **iHMT,TH1F **iHNMT,int iN,std::string iVar,std::string iCut,TFile * iFile = 0,std::string iDirName="",bool *iUseScale,TH1F** iHHigh,TH1F** iHLow) { 
+  cout << "=====> " << fWId << " -- " << fQCDId << endl;
   for(int i0 = 0; i0 < iN; i0++) {
     iH   [i0]   = draw(iVar,iTree[i0],i0,iCut+"*(q_1*q_2 < 0)*(mt_1 < 40)"," Main");
     iHSS [i0]   = draw(iVar,iTree[i0],i0,iCut+"*(q_1*q_2 > 0)*(mt_1 < 40)"," Same Sign");
     iHMT [i0]   = draw(iVar,iTree[i0],i0,iCut+"*              (mt_1 > 70)"," m_{T} > 70 GeV");
     iHNMT[i0]   = draw(iVar,iTree[i0],i0,iCut+"*(q_1*q_2 < 0)*(mt_1 >  0)"," No m_{T} Cut");
     cout << "====> " << fString[i0] << " -- " << iH[i0]->Integral() << endl;
+    if(iFile == 0    ) continue;
+    iHHigh[i0]   = 0;
+    iHLow[i0]    = 0;
+    if(!iUseScale[i0]) continue;
+    iHHigh[i0]   = draw(iVar+"High",iTree[i0],i0,iCut+"*(q_1*q_2 < 0)*(mt_1 < 40)"," Main");
+    iHLow [i0]   = draw(iVar+"Low" ,iTree[i0],i0,iCut+"*(q_1*q_2 < 0)*(mt_1 < 40)"," Same Sign");
   }
   //Comput MT Scale Factor
   TH1F *lMTMC = (TH1F*) iHMT[0]->Clone("mTTmp"); clear(lMTMC);
@@ -108,6 +122,9 @@ void drawSpec(TTree **iTree,TH1F **iH,TH1F **iHSS,TH1F **iHMT,TH1F **iHNMT,int i
   iH   [fQCDId] = iHSS[fQCDId];
   iHNMT[fQCDId] = iHSS[fQCDId];
   //for(int i0 = 0; i0 < iH[iN-1]->GetNbinsX()+1; i0++) if(iH[iN-1]->GetXaxis()->GetBinCenter(i0) > 80 && iH[iN-1]->GetXaxis()->GetBinCenter(i0) < 130) iH[iN-1]->SetBinContent(i0,0);
+  //Make DataCards ==> If Asked
+  if(iFile !=0) makeDataCard(iFile,iH,iHHigh,iHLow,iN,iDirName,fString);
+ 
   //Draw the plot
   draw(iH   ,iN,iVar+"A",iVar,5);
   draw(iHSS ,iN,iVar+"B",iVar,5);
@@ -123,6 +140,9 @@ void plotHadTau(std::string iVar="m_vis",std::string iCut="(pt_1 > 24 && iso_1 <
   //std::string lName  = "/data/blue/arapyan/httprod/hpstau/mutau/ntuples/";//etau2/ntuples/"+lNameId.str();
   //std::string lName1 = "tmp/ntuples/";
   // std::string lName = "/data/blue/arapyan/httprod/tmp/ntuples/"+lNameId.str();
+
+  int fWId   = 2;
+  int fQCDId = 4;
   
   TTree **lTree = new TTree*[lN]; 
   TH1F**lH    = new TH1F*[lN]; 
