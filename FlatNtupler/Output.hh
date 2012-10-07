@@ -180,7 +180,7 @@ public:
   void fillEvent(mithep::TEventInfo *event, HttMVA *vbfmva, int npv);  //always to be called the last
   void fillJets(const mithep::TJet *jet1,const mithep::TJet *jet2,const mithep::TJet *bjet, int njets, int bjets, int npt20, int nCentralJets);
   void save();
-  
+  void cd();
 protected:
   /// output file
   TFile* fOutputFile;           

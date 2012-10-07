@@ -119,7 +119,9 @@ Output::Output(TString name):
      }
   setupOutput(name);
 }
-
+void Output::cd() { 
+  fOutputFile->cd();
+}
 void Output::setupOutput(TString name) {
   fOutputFile = new TFile( name, "RECREATE" );
   fEventTree = new TTree("Events","Events");
@@ -233,7 +235,7 @@ void Output::save()
   fOutputFile->Write(); 
   delete fEventTree;
   delete fOutputFile;
-  if(doRecoil) delete corrector;
+  //if(doRecoil) delete corrector;
 }
 
 void Output::fillMuon(const mithep::TMuon *muon, double iso, bool passiso)
