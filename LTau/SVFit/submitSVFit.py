@@ -1,24 +1,29 @@
 #!/bin/env python
 
-import sys, os, errno, re, argparse, subprocess, datetime
+import sys, os, errno, re, optparse, subprocess, datetime
 from os.path import expandvars
 import ROOT
 
 def main():
     # Parse command-line arguments
-    parser = argparse.ArgumentParser()
-    parser.add_argument('-i', '--input', required=True)
-    parser.add_argument('-o', '--output', required=True)
-    parser.add_argument('-s', '--script', default='applySVFit.sh')
-    parser.add_argument('-l', '--logdir', default='batch_logs')
-    parser.add_argument('-t', '--stepsize', type=int, default=500)
-    parser.add_argument('-z', '--zeroonly', action='store_true')
-    args = parser.parse_args()
+    parser = optparse.OptionParser()
+    parser.add_option('-i', '--input')
+    parser.add_option('-o', '--output')
+    parser.add_option('-s', '--script', default='applySVFit.sh')
+    parser.add_option('-l', '--logdir', default='batch_logs')
+    parser.add_option('-t', '--stepsize', type=int, default=500)
+    parser.add_option('-z', '--zeroonly', action='store_true')
+    options, args = parser.parse_args()
 
-    inputdir = os.path.abspath(args.input)
-    outputdir = os.path.abspath(args.output)
+    if not options.input or not options.output:
+        print "--input and --output options are required"
+        print "Exiting"
+        sys.exit(1)
 
-    submitSVFit(args.script, inputdir, outputdir, args.logdir, args.stepsize, args.zeroonly)
+    inputdir = os.path.abspath(options.input)
+    outputdir = os.path.abspath(options.output)
+
+    submitSVFit(options.script, inputdir, outputdir, options.logdir, options.stepsize, options.zeroonly)
 
 
 def submitSVFit(script, inputdir, outputdir, logdir, stepsize, zeroonly = False):
