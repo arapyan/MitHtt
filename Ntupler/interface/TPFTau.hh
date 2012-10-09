@@ -25,6 +25,7 @@ namespace mithep
       kLooseEle      = 0x00000001,
       kMediumEle     = 0x00000002,
       kTightEle      = 0x00000004,
+      kMVAEle        = 0x00004000, 
       kLooseMu	     = 0x00000008,
       kTightMu	     = 0x00000010,
       kDecayMode     = 0x00000020,
@@ -112,7 +113,7 @@ namespace mithep
     float ringIso;
     // antielectron id bdt
     float antiEleID;
-    ClassDef(TPFTau, 1)
+    ClassDef(TPFTau, 2)
   };  
 }
 #endif
