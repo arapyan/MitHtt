@@ -914,6 +914,7 @@ HttNtupler::fillPFTaus()
       if( pftau->DiscriminationByLooseElectronRejection()             ) pPFTau->hpsDiscriminators |= TPFTau::kLooseEle;
       if( pftau->DiscriminationByMediumElectronRejection()            ) pPFTau->hpsDiscriminators |= TPFTau::kMediumEle;
       if( pftau->DiscriminationByTightElectronRejection()             ) pPFTau->hpsDiscriminators |= TPFTau::kTightEle;
+      if(pftau->DiscriminationByMVAElectronRejection())                 pPFTau->hpsDiscriminators |= TPFTau::kMVAEle;
       if( pftau->DiscriminationByLooseMuonRejection()                 ) pPFTau->hpsDiscriminators |= TPFTau::kLooseMu;
       if( pftau->DiscriminationByTightMuonRejection()                 ) pPFTau->hpsDiscriminators |= TPFTau::kTightMu;
       if( pftau->DiscriminationByDecayModeFinding()                   ) pPFTau->hpsDiscriminators |= TPFTau::kDecayMode;
