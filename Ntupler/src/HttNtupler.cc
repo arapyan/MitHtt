@@ -125,8 +125,14 @@ HttNtupler::SlaveBegin()
   fJetCorrector = new FactorizedJetCorrector(correctionParameters); 
   // setup jet energy scale uncertainties
   std::string jetCorrectorParams;
-  
-  if(f2012) jetCorrectorParams = std::string(TString::Format("%s/src/MitPhysics/data/START52_V9_Uncertainty_AK5PF.txt", getenv("CMSSW_BASE")));
+
+  if(f2012) {
+    if(TString(getenv("CMSSW_BASE")).Contains("CMSSW_5_3")) {
+      jetCorrectorParams = std::string(TString::Format("%s/src/MitPhysics/data/START53_V7F_Uncertainty_AK5PF.txt", getenv("CMSSW_BASE")));
+    } else {
+      jetCorrectorParams = std::string(TString::Format("%s/src/MitPhysics/data/START52_V9_Uncertainty_AK5PF.txt", getenv("CMSSW_BASE")));
+    }
+  }
   else jetCorrectorParams = std::string(TString::Format("%s/src/MitPhysics/data/START42_V17_AK5PF_Uncertainty.txt", getenv("CMSSW_BASE")));
   JetCorrectorParameters param(jetCorrectorParams);
   fJetUncertainties = new JetCorrectionUncertainty(param);
