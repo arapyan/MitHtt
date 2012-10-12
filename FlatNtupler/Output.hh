@@ -70,7 +70,7 @@ public:
   float fMt1;      // mT of lepton wrt to pf met
   float fMVAMt1;   // mT of first leptron wrt to MVA met
   int   fngamma1;   //number of gamma candidates 
-  int   fnprong1;  // number of prongs
+  float fnprong1;  // number of prongs
 
   ///Second lepton :  hadronic Tau for muTau had for eTau, electron for emu, Trailing (in pT)  Tau for TauTau
   float fPt2;      //pt2
