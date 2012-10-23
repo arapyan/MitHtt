@@ -113,6 +113,7 @@ public:
   float fJPt1;       //Jet Pt after corrections
   float fJEta1;      //Jet Eta
   float fJPhi1;      //Jet Phi
+  float fJM1;        //Jet Mass
   float fJPtUnc1;    //Jet Unc (relative to Jet corrected pT)
   float fJMVA1;      //JetMVA id values
   float fJcsv1;      //CSV discriminator value 
@@ -123,6 +124,7 @@ public:
   float fJPt2;      //Jet Pt after corrections
   float fJEta2;      //Jet Eta
   float fJPhi2;      //Jet Phi
+  float fJM2;        //Jet Mass
   float fJPtUnc2;    //Jet Unc (relative to Jet corrected pT)
   float fJMVA2;      //JetMVA id values
   float fJcsv2;      //CSV discriminator value 
@@ -132,6 +134,7 @@ public:
   float fBTagPt;     //Corrected BTag Pt
   float fBTagEta;    //Btag Eta
   float fBTagPhi;    //Btag Phi
+  float fBTagM;      //Btag Mass
   float fbcsv;       //B CSV
   
   //Di Jet kinematic variables (usefull for VBF selection)

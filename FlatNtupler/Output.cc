@@ -63,6 +63,7 @@ Output::Output(TString name):
   fJPt1(0),
   fJEta1(0),
   fJPhi1(0),
+  fJM1(0),
   fJPtUnc1(0),
   fJMVA1(0),
   fJcsv1(0),
@@ -70,6 +71,7 @@ Output::Output(TString name):
   fJPt2(0),
   fJEta2(0),
   fJPhi2(0),
+  fJM2(0),
   fJPtUnc2(0),
   fJMVA2(0),
   fJcsv2(0),
@@ -77,6 +79,7 @@ Output::Output(TString name):
   fBTagPt(0),
   fBTagEta(0),
   fBTagPhi(0),
+  fBTagM(0),
   fbcsv(0),
   fMJJ(0),
   fJDEta(0),
@@ -187,6 +190,7 @@ void Output::setupOutput(TString name) {
   fEventTree->Branch("jpt_1",&fJPt1,"fJPt1/F");
   fEventTree->Branch("jeta_1",&fJEta1,"fJEta1/F");
   fEventTree->Branch("jphi_1",&fJPhi1,"fJPhi1/F");
+  fEventTree->Branch("jm_1",&fJM1,"fJM1/F");
   fEventTree->Branch("jptunc_1",&fJPtUnc1,"fJPtUnc1/F");
   fEventTree->Branch("jmva_1",&fJMVA1,"fJMVA1/F");
   fEventTree->Branch("jcsv_1",&fJcsv1,"fJcsv1/F");
@@ -194,6 +198,7 @@ void Output::setupOutput(TString name) {
   fEventTree->Branch("jpt_2",&fJPt2,"fJPt2/F");
   fEventTree->Branch("jeta_2",&fJEta2,"fJEta2/F");
   fEventTree->Branch("jphi_2",&fJPhi2,"fJPhi2/F");
+  fEventTree->Branch("jm_2",&fJM2,"fJM2/F");
   fEventTree->Branch("jptunc_2",&fJPtUnc2,"fJPtUnc2/F");
   fEventTree->Branch("jmva_2",&fJMVA2,"fJMVA2/F");
   fEventTree->Branch("jcsv_2",&fJcsv2,"fJcsv2/F");
@@ -201,6 +206,7 @@ void Output::setupOutput(TString name) {
   fEventTree->Branch("bpt",&fBTagPt,"fBtagPt/F");
   fEventTree->Branch("beta",&fBTagEta,"fBTagEta/F");
   fEventTree->Branch("bphi",&fBTagPhi,"fBTagPhi/F");
+  fEventTree->Branch("bm",&fBTagM,"fBTagM/F");
   fEventTree->Branch("bcsv",&fbcsv,"fbcsv/F");
   fEventTree->Branch("mjj",&fMJJ,"fMJJ/F");
   fEventTree->Branch("jdeta",&fJDEta,"fJDEta/F");
@@ -223,7 +229,7 @@ void Output::setupOutput(TString name) {
   fEventTree->Branch("genlid_2",&fGenId2 ,"fGenId2/I");
   fEventTree->Branch("genmatch",&fGenMatch ,"fGenMatch/I");
   fEventTree->Branch("vbfmva",&fMVA,"fMVA/F");
-  fEventTree->Branch("njetingap",&fNJetInGap,"fNJetInGap/F");
+  fEventTree->Branch("njetingap",&fNJetInGap,"fNJetInGap/I");
   fEventTree->Branch("npt20jets",&npt20jets);
   fEventTree->Branch("btagArray",&btagArray);
   fEventTree->Branch("jptArray",&jptArray);
@@ -330,6 +336,7 @@ void Output::fillJets(const mithep::TJet *jet1,const mithep::TJet *jet2, const m
   fJPt1		 = (jet1) ? jet1->pt  : 0;
   fJEta1	 = (jet1) ? jet1->eta : 0;
   fJPhi1	 = (jet1) ? jet1->phi : 0;
+  fJM1	         = (jet1) ? jet1->mass : 0;
   fJPtUnc1	 = (jet1) ? jet1->unc : 0;
   fJMVA1	 = (jet1) ? jet1->mva : 0;
   fJcsv1         = (jet1) ? jet1->csv : 0;
@@ -337,6 +344,7 @@ void Output::fillJets(const mithep::TJet *jet1,const mithep::TJet *jet2, const m
   fJPt2		 = (jet2) ? jet2->pt  : 0;
   fJEta2	 = (jet2) ? jet2->eta : 0;
   fJPhi2	 = (jet2) ? jet2->phi : 0;
+  fJM2	         = (jet2) ? jet2->mass : 0;
   fJPtUnc2	 = (jet2) ? jet2->unc : 0;
   fJMVA2	 = (jet2) ? jet2->mva : 0;
   fJcsv2         = (jet2) ? jet2->csv : 0;
@@ -344,6 +352,7 @@ void Output::fillJets(const mithep::TJet *jet1,const mithep::TJet *jet2, const m
   fBTagPt	 = (bjet) ? bjet->pt  : 0;
   fBTagEta	 = (bjet) ? bjet->eta : 0;
   fBTagPhi	 = (bjet) ? bjet->phi : 0; 
+  fBTagM	 = (bjet) ? bjet->mass : 0; 
   fbcsv         = (bjet) ? bjet->csv : 0;
   fNJets         = njets;
   fNBTag         = nbjets;
@@ -412,9 +421,9 @@ void Output::fillEvent(mithep::TEventInfo *info, HttMVA *vbfmva, int npv)
   lep2.SetPtEtaPhiM(fPt2, fEta2, fPhi2,fM2);
   dilep = lep1+lep2;
  
-  TLorentzVector jv1, jv2, dijet;
-  jv1.SetPtEtaPhiM(fJPt1,fJEta1,fJPhi1,fJPhi1);
-  jv2.SetPtEtaPhiM(fJPt2,fJEta2,fJPhi2,fJPhi2);
+  TLorentzVector jv1, jv2,dijet;
+  jv1.SetPtEtaPhiM(fJPt1,fJEta1,fJPhi1,fJM1);
+  jv2.SetPtEtaPhiM(fJPt2,fJEta2,fJPhi2,fJM2);
   dijet = jv1+jv2;
   
   // recoil corrections
