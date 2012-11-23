@@ -2,6 +2,7 @@
 #include <TROOT.h>
 #include <TChain.h>
 #include <TFile.h>
+#include <TFileMerger.h>
 #include <TString.h>
 #include <TBenchmark.h>
 #include <vector>
@@ -36,14 +37,18 @@ void MergeNtuples(const TString input)
   //
   // Combine TTrees from each file
   //
-  TChain chain("Events");
+  //TChain chain("Events");
+  TFileMerger m(kFALSE);
+  m.OutputFile(outfilename);
   for(UInt_t ifile=0; ifile<infilenames.size(); ifile++) {
     cout << "Adding " << infilenames[ifile] << endl;
-    chain.Add(infilenames[ifile]);
+    //chain.Add(infilenames[ifile]);
+    m.AddFile(infilenames[ifile]);
   }
   cout << "Merging..." << endl;
-  chain.Merge(outfilename,"fast");
-  std::cout << "Merged events: " << chain.GetEntries() << endl;
+  //chain.Merge(outfilename,"fast");
+  m.Merge();
+  //std::cout << "Merged events: " << chain.GetEntries() << endl;
   std::cout << outfilename << " created!" << std::endl;
   
   gBenchmark->Show("MergeNtuples");

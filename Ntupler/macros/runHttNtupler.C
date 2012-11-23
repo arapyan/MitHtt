@@ -51,23 +51,23 @@ void runHttNtupler(
   sprintf(output,"%s_%s_ntuple.root",dataset,fileset); 
   
   // muon kinematics
-  const Double_t muPtMin  = 3;  
+  const Double_t muPtMin  = 3; //3  
   const Double_t muPtMax  = 7000;
   const Double_t muEtaMin = -2.4;
   const Double_t muEtaMax =  2.4;
 
   // electron kinematics
-  const Double_t eleEtMin  = 7;
+  const Double_t eleEtMin  = 7; //7
   const Double_t eleEtMax  = 7000;
   const Double_t eleEtaMin = -2.7;
   const Double_t eleEtaMax =  2.7;
   
   //tau kinematics
-  const Double_t  tauPtMin = 15;   //18
-  const Double_t  tauEtaMax = 2.5; //2.7
+  const Double_t  tauPtMin = 18; //20
+  const Double_t  tauEtaMax = 2.5;//2.5
   
   // jet requirements
-  const Double_t jetPtMin = 18; //10
+  const Double_t jetPtMin = 18; //30
 
   // photon requirements
   const Double_t photonEtMin = 9;
@@ -127,13 +127,20 @@ void runHttNtupler(
   if(is2012)
     {
       if(TString(getenv("CMSSW_BASE")).Contains("CMSSW_5_3")) {
-	mymod->AddJetCorr(path + "START53_V7F_L1FastJet_AK5PF.txt"   );
-	mymod->AddJetCorr(path + "START53_V7F_L2Relative_AK5PF.txt"  );
-	mymod->AddJetCorr(path + "START53_V7F_L3Absolute_AK5PF.txt"  );
 	if(isData || useGen==ESampleType::kEmbed){
-	  mymod->AddJetCorr(path + "START53_V7F_L2L3Residual_AK5PF.txt");
+	  mymod->AddJetCorr(path + "GR_P_V41_AN2_L1FastJet_AK5PF.txt");
+	  mymod->AddJetCorr(path + "GR_P_V41_AN2_L2Relative_AK5PF.txt");
+	  mymod->AddJetCorr(path + "GR_P_V41_AN2_L3Absolute_AK5PF.txt");
+	  mymod->AddJetCorr(path + "GR_P_V41_AN2_L2L3Residual_AK5PF.txt");
 	}
-      } else {
+	else
+	  {
+	    mymod->AddJetCorr(path + "START53_V7F_L1FastJet_AK5PF.txt"   );
+	    mymod->AddJetCorr(path + "START53_V7F_L2Relative_AK5PF.txt"  );
+	    mymod->AddJetCorr(path + "START53_V7F_L3Absolute_AK5PF.txt"  );
+	  }
+      } 
+      else {
 	mymod->AddJetCorr(path + "START52_V9_L1FastJet_AK5PF.txt"   );
 	mymod->AddJetCorr(path + "START52_V9_L2Relative_AK5PF.txt"  );
 	mymod->AddJetCorr(path + "START52_V9_L3Absolute_AK5PF.txt"  );
@@ -660,9 +667,9 @@ void runHttNtupler(
 //   mymod->AddTrigger("HLT_DoubleMediumIsoPFTau25_Trk5_eta2p1_Jet30_v3",kHLT_DoubleMediumIsoPFTau25_Trk5_eta2p1_Jet30,"hltDoublePFTau25TrackPt5MediumIsolation",kHLT_DoubleMediumIsoPFTau25_Trk5_eta2p1_Jet30Obj);//auto
 //   mymod->AddTrigger("HLT_DoubleMediumIsoPFTau25_Trk5_eta2p1_Jet30_v4",kHLT_DoubleMediumIsoPFTau25_Trk5_eta2p1_Jet30,"hltDoublePFTau25TrackPt5MediumIsolation",kHLT_DoubleMediumIsoPFTau25_Trk5_eta2p1_Jet30Obj);//auto
 
- //  mymod->AddTrigger("HLT_DoubleMediumIsoPFTau30_Trk1_eta2p1_Jet30_v1", kHLT_DoubleMediumIsoPFTau30_Trk1_eta2p1_Jet30, "hltDoublePFTau25TrackPt5MediumIsolationProng4Dz02",kHLT_DoubleMediumIsoPFTau30_Trk1_eta2p1_Jet30Obj);
-//   mymod->AddTrigger("HLT_DoubleMediumIsoPFTau30_Trk1_eta2p1_Jet30_v4",kHLT_DoubleMediumIsoPFTau30_Trk1_eta2p1_Jet30,"hltDoublePFTau30TrackPt1MediumIsolation",kHLT_DoubleMediumIsoPFTau30_Trk1_eta2p1_Jet30Obj);//auto
-//   mymod->AddTrigger("HLT_DoubleMediumIsoPFTau30_Trk1_eta2p1_Jet30_v5",kHLT_DoubleMediumIsoPFTau30_Trk1_eta2p1_Jet30,"hltDoublePFTau30TrackPt1MediumIsolation",kHLT_DoubleMediumIsoPFTau30_Trk1_eta2p1_Jet30Obj);//auto
+mymod->AddTrigger("HLT_DoubleMediumIsoPFTau30_Trk1_eta2p1_Jet30_v1", kHLT_DoubleMediumIsoPFTau30_Trk1_eta2p1_Jet30, "hltDoublePFTau30TrackPt1MediumIsolationProng4Dz02",kHLT_DoubleMediumIsoPFTau30_Trk1_eta2p1_Jet30Obj);
+mymod->AddTrigger("HLT_DoubleMediumIsoPFTau30_Trk1_eta2p1_Jet30_v4",kHLT_DoubleMediumIsoPFTau30_Trk1_eta2p1_Jet30,"hltDoublePFTau30TrackPt1MediumIsolationProng4Dz02",kHLT_DoubleMediumIsoPFTau30_Trk1_eta2p1_Jet30Obj);//auto
+mymod->AddTrigger("HLT_DoubleMediumIsoPFTau30_Trk1_eta2p1_Jet30_v5",kHLT_DoubleMediumIsoPFTau30_Trk1_eta2p1_Jet30,"hltDoublePFTau30TrackPt1MediumIsolationProng4Dz02",kHLT_DoubleMediumIsoPFTau30_Trk1_eta2p1_Jet30Obj);//auto
   
   mymod->AddTrigger("HLT_DoubleMediumIsoPFTau30_Trk5_eta2p1_Jet30_v1",kHLT_DoubleMediumIsoPFTau30_Trk5_eta2p1_Jet30,"hltDoublePFTau30TrackPt5MediumIsolationProng4Dz02",kHLT_DoubleMediumIsoPFTau30_Trk5_eta2p1_Jet30Obj);//auto 
   mymod->AddTrigger("HLT_DoubleMediumIsoPFTau30_Trk5_eta2p1_Jet30_v2",kHLT_DoubleMediumIsoPFTau30_Trk5_eta2p1_Jet30,"hltDoublePFTau30TrackPt5MediumIsolationProng4Dz02",kHLT_DoubleMediumIsoPFTau30_Trk5_eta2p1_Jet30Obj);//auto
