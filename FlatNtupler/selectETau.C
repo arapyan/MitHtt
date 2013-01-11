@@ -58,14 +58,10 @@ const Double_t pi = 3.14159265358979;
 //=== MAIN MACRO =================================================================================================
 
 void selectETau(const TString conf="etau.conf",         // input config file
-		const TString outputDir="etau2",    // output directory
+		const TString outputDir="etau",    // output directory
 		const Double_t lumi=1.,        // luminosity pb^-1
-		const Int_t is2012=true,          //2012 or 2011 data
-		const UInt_t btageff=0,     // b-tag efficiency scale factor uncertainty
-		const UInt_t jetunc=0,      // jet energy uncertainties
-		const UInt_t mistag=0,      // b mistag rate scale factor uncertainty
-		const UInt_t elescale=0     // electron energy scale/resolution uncertainty
-) {
+		const Int_t is2012=true          //2012 or 2011 data
+		) {
   gBenchmark->Start("selectETau");
   
   //--------------------------------------------------------------------------------------------------------------
@@ -132,11 +128,10 @@ void selectETau(const TString conf="etau.conf",         // input config file
   const TString ntupDir = outputDir + TString("/ntuples");
   gSystem->mkdir(ntupDir,kTRUE);
 
-  enum { eMC, eMuEl, eDiMu, eMu, eDiEl, eEl };  // dataset type  
+  enum {eMC};  // dataset type  
 
-  const Double_t kTauPtMin = 20;
-  const Double_t kElePtMin  = 20;
-
+  const Double_t kTauPtMin   = 20;
+  const Double_t kElePtMin   = 20;
   const Double_t kJetPtMin   = 30;
   const Double_t kBJetPtMin  = 20;
 
@@ -153,13 +148,8 @@ void selectETau(const TString conf="etau.conf",         // input config file
 
   //vbf MVA
   HttMVA *vbfMVA = new HttMVA();
-  //vbfMVA->Initialize("BDTG method", getenv("CMSSW_BASE")+std::string("/src/MitHtt/data/VBFMVA/MuTau/VBFMVA_BDTG.weights.xml"), HttMVA::kVBF2);   // vbf mva
   if(!is2012) vbfMVA->Initialize("BDTG method", getenv("CMSSW_BASE")+std::string("/src/MitHtt/data/VBFMVA/MuTau/VBFMVA_BDTG_HCP_42X.weights.xml"), HttMVA::kVBF3);   // vbf mva
-  if(is2012)  vbfMVA->Initialize("BDTG method", getenv("CMSSW_BASE")+std::string("/src/MitHtt/data/VBFMVA/MuTau/VBFMVA_BDTG_HCP_52X.weights.xml"), HttMVA::kVBF3);   // vbf mva 
-
-  setupTrigScale(is2012);
-  mithep::TrigEffRatio * tautrigscale = mithep::getTauETrigEffR12();
-  mithep::TrigEffRatio * eletrigscale  = mithep::getElectronTrigEffR12();
+  else  vbfMVA->Initialize("BDTG method", getenv("CMSSW_BASE")+std::string("/src/MitHtt/data/VBFMVA/MuTau/VBFMVA_BDTG_HCP_52X.weights.xml"), HttMVA::kVBF3);   // vbf mva 
 
   // Data structures to store info from TTrees
   mithep::TEventInfo *info  = new mithep::TEventInfo();
@@ -169,9 +159,11 @@ void selectETau(const TString conf="etau.conf",         // input config file
   TClonesArray *pvArr       = new TClonesArray("mithep::TVertex");
   TClonesArray *svfitArr    = new TClonesArray("mithep::TSVfit");
   TClonesArray *tauArr      = new TClonesArray("mithep::TPFTau");
-  
-  Bool_t hasData = (samplev[0]->fnamev.size()>0);
 
+  mithep::TrigEffRatio * tautrigscale = mithep::getTauETrigEffR12();
+  mithep::TrigEffRatio * eletrigscale  = mithep::getElectronTrigEffR12();
+  Bool_t hasData = (samplev[0]->fnamev.size()>0);
+  
   // loop over samples
   for(UInt_t isam=0; isam<samplev.size(); isam++) {
     if(isam==0 && !hasData) continue;
@@ -203,15 +195,13 @@ void selectETau(const TString conf="etau.conf",         // input config file
       Bool_t ismssm     = sfname.Contains("-ggh-") || sfname.Contains("-bbh-");
       Bool_t doIdScale  = !isdata;
       Bool_t doTrigScale= !isdata;
-      //Bool_t getGen     =  sfname.Contains("wjets") || doRecoil || reallyDoKf || ismadz ||isemb || ismssm;
-      Bool_t doJetUnc   = (jetunc!=kNo);
       Int_t  doRecoil   = (sfname.Contains("ztt") || sfname.Contains("-zll") || sfname.Contains("zjets")) && !isemb;
-      if((snamev[isam].Contains("wjets") || snamev[isam].Contains("w1jets") ||  snamev[isam].Contains("w2jets") || snamev[isam].Contains("w3jets") || snamev[isam].Contains("w4jets") ) && !isemb) doRecoil = 2;
+      if(snamev[isam].Contains("wjets") || snamev[isam].Contains("w1jets") ||  snamev[isam].Contains("w2jets") || snamev[isam].Contains("w3jets") || snamev[isam].Contains("w4jets")) doRecoil = 2;
       if((snamev[isam].Contains("_sm_") || snamev[isam].Contains("_mssm_")) && !isemb) doRecoil = 3;
-      Bool_t getGen     = sfname.Contains("wjets") || (doRecoil > 0) || reallyDoKf || ismadz ||isemb || ismssm;
+      Bool_t getGen     = doRecoil || ismadz ||isemb || ismssm ||  ismadzmm;
+      if(sfname.Contains("vtth")) getGen=0;
 
-      out->doRecoil = doRecoil;
-      
+      out->setupRecoil(doRecoil);
       // PU reweighting
       TString pileupReweightFile;
       if(!is2012) {
@@ -225,7 +215,7 @@ void selectETau(const TString conf="etau.conf",         // input config file
       // setup selecting with JSON file, if necessary
       Bool_t hasJSON = kFALSE;
       mithep::RunLumiRangeMap rlrm;
-      if(0 && isdata && (samp->jsonv[ifile].CompareTo("NONE")!=0)) { 
+      if(isdata && (samp->jsonv[ifile].CompareTo("NONE")!=0)) { 
         hasJSON = kTRUE;
 	ifstream jsonchk; jsonchk.open(samp->jsonv[ifile].Data()); assert(jsonchk.is_open()); jsonchk.close();
         rlrm.AddJSONFile(samp->jsonv[ifile].Data()); 
@@ -260,15 +250,13 @@ void selectETau(const TString conf="etau.conf",         // input config file
 	if(isemb)  weight=1.0;
       }
       samp->weightv.push_back(weight);
-      
       // counters
       Double_t nsel=0, nselvar=0; 
       Double_t nlowmass=0; // low mass z events (below 50)
 
-      cout << eventTree->GetEntries() << " events" << endl;
+      cout << lTree->GetEntries() << " events" << endl;
       int lNEvents = 0;
       // loop over events
-      // Start loop
       for(UInt_t ientry=0; ientry<eventTree->GetEntries(); ientry++) {
 	if(ientry%100000 == 0) cout << "processing " << float(ientry)/float(eventTree->GetEntriesFast()) << endl;
 	//cout << info->runNum << " " << info->lumiSec << " " << info->evtNum << endl;
@@ -276,10 +264,10 @@ void selectETau(const TString conf="etau.conf",         // input config file
 	if((fabs(gen->id_1_a) + fabs(gen->id_2_a) == 36 && (fabs(gen->id_1_a) == 17 || fabs(gen->id_2_a) == 17)) && gen->pt_1_b > 20 && gen->pt_2_b > 20)  lNEvents++;
 
 	// skip non-tau events in madgraph sample
-	if(ismadz && !ismadzmm && (fabs(gen->id_1_a)<15 || fabs(gen->id_1_a)>19)) continue;
+	//if(ismadz && !ismadzmm && (fabs(gen->id_1_a)<15 || fabs(gen->id_1_a)>19)) continue;
 
         // skip non-mumu events in madgraph sample for zmm
-        if(ismadzmm && (fabs(gen->id_1_a)>14 && fabs(gen->id_1_a)<20)) continue; 
+        //if(ismadzmm && (fabs(gen->id_1_a)>14 && fabs(gen->id_1_a)<20)) continue; 
 	infoBr->GetEntry(ientry);
 
 	// certified run selection
@@ -299,15 +287,13 @@ void selectETau(const TString conf="etau.conf",         // input config file
 	pvBr->GetEntry(ientry);	
 	
 	// loop through electrons
-        vector<const mithep::TElectron*> looseElev;
-	vector<const mithep::TElectron*> goodElev;
+	const mithep::TElectron *leadEle = NULL;
         eleArr->Clear();
         eleBr->GetEntry(ientry);
-
-	const mithep::TElectron *leadEle = NULL;
+	
         for(Int_t i=0; i<eleArr->GetEntriesFast(); i++) {
 	  const mithep::TElectron *ele = (mithep::TElectron*)((*eleArr)[i]);
-	
+	  if(!(pass2012EleMVAID(ele,kMedium,1))) continue;
 	  Bool_t trigmatch = kFALSE;
 	  // trigger matching
 	  if(is2012)
@@ -318,32 +304,26 @@ void selectETau(const TString conf="etau.conf",         // input config file
 	  if(!isemb && !trigmatch)     continue;
 	  if(ele->pt < kElePtMin)		continue;
 	  if(fabs(ele->eta) > 2.1)		continue;
-	  if(!(pass2012EleMVAID(ele,kMedium,1))) continue;
-	  
-	  if(!(passEleIsoPU(ele,2)))  continue;
-	  goodElev.push_back(ele);
+     
 	  double pIso = eleIsoPU(ele);
 	  if(!leadEle || (ele->pt > leadEle->pt && (pIso < eleIsoPU(leadEle) || pIso < 0.1)) || ( pIso  < eleIsoPU(leadEle) && ( eleIsoPU(leadEle)  > 0.1))) 
 	    leadEle = ele;
         }
        	if(!leadEle) continue;
-        // loop through HPSTaus
         
+	// loop through HPSTaus
 	tauArr->Clear();
 	tauBr->GetEntry(ientry);
 	const mithep::TPFTau *leadTau = NULL;
-	vector<const mithep::TPFTau*> goodHPSTaus;
 	for(Int_t i = 0; i < tauArr->GetEntries(); i++)
 	  {
 	    const mithep::TPFTau *tau = dynamic_cast<mithep::TPFTau *>(tauArr->At(i));
-	    assert(tau);
 	    if(toolbox::deltaR(tau->eta, tau->phi, leadEle->eta, leadEle->phi) < 0.3) continue;
 	    
 	    // Tau ID
 	    if(!tauIdElectron(tau)) continue;
-	    if(!(tauIdElectronMVA(tau,tau->antiEleID))) continue;
-	       
-		// Tau Kinematics
+	      
+	    // Tau Kinematics
 	    if(!(tau->pt > kTauPtMin && fabs(tau->eta) < 2.3)) continue;
 	    
 	    Bool_t trigmatch = kFALSE;
@@ -354,27 +334,24 @@ void selectETau(const TString conf="etau.conf",         // input config file
 	      trigmatch = ((info->triggerBits[kHLT_Ele15_CaloIdVT_TrkIdT_LooseIsoPFTau15] && tau->hltMatchBits[kHLT_Ele15_CaloIdVT_TrkIdT_LooseIsoPFTau15_TauObj]) || (info->triggerBits[kHLT_Ele15_CaloIdVT_TrkIdT_TightIsoPFTau20] && tau->hltMatchBits[kHLT_Ele15_CaloIdVT_TrkIdT_TightIsoPFTau20_TauObj]) ||(info->triggerBits[kHLT_Ele18_CaloIdVT_TrkIdT_MediumIsoPFTau20] && tau->hltMatchBits[kHLT_Ele18_CaloIdVT_TrkIdT_MediumIsoPFTau20_TauObj]) ||  (info->triggerBits[kHLT_Ele18_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_MediumIsoPFTau20] && tau->hltMatchBits[kHLT_Ele18_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_MediumIsoPFTau20_TauObj]) ||(info->triggerBits[kHLT_Ele20_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_MediumIsoPFTau20] && tau->hltMatchBits[kHLT_Ele20_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_MediumIsoPFTau20_TauObj]));
        	    
 	    if(!isemb && !trigmatch)     continue;
-	
-	    // Tau Isolation
-	    //if(!(tau->ringIso > 0.795)) continue;
 		     
-	    if(!(tau->hcalOverP + tau->ecalOverP > 0.2 ||
-	       tau->nSignalPFChargedHadrCands > 1 ||
-		 tau->nSignalPFGammaCands > 0)) continue;
-
-	    goodHPSTaus.push_back(tau);
+	    //if(!(tau->hcalOverP + tau->ecalOverP > 0.2 ||
+	    //   tau->nSignalPFChargedHadrCands > 1 ||
+	    //	 tau->nSignalPFGammaCands > 0)) continue;
+	    
 	    if(!leadTau || (tau->pt > leadTau->pt && (tau->ringIso > leadTau->ringIso || tau->ringIso > 0.795)) || (tau->ringIso > leadTau->ringIso && (leadTau->ringIso < 0.795)) )
 	      leadTau = tau;
           }	
-	if(goodHPSTaus.size()<1) continue;
-	
+	if(!leadTau) continue;
+
+	//Di-electron veto
 	Bool_t diElectron = kFALSE;
 	for(Int_t i = 0; i < eleArr->GetEntries(); i++)
 	  {
 	    const mithep::TElectron *ele1 = (mithep::TElectron *)(eleArr->At(i));
 	    assert(ele1);
 	    
-	    for(Int_t j = 0; j < eleArr->GetEntries(); j++)
+	    for(Int_t j = i+1; j < eleArr->GetEntries(); j++)
 	      {
 		const mithep::TElectron *ele2 = (mithep::TElectron *)(eleArr->At(j));
 		assert(ele2);
@@ -383,8 +360,8 @@ void selectETau(const TString conf="etau.conf",         // input config file
 		   ele1->q + ele2->q == 0 &&
 		   ele1->pt > 15.0 && ele2->pt > 15.0 &&
 		   passEleIdVeto(ele1) && passEleIdVeto(ele2) &&
-		   (eleIsoPU(ele1)/ele1->pt) < 0.3 && 
-		   (eleIsoPU(ele2)/ele2->pt) < 0.3 &&
+		   eleIsoPU(ele1) < 0.3 && 
+		   eleIsoPU(ele2) < 0.3 &&
 		   toolbox::deltaR(ele1->eta, ele1->phi, ele2->eta, ele2->phi) > 0.15)
 		  {
 		    diElectron = kTRUE;
@@ -394,7 +371,6 @@ void selectETau(const TString conf="etau.conf",         // input config file
 	  }
 
 	if(diElectron) continue;
-	if(!leadTau && !leadEle) continue;
 
 	out->fillElectron(leadEle,1,eleIsoPU(leadEle),passEleIsoPU(leadEle,1));
 	out->fillTau(leadTau,0,leadTau->ringIso > 0.795);
@@ -424,18 +400,16 @@ void selectETau(const TString conf="etau.conf",         // input config file
 	out->btagArray.Reset();	out->jptArray.Reset();	out->jetaArray.Reset();	UInt_t npt20jets=0;
         for(Int_t i=0; i<jetArr->GetEntriesFast(); i++) {
 	  mithep::TJet *jet = (mithep::TJet*)((*jetArr)[i]);
-
-	  if(doJetUnc) jet->pt *= (jetunc==kDown) ? (1-jet->unc) : (1+jet->unc);
-	  
+ 
           if(toolbox::deltaR(jet->eta,jet->phi,leadTau->eta,leadTau->phi) < 0.5) continue;
           if(toolbox::deltaR(jet->eta,jet->phi,leadEle->eta,leadEle->phi) < 0.5) continue;
-          if(fabs(jet->eta) > 5) continue;
+          if(fabs(jet->eta) > 4.7) continue;
 	  if(!jet->id) continue;
 	  // look for b-jets
 	  Int_t btagopt = 0;
 	  if(isdata||isemb) btagopt = 1;
 	  else btagopt = 2;
-	  Bool_t btagged = isbtagged(jet,btagopt,btageff,mistag);
+	  Bool_t btagged = isbtagged(jet,btagopt,0,0);
 	  if((jet->pt > kBJetPtMin) && (fabs(jet->eta) < 2.4)) { // note: bjet can be the same as jet1 or jet2
 	    assert(npt20jets<50);
 	    out->btagArray.AddAt(jet->csv,npt20jets);
@@ -465,24 +439,26 @@ void selectETau(const TString conf="etau.conf",         // input config file
 	if(njets>1) {
           for(Int_t i=2; i<jetArr->GetEntriesFast(); i++) {
             mithep::TJet *jet = (mithep::TJet*)((*jetArr)[i]);
-	    if(!(jet->pt > kJetPtMin && fabs(jet->eta)<5 && jet->id==1)) continue;
+	    if(toolbox::deltaR(jet->eta,jet->phi,leadTau->eta,leadTau->phi) < 0.5) continue;
+	    if(toolbox::deltaR(jet->eta,jet->phi,leadEle->eta,leadEle->phi) < 0.5) continue;
+	    if(!(jet->pt > kJetPtMin && fabs(jet->eta)<4.7 && jet->id==1)) continue;
 	    if(jet1->eta > jet2->eta && jet->eta > jet2->eta && jet->eta < jet1->eta) nCentralJets++;
 	    else if(jet2->eta > jet1->eta && jet->eta > jet1->eta && jet->eta < jet2->eta) nCentralJets++;
 	  }
         }
 
 	out->fillJets(jet1,jet2,bjet,njets,nbjets,npt20jets,nCentralJets);
+
         // get k-factor if necessary
         Double_t kf=1;
         if(reallyDoKf) kf = kfFHPValue(gen->vpt_a, hKFactors);
 	
 	//W+Jets
-	if(doRecoil == 2 && is2012 && gen->npartons == 1) kf  *= 0.286696*treeEntries/36445097.;
-	if(doRecoil == 2 && is2012 && gen->npartons == 2) kf  *= 0.101601*treeEntries/36445097.;
-	if(doRecoil == 2 && is2012 && gen->npartons == 3) kf  *= 0.114912*treeEntries/36445097.;
-	if(doRecoil == 2 && is2012 && gen->npartons == 4) kf  *= 0.159457*treeEntries/36445097.;
+	if(doRecoil == 2 && is2012 && gen->npartons == 1) kf  *= 0.02203*treeEntries/36541049.;
+        if(doRecoil == 2 && is2012 && gen->npartons == 2) kf  *= 0.05819*treeEntries/36541049.;
+        if(doRecoil == 2 && is2012 && gen->npartons == 3) kf  *= 0.03891*treeEntries/36541049.;
+        if(doRecoil == 2 && is2012 && gen->npartons == 4) kf  *= 0.01934*treeEntries/36541049.;
 
-	
 	// do vertex reweighting
 	Double_t npuWgt = 1;
 	if(!isdata && !isemb && doNpuRwgt) {
@@ -497,12 +473,11 @@ void selectETau(const TString conf="etau.conf",         // input config file
 	if(doIdScale) idscale = eleIDscaleETau(leadEle->pt,leadEle->eta,is2012);
 	// trigger scale factor for MC
 	Double_t trigscale = 1;
-	if(doTrigScale && !isemb && !is2012) trigscale=fMuTrigSF->GetBinContent(fMuTrigSF->FindBin(leadEle->pt, leadEle->eta))*fTauTrigSF->GetBinContent(fTauTrigSF->FindBin(leadTau->pt, leadTau->eta));
 	
 	if(doTrigScale && !isemb && is2012) 
-	  trigscale = tautrigscale->eff(leadTau->pt,leadTau->eta) * eletrigscale->eff(leadEle->pt,leadEle->eta);
-	if(isnan(trigscale) || isinf(trigscale)) trigscale = 1.;
-	
+	  trigscale = tautrigscale->eff(leadTau->pt,leadTau->eta) * eletrigscale->eff(leadEle->pt,leadEle->phi);
+	if(isnan(trigscale) || isinf(trigscale)) 
+	  trigscale = 1.;
 	Double_t embWgt = 1;
 	if(!isdata) out->fillGen(gen);
 	if(isemb)  embWgt=info->embWeight;
@@ -516,7 +491,6 @@ void selectETau(const TString conf="etau.conf",         // input config file
 	nsel    += weight*kf*npuWgt*trigscale*idscale*embWgt;
 	nselvar += weight*weight*kf*kf*npuWgt*npuWgt*trigscale*trigscale*idscale*idscale*embWgt*embWgt;
 	if(doRecoil && (gen->vmass_a < 50)) nlowmass += weight*kf*npuWgt*trigscale*idscale*embWgt;
-
 	// passing events in whole sample 
         nSelEvents += weight*kf*npuWgt*trigscale*idscale*embWgt;
       }

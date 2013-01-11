@@ -51,14 +51,10 @@ const Double_t pi = 3.14159265358979;
 
 //=== MAIN MACRO =================================================================================================
 
-void selectTauTau(const TString conf,         // input config file
-		  const TString outputDir,    // output directory
-		  const Double_t lumi,        // luminosity pb^-1
-		  const Int_t is2012,          //2012 or 2011 data
-		  const UInt_t btageff=0,     // b-tag efficiency scale factor uncertainty
-		  const UInt_t jetunc=0,      // jet energy uncertainties
-		  const UInt_t mistag=0,      // b mistag rate scale factor uncertainty
-		  const UInt_t elescale=0     // electron energy scale/resolution uncertainty
+void selectTauTau(const TString conf="tautau.conf",  // input config file
+		  const TString outputDir="tmp",    // output directory
+		  const Double_t lumi=1.,        // luminosity pb^-1
+		  const Int_t is2012=true          //2012 or 2011 data
 		  ) {
   gBenchmark->Start("selectTauTau");
   
@@ -126,11 +122,10 @@ void selectTauTau(const TString conf,         // input config file
   const TString ntupDir = outputDir + TString("/ntuples");
   gSystem->mkdir(ntupDir,kTRUE);
 
-  enum { eMC, eMuEl, eDiMu, eMu, eDiEl, eEl };  // dataset type  
+  enum {eMC};  // dataset type  
 
-  const Double_t kTauPtMin = 35;
-
-  const Double_t kJetPtMin   = 0.0;
+  const Double_t kTauPtMin = 30;
+  const Double_t kJetPtMin   = 30.0;
   const Double_t kBJetPtMin  = 20;
   
   Bool_t doKFactors = kTRUE;
@@ -180,18 +175,18 @@ void selectTauTau(const TString conf,         // input config file
       Bool_t isdata     = !(samp->typev[ifile]==eMC);
       Bool_t isemb      = snamev[isam].Contains("emb");
       Bool_t reallyDoKf = doKFactors && sfname.Contains("-gf-");
-      Bool_t ismadz     = sfname.Contains("-zll") || sfname.Contains("-zjets"); // madgraph z samples
+      Bool_t ismadz     = sfname.Contains("ztt") || sfname.Contains("-zjets"); // madgraph z samples
       Bool_t ismadzmm   = snamev[isam].Contains("zmm") && (sfname.Contains("-zll") || sfname.Contains("-zjets")); // madgraph z samples 
       Bool_t ismssm     = sfname.Contains("-ggh-") || sfname.Contains("-bbh-");
       Bool_t doIdScale  = !isdata;
       Bool_t doTrigScale= !isdata;
       Int_t  doRecoil   = (sfname.Contains("ztt") || sfname.Contains("-zll") || sfname.Contains("zjets")) && !isemb;
-      if((snamev[isam].Contains("wjets") || snamev[isam].Contains("w1jets") ||  snamev[isam].Contains("w2jets") || snamev[isam].Contains("w3jets") || snamev[isam].Contains("w4jets") ) && !isemb) doRecoil = 2;
-      if((snamev[isam].Contains("_sm_") || snamev[isam].Contains("_mssm_")) && !isemb) doRecoil = 3;
-      Bool_t getGen     = sfname.Contains("wjets") || doRecoil || reallyDoKf || ismadz ||isemb || ismssm;
-      Bool_t doJetUnc   = (jetunc!=kNo);
-
-      out->doRecoil = doRecoil;
+      if(snamev[isam].Contains("wjets") || snamev[isam].Contains("w1jets") ||  snamev[isam].Contains("w2jets") || snamev[isam].Contains("w3jets") || snamev[isam].Contains("w4jets")) doRecoil = 2;
+      if(snamev[isam].Contains("_sm_") || snamev[isam].Contains("_mssm_")) doRecoil = 3;
+      Bool_t getGen     = doRecoil || ismadz ||isemb || ismssm || ismadzmm;
+      if(sfname.Contains("vtth")) getGen=0;
+   
+      out->setupRecoil(doRecoil);
      
       // PU reweighting
       TString pileupReweightFile;
@@ -248,65 +243,70 @@ void selectTauTau(const TString conf,         // input config file
       Double_t nlowmass=0; // low mass z events (below 50)
 
       cout << eventTree->GetEntries() << " events" << endl;
-   	
-
+      
       // loop over events
       for(UInt_t ientry=0; ientry<eventTree->GetEntries(); ientry++) {
 	if(ientry%100000 == 0) cout << "processing " << float(ientry)/float(eventTree->GetEntriesFast()) << endl;
 	if(getGen)  genBr->GetEntry(ientry);
         infoBr->GetEntry(ientry);
 	//cout << info->runNum << " " << info->lumiSec << " " << info->evtNum << endl;
-       
+	
+       	infoBr->GetEntry(ientry);
+	
 	// skip non-tau events in madgraph sample
-	if(ismadz && !ismadzmm && (fabs(gen->id_1_a)<15 || fabs(gen->id_1_a)>19)) continue;
-
+	//if(ismadz && !ismadzmm && (fabs(gen->id_1_a)<15 || fabs(gen->id_1_a)>19)) continue;
+	
         // skip non-mumu events in madgraph sample for zmm
-        if(ismadzmm && (fabs(gen->id_1_a)>14 && fabs(gen->id_1_a)<20)) continue;
-
+        //if(ismadzmm && (fabs(gen->id_1_a)>14 && fabs(gen->id_1_a)<20)) continue;
 	// certified run selection
         mithep::RunLumiRangeMap::RunLumiPairType rl(info->runNum, info->lumiSec);
         if(hasJSON && !rlrm.HasRunLumi(rl)) continue;
-       
+
 	// trigger
-	if(!isemb && isdata && !(info->triggerBits[kHLT_DoubleMediumIsoPFTau30_Trk5_eta2p1_Jet30] || info->triggerBits[kHLT_DoubleMediumIsoPFTau25_Trk5_eta2p1_Jet30])) continue;
+ 	if(!isemb && isdata && !(info->triggerBits[kHLT_DoubleMediumIsoPFTau30_Trk5_eta2p1_Jet30] || info->triggerBits[kHLT_DoubleMediumIsoPFTau25_Trk5_eta2p1_Jet30] || info->triggerBits[kHLT_DoubleMediumIsoPFTau30_Trk1_eta2p1_Jet30])) continue;
+// 	if(!(info->triggerBits[kHLT_DoubleMediumIsoPFTau30_Trk5_eta2p1_Jet30] || info->triggerBits[kHLT_DoubleMediumIsoPFTau25_Trk5_eta2p1_Jet30] || info->triggerBits[kHLT_DoubleMediumIsoPFTau30_Trk1_eta2p1_Jet30])) continue;
+	
+	//if(!(info->triggerBits[kHLT_Ele20_CaloIdVT_CaloIsoRhoT_TrkIdT_TrkIsoT_LooseIsoPFTau20] || info->triggerBits[kHLT_Ele22_eta2p1_WP90Rho_LooseIsoPFTau20] || info->triggerBits[kHLT_Ele20_CaloIdVT_TrkIdT_LooseIsoPFTau20])) continue;
+
+	//if(!(info->triggerBits[kHLT_Ele17_CaloIdT_TrkIdVL_CaloIsoVL_TrkIsoVL_Ele8_CaloIdT_TrkIdVL_CaloIsoVL_TrkIsoVL] || info->triggerBits[kHLT_Ele17_CaloIdL_CaloIsoVL_Ele8_CaloIdL_CaloIsoVL])) continue;
+
+	//if(!(info->triggerBits[kHLT_Ele27_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT] || info->triggerBits[kHLT_Ele27_WP80])) continue;
+	//if(!(info->triggerBits[kHLT_Photon20_CaloIdVT_IsoT_Ele8_CaloIdL_CaloIsoVL])) continue;
 
         // good primary vertex
         if(!info->hasGoodPV) continue;
 	pvArr->Clear();
 	pvBr->GetEntry(ientry);	
 
+
         // loop through HPSTaus
         
 	tauArr->Clear();
 	tauBr->GetEntry(ientry);
 
-	vector<const mithep::TPFTau*> goodHPSTaus;
 	const mithep::TPFTau *leadTau = NULL;
 	const mithep::TPFTau *subTau  = NULL;
 	for(Int_t i = 0; i < tauArr->GetEntries(); i++)
 	  {
 	    const mithep::TPFTau *tau = dynamic_cast<mithep::TPFTau *>(tauArr->At(i));
 	    assert(tau);
-          
+        
 	    // Tau ID
-	    if(!(passtautauId(tau,0))) continue;
-	    if(!(tauIdElectronMVA(tau,tau->antiEleID))) continue;
-
-		// Tau Kinematics
-	    if(!(tau->pt > kTauPtMin && fabs(tau->eta) < 2.1)) continue;
-	    
+	    if(!passtauId(tau)) continue;
+	    //if(!(tauIdElectronMVA(tau,tau->antiEleID))) continue;
+	    // Tau Kinematics
+	    if(!(tau->pt > kTauPtMin)) continue;
 	    //Tau HLT
-	    Bool_t trigmatch = ((info->triggerBits[kHLT_DoubleMediumIsoPFTau25_Trk5_eta2p1_Jet30] && tau->hltMatchBits[kHLT_DoubleMediumIsoPFTau25_Trk5_eta2p1_Jet30Obj]) || (info->triggerBits[kHLT_DoubleMediumIsoPFTau30_Trk5_eta2p1_Jet30] && tau->hltMatchBits[kHLT_DoubleMediumIsoPFTau30_Trk5_eta2p1_Jet30Obj]));
-	   
-            if(isdata && !isemb && !trigmatch)     continue;
+	    Bool_t trigmatch = ((info->triggerBits[kHLT_DoubleMediumIsoPFTau25_Trk5_eta2p1_Jet30] && tau->hltMatchBits[kHLT_DoubleMediumIsoPFTau25_Trk5_eta2p1_Jet30Obj]) || (info->triggerBits[kHLT_DoubleMediumIsoPFTau30_Trk5_eta2p1_Jet30] && tau->hltMatchBits[kHLT_DoubleMediumIsoPFTau30_Trk5_eta2p1_Jet30Obj]) || (info->triggerBits[kHLT_DoubleMediumIsoPFTau30_Trk1_eta2p1_Jet30] && tau->hltMatchBits[kHLT_DoubleMediumIsoPFTau30_Trk1_eta2p1_Jet30Obj]));
+	    if(isdata && !trigmatch)     continue;
+	 
 	    // Tau Isolation
-	    //if(!(tau->ringIso > 0.884)) continue;
-            //  if(!(tau->ringIso > 0.921)) continue;
-	    if(!(tau->hcalOverP + tau->ecalOverP > 0.2 ||
-		 tau->nSignalPFChargedHadrCands > 1 ||
-	    	 tau->nSignalPFGammaCands > 0)) continue;
+	    if(!(tau->ringIso > 0.5)) continue; //0.921 tight
+           
+	    //if(!(tau->hcalOverP + tau->ecalOverP > 0.2 ||
+	    //	 tau->nSignalPFChargedHadrCands > 1 ||
+	    //	 tau->nSignalPFGammaCands > 0)) continue;
 	    
-	    goodHPSTaus.push_back(tau);
 	    if(!leadTau || tau->ringIso > leadTau->ringIso)
 	      {
 		subTau = leadTau;
@@ -315,14 +315,20 @@ void selectTauTau(const TString conf,         // input config file
 	      subTau = tau;
 	    }
           }	
-         
-	if(!(leadTau && subTau)) continue;
- 	//if(goodHPSTaus.size()<2) continue;
-	//if(!(passtautauId(leadTau,1))) continue; 
-        //if(!(tauIdElectronMVA(subTau,subTau->antiEleID))) continue;
-	out->fillTau(leadTau,1,leadTau->ringIso > 0.884);
-	out->fillTau(subTau,0,subTau->ringIso > 0.884);
 
+ 	if(!(leadTau && subTau)) continue;
+
+	if(subTau->pt < leadTau->pt)
+	  {
+	    out->fillTau(leadTau,1,leadTau->ringIso > 0.884);
+	    out->fillTau(subTau,0,subTau->ringIso > 0.884);
+	  }
+	else
+	  {
+	    out->fillTau(leadTau,0,leadTau->ringIso > 0.884);
+	    out->fillTau(subTau,1,subTau->ringIso > 0.884);
+	  }
+       
 	// SVFit
         svfitArr->Clear();
         svfitBr->GetEntry(ientry);
@@ -348,20 +354,18 @@ void selectTauTau(const TString conf,         // input config file
 	out->btagArray.Reset();	out->jptArray.Reset();	out->jetaArray.Reset();	UInt_t npt20jets=0;
         for(Int_t i=0; i<jetArr->GetEntriesFast(); i++) {
 	  mithep::TJet *jet = (mithep::TJet*)((*jetArr)[i]);
-
-	  if(doJetUnc) jet->pt *= (jetunc==kDown) ? (1-jet->unc) : (1+jet->unc);
-
+	  
           if(toolbox::deltaR(jet->eta,jet->phi,leadTau->eta,leadTau->phi) < 0.5) continue;
           if(toolbox::deltaR(jet->eta,jet->phi,subTau->eta,subTau->phi) < 0.5) continue;
 
-          if(fabs(jet->eta) > 5) continue;
+          if(fabs(jet->eta) > 4.7) continue;
 	  if(!jet->id) continue;
 
 	  // look for b-jets
 	  Int_t btagopt = 0;
 	  if(isdata||isemb) btagopt = 1;
 	  else btagopt = 2;
-	  Bool_t btagged = isbtagged(jet,btagopt,btageff,mistag);
+	  Bool_t btagged = isbtagged(jet,btagopt,0,0);
 	  if((jet->pt > kBJetPtMin) && (fabs(jet->eta) < 2.4)) { // note: bjet can be the same as jet1 or jet2
 	    assert(npt20jets<50);
 	    out->btagArray.AddAt(jet->csv,npt20jets);
@@ -392,7 +396,9 @@ void selectTauTau(const TString conf,         // input config file
 	if(njets>1) {
           for(Int_t i=2; i<jetArr->GetEntriesFast(); i++) {
             mithep::TJet *jet = (mithep::TJet*)((*jetArr)[i]);
-	    if(!(jet->pt > kJetPtMin && fabs(jet->eta)<5 && jet->id==1)) continue;
+	    if(toolbox::deltaR(jet->eta,jet->phi,leadTau->eta,leadTau->phi) < 0.5) continue;
+	    if(toolbox::deltaR(jet->eta,jet->phi,subTau->eta,subTau->phi) < 0.5) continue;
+	    if(!(jet->pt > kJetPtMin && fabs(jet->eta)<4.7 && jet->id==1)) continue;
 	    if(jet1->eta > jet2->eta && jet->eta > jet2->eta && jet->eta < jet1->eta) nCentralJets++;
 	    else if(jet2->eta > jet1->eta && jet->eta > jet1->eta && jet->eta < jet2->eta) nCentralJets++;
 	  }
@@ -413,10 +419,10 @@ void selectTauTau(const TString conf,         // input config file
 	}
 
 	//W+Jets
-	if(doRecoil == 2 && is2012 && gen->npartons == 1) kf  *= 0.286696;
-	if(doRecoil == 2 && is2012 && gen->npartons == 2) kf  *= 0.101601;
-	if(doRecoil == 2 && is2012 && gen->npartons == 3) kf  *= 0.114912;
-	if(doRecoil == 2 && is2012 && gen->npartons == 4) kf  *= 0.159457;
+	if(doRecoil == 2 && is2012 && gen->npartons == 1) kf  *= 0.02203*treeEntries/36541049.;
+        if(doRecoil == 2 && is2012 && gen->npartons == 2) kf  *= 0.05819*treeEntries/36541049.;
+        if(doRecoil == 2 && is2012 && gen->npartons == 3) kf  *= 0.03891*treeEntries/36541049.;
+        if(doRecoil == 2 && is2012 && gen->npartons == 4) kf  *= 0.01934*treeEntries/36541049.;
 
 	// lepton ID corrections
 	Double_t idscale = 1;
@@ -424,8 +430,8 @@ void selectTauTau(const TString conf,         // input config file
 	// trigger scale factor for MC
 	Double_t trigscale = 1;
 	if(doTrigScale)
-	  trigscale =  eff2012IsoTau5fb(leadTau->pt,leadTau->eta)*eff2012IsoTau5fb(subTau->pt,subTau->eta);
-	if(doTrigScale && jet1) trigscale *= eff2012Jet5fb(jet1->pt,jet1->eta);
+	  trigscale =  eff2012IsoTau12fb(leadTau->pt,leadTau->eta)*eff2012IsoTau12fb(subTau->pt,subTau->eta);
+	if(doTrigScale && jet1) trigscale *= eff2012Jet12fb(jet1->pt,jet1->eta);
 
 	// embedding weight for embedded sample
 	Double_t embWgt = 1;
@@ -454,7 +460,6 @@ void selectTauTau(const TString conf,         // input config file
     }
     out->save();
     delete out;
-
     if(samp->typev.size()>0 && samp->typev[0]==eMC)
       printf("    Yields for %1.2f/fb:",lumi/1000.);
     else
