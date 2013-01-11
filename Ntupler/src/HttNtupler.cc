@@ -127,12 +127,10 @@ HttNtupler::SlaveBegin()
   std::string jetCorrectorParams;
 
   if(f2012) {
-    if(TString(getenv("CMSSW_BASE")).Contains("CMSSW_5_3")) {
+    if(fIsData) 
+      jetCorrectorParams = std::string(TString::Format("%s/src/MitPhysics/data/GR_P_V41_AN2_Uncertainty_AK5PF.txt", getenv("CMSSW_BASE")));
+    else
       jetCorrectorParams = std::string(TString::Format("%s/src/MitPhysics/data/START53_V7F_Uncertainty_AK5PF.txt", getenv("CMSSW_BASE")));
-      //jetCorrectorParams = std::string(TString::Format("%s/src/MitPhysics/data/GR_P_V41_AN1_Uncertainty_AK5PF.txt", getenv("CMSSW_BASE")));
-    } else {
-      jetCorrectorParams = std::string(TString::Format("%s/src/MitPhysics/data/START52_V9_Uncertainty_AK5PF.txt", getenv("CMSSW_BASE")));
-    }
   }
   else jetCorrectorParams = std::string(TString::Format("%s/src/MitPhysics/data/START42_V17_AK5PF_Uncertainty.txt", getenv("CMSSW_BASE")));
   JetCorrectorParameters param(jetCorrectorParams);
@@ -311,7 +309,7 @@ HttNtupler::Process()
   // loop and fill jets
   fillJets();
   // loop and fill photons
-  //fillPhotons();
+  fillPhotons();
   // fill the tree
   fEventTree->Fill();
 }
@@ -955,7 +953,7 @@ HttNtupler::fillJets()
     else
       fJetCorrector->setRho   ( fPUEnergyDensity->At(0)->RhoRandom() );
     fJetCorrector->setJetA  ( jet->JetArea() );
-    fJetCorrector->setJetEMF( -99.0 );        
+    fJetCorrector->setJetEMF( -99.0 );       
     double correction = fJetCorrector->getCorrection();
     double pt = rawMom.Pt()*correction;
     
@@ -981,7 +979,7 @@ HttNtupler::fillJets()
       if(f2012) 
 	fJetCorrector->setRho   ( fPUEnergyDensity->At(0)->RhoKt6PFJets() );
       else
-	fJetCorrector->setRho   ( fPUEnergyDensity->At(0)->RhoRandom() );
+       	fJetCorrector->setRho   ( fPUEnergyDensity->At(0)->RhoRandom() );
       fJetCorrector->setJetA  ( jet->JetArea() );
       fJetCorrector->setJetEMF( -99.0 );
       fJetUncertainties->setJetPt ( rawMom.Pt()  );
@@ -990,8 +988,11 @@ HttNtupler::fillJets()
       pPFJet->pt          = rawMom.Pt()*jetcorr;
       pPFJet->eta         = rawMom.Eta();
       pPFJet->phi         = rawMom.Phi();
-      pPFJet->mass        = rawMom.M()*jetcorr;
-      pPFJet->unc         = fJetUncertainties->getUncertainty(true);
+      pPFJet->mass        = rawMom.M()*jetcorr; 
+      if(rawMom.Eta() < 5.2)     
+	pPFJet->unc         = fJetUncertainties->getUncertainty(true);
+      else
+	pPFJet->unc         = -999;
       pPFJet->ptraw       = rawMom.Pt();
       pPFJet->beta        = jet->Beta();
       pPFJet->area        = jet->JetArea();
@@ -1007,7 +1008,7 @@ HttNtupler::fillJets()
       //pPFJet->quark       = pQGVals[0];
       //pPFJet->gluon       = pQGVals[1];
       //pPFJet->pu          = pQGVals[2];
-
+    
       pPFJet->mcFlavor    = jet->MatchedMCFlavor();
       int   matchedFlavor = -999;
       float genpt         = -999;
@@ -1027,9 +1028,9 @@ HttNtupler::fillJets()
 	}
       }
       pPFJet->matchedFlavor = matchedFlavor;
-      // pPFJet->genpt         = genpt;
-      //pPFJet->geneta        = geneta;
-      //pPFJet->genphi        = genphi;
+      pPFJet->genpt         = genpt;
+      pPFJet->geneta        = geneta;
+      pPFJet->genphi        = genphi;
       int matchedId       = -999;
       if (fParticles) {
         Double_t dRmin = 0.3;
