@@ -37,14 +37,16 @@ namespace mithep
     double cov_11;
     //MVA met 
     double mvaMET, mvaMETphi;
-    /// MVA met significance matrix element [x|x]
-    double mvacov_00;
+    //MVA met 53X
+    double mvaMET53, mvaMETphi53;
+    /// MVA met significance matrix element [x|x] (53)
+    double mvacov_00,mvacov_0053;
     /// MVA met significance matrix element [y|x]
-    double mvacov_10;
+    double mvacov_10,mvacov_1053;
     /// MVA met significance matrix element [x|y]
-    double mvacov_01;
+    double mvacov_01,mvacov_0153;
     /// MVA met significance matrix element [y|y]
-    double mvacov_11;
+    double mvacov_11,mvacov_1153;
     /// EGenType Id of daughter1 and daughter2
     unsigned int daughterId1, daughterId2;
     /// di-lepton resonance daughters.

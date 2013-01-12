@@ -119,6 +119,8 @@ namespace mithep
     void SetPrintHLT(const bool flag){ fPrintTable = flag; }
     /// add a given trigger path to the analysis and perform a given matching
     void AddTrigger(const char* name, const unsigned int id, const char* objName1="", const unsigned int objId1=0, const double minPt1=0, const char* objName2="", const unsigned int objId2=0, const double minPt2=0);
+    /// add a given jet corrector to the list of jet correctors 53X    
+    void AddJetCorrNew(const char* name);
     /// add a given jet corrector to the list of jet correctors     
     void AddJetCorr(const char* name);
     /// add a given JSON file to the list of JSON files
@@ -402,10 +404,16 @@ namespace mithep
     
     /// list of jet correction parameters corresponding to a given jet correction level
     std::vector<TString> fJetCorrParsv;
+    /// list of jet correction parameters corresponding to a given jet correction level 53X
+    std::vector<TString> fJetCorrParsvNew;
     /// factorized jet corrector 
     FactorizedJetCorrector* fJetCorrector;
+    /// factorized jet corrector 53X
+    FactorizedJetCorrector* fJetCorrectorNew;
     /// jet correction uncertainties
     JetCorrectionUncertainty* fJetUncertainties;
+    /// jet correction uncertainties 53X
+    JetCorrectionUncertainty* fJetUncertaintiesNew;
     /// electron tools
     ElectronTools* fEleTools;
     /// muon tools
@@ -418,10 +426,14 @@ namespace mithep
     ElectronIDMVA* fElectronMVAIDTrig;
     /// Jet ID MVA
     JetIDMVA* fJetIDMVA;
+    /// Jet ID MVA 53X
+    JetIDMVA* fJetIDMVANew;
     /// Quark Gluon ID MVA
     JetIDMVA* fQGJetIDMVA;
     /// MET MVA
     MVAMet* fMVAMet;
+    /// MET MVA for 53X
+    MVAMet* fMVAMetNew;
     /// Tau ring ISO
     TauIsoMVA * fTauMVAIso;
     //AntiElectron ID MVA
@@ -538,6 +550,14 @@ namespace mithep
     ifstream jetcorrchk;
     jetcorrchk.open(name); assert(jetcorrchk.is_open()); jetcorrchk.close();
     fJetCorrParsv.push_back(name);
+  }
+  
+  inline void 
+  HttNtupler::AddJetCorrNew(const char* name) 
+  {
+    ifstream jetcorrchk;
+    jetcorrchk.open(name); assert(jetcorrchk.is_open()); jetcorrchk.close();
+    fJetCorrParsvNew.push_back(name);
   }
   
   inline void 

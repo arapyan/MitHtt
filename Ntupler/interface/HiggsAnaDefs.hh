@@ -231,8 +231,9 @@ enum ETriggerBit {
   kHLT_Jet240          = 101,
 
   //additional 2012 Tau+Tau
-  kHLT_DoubleMediumIsoPFTau30_Trk5_eta2p1_Jet30 = 102,
-  kHLT_DoubleMediumIsoPFTau25_Trk5_eta2p1_Jet30 = 103
+  kHLT_DoubleMediumIsoPFTau30_Trk5_eta2p1_Jet30  = 102,
+  kHLT_DoubleMediumIsoPFTau25_Trk5_eta2p1_Jet30  = 103,
+  kHLT_DoubleMediumIsoPFTau35_Trk1_eta2p1_Prong1 = 104 
 };
 
 const unsigned int kNTrigObj = 256;
@@ -415,7 +416,8 @@ enum ETriggerObject {
 
   //Tau Tau, additional 2012
   kHLT_DoubleMediumIsoPFTau30_Trk5_eta2p1_Jet30Obj = 152,
-  kHLT_DoubleMediumIsoPFTau25_Trk5_eta2p1_Jet30Obj = 153
+  kHLT_DoubleMediumIsoPFTau25_Trk5_eta2p1_Jet30Obj = 153,
+  kHLT_DoubleMediumIsoPFTau35_Trk1_eta2p1_Prong1Obj = 154 
 };
 
 #endif
