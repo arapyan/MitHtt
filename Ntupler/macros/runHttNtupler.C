@@ -125,10 +125,10 @@ void runHttNtupler(
   if(is2012)
     {
       if(isData || useGen==ESampleType::kEmbed){
-	// mymod->AddJetCorr(path + "GR_P_V42_AN3_L1FastJet_AK5PF.txt");
-	// mymod->AddJetCorr(path + "GR_P_V42_AN3_L2Relative_AK5PF.txt");
-	// mymod->AddJetCorr(path + "GR_P_V42_AN3_L3Absolute_AK5PF.txt");
-	// mymod->AddJetCorr(path + "GR_P_V42_AN3_L2L3Residual_AK5PF.txt");
+	mymod->AddJetCorrNew(path + "GR_P_V42_AN3_L1FastJet_AK5PF.txt");
+	mymod->AddJetCorrNew(path + "GR_P_V42_AN3_L2Relative_AK5PF.txt");
+	mymod->AddJetCorrNew(path + "GR_P_V42_AN3_L3Absolute_AK5PF.txt");
+	mymod->AddJetCorrNew(path + "GR_P_V42_AN3_L2L3Residual_AK5PF.txt");
 	mymod->AddJetCorr(path + "GR_P_V41_AN2_L1FastJet_AK5PF.txt");
 	mymod->AddJetCorr(path + "GR_P_V41_AN2_L2Relative_AK5PF.txt");
 	mymod->AddJetCorr(path + "GR_P_V41_AN2_L3Absolute_AK5PF.txt");
@@ -136,6 +136,9 @@ void runHttNtupler(
       }
       else
 	{
+	  mymod->AddJetCorrNew(path + "START53_V15_L1FastJet_AK5PF.txt"   );
+	  mymod->AddJetCorrNew(path + "START53_V15_L2Relative_AK5PF.txt"  );
+	  mymod->AddJetCorrNew(path + "START53_V15_L3Absolute_AK5PF.txt"  );
 	  mymod->AddJetCorr(path + "START53_V7F_L1FastJet_AK5PF.txt"   );
 	  mymod->AddJetCorr(path + "START53_V7F_L2Relative_AK5PF.txt"  );
 	  mymod->AddJetCorr(path + "START53_V7F_L3Absolute_AK5PF.txt"  );
@@ -150,7 +153,7 @@ void runHttNtupler(
 	mymod->AddJetCorr(path + "GR_R_42_V23_AK5PF_L2L3Residual.txt");
       }
     }
-
+  
 
   if(TString(json).Length() > 0){
     mymod->AddJSON(json);
