@@ -111,9 +111,29 @@ namespace mithep
 
     //ring isolation	
     float ringIso;
+    //new ring isolation	
+    float ringIso2;
     // antielectron id bdt
     float antiEleID;
-    ClassDef(TPFTau, 2)
+    // anti ele MVA2
+    float antiEleMVA2;
+    // anti ele MVA3
+    float antiEleMVA3;
+    // anti ele MVA2 Category
+    float antiEleMVA2Cat;
+    // anti ele MVA3 Category
+    float antiEleMVA3Cat;
+    // anti ele MVA2 Pass Index
+    float passAntiEleMVA2;
+    // anti ele MVA3 Pass Index
+    float passAntiEleMVA3;
+    // raw Iso 3 Hits
+    float rawIso3Hits;
+    // raw Iso 3 Hits Pass Index
+    float passRawIso3Hits;
+    // anti Muon discriminator 2
+    float passAntiMu2;
+    ClassDef(TPFTau, 3)
   };  
 }
 #endif

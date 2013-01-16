@@ -436,6 +436,8 @@ namespace mithep
     MVAMet* fMVAMetNew;
     /// Tau ring ISO
     TauIsoMVA * fTauMVAIso;
+   /// Tau ring ISO
+    TauIsoMVA * fTauMVAIso2;
     //AntiElectron ID MVA
     AntiElectronIDMVA * fAntiElectronIDMVA;
     /// list JSON files to be applied
