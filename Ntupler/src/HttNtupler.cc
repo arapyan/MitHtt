@@ -194,10 +194,12 @@ HttNtupler::SlaveBegin()
 			  JetIDMVA::kQGP,
 			  TString(getenv("CMSSW_BASE")+string("/src/MitPhysics/Utils/python/JetIdParams_cfi.py")));
   
-  fTauMVAIso = new TauIsoMVA();
-  fTauMVAIso->Initialize(TString(getenv("CMSSW_BASE")+string("/src/MitPhysics/data/SXIsoMVA_BDTG.weights.xml")));
- 			 
-  				 
+  fTauMVAIso  = new TauIsoMVA();
+  fTauMVAIso ->Initialize(TString(getenv("CMSSW_BASE")+string("/src/MitPhysics/data/SXIsoMVA_BDTG.weights.xml")));
+
+  fTauMVAIso2 = new TauIsoMVA();
+  fTauMVAIso2->InitializeGBR(TString(getenv("CMSSW_BASE")+string("/src/MitPhysics/data/gbrfTauIso_v2.root")));
+ 				 
   fMVAMet     = new MVAMet();
   fMVAMetNew  = new MVAMet();
   if(f2012) {
@@ -936,8 +938,36 @@ HttNtupler::fillPFTaus()
       pPFTau->puIso       = computeCommonIso((const ChargedParticle*) pftau,                   fPFPileUp    , 0.5, 0.3, 0.0001, 0);
       pPFTau->puIsoNoZ    = computeCommonIso((const ChargedParticle*) pftau, (PFCandidateCol*)fPFCandidates, 0.5, 0.5, 0.0001, 0);
       pPFTau->puIsoNoPt   = computeCommonIso((const ChargedParticle*) pftau,                   fPFPileUp    ,  0., 0.5,     0., 0);
-      pPFTau->ringIso =  fTauMVAIso->MVAValue(pftau,fPUEnergyDensity->At(0)->Rho());
-      pPFTau->antiEleID =  fAntiElectronIDMVA->MVAValue(pPFTau);
+      pPFTau->ringIso     =  fTauMVAIso ->MVAValue(pftau,fPUEnergyDensity->At(0)->Rho());
+      pPFTau->ringIso2    =  fTauMVAIso2->MVAValue(pftau,fPUEnergyDensity->At(0)->Rho());
+      pPFTau->antiEleID   =  fAntiElectronIDMVA->MVAValue(pPFTau);
+      pPFTau->antiEleMVA2    = pftau->MVA2rawElectronRejection();
+      pPFTau->antiEleMVA3    = pftau->MVA3rawElectronRejection();
+      pPFTau->antiEleMVA2Cat = pftau->MVA2rawElectronRejectionCategory();
+      pPFTau->antiEleMVA3Cat = pftau->MVA3rawElectronRejectionCategory();
+      
+      pPFTau->passAntiEleMVA2       = 0;
+      if(pftau->MVA2LooseElectronRejection())  pPFTau->passAntiEleMVA2++;
+      if(pftau->MVA2MediumElectronRejection()) pPFTau->passAntiEleMVA2++;
+      if(pftau->MVA2TightElectronRejection())  pPFTau->passAntiEleMVA2++;
+
+      pPFTau->passAntiEleMVA3       = 0;
+      if(pftau->MVA3LooseElectronRejection())   pPFTau->passAntiEleMVA3++;
+      if(pftau->MVA3MediumElectronRejection())  pPFTau->passAntiEleMVA3++;
+      if(pftau->MVA3TightElectronRejection())   pPFTau->passAntiEleMVA3++;
+      if(pftau->MVA3VTightElectronRejection())  pPFTau->passAntiEleMVA3++;
+      
+      pPFTau->rawIso3Hits        = pftau->RawCombinedIsolationDBSumPtCorr3Hits(); 
+      pPFTau->passRawIso3Hits    = 0;
+      if(pftau->LooseCombinedIsolationDBSumPtCorr3Hits())   pPFTau->passRawIso3Hits++;
+      if(pftau->MediumCombinedIsolationDBSumPtCorr3Hits())  pPFTau->passRawIso3Hits++;
+      if(pftau->TightCombinedIsolationDBSumPtCorr3Hits())   pPFTau->passRawIso3Hits++;
+
+      pPFTau->passAntiMu2       = 0;
+      if(pftau->LooseMuonRejection2())  pPFTau->passAntiMu2++;
+      if(pftau->MediumMuonRejection2()) pPFTau->passAntiMu2++;
+      if(pftau->TightMuonRejection2())  pPFTau->passAntiMu2++;
+
       if(pftau->LeadChargedHadronPFCand() && pftau->LeadChargedHadronPFCand()->Trk()) {
 	pPFTau->isoEtPU = computePFTauIso(pftau, pftau->LeadChargedHadronPFCand()->Trk());
       }
