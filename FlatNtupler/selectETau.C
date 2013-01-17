@@ -293,7 +293,7 @@ void selectETau(const TString conf="etau.conf",         // input config file
 	
         for(Int_t i=0; i<eleArr->GetEntriesFast(); i++) {
 	  const mithep::TElectron *ele = (mithep::TElectron*)((*eleArr)[i]);
-	  if(!(pass2012EleMVAID(ele,kMedium,1))) continue;
+	  if(!(pass2012EleMVAID(ele,kTight,1))) continue;
 	  Bool_t trigmatch = kFALSE;
 	  // trigger matching
 	  if(is2012)
@@ -369,8 +369,31 @@ void selectETau(const TString conf="etau.conf",         // input config file
 		  }
 	      }
 	  }
-
 	if(diElectron) continue;
+	
+	// bool thirdlep=false;
+	// for(Int_t i = 0; i < eleArr->GetEntries(); i++)
+	//   {
+	//     const mithep::TElectron *ele = (mithep::TElectron *)(eleArr->At(i))
+	//     assert(ele);
+	//     if(toolbox::deltaR(leadEle->eta,leadEle->phi,ele->eta,ele->phi) < 0.01) continue;
+	//     if(ele->pt < 10.0) continue;
+	//     if(fabs(ele->eta) > 2.5) continue;
+	//     if(!(pass2012EleMVAID(ele,kLoose,1))) continue;
+	//     if(eleIsoPU(ele) > 0.3) continue;
+	//     thirdlep=true;
+	//   }
+	// for(Int_t i=0; i<muonArr->GetEntriesFast(); i++) {
+        //   const mithep::TMuon *muon = (mithep::TMuon*)((*muonArr)[i]);
+	//   assert(muon);
+	//   if(muon->pt < 10.0) continue;
+	//   if(fabs(muon->eta) > 2.4) continue;
+	//   if(!passTightPFMuonID(muon,1)) continue;
+	//   if(muonIsoPU(muon) > 0.3) continue;
+	//   thirdlep=true;
+	// }
+	// //thrid lepton veto (WlHhadhad)       
+	// if(thirdlep) continue;
 
 	out->fillElectron(leadEle,1,eleIsoPU(leadEle),passEleIsoPU(leadEle,1));
 	out->fillTau(leadTau,0,leadTau->ringIso > 0.795);
@@ -396,7 +419,7 @@ void selectETau(const TString conf="etau.conf",         // input config file
         jetArr->Clear();
         jetBr->GetEntry(ientry);
         UInt_t njets = 0, nbjets = 0;
-        const mithep::TJet *jet1=0, *jet2=0, *bjet=0;
+        const mithep::TJet *jet1=0, *jet2=0, *bjet1=0, *bjet2=0;
 	out->btagArray.Reset();	out->jptArray.Reset();	out->jetaArray.Reset();	UInt_t npt20jets=0;
         for(Int_t i=0; i<jetArr->GetEntriesFast(); i++) {
 	  mithep::TJet *jet = (mithep::TJet*)((*jetArr)[i]);
@@ -416,8 +439,12 @@ void selectETau(const TString conf="etau.conf",         // input config file
 	    npt20jets++;
 	    if(btagged) {
 	      nbjets++;
-	      if(!bjet || jet->pt > bjet->pt)
-		bjet = jet; // leading b-jet
+	      if(!bjet1 || jet->pt > bjet1->pt) {
+		bjet2 = bjet1; // leading b-jet
+		bjet1 = jet;
+	      } else  if(!bjet2 || jet->pt > bjet2->pt) {
+		bjet2 = jet;
+	      }
 	    }
 	  }
 	  // look for jets
@@ -447,7 +474,7 @@ void selectETau(const TString conf="etau.conf",         // input config file
 	  }
         }
 
-	out->fillJets(jet1,jet2,bjet,njets,nbjets,npt20jets,nCentralJets);
+	out->fillJets(jet1,jet2,bjet1,bjet2,njets,nbjets,npt20jets,nCentralJets);
 
         // get k-factor if necessary
         Double_t kf=1;

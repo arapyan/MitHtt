@@ -344,6 +344,7 @@ void selectMuTau(const TString conf="mutau.conf",  // input config file
 	      leadTau = tau;
           }	
 	if(!leadTau) continue;
+	
 	// Di-muon veto
 	//
 	Bool_t diMuon = kFALSE;
@@ -369,9 +370,33 @@ void selectMuTau(const TString conf="mutau.conf",  // input config file
 		    break;
 		  }
 	      }
-	  }
-	
+	  }	
 	if(diMuon) continue;
+	
+	// bool thirdlep=false;
+	// for(Int_t i = 0; i < eleArr->GetEntries(); i++)
+	//   {
+	//     const mithep::TElectron *ele = (mithep::TElectron *)(eleArr->At(i))
+	//     assert(ele);
+	//     if(ele->pt < 10.0) continue;
+	//     if(fabs(ele->eta) > 2.5) continue;
+	//     if(!(pass2012EleMVAID(ele,kLoose,1))) continue;
+	//     if(eleIsoPU(ele) > 0.3) continue;
+	//     thirdlep=true;
+	//   }
+	// for(Int_t i=0; i<muonArr->GetEntriesFast(); i++) {
+        //   const mithep::TMuon *muon = (mithep::TMuon*)((*muonArr)[i]);
+	//   assert(muon);
+	//   if(toolbox::deltaR(leadMu->eta,leadMu->phi,muon->eta,muon->phi) < 0.01) continue;
+	//   if(muon->pt < 10.0) continue;
+	//   if(fabs(muon->eta) > 2.4) continue;
+	//   if(!passTightPFMuonID(muon,1)) continue;
+	//   if(muonIsoPU(muon) > 0.3) continue;
+	//   thirdlep=true;
+	// }
+	// //thrid lepton veto (WlHhadhad)       
+	// if(thirdlep) continue;
+	
 	out->fillMuon(leadMu,muonIsoPU(leadMu),passMuonIsoPU(leadMu,1));
 	out->fillTau(leadTau,0,leadTau->ringIso > 0.795);
 	
@@ -397,7 +422,7 @@ void selectMuTau(const TString conf="mutau.conf",  // input config file
         jetArr->Clear();
         jetBr->GetEntry(ientry);
         UInt_t njets = 0, nbjets = 0;
-        const mithep::TJet *jet1=0, *jet2=0, *bjet=0;
+        const mithep::TJet *jet1=0, *jet2=0, *bjet1=0, *bjet2=0;
 	out->btagArray.Reset();	out->jptArray.Reset();	out->jetaArray.Reset();	UInt_t npt20jets=0;
         for(Int_t i=0; i<jetArr->GetEntriesFast(); i++) {
 	  mithep::TJet *jet = (mithep::TJet*)((*jetArr)[i]);
@@ -417,10 +442,15 @@ void selectMuTau(const TString conf="mutau.conf",  // input config file
 	    npt20jets++;
 	    if(btagged) {
 	      nbjets++;
-	      if(!bjet || jet->pt > bjet->pt)
-		bjet = jet; // leading b-jet
+	      if(!bjet1 || jet->pt > bjet1->pt) {
+		bjet2 = bjet1; // leading b-jet
+		bjet1 = jet;
+	      } else  if(!bjet2 || jet->pt > bjet2->pt) {
+		bjet2 = jet;
+	      }
 	    }
 	  }
+  
 	  // look for jets
           if(jet->pt > kJetPtMin) {
             assert(njets<50);
@@ -448,7 +478,7 @@ void selectMuTau(const TString conf="mutau.conf",  // input config file
 	  }
         }
 	
-	out->fillJets(jet1,jet2,bjet,njets,nbjets,npt20jets,nCentralJets);
+	out->fillJets(jet1,jet2,bjet1,bjet2,njets,nbjets,npt20jets,nCentralJets);
 	// get k-factor if necessary
         Double_t kf=1;
         if(reallyDoKf) kf = kfFHPValue(gen->vpt_a, hKFactors);

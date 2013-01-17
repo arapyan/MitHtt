@@ -30,9 +30,9 @@ Bool_t passMuonIsoPUTauHad(const mithep::TMuon *muon);
 Bool_t passEleID(const mithep::TElectron *electron);
 Bool_t passLooseEleID(const mithep::TElectron *electron);
 Bool_t passEleMVAID(const mithep::TElectron *electron, Double_t mvaValue);
+Bool_t passEleNonTrigMVA(const mithep::TElectron *electron, EWorkingPoint WP);
 Bool_t pass2012EleMVAID(const mithep::TElectron *electron, EWorkingPoint WP, Bool_t etau);
 Bool_t passEleIdVeto(const mithep::TElectron *ele);
-Bool_t passEleNonTrigMVA(const mithep::TElectron *electron, EWorkingPoint WP);
 Bool_t passEleIso(const mithep::TElectron *electron);
 Bool_t passEleIsoPU(const mithep::TElectron *electron, Bool_t xtau);
 Bool_t passEleIsoPUTauHad(const mithep::TElectron *electron);
@@ -129,9 +129,10 @@ Bool_t passMuonIsoPUTauHad(const mithep::TMuon *muon)
 Double_t muonIsoPU(const mithep::TMuon *muon)
 {
   Double_t chargedIso = muon->pfIsoCharged;
+  Double_t mupt = muon->pt;
   Double_t neutralIso = max(muon->pfIsoNeutral + muon->pfIsoGamma - 0.5 * muon->puIso, 0.0);
   
-  return chargedIso+neutralIso;
+  return (chargedIso+neutralIso)/mupt;
 }
 //--------------------------------------------------------------------------------------------------
 Bool_t passEleID(const mithep::TElectron *electron)
@@ -320,42 +321,7 @@ Bool_t pass2012EleMVAID(const mithep::TElectron *electron, EWorkingPoint WP, Boo
       if(fabs(electron->d0) > 0.02)   return kFALSE;
       if(fabs(electron->dz) > 0.1)    return kFALSE;
     }
- 
-  Int_t subdet = 0;
-  if (fabs(electron->scEta) < 0.8) subdet = 0;
-  else if (fabs(electron->scEta) < 1.479) subdet = 1;
-  else subdet = 2;
-  Int_t ptBin = 0;
-  if (electron->pt > 20.0) ptBin = 1;
-  Int_t MVABin = -1;
-  if (subdet == 0 && ptBin == 0) MVABin = 0;
-  if (subdet == 1 && ptBin == 0) MVABin = 1;
-  if (subdet == 2 && ptBin == 0) MVABin = 2;
-  if (subdet == 0 && ptBin == 1) MVABin = 3;
-  if (subdet == 1 && ptBin == 1) MVABin = 4;
-  if (subdet == 2 && ptBin == 1) MVABin = 5;
-
-  Double_t MVACut = -9999;
-  if(WP==kMedium) {
-    if (MVABin == 0) MVACut = 0.925;
-    if (MVABin == 1) MVACut = 0.915; 
-    if (MVABin == 2) MVACut = 0.965;  
-    if(etau)
-      {
-	if (MVABin == 3) MVACut = 0.925;
-	if (MVABin == 4) MVACut = 0.975;
-	if (MVABin == 5) MVACut = 0.985;
-      }
-    else
-      {
-	if (MVABin == 3) MVACut = 0.905;
-	if (MVABin == 4) MVACut = 0.955;
-	if (MVABin == 5) MVACut = 0.975;
-      }
-  }
-
-  if (electron->mvaValID > MVACut) return kTRUE;
-  return kFALSE;
+  return passEleNonTrigMVA(electron,WP);
 }  
 
 ////////////////////////////////////////////////////
@@ -397,15 +363,19 @@ Bool_t passEleNonTrigMVA(const mithep::TElectron *electron, EWorkingPoint WP)
   if (subdet == 2 && ptBin == 1) MVABin = 5;
 
   Double_t MVACut = -9999;
-  if(WP==kMedium) {
-    if (MVABin == 0) MVACut = 0.925;
-    if (MVABin == 1) MVACut = 0.915;
-    if (MVABin == 2) MVACut = 0.965;
+  if (MVABin == 0) MVACut = 0.925;
+  if (MVABin == 1) MVACut = 0.915;
+  if (MVABin == 2) MVACut = 0.965;
+  if(WP==kLoose) {
     if (MVABin == 3) MVACut = 0.905;
     if (MVABin == 4) MVACut = 0.955;
     if (MVABin == 5) MVACut = 0.975;
   }
-
+  else if(WP==kTight) {
+    if (MVABin == 3) MVACut = 0.925;
+    if (MVABin == 4) MVACut = 0.975;
+    if (MVABin == 5) MVACut = 0.985;
+  }
   if (electron->mvaValID > MVACut) return kTRUE;
   return kFALSE;
 }
@@ -416,7 +386,7 @@ Bool_t passEleIsoPU(const mithep::TElectron *electron, int xtau)
   Double_t neutralIso = max(electron->pfIsoNeutral + electron->pfIsoGamma - 0.5 * electron->puIso, 0.0);
 
   Double_t totalIso = chargedIso+neutralIso;
-  if(xtau == 2) return (totalIso<0.3*(electron->pt));
+  if(xtau == 2) return (totalIso<0.1*(electron->pt));
 
   // barrel/endcap dependent requirments      
   if(fabs(electron->scEta)<1.479 && !xtau) {
@@ -441,9 +411,10 @@ Bool_t passEleIsoPUTauHad(const mithep::TElectron *electron)
 Double_t eleIsoPU(const mithep::TElectron *electron)
 {
   Double_t chargedIso = electron->pfIsoCharged;
+  Double_t elept = electron->pt;
   Double_t neutralIso = max(electron->pfIsoNeutral + electron->pfIsoGammaNoZ - 0.5 * electron->puIso, 0.0);
 
-  return chargedIso+neutralIso;
+  return (chargedIso+neutralIso)/elept;
 }
 //--------------------------------------------------------------------------------------------------
 Bool_t isSoftMuon(const mithep::TMuon *muon)
@@ -538,15 +509,11 @@ Bool_t passtauIdMu(const mithep::TPFTau *tau)
 	 tau->hpsDiscriminators & mithep::TPFTau::kTightMu &&
 	 tau->hpsDiscriminators & mithep::TPFTau::kDecayMode);
 }
-Bool_t passtautauId(const mithep::TPFTau *tau,Bool_t ele)
+Bool_t passtauId(const mithep::TPFTau *tau)
 {
-  if(ele)
-    return(tau->hpsDiscriminators & mithep::TPFTau::kLooseEle &&
-	   tau->hpsDiscriminators & mithep::TPFTau::kLooseMu &&
-	   tau->hpsDiscriminators & mithep::TPFTau::kDecayMode);
-  else
-    return(tau->hpsDiscriminators & mithep::TPFTau::kLooseMu &&
-	   tau->hpsDiscriminators & mithep::TPFTau::kDecayMode);
+  return(tau->hpsDiscriminators & mithep::TPFTau::kLooseEle &&
+	 tau->hpsDiscriminators & mithep::TPFTau::kLooseMu &&
+	 tau->hpsDiscriminators & mithep::TPFTau::kDecayMode);
 }
 Bool_t tauIdElectron(const mithep::TPFTau *tau)
 {
