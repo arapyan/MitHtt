@@ -377,6 +377,8 @@ void selectMuTau(const TString conf="mutau.conf",  // input config file
 	// for(Int_t i = 0; i < eleArr->GetEntries(); i++)
 	//   {
 	//     const mithep::TElectron *ele = (mithep::TElectron *)(eleArr->At(i))
+	//if(toolbox::deltaR(leadEle->eta,leadEle->phi,ele->eta,ele->phi) < 0.3) continue;
+	//if(toolbox::deltaR(leadTau->eta,leadTau->phi,ele->eta,ele->phi) < 0.3) continue;
 	//     assert(ele);
 	//     if(ele->pt < 10.0) continue;
 	//     if(fabs(ele->eta) > 2.5) continue;
@@ -388,6 +390,7 @@ void selectMuTau(const TString conf="mutau.conf",  // input config file
         //   const mithep::TMuon *muon = (mithep::TMuon*)((*muonArr)[i]);
 	//   assert(muon);
 	//   if(toolbox::deltaR(leadMu->eta,leadMu->phi,muon->eta,muon->phi) < 0.01) continue;
+	//if(toolbox::deltaR(leadTau->eta,leadTau->phi,muon->eta,muon->phi) < 0.3) continue;
 	//   if(muon->pt < 10.0) continue;
 	//   if(fabs(muon->eta) > 2.4) continue;
 	//   if(!passTightPFMuonID(muon,1)) continue;
