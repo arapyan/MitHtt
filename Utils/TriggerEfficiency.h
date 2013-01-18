@@ -102,8 +102,39 @@ namespace mithep
   private:
     CBTurnOn *barrel;
     CBTurnOn *endcap;
-
+    
     double boundary;
+  };
+
+  
+  
+  class CBTurnOn6Eta : public TrigEff
+  {
+  public:
+    CBTurnOn6Eta() : ecM(0),trM(0),bM(0),bP(0),trP(0),ecP(0),b1(-1.2),b2(-0.8),b3(0.),b4(0.8),b5(1.2) {}
+    CBTurnOn6Eta(CBTurnOn *ecM_, CBTurnOn *trM_, CBTurnOn *bM_,CBTurnOn *bP_,CBTurnOn *trP_,CBTurnOn *ecP_,double b1_,double b2_,double b3_,double b4_,double b5_) :
+      ecM(ecM_),trM(trM_),bM(bM_),bP(bP_),trP(trP_),ecP(ecP_),b1(b1_),b2(b2_),b3(b3_),b4(b4_),b5(b5_) 
+      {}
+	
+   double eff(double pt, double eta)
+    {
+      if(fabs(eta) < b1)                   return ecM->eff(pt, eta);
+      if(fabs(eta) > b1 && fabs(eta) < b2) return trM->eff(pt, eta);
+      if(fabs(eta) > b2 && fabs(eta) < b3) return bM ->eff(pt, eta);
+      if(fabs(eta) > b3 && fabs(eta) < b4) return ecP->eff(pt, eta);
+      if(fabs(eta) > b4 && fabs(eta) < b5) return trP->eff(pt, eta);
+      return                                      ecP->eff(pt, eta);
+    }
+										   
+  private:
+   CBTurnOn *ecM;
+   CBTurnOn *trM;
+   CBTurnOn *bM;
+   CBTurnOn *bP;
+   CBTurnOn *trP;
+   CBTurnOn *ecP;
+
+   double b1,b2,b3,b4,b5;
   };
 
 

@@ -442,6 +442,7 @@ void RecoilCorrector::metDistributionType1(double &iMet,double &iMPhi,double iGe
 					   TF1 *iU2MSZDatFit, TF1 *iU2MSZMCFit, 		   		   
 					   //TF1 *iU1U2ZDatCorr,TF1 *iU1U2ZMCCorr,
 					   double &iU1,double &iU2,double iFluc,double iScale) {
+  if(iLepPt < 4) return;
   double lRescale  = sqrt((TMath::Pi())/2.);		     
   double pU1       = iU1RZDatFit->Eval(iGenPt)/iU1RZMCFit->Eval(iGenPt);
   double pU2       = 0; //Right guys are for cumulants => code deleted
@@ -536,7 +537,7 @@ void RecoilCorrector::metDistributionType2(double &iMet,double &iMPhi,double iGe
   //double pDMean2    = pDFrac2;
  
   double pMU1       = iU1RZMCFit  ->Eval(iGenPt);
-  //double pMU2       = 0; 
+  double pMU2       = 0; 
   double pMFrac1    = iU1MSZMCFit ->Eval(iGenPt)*lRescale;
   double pMSigma1_1 = iU1S1ZMCFit ->Eval(iGenPt)*pMFrac1;
   double pMSigma1_2 = iU1S2ZMCFit ->Eval(iGenPt)*pMFrac1;
@@ -565,11 +566,11 @@ void RecoilCorrector::metDistributionType2(double &iMet,double &iMPhi,double iGe
     //Modify all the different parameters the choice of signs makes it maximal
     pDU1       = pDU1       + iScale*lEUR1;             //Recoil
     pDFrac1    = pDFrac1    + iFluc*(lEU1Frac);        //Mean RMS 
-    pDSigma1_1 = pDSigma1_1 + lEUS1_1*pDFrac1;    //Sigma 1 smalles sigma
-    pDSigma1_2 = pDSigma1_2 + lEUS1_2*pDFrac1;    //Sigma 2 (Maximal when oppsite sigma 1)
+    pDSigma1_1 = pDSigma1_1 + iFluc*lEU1Frac;//lEUS1_1*pDFrac1;    //Sigma 1 smalles sigma
+    pDSigma1_2 = pDSigma1_2 + iFluc*lEU1Frac;//lEUS1_2*pDFrac1;    //Sigma 2 (Maximal when oppsite sigma 1)
     pDFrac2    = pDFrac2    + iFluc*(lEU2Frac);        //Mean RMS for U2
-    pDSigma2_1 = pDSigma2_1 + lEUS2_1*pDFrac2;    //Sigma 1 U2
-    pDSigma2_2 = pDSigma2_2 + (lEUS2_2)*pDFrac2;
+    pDSigma2_1 = pDSigma2_1 + iFluc*lEU2Frac;//lEUS2_1*pDFrac2;    //Sigma 1 U2
+    pDSigma2_2 = pDSigma2_2 + iFluc*lEU2Frac;//(lEUS2_2)*pDFrac2;
   }
   pDFrac1           = (pDFrac1-pDSigma1_2)/(pDSigma1_1-pDSigma1_2);
   pDFrac2           = (pDFrac2-pDSigma2_2)/(pDSigma2_1-pDSigma2_2);
@@ -588,7 +589,7 @@ void RecoilCorrector::metDistributionType2(double &iMet,double &iMPhi,double iGe
 
   double p1Charge        = pU1Diff/fabs(pU1Diff);
   double p2Charge        = pU2Diff/fabs(pU2Diff);
-  //double pTU1Diff        = pU1Diff;
+  double pTU1Diff        = pU1Diff;
   // double lMU1U2  = iU1U2ZMCCorr->Eval(iGenPt);
   // pU1Diff                = deCorrelate(pMMean1,lMU1U2,0.,0.,pU1Diff/pMMean1,pU2Diff/pMMean1 ,0.,0.);
   //pU2Diff                = deCorrelate(pMMean2,lMU1U2,0.,0.,pU2Diff/pMMean2,pTU1Diff/pMMean2,0.,0.);

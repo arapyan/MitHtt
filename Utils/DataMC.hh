@@ -1,11 +1,16 @@
 #ifndef DATAMC_HH
 #define DATAMC_HH
 
+#include <sstream>
+#include "TFile.h"
+#include "TMath.h"
+#include "TRegexp.h"
 #include "TTree.h"
 #include "TBranch.h"
 #include "TRandom1.h"
 #include "TH1D.h"
 #include "TH2D.h"
+#include "BtagSF.hh"
 
 TRandom1 randm(0xDEADBEEF);
 enum { kNo, kDown, kUp };                     // systematic variation
@@ -23,10 +28,11 @@ Double_t muTrigScaleEmu(Double_t mupt, Double_t mueta, Int_t is2012);
 // Get higgs mass point from sample name
 Int_t higgsmass(TString basename)
 {
+  cout << basename << endl;
   stringstream ss(basename(TRegexp("[0-9][0-9]*"),3).Data());
   Int_t mass;
   ss >> mass;
-  if(basename.Contains("-gf-")) assert(mass>85 && mass<1200);
+  //if(basename.Contains("-gf-")) assert(mass>85 && mass<1200);
   return mass;
 }
 
@@ -57,7 +63,7 @@ Double_t kfFHPValue(Double_t pt, TH1D* hKF);
 
 double efficiency(double m, double m0, double sigma, double alpha,double n, double norm);
 
-Bool_t isbtagged(mithep::TJet *jet, Int_t isdata, UInt_t btageff, UInt_t mistag);
+//Bool_t isbtagged(mithep::TJet *jet, Int_t isdata, UInt_t btageff, UInt_t mistag);
 
 Double_t embUnfoldWgt(Double_t pt1, Double_t eta1, Double_t pt2, Double_t eta2);
 Double_t unskimmedEntries(TString skimname);
@@ -85,6 +91,7 @@ Double_t kfFHPValue(Double_t pt, TH1D* hKF)
   return hKF->Interpolate(pt);
 }
 //----------------------------------------------------------------------------------------
+/*
 Bool_t isbtagged(mithep::TJet *jet, Int_t isdata, UInt_t btageff, UInt_t mistag)
 {
 
@@ -128,7 +135,8 @@ Bool_t isbtagged(mithep::TJet *jet, Int_t isdata, UInt_t btageff, UInt_t mistag)
   }
 
   return btagged;
-}  
+} 
+*/ 
 //----------------------------------------------------------------------------------------
 Double_t embUnfoldWgt(Double_t pt1, Double_t eta1, Double_t pt2, Double_t eta2)
 {
@@ -203,16 +211,18 @@ Double_t muIDscaleMuTau(Double_t mupt, Double_t mueta, Int_t is2012)
 {
   if((fabs(mueta) > 2.1) || (mupt < 15)) { cout << "mu kinematics out of range" << endl; assert(0); }
   if(mupt > 30) {
-    if(fabs(mueta) < 1.6)  return is2012 ? 0.993*0.989 : 1.030*1.010;
-    else   return is2012 ? 1.005*0.989 : 0.997*0.990;
+    if     (fabs(mueta) < 0.8)  return is2012 ? 0.9872*0.9857  : 1.030*1.010;
+    else if(fabs(mueta) < 1.2)  return is2012 ? 0.9924*0.9805  : 0.997*0.990;
+    else                        return is2012 ? 1.0012*0.9900  : 0.997*0.990;
   }
   else if(mupt > 20) {
-    if(fabs(mueta) < 1.6)  return is2012 ? 1.005*0.991 : 0.977*0.995;
-    else   return is2012 ? 0.992*0.974 : 0.984*0.986;
+    if     (fabs(mueta) < 0.8)  return is2012 ? 0.9685*0.9853  : 0.977*0.995;
+    else if(fabs(mueta) < 1.2)  return is2012 ? 0.9808*0.9818  : 0.984*0.986;
+    else                        return is2012 ? 0.9972*0.9899  : 0.984*0.986;
   }
   else if(mupt > 17 && !is2012) {
-    if(fabs(mueta) < 1.6)   return 0.997*0.930;
-    else               return 0.986*0.929;
+    if(fabs(mueta) < 1.)   return 0.997*0.930;
+    else                  return 0.986*0.929;
   }
   else {
     if(fabs(mueta) < 1.6)   return 0.945*0.989;
@@ -224,12 +234,12 @@ Double_t eleIDscaleETau(Double_t ept, Double_t eeta, Int_t is2012)
 {
   if((fabs(eeta) > 2.1) || (ept < 20)) { cout << "electron kinematics out of range" << endl; assert(0); }
   if(ept > 30) {
-    if(fabs(eeta) < 1.479)  return is2012 ? 0.997*0.964 : 1.044*0.984;
-    else   return is2012 ? 0.983*0.958 : 0.989*0.977;
+    if(fabs(eeta) < 1.479)  return is2012 ? 0.982*0.949 : 1.044*0.984;
+    else                    return is2012 ? 0.995*0.926 : 0.989*0.977;
   }
   else {
-    if(fabs(eeta) < 1.479)   return is2012 ? 0.922*0.974 : 0.955*0.980 ;
-    else                 return is2012 ? 1.008*0.944 : 0.967*0.938;
+    if(fabs(eeta) < 1.479) return is2012 ? 0.947*0.9100 : 0.955*0.980 ;
+    else                   return is2012 ? 0.959*0.8244 : 0.967*0.938;
   }
 }
 //----------------------------------------------------------------------------------------
