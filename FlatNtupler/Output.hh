@@ -70,7 +70,8 @@ public:
   float fMt1;      // mT of lepton wrt to pf met
   float fMVAMt1;   // mT of first leptron wrt to MVA met
   int   fngamma1;   //number of gamma candidates 
-  float fnprong1;  // number of prongs
+  int   fnprong1;  // number of prongs
+  bool  fantiele1; //for tau: passes the antielectron discriminator mva
 
   ///Second lepton :  hadronic Tau for muTau had for eTau, electron for emu, Trailing (in pT)  Tau for TauTau
   float fPt2;      //pt2
@@ -84,8 +85,9 @@ public:
   bool  fPassIso2; // passes default iso?
   float fMt2;      // mT of lepton wrt to pf met
   float fMVAMt2;   // mT of first leptron wrt to MVA met
-  int fngamma2;    // number of gamma candidates
-  int fnprong2;    // number of prongs
+  int   fngamma2;    // number of gamma candidates
+  int   fnprong2;    // number of prongs
+  bool  fantiele2; //for tau: passes the antielectron discriminator mva
 
   float fdrll;     //dR between two leptons
 
@@ -130,12 +132,19 @@ public:
   float fJcsv2;      //CSV discriminator value 
   bool  fJPass2;     //Jet passes PU ID loose WP?
   
-  //B Tagged Jet : leading btagged jet passing btag wp (pt > 20+cvs medium)
-  float fBTagPt;     //Corrected BTag Pt
-  float fBTagEta;    //Btag Eta
-  float fBTagPhi;    //Btag Phi
-  float fBTagM;      //Btag Mass
-  float fbcsv;       //B CSV
+  //Leading B Tagged Jet : leading btagged jet passing btag wp (pt > 20+cvs medium)
+  float fBTagPt1;     //Corrected BTag Pt
+  float fBTagEta1;    //Btag Eta
+  float fBTagPhi1;    //Btag Phi
+  float fBTagM1;      //Btag Mass
+  float fbcsv1;       //B CSV
+
+  //Second B Tagged Jet : 2nd leading btagged jet passing btag wp (pt > 20+cvs medium)
+  float fBTagPt2;     //Corrected BTag Pt
+  float fBTagEta2;    //Btag Eta
+  float fBTagPhi2;    //Btag Phi
+  float fBTagM2;      //Btag Mass
+  float fbcsv2;       //B CSV
   
   //Di Jet kinematic variables (usefull for VBF selection)
   float fMJJ;        //Mass Di Jet system
@@ -150,8 +159,9 @@ public:
   float fHDJetPhi; //Phi of the di jet system
   float fVisJetEta; //TMath::Min(eta_vis - jeta,eta_vis,jeta2)
   float fPtVis;     //Pt Vis
-  float fPtH;       //Pt of the higgs system
-
+  float fPtH;       //Pt of the system
+  float fPtHMVA;       //Pt of the system mva
+  
   //number of btags passing btag id (pt > 20)
   int fNBTag;   
   //number of jets passing jet id (pt > 30)
@@ -167,9 +177,8 @@ public:
   float fGenEta2; //Eta sub-leading
   int   fGenId2;  //Pdg Id leading
   int   fGenMatch; //Matched to ll/l+Tau/Tau+Tau/l+Jet/Tau+Jet/None of above (1/2/3/4/5/0)
-
-  int    doRecoil; //Recoil corrections  
-  
+ 
+  int  doRecoil; //Recoil corrections  
   UInt_t npt20jets;
   TArrayF btagArray;
   TArrayF jptArray;
@@ -181,7 +190,8 @@ public:
   void fillCov(mithep::TSVfit *svfit); 	
   void fillGen(mithep::TGenInfo *gen);
   void fillEvent(mithep::TEventInfo *event, HttMVA *vbfmva, int npv);  //always to be called the last
-  void fillJets(const mithep::TJet *jet1,const mithep::TJet *jet2,const mithep::TJet *bjet, int njets, int bjets, int npt20, int nCentralJets);
+  void fillJets(const mithep::TJet *jet1,const mithep::TJet *jet2,const mithep::TJet *bjet1, const mithep::TJet *bjet2, int njets, int bjets, int npt20, int nCentralJets);
+  void setupRecoil(int doRec);
   void save();
   void cd();
 protected:
