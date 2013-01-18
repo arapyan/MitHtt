@@ -131,11 +131,11 @@ void Output::setupRecoil(int doRec)
     {
       doRecoil = doRec;
       cout << "doing recoil corrections" << endl;
-      if(doRecoil == 1) corrector = new RecoilCorrector("$CMSSW_BASE/src/MitHtt/Utils/recoilfits/recoilfit_zmm53X_20pv_njet.root");
+      if(doRecoil == 1) corrector = new RecoilCorrector("$CMSSW_BASE/src/MitHtt/Utils/recoilfits/recoilfit_zmm53X_2012_njet.root");
       if(doRecoil == 2) corrector = new RecoilCorrector("$CMSSW_BASE/src/MitHtt/Utils/recoilfits/recoilfit_wjets53X_20pv_njet.root");
       if(doRecoil == 3) corrector = new RecoilCorrector("$CMSSW_BASE/src/MitHtt/Utils/recoilfits/recoilfit_higgs53X_20pv_njet.root");
-      corrector->addMCFile      ("$CMSSW_BASE/src/MitHtt/Utils/recoilfits/recoilfit_zmm53X_20pv_njet.root");
-      corrector->addDataFile    ("$CMSSW_BASE/src/MitHtt/Utils/recoilfits/recoilfit_datamm53X_20pv_njet.root");
+      corrector->addMCFile      ("$CMSSW_BASE/src/MitHtt/Utils/recoilfits/recoilfit_zmm53X_2012_njet.root");
+      corrector->addDataFile    ("$CMSSW_BASE/src/MitHtt/Utils/recoilfits/recoilfit_datamm53X_2012_njet.root");
     }  
 }
 void Output::setupOutput(TString name) {
@@ -272,7 +272,7 @@ void Output::fillMuon(const mithep::TMuon *muon, double iso, bool passiso)
   fEta1 = muon->eta;
   fM1  = 105.658369e-3;
   fq1 = muon->q;
-  fIso1 = iso/muon->pt;
+  fIso1 = iso;
   fD01 = muon->d0;
   fDZ1 = muon->dz;
   fPassIso1 = passiso;
@@ -287,7 +287,7 @@ void Output::fillElectron(const mithep::TElectron *ele, bool first, double iso, 
       fEta1 = ele->eta;
       fM1  = 0.000511;
       fq1 = ele->q;
-      fIso1 = iso/ele->pt;
+      fIso1 = iso;
       fD01 = ele->d0;
       fDZ1 = ele->dz;
       fPassIso1 = passiso;
@@ -460,8 +460,8 @@ void Output::fillEvent(mithep::TEventInfo *info, HttMVA *vbfmva, int npv)
   double lMVAMet     = fMVAMet;
   double lMVAMetPhi  = fMVAMetPhi;
   
-  if(corrector && doRecoil != 2) corrector->CorrectType2(lMVAMet, lMVAMetPhi, fgenpt, fgenphi, dilep.Pt(), dilep.Phi(), pU1, pU2, 0, 0, fNJets);
-  if(corrector && doRecoil == 2) corrector->CorrectType2(lMVAMet, lMVAMetPhi, fgenpt, fgenphi, lep1 .Pt(), lep1 .Phi(), pU1, pU2, 0, 0, fNJets);
+  if(corrector && doRecoil != 2) corrector->CorrectType1(lMVAMet, lMVAMetPhi, fgenpt, fgenphi, dilep.Pt(), dilep.Phi(), pU1, pU2, 0, 0, fNJets);
+  if(corrector && doRecoil == 2) corrector->CorrectType1(lMVAMet, lMVAMetPhi, fgenpt, fgenphi, lep1 .Pt(), lep1 .Phi(), pU1, pU2, 0, 0, fNJets);
   fMVAMet            = lMVAMet;
   fMVAMetPhi         = lMVAMetPhi;
 
