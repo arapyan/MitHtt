@@ -1,3 +1,4 @@
+
 #ifndef TRIGGERATIO_H
 #define TRIGGERATIO_H
 

@@ -118,12 +118,12 @@ namespace mithep
 	
    double eff(double pt, double eta)
     {
-      if(fabs(eta) < b1)                   return ecM->eff(pt, eta);
-      if(fabs(eta) > b1 && fabs(eta) < b2) return trM->eff(pt, eta);
-      if(fabs(eta) > b2 && fabs(eta) < b3) return bM ->eff(pt, eta);
-      if(fabs(eta) > b3 && fabs(eta) < b4) return ecP->eff(pt, eta);
-      if(fabs(eta) > b4 && fabs(eta) < b5) return trP->eff(pt, eta);
-      return                                      ecP->eff(pt, eta);
+      if(eta < b1)             return ecM->eff(pt, eta);
+      if(eta > b1 && eta < b2) return trM->eff(pt, eta);
+      if(eta > b2 && eta < b3) return bM ->eff(pt, eta);
+      if(eta > b3 && eta < b4) return ecP->eff(pt, eta);
+      if(eta > b4 && eta < b5) return trP->eff(pt, eta);
+      return                          ecP->eff(pt, eta);
     }
 										   
   private:
