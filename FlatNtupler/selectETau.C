@@ -516,7 +516,7 @@ void selectETau(const TString conf="etau.conf",         // input config file
 	Double_t npuWgt = 1;
 	if(!isdata && !isemb && doNpuRwgt) {
 	  assert(puWeights);
-	  Int_t npuxbin = puWeights->GetXaxis()->FindFixBin(TMath::Min(double(info->nPU), 59.499));
+	  Int_t npuxbin = puWeights->GetXaxis()->FindBin(TMath::Min(double(info->nPUTrue), 59.499));
 	  npuWgt = puWeights->GetBinContent(npuxbin);
 	}
 
