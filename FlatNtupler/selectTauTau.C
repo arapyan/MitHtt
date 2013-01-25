@@ -32,6 +32,8 @@
 #include "MitHtt/Ntupler/interface/TVertex.hh"   
 #include "MitHtt/Ntupler/interface/TSVfit.h"
 #include "MitHtt/Ntupler/interface/TSVfitter.h"
+#include "MitHtt/Ntupler/interface/TMuon.hh" 
+#include "MitHtt/Ntupler/interface/TElectron.hh"
 
 // lumi section selection with JSON files
 #include "MitAna/DataCont/interface/RunLumiRangeMap.h"
@@ -44,6 +46,9 @@
 #include "MitHtt/Utils/DataMC.hh"
 
 #include "Output.hh"
+
+// B-tag scale factors
+#include "BtagSF.hh"
 
 #endif
 
@@ -124,9 +129,9 @@ void selectTauTau(const TString conf="tautau.conf",  // input config file
 
   enum {eMC};  // dataset type  
 
-  const Double_t kTauPtMin = 30;
-  const Double_t kJetPtMin   = 30.0;
-  const Double_t kBJetPtMin  = 20;
+  const Double_t kTauPtMin = 30; //30;
+  const Double_t kJetPtMin   = 30; //30.0;
+  const Double_t kBJetPtMin  = 20; //20;
   
   Bool_t doKFactors = kTRUE;
   if(is2012)
@@ -138,6 +143,8 @@ void selectTauTau(const TString conf="tautau.conf",  // input config file
   TFile *infile=0;
   TTree *eventTree=0;  
   TTree *lTree=0;
+
+  BtagSF* btsf = new BtagSF(12345);
  
   // Data structures to store info from TTrees
   mithep::TEventInfo *info  = new mithep::TEventInfo();
@@ -145,7 +152,9 @@ void selectTauTau(const TString conf="tautau.conf",  // input config file
   TClonesArray *jetArr      = new TClonesArray("mithep::TJet");
   TClonesArray *pvArr       = new TClonesArray("mithep::TVertex");
   TClonesArray *svfitArr    = new TClonesArray("mithep::TSVfit");
-  TClonesArray *tauArr      = new TClonesArray("mithep::TPFTau"); 
+  TClonesArray *tauArr      = new TClonesArray("mithep::TPFTau");
+  TClonesArray *electronArr = new TClonesArray("mithep::TElectron");
+  TClonesArray *muonArr     = new TClonesArray("mithep::TMuon");
   
   Bool_t hasData = (samplev[0]->fnamev.size()>0);
 
@@ -186,14 +195,16 @@ void selectTauTau(const TString conf="tautau.conf",  // input config file
       Bool_t getGen     = doRecoil || ismadz ||isemb || ismssm || ismadzmm;
       if(sfname.Contains("vtth")) getGen=0;
    
-      out->setupRecoil(doRecoil);
+      out->setupRecoil(0);
+      cout << doRecoil << endl;
      
       // PU reweighting
       TString pileupReweightFile;
       if(!is2012) {
 	cout << "Fall11 sample!" << endl;
 	pileupReweightFile = "$CMSSW_BASE/src/MitHtt/data/pileup/PUWeights_Fall11toFull2011_PixelLumi_50bins.root";
-      } else pileupReweightFile = "$CMSSW_BASE/src/MitHtt/data/pileup/PUWeights_S1253XTo2012_12ifb.root";
+      } //else pileupReweightFile = "$CMSSW_BASE/src/MitHtt/data/pileup/PUWeights_S1253XTo2012_12ifb.root";
+      else pileupReweightFile = "$CMSSW_BASE/src/MitHtt/data/pileup/PUWeights_S1253XTo2012_19ifb.root";
       TH1F *puWeights = 0;
       TFile *pufile = new TFile(pileupReweightFile.Data());
       puWeights = (TH1F*)pufile->Get("puWeights");
@@ -221,6 +232,8 @@ void selectTauTau(const TString conf="tautau.conf",  // input config file
       eventTree->SetBranchAddress("HPSTau", &tauArr);   TBranch *tauBr = eventTree->GetBranch("HPSTau");
       eventTree->SetBranchAddress("PFJet",    &jetArr);      TBranch *jetBr      = eventTree->GetBranch("PFJet");      
       eventTree->SetBranchAddress("PV",       &pvArr);       TBranch *pvBr       = eventTree->GetBranch("PV");
+      eventTree->SetBranchAddress("Muon",     &muonArr);     TBranch *muonBr     = eventTree->GetBranch("Muon");
+      eventTree->SetBranchAddress("Electron", &electronArr); TBranch *electronBr = eventTree->GetBranch("Electron");
       eventTree->SetBranchAddress("SVfitTauTau", &svfitArr);    TBranch *svfitBr    = eventTree->GetBranch("SVfitTauTau");
       TBranch *genBr=0;
       if(getGen) {
@@ -243,16 +256,14 @@ void selectTauTau(const TString conf="tautau.conf",  // input config file
       Double_t nlowmass=0; // low mass z events (below 50)
 
       cout << eventTree->GetEntries() << " events" << endl;
-      
+   
       // loop over events
       for(UInt_t ientry=0; ientry<eventTree->GetEntries(); ientry++) {
 	if(ientry%100000 == 0) cout << "processing " << float(ientry)/float(eventTree->GetEntriesFast()) << endl;
 	if(getGen)  genBr->GetEntry(ientry);
         infoBr->GetEntry(ientry);
 	//cout << info->runNum << " " << info->lumiSec << " " << info->evtNum << endl;
-	
-       	infoBr->GetEntry(ientry);
-	
+       
 	// skip non-tau events in madgraph sample
 	//if(ismadz && !ismadzmm && (fabs(gen->id_1_a)<15 || fabs(gen->id_1_a)>19)) continue;
 	
@@ -263,8 +274,11 @@ void selectTauTau(const TString conf="tautau.conf",  // input config file
         if(hasJSON && !rlrm.HasRunLumi(rl)) continue;
 
 	// trigger
- 	if(!isemb && isdata && !(info->triggerBits[kHLT_DoubleMediumIsoPFTau30_Trk5_eta2p1_Jet30] || info->triggerBits[kHLT_DoubleMediumIsoPFTau25_Trk5_eta2p1_Jet30] || info->triggerBits[kHLT_DoubleMediumIsoPFTau30_Trk1_eta2p1_Jet30])) continue;
-// 	if(!(info->triggerBits[kHLT_DoubleMediumIsoPFTau30_Trk5_eta2p1_Jet30] || info->triggerBits[kHLT_DoubleMediumIsoPFTau25_Trk5_eta2p1_Jet30] || info->triggerBits[kHLT_DoubleMediumIsoPFTau30_Trk1_eta2p1_Jet30])) continue;
+ 	if(!isemb  && !(info->triggerBits[kHLT_DoubleMediumIsoPFTau30_Trk5_eta2p1_Jet30] || info->triggerBits[kHLT_DoubleMediumIsoPFTau25_Trk5_eta2p1_Jet30] || info->triggerBits[kHLT_DoubleMediumIsoPFTau30_Trk1_eta2p1_Jet30])) continue;
+
+
+	//if(isdata  && !(info->triggerBits[kHLT_DoubleMediumIsoPFTau35_Trk1_eta2p1_Prong1])) continue;
+//     if(!(info->triggerBits[kHLT_DoubleMediumIsoPFTau30_Trk5_eta2p1_Jet30] || info->triggerBits[kHLT_DoubleMediumIsoPFTau25_Trk5_eta2p1_Jet30] || info->triggerBits[kHLT_DoubleMediumIsoPFTau30_Trk1_eta2p1_Jet30])) continue;
 	
 	//if(!(info->triggerBits[kHLT_Ele20_CaloIdVT_CaloIsoRhoT_TrkIdT_TrkIsoT_LooseIsoPFTau20] || info->triggerBits[kHLT_Ele22_eta2p1_WP90Rho_LooseIsoPFTau20] || info->triggerBits[kHLT_Ele20_CaloIdVT_TrkIdT_LooseIsoPFTau20])) continue;
 
@@ -277,7 +291,7 @@ void selectTauTau(const TString conf="tautau.conf",  // input config file
         if(!info->hasGoodPV) continue;
 	pvArr->Clear();
 	pvBr->GetEntry(ientry);	
-
+	
 
         // loop through HPSTaus
         
@@ -298,10 +312,11 @@ void selectTauTau(const TString conf="tautau.conf",  // input config file
 	    if(!(tau->pt > kTauPtMin)) continue;
 	    //Tau HLT
 	    Bool_t trigmatch = ((info->triggerBits[kHLT_DoubleMediumIsoPFTau25_Trk5_eta2p1_Jet30] && tau->hltMatchBits[kHLT_DoubleMediumIsoPFTau25_Trk5_eta2p1_Jet30Obj]) || (info->triggerBits[kHLT_DoubleMediumIsoPFTau30_Trk5_eta2p1_Jet30] && tau->hltMatchBits[kHLT_DoubleMediumIsoPFTau30_Trk5_eta2p1_Jet30Obj]) || (info->triggerBits[kHLT_DoubleMediumIsoPFTau30_Trk1_eta2p1_Jet30] && tau->hltMatchBits[kHLT_DoubleMediumIsoPFTau30_Trk1_eta2p1_Jet30Obj]));
-	    if(isdata && !trigmatch)     continue;
+	    //Bool_t trigmatch = (info->triggerBits[kHLT_DoubleMediumIsoPFTau35_Trk1_eta2p1_Prong1] && tau->hltMatchBits[kHLT_DoubleMediumIsoPFTau35_Trk1_eta2p1_Prong1Obj]);
+	    if(!isemb && !trigmatch)     continue;
 	 
 	    // Tau Isolation
-	    if(!(tau->ringIso > 0.5)) continue; //0.921 tight
+	    if(!(tau->ringIso > 0.50)) continue; //0.921 tight
            
 	    //if(!(tau->hcalOverP + tau->ecalOverP > 0.2 ||
 	    //	 tau->nSignalPFChargedHadrCands > 1 ||
@@ -328,7 +343,35 @@ void selectTauTau(const TString conf="tautau.conf",  // input config file
 	    out->fillTau(leadTau,0,leadTau->ringIso > 0.884);
 	    out->fillTau(subTau,1,subTau->ringIso > 0.884);
 	  }
-       
+	
+	muonArr->Clear();
+	muonBr->GetEntry(ientry);
+	electronArr->Clear();
+	electronBr->GetEntry(ientry);
+	
+	bool thirdlep=false;
+	for(Int_t i = 0; i < electronArr->GetEntries(); i++)
+	  {
+	    const mithep::TElectron *ele = (mithep::TElectron *)(electronArr->At(i));
+	    assert(ele);
+	    if(ele->pt < 10.0) continue;
+	    if(fabs(ele->eta) > 2.5) continue;
+	    if(!(pass2012EleMVAID(ele,kLoose,1))) continue;
+	    if(eleIsoPU(ele) > 0.3) continue;
+	    thirdlep=true;
+	  }
+	for(Int_t i=0; i<muonArr->GetEntriesFast(); i++) {
+          const mithep::TMuon *muon = (mithep::TMuon*)((*muonArr)[i]);
+	  assert(muon);
+	  if(muon->pt < 10.0) continue;
+	  if(fabs(muon->eta) > 2.4) continue;
+	  if(!passTightPFMuonID(muon,1)) continue;
+	  if(muonIsoPU(muon) > 0.3) continue;
+	  thirdlep=true;
+	}
+	//thrid lepton veto (WlHhadhad)       
+	if(thirdlep) continue;
+	
 	// SVFit
         svfitArr->Clear();
         svfitBr->GetEntry(ientry);
@@ -350,7 +393,7 @@ void selectTauTau(const TString conf="tautau.conf",  // input config file
         jetArr->Clear();
         jetBr->GetEntry(ientry);
         UInt_t njets = 0, nbjets = 0;
-        const mithep::TJet *jet1=0, *jet2=0, *bjet=0;
+        const mithep::TJet *jet1=0, *jet2=0, *bjet1=0, *bjet2=0;
 	out->btagArray.Reset();	out->jptArray.Reset();	out->jetaArray.Reset();	UInt_t npt20jets=0;
         for(Int_t i=0; i<jetArr->GetEntriesFast(); i++) {
 	  mithep::TJet *jet = (mithep::TJet*)((*jetArr)[i]);
@@ -365,15 +408,20 @@ void selectTauTau(const TString conf="tautau.conf",  // input config file
 	  Int_t btagopt = 0;
 	  if(isdata||isemb) btagopt = 1;
 	  else btagopt = 2;
-	  Bool_t btagged = isbtagged(jet,btagopt,0,0);
+	  //Bool_t btagged = isbtagged(jet,btagopt,0,0);
+	  Bool_t btagged = btsf->isbtagged(jet->pt,jet->eta,jet->csv,jet->matchedId,(isdata||isemb),0,0,is2012);
 	  if((jet->pt > kBJetPtMin) && (fabs(jet->eta) < 2.4)) { // note: bjet can be the same as jet1 or jet2
 	    assert(npt20jets<50);
 	    out->btagArray.AddAt(jet->csv,npt20jets);
 	    npt20jets++;
 	    if(btagged) {
 	      nbjets++;
-	      if(!bjet || jet->pt > bjet->pt)
-		bjet = jet; // leading b-jet
+	      if(!bjet1 || jet->pt > bjet1->pt) {
+		bjet2 = bjet1; // leading b-jet
+		bjet1 = jet;
+	      } else  if(!bjet2 || jet->pt > bjet2->pt) {
+		bjet2 = jet;
+	      }
 	    }
 	  }
 
@@ -404,7 +452,7 @@ void selectTauTau(const TString conf="tautau.conf",  // input config file
 	  }
         }
 	
-	out->fillJets(jet1,jet2,bjet,njets,nbjets,npt20jets,nCentralJets);
+	out->fillJets(jet1,jet2,bjet1,bjet2,njets,nbjets,npt20jets,nCentralJets);
 
         // get k-factor if necessary
         Double_t kf=1;
@@ -419,10 +467,16 @@ void selectTauTau(const TString conf="tautau.conf",  // input config file
 	}
 
 	//W+Jets
-	if(doRecoil == 2 && is2012 && gen->npartons == 1) kf  *= 0.02203*treeEntries/36541049.;
-        if(doRecoil == 2 && is2012 && gen->npartons == 2) kf  *= 0.05819*treeEntries/36541049.;
-        if(doRecoil == 2 && is2012 && gen->npartons == 3) kf  *= 0.03891*treeEntries/36541049.;
-        if(doRecoil == 2 && is2012 && gen->npartons == 4) kf  *= 0.01934*treeEntries/36541049.;
+	if(doRecoil == 2 && is2012 && gen->npartons == 1) kf  *= 1.193*0.3085096*treeEntries/57709905.;
+        if(doRecoil == 2 && is2012 && gen->npartons == 2) kf  *= 1.193*0.0889050*treeEntries/57709905.;
+        if(doRecoil == 2 && is2012 && gen->npartons == 3) kf  *= 1.193*0.0600994*treeEntries/57709905.;
+        if(doRecoil == 2 && is2012 && gen->npartons == 4) kf  *= 1.193*0.0302017*treeEntries/57709905.;
+
+// 	//Z+Jets
+	//if(doRecoil == 1 && is2012 && gen->npartons == 1) kf *= 0.159783537*treeEntries/30459503.;
+	//if(doRecoil == 1 && is2012 && gen->npartons == 2) kf *= 0.4427371*treeEntries/30459503.;
+	//if(doRecoil == 1 && is2012 && gen->npartons == 3) kf *= 0.04570887*treeEntries/30459503.;
+	//if(doRecoil == 1 && is2012 && gen->npartons == 4) kf *= 0.0358235025*treeEntries/30459503.;
 
 	// lepton ID corrections
 	Double_t idscale = 1;
@@ -430,7 +484,7 @@ void selectTauTau(const TString conf="tautau.conf",  // input config file
 	// trigger scale factor for MC
 	Double_t trigscale = 1;
 	if(doTrigScale)
-	  trigscale =  eff2012IsoTau12fb(leadTau->pt,leadTau->eta)*eff2012IsoTau12fb(subTau->pt,subTau->eta);
+	  trigscale =  eff2012IsoTau19fb(leadTau->pt,leadTau->eta)*eff2012IsoTau19fb(subTau->pt,subTau->eta);
 	if(doTrigScale && jet1) trigscale *= eff2012Jet12fb(jet1->pt,jet1->eta);
 
 	// embedding weight for embedded sample
@@ -475,6 +529,9 @@ void selectTauTau(const TString conf="tautau.conf",  // input config file
   delete pvArr;
   delete tauArr;
   delete svfitArr;
+  delete btsf;
+  delete electronArr;
+  delete muonArr;
 
   //--------------------------------------------------------------------------------------------------------------
   // Summary print out
