@@ -15,16 +15,6 @@
 TRandom1 randm(0xDEADBEEF);
 enum { kNo, kDown, kUp };                     // systematic variation
 
-// Lepton id scale factors
-Double_t eleIDscaleEmu(Double_t elept, Double_t eleeta, Int_t is2012);
-Double_t muIDscaleEmu(Double_t mupt, Double_t mueta, Int_t is2012);
-Double_t muIDscaleMuTau(Double_t mupt, Double_t mueta, Int_t is2012);
-Double_t eleIDscaleETau(Double_t ept, Double_t eeta, Int_t is2012);
-
-Double_t eleTrigScaleEmu(Double_t elept, Double_t eleeta, Int_t is2012);
-Double_t muTrigScaleEmu(Double_t mupt, Double_t mueta, Int_t is2012);
-
-
 // Get higgs mass point from sample name
 Int_t higgsmass(TString basename)
 {
@@ -35,7 +25,6 @@ Int_t higgsmass(TString basename)
   //if(basename.Contains("-gf-")) assert(mass>85 && mass<1200);
   return mass;
 }
-
 
 TH2D* fEleTrigSF      = 0;
 TH2D* fMuTrigSF      = 0;
@@ -67,6 +56,7 @@ double efficiency(double m, double m0, double sigma, double alpha,double n, doub
 
 Double_t embUnfoldWgt(Double_t pt1, Double_t eta1, Double_t pt2, Double_t eta2);
 Double_t unskimmedEntries(TString skimname);
+
 
 TH1D* kfFHPInit(Int_t mH)
 {
@@ -140,32 +130,13 @@ Bool_t isbtagged(mithep::TJet *jet, Int_t isdata, UInt_t btageff, UInt_t mistag)
 //----------------------------------------------------------------------------------------
 Double_t embUnfoldWgt(Double_t pt1, Double_t eta1, Double_t pt2, Double_t eta2)
 {
-  TFile *unfFile1   = TFile::Open("data/unfold/v8/Unfold2D_1.root"); assert(unfFile1->IsOpen());
-  TH2F  *unfWeight1 = (TH2F*) unfFile1->FindObjectAny("UnfoldDen1");
-  TFile *unfFile2   = TFile::Open("data/unfold/v8/Unfold2D_2.root"); assert(unfFile2->IsOpen());
-  TH2F  *unfWeight2 = (TH2F*) unfFile2->FindObjectAny("UnfoldDen2");
-  double weight1 = unfWeight1->GetBinContent(unfWeight1->GetXaxis()->FindBin(eta1),unfWeight1->GetYaxis()->FindBin(pt1));
-  double weight2 = unfWeight2->GetBinContent(unfWeight2->GetXaxis()->FindBin(eta2),unfWeight2->GetYaxis()->FindBin(pt2));
+  TFile *unfFile1   = TFile::Open("mutau.root"); assert(unfFile1->IsOpen());
+  TH2F  *unfWeight1 = (TH2F*) unfFile1->FindObjectAny("hadunf");
+  TH2F  *unfWeight2 = (TH2F*) unfFile1->FindObjectAny("lepunf");
+  double weight1 = unfWeight1->GetBinContent(unfWeight1->GetXaxis()->FindBin(pt1),unfWeight1->GetYaxis()->FindBin(eta1));
+  double weight2 = unfWeight2->GetBinContent(unfWeight2->GetXaxis()->FindBin(pt2),unfWeight2->GetYaxis()->FindBin(eta2));
   unfFile1->Close();
-  unfFile2->Close();
   return weight1*weight2;
-}
-//----------------------------------------------------------------------------------------
-Double_t unskimmedEntries(TString skimname)
-{
-  Double_t entries;
-  
-  skimname.ReplaceAll("_emu_skim.root","_ntuple.root");
-  skimname.ReplaceAll("_emunod0_skim.root","_ntuple.root");
-  TFile unskimmed(skimname);
-  assert(unskimmed.IsOpen());
-  TTree *tree = 0;
-  unskimmed.GetObject("Events",tree);
-  assert(tree);
-  entries = (Double_t)tree->GetEntries();
-  unskimmed.Close();
-
-  return entries;
 }
 
 //----------------------------------------------------------------
@@ -209,7 +180,7 @@ Double_t eleIDscaleEmu(Double_t elept, Double_t eleeta, Int_t is2012)
 //----------------------------------------------------------------
 Double_t muIDscaleMuTau(Double_t mupt, Double_t mueta, Int_t is2012)
 {
-  if((fabs(mueta) > 2.1) || (mupt < 15)) { cout << "mu kinematics out of range" << endl; assert(0); }
+  if((fabs(mueta) > 2.1) || (mupt < 10)) { cout << "mu kinematics out of range" << endl; assert(0); }
   if(mupt > 30) {
     if     (fabs(mueta) < 0.8)  return is2012 ? 0.9872*0.9857  : 1.030*1.010;
     else if(fabs(mueta) < 1.2)  return is2012 ? 0.9924*0.9805  : 0.997*0.990;
@@ -232,7 +203,7 @@ Double_t muIDscaleMuTau(Double_t mupt, Double_t mueta, Int_t is2012)
 //----------------------------------------------------------------
 Double_t eleIDscaleETau(Double_t ept, Double_t eeta, Int_t is2012)
 {
-  if((fabs(eeta) > 2.1) || (ept < 20)) { cout << "electron kinematics out of range" << endl; assert(0); }
+  if((fabs(eeta) > 2.1) || (ept < 10)) { cout << "electron kinematics out of range" << endl; assert(0); }
   if(ept > 30) {
     if(fabs(eeta) < 1.479)  return is2012 ? 0.982*0.949 : 1.044*0.984;
     else                    return is2012 ? 0.995*0.926 : 0.989*0.977;
@@ -334,113 +305,60 @@ double efficiency(double m, double m0, double sigma, double alpha,
                                    1/TMath::Power(absAlpha - b,n-1)) / (1 - n)) / area;
   }
 }
-// double mutaueff(bool run, double pt, double eta, bool is2012)
-// {
-//   double m0,sigma, alpha,n,norm;
-//   if(is2012)
-//     {
-//       if(run <193686)
-// 	{
-// 	  if(fabs(eta) < 1.5)
-// 	    {
-// 	      m0 = 18.52262128;
-// 	      sigma = 1.85879597;
-// 	      alpha = 3.48843815;
-// 	      n = 1.15491294;
-// 	      norm = 1.02489024;
-// 	    }
-// 	  else
-// 	    {
-// 	      m0 = 18.90119559;
-// 	      sigma = 0.14025596;
-// 	      alpha = 0.14482632;
-// 	      n = 1.56126508;
-// 	      norm = 0.81188198;
-// 	    }
-// 	}
-//       else
-// 	{
-// 	  if(fabs(eta) < 1.5)
-// 	    {
-// 	      m0 = 17.92648563;
-// 	      sigma = 1.96846742;
-// 	      alpha = 4.46406075;
-// 	      n = 1.02023992;
-// 	      norm = 1.52260575;
-// 	    }
-// 	  else
-// 	    {
-// 	      m0 = 18.59856420;
-// 	      sigma = 2.49132550;
-// 	      alpha = 10.99643595;
-// 	      n = 1.50651123;
-// 	      norm = 0.87952970;
-// 	    }
-// 	}    
-//     }
-//   else
-//     {
-//       if(fabs(eta) < 1.5)
-// 	{
-// 	  m0 = 13.9694;
-// 	  sigma = 0.084835;
-// 	  alpha = 0.057743;
-// 	  n = 1.50674
-// 	  norm = 0.984976;
-// 	}
-//       else
-// 	{
-// 	  m0 = 14.435;
-// 	  sigma = 1.34952;
-// 	  alpha = 2.43996;
-// 	  n = 1.03631;
-// 	  norm = 1.79081;
-// 	}
-//     }
-//   return efficiency(pt,m0,sigma,alpha,n,norm); 
-// }
-// double mutauratio(bool run, double pt, double eta, bool is2012)
-// {
-//   double m0,sigma, alpha,n,norm;
-//   if(is2012)
-//     {
-//       if(fabs(eta) < 1.5)
-// 	{
-// 	  m0 = 14.435;
-// 	  sigma = 1.34952;
-// 	  alpha = 2.43996;
-// 	  n = 1.03631;
-// 	  norm = 1.79081;
-// 	}
-//       else
-// 	{
-// 	  m0 = 14.435;
-// 	  sigma = 1.34952;
-// 	  alpha = 2.43996;
-// 	  n = 1.03631;
-// 	  norm = 1.79081;
-// 	}
-//     }
-//   else
-//     {
-//       if(fabs(eta) < 1.5)
-// 	{
-// 	  m0 = 14.435;
-// 	  sigma = 1.34952;
-// 	  alpha = 2.43996;
-// 	  n = 1.03631;
-// 	  norm = 1.79081;
-// 	}
-//       else
-// 	{
-// 	  m0 = 14.435;
-// 	  sigma = 1.34952;
-// 	  alpha = 2.43996;
-// 	  n = 1.03631;
-// 	  norm = 1.79081;
-// 	}
-//     }
-//   return mutaueff(bool run, double pt, double eta, bool is2012)/efficiency(pt,m0,sigma,alpha,n,norm);
-// }
+double eff2012IsoTau12fb(double pt, double eta){
+  return (808.411*(0.764166*0.5*(TMath::Erf((pt-33.2236)/2./0.97289/sqrt(pt))+1.))+
+	  4428.0*(0.802387*0.5*(TMath::Erf((pt-38.0971)/2./0.82842/sqrt(pt))+1.))+
+	  1783.003*(0.818051*0.5*(TMath::Erf((pt-37.3669)/2./0.74847/sqrt(pt))+1.))+
+	  5109.155*(0.796086*0.5*(TMath::Erf((pt-37.3302)/2./0.757558/sqrt(pt))+1.))
+	  )/(808.411+4428.0+1783.003+5109.155);
+}
+  
+double eff2012Jet12fb(double pt, double eta){
+  return (abs(eta)<=2.1)*
+    ((808.411*(0.99212*0.5*(TMath::Erf((pt-31.3706)/2./1.22821/sqrt(pt))+1.))+
+      4428.0*(0.99059*0.5*(TMath::Erf((pt-32.1104)/2./1.23292/sqrt(pt))+1.))+
+      1783.003*(0.988256*0.5*(TMath::Erf((pt-31.3103)/2./1.18766/sqrt(pt))+1.))+
+      5109.155*(0.988578*0.5*(TMath::Erf((pt-31.6391)/2./1.22826/sqrt(pt))+1.))
+      )/(808.411+4428.0+1783.003+5109.155))+
+    (abs(eta)>2.1)*
+    ((808.411*(0.969591*0.5*(TMath::Erf((pt-36.8179)/2./0.904254/sqrt(pt))+1.))+
+      4428.0*(0.975932*0.5*(TMath::Erf((pt-37.2121)/2./0.961693/sqrt(pt))+1.))+
+      1783.003*(0.990305*0.5*(TMath::Erf((pt-36.3096)/2./0.979524/sqrt(pt))+1.))+
+      5109.155*(0.971612*0.5*(TMath::Erf((pt-36.2294)/2./0.871726/sqrt(pt))+1.))
+      )/(808.411+4428.0+1783.003+5109.155));
+}
+
+
+double eff2012Jet19fb(double pt, double eta){
+return (abs(eta)<=2.1)*
+((808.411*(0.99212*0.5*(TMath::Erf((pt-31.3706)/2./1.22821/sqrt(pt))+1.))+
+4428.0*(0.99059*0.5*(TMath::Erf((pt-32.1104)/2./1.23292/sqrt(pt))+1.))+
+1783.003*(0.988256*0.5*(TMath::Erf((pt-31.3103)/2./1.18766/sqrt(pt))+1.))+
+5109.155*(0.988578*0.5*(TMath::Erf((pt-31.6391)/2./1.22826/sqrt(pt))+1.))+
+4131*(0.989049*0.5*(TMath::Erf((pt-31.9836)/2./1.23871/sqrt(pt))+1.))+
+3143*(0.988047*0.5*(TMath::Erf((pt-31.6975)/2./1.25372/sqrt(pt))+1.))
+)/(808.411+4428.0+1783.003+5109.155+4131+3143))+
+(abs(eta)>2.1)*
+((808.411*(0.969591*0.5*(TMath::Erf((pt-36.8179)/2./0.904254/sqrt(pt))+1.))+
+4428.0*(0.975932*0.5*(TMath::Erf((pt-37.2121)/2./0.961693/sqrt(pt))+1.))+
+1783.003*(0.990305*0.5*(TMath::Erf((pt-36.3096)/2./0.979524/sqrt(pt))+1.))+
+5109.155*(0.971612*0.5*(TMath::Erf((pt-36.2294)/2./0.871726/sqrt(pt))+1.))+
+4131*(0.977958*0.5*(TMath::Erf((pt-37.131)/2./0.987523/sqrt(pt))+1.))+
+3143*(0.968457*0.5*(TMath::Erf((pt-36.3159)/2./0.895031/sqrt(pt))+1.))
+)/(808.411+4428.0+1783.003+5109.155+4131+3143));
+}
+
+
+
+double eff2012IsoTau19fb(double pt, double eta){
+return (808.411*(0.764166*0.5*(TMath::Erf((pt-33.2236)/2./0.97289/sqrt(pt))+1.))+
+4428.0*(0.802387*0.5*(TMath::Erf((pt-38.0971)/2./0.82842/sqrt(pt))+1.))+
+1783.003*(0.818051*0.5*(TMath::Erf((pt-37.3669)/2./0.74847/sqrt(pt))+1.))+
+5109.155*(0.796086*0.5*(TMath::Erf((pt-37.3302)/2./0.757558/sqrt(pt))+1.))+
+4131*(0.828182*0.5*(TMath::Erf((pt-37.6596)/2./0.830682/sqrt(pt))+1.))+
+3143*(0.833004*0.5*(TMath::Erf((pt-37.634)/2./0.777843/sqrt(pt))+1.))
+)/(808.411+4428.0+1783.003+5109.155+4131+3143);
+}
+
 
 #endif
