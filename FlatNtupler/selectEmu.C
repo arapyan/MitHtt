@@ -47,6 +47,9 @@
 // event-based MVA
 #include "MitHtt/Utils/HttMVA.hh" 
 
+// B-tag scale factors
+#include "BtagSF.hh"
+
 #include "Output.hh"
 
 #endif
@@ -58,11 +61,7 @@ const Double_t pi = 3.14159265358979;
 void selectEmu(const TString conf,         // input config file
                const TString outputDir,    // output directory
 	       const Double_t lumi,        // luminosity pb^-1
-	       const Int_t is2012,          //2012 or 2011 data 
-               const UInt_t btageff=0,     // b-tag efficiency scale factor uncertainty
-               const UInt_t jetunc=0,      // jet energy uncertainties
-               const UInt_t mistag=0,      // b mistag rate scale factor uncertainty
-	       const UInt_t elescale=0     // electron energy scale/resolution uncertainty
+	       const Int_t is2012          //2012 or 2011 data 
 ) {
   gBenchmark->Start("selectEmu");
   
@@ -132,14 +131,14 @@ void selectEmu(const TString conf,         // input config file
 
   enum { eMC, eMuEl, eDiMu, eMu, eDiEl, eEl };  // dataset type  
   
-  const Double_t kMuonPt1Min = 20;
+  const Double_t kMuonPt1Min = 10;//20;
   const Double_t kMuonPt2Min = 10;
   
-  const Double_t kElePt1Min  = 20;
+  const Double_t kElePt1Min  = 10;//20;
   const Double_t kElePt2Min  = 10;
 
-  const Double_t kJetPtMin   = 30;
-  const Double_t kBJetPtMin  = 20;
+  const Double_t kJetPtMin   = 10;//30;
+  const Double_t kBJetPtMin  = 10;//20;
   
   Bool_t doKFactors = kTRUE;
   if(is2012)
@@ -152,9 +151,11 @@ void selectEmu(const TString conf,         // input config file
   TTree *eventTree=0;
   TTree *lTree = 0;
 
+  BtagSF* btsf = new BtagSF(12345);
+
   //vbf MVA
-  HttMVA *vbfMVA = new HttMVA();
-  vbfMVA->Initialize("BDTG method", getenv("CMSSW_BASE")+std::string("/src/MitHtt/data/VBFMVA/EMu/TMVA_BDTG.weights.xml"), HttMVA::kVBF2);   // vbf mva
+  //HttMVA *vbfMVA = new HttMVA();
+  //vbfMVA->Initialize("BDTG method", getenv("CMSSW_BASE")+std::string("/src/MitHtt/data/VBFMVA/EMu/VBFMVA_EMu_BDTG_HCP_53X.weights.xml"), HttMVA::kVBF2);   // vbf mva
        
   // Data structures to store info from TTrees
   mithep::TEventInfo *info  = new mithep::TEventInfo();
@@ -200,9 +201,9 @@ void selectEmu(const TString conf,         // input config file
       Bool_t doIdScale  = !isdata;
       Bool_t doTrigScale= !isdata;
       Bool_t getGen     = sfname.Contains("wjets") || doRecoil || reallyDoKf || ismadz ||isemb || ismssm;
-      Bool_t doJetUnc   = (jetunc!=kNo);
       
-      out->doRecoil = doRecoil;
+      out->setupRecoil(doRecoil);
+      cout << doRecoil << endl; 
       // PU reweighting
       TString pileupReweightFile;
       if(!is2012) {
@@ -258,7 +259,7 @@ void selectEmu(const TString conf,         // input config file
       Double_t nlowmass=0; // low mass z events (below 50)
 
       cout << eventTree->GetEntries() << " events" << endl;
-
+     
       unsigned int evtt = 21585;
       // loop over events
       for(UInt_t ientry=0; ientry<eventTree->GetEntries(); ientry++) {
@@ -277,11 +278,11 @@ void selectEmu(const TString conf,         // input config file
 	// certified run selection
         mithep::RunLumiRangeMap::RunLumiPairType rl(info->runNum, info->lumiSec);
         if(hasJSON && !rlrm.HasRunLumi(rl)) continue;
-	
+
 	// trigger
 	if(is2012)
 	  {
-	    if(!isemb && !(info->triggerBits[kHLT_Mu8_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL] || info->triggerBits[kHLT_Mu17_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL])) continue;
+	    //if(!isemb && !(info->triggerBits[kHLT_Mu8_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL] || info->triggerBits[kHLT_Mu17_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL])) continue;
 	  }
 	else
 	  if(!isemb && !(info->triggerBits[kHLT_Mu8_Ele17_CaloIdL] || info->triggerBits[kHLT_Mu17_Ele8_CaloIdL] || info->triggerBits[kHLT_Mu8_Ele17_CaloIdT_CaloIsoVL] || info->triggerBits[kHLT_Mu17_Ele8_CaloIdT_CaloIsoVL])) continue;
@@ -307,12 +308,12 @@ void selectEmu(const TString conf,         // input config file
 	    trigmatch = ((info->triggerBits[kHLT_Mu17_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL] && muon->hltMatchBits[kHLT_Mu17_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_MuObj]) || (info->triggerBits[kHLT_Mu8_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL] && muon->hltMatchBits[kHLT_Mu8_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_MuObj]));
 	  else trigmatch = ((info->triggerBits[kHLT_Mu17_Ele8_CaloIdL] && muon->hltMatchBits[kHLT_Mu17_Ele8_CaloIdL_MuObj]) || (info->triggerBits[kHLT_Mu8_Ele17_CaloIdL] && muon->hltMatchBits[kHLT_Mu8_Ele17_CaloIdL_MuObj]) || (info->triggerBits[kHLT_Mu17_Ele8_CaloIdT_CaloIsoVL] && muon->hltMatchBits[kHLT_Mu17_Ele8_CaloIdT_CaloIsoVL_MuObj]) || (info->triggerBits[kHLT_Mu8_Ele17_CaloIdT_CaloIsoVL] && muon->hltMatchBits[kHLT_Mu8_Ele17_CaloIdT_CaloIsoVL_MuObj]));
 	 
-	  if(!isemb && !trigmatch)			continue;
+	  //if(!isemb && !trigmatch)			continue;
 	  if(!(muon->typeBits & kGlobal))	continue;
 	  if(muon->pt < kMuonPt2Min)		continue;
 	  if(fabs(muon->eta) > 2.1)		continue;
 	  //if(passTightPFMuonID(muon,0))  goodMuonsv.push_back(muon);
-	  if(passTightPFMuonID(muon,0) && passMuonIsoPU(muon,0))  goodMuonsv.push_back(muon);
+	  if(passTightPFMuonID(muon,0))  goodMuonsv.push_back(muon);
 	}
        
 	// loop through electrons 
@@ -328,7 +329,7 @@ void selectEmu(const TString conf,         // input config file
 	  if(is2012)
 	    trigmatch = ((info->triggerBits[kHLT_Mu17_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL] && electron->hltMatchBits[kHLT_Mu17_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_EGObj]) || (info->triggerBits[kHLT_Mu8_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL] && electron->hltMatchBits[kHLT_Mu8_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_EGObj]));
 	  else trigmatch = ((info->triggerBits[kHLT_Mu17_Ele8_CaloIdL] && electron->hltMatchBits[kHLT_Mu17_Ele8_CaloIdL_EGObj]) || (info->triggerBits[kHLT_Mu17_Ele8_CaloIdT_CaloIsoVL] && electron->hltMatchBits[kHLT_Mu17_Ele8_CaloIdT_CaloIsoVL_EGObj]) || (info->triggerBits[kHLT_Mu8_Ele17_CaloIdL] && electron->hltMatchBits[kHLT_Mu8_Ele17_CaloIdL_EGObj]) || (info->triggerBits[kHLT_Mu8_Ele17_CaloIdT_CaloIsoVL] && electron->hltMatchBits[kHLT_Mu8_Ele17_CaloIdT_CaloIsoVL_EGObj]));
-	  if(!isemb && !trigmatch)                        continue;
+	  //if(!isemb && !trigmatch)                        continue;
 
 	  if(fabs(electron->eta) > 2.3)		continue;
 	  
@@ -347,7 +348,7 @@ void selectEmu(const TString conf,         // input config file
 	  }
 	  
 	  if(matchLooseMuon)			continue;
-	  if(pass2012EleMVAID(electron, kMedium,0) && passEleIsoPU(electron,0))
+	  if(pass2012EleMVAID(electron, kLoose,0))
 	    //if(pass2012EleMVAID(electron, kMedium,0))
 	    goodElectronsv.push_back(electron);
 	  
@@ -366,27 +367,27 @@ void selectEmu(const TString conf,         // input config file
 	if(mu->pt  < kMuonPt1Min) {
 	  if(is2012)
 	    {
-	      if(!isemb && !(info->triggerBits[kHLT_Mu8_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL])) continue; // if failed trig1
+	      //if(!isemb && !(info->triggerBits[kHLT_Mu8_Ele17_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL])) continue; // if failed trig1
 	    }
 	  else
 	    {
-	      if(!isemb && !(info->triggerBits[kHLT_Mu8_Ele17_CaloIdL])) continue; // if failed trig1
+	      //if(!isemb && !(info->triggerBits[kHLT_Mu8_Ele17_CaloIdL])) continue; // if failed trig1
 	    }
 	}
 	else if(ele->pt < kElePt1Min) {
 	  if(is2012)
 	    {
-	      if(!isemb && !(info->triggerBits[kHLT_Mu17_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL])) continue; // if failed trig2
+	      //if(!isemb && !(info->triggerBits[kHLT_Mu17_Ele8_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL])) continue; // if failed trig2
 	    }
 	  else
 	    {
-	      if(!isemb && !(info->triggerBits[kHLT_Mu17_Ele8_CaloIdL])) continue; // if failed trig2
+	      //if(!isemb && !(info->triggerBits[kHLT_Mu17_Ele8_CaloIdL])) continue; // if failed trig2
 	    }
 	}
 
 	out->fillMuon(mu,muonIsoPU(mu),passMuonIsoPU(mu,0));
 	out->fillElectron(ele,0,eleIsoPU(ele),passEleIsoPU(ele,0));
-	
+
 	// SVFit
 	svfitArr->Clear();
 	svfitBr->GetEntry(ientry);
@@ -407,35 +408,37 @@ void selectEmu(const TString conf,         // input config file
 	jetArr->Clear();
 	jetBr->GetEntry(ientry);
 	UInt_t njets = 0, nbjets = 0;
-	const mithep::TJet *jet1=0, *jet2=0, *bjet=0;
+	const mithep::TJet *jet1=0, *jet2=0, *bjet1=0, *bjet2=0;
 	out->btagArray.Reset();	out->jptArray.Reset();	out->jetaArray.Reset();	UInt_t npt20jets=0;
 	for(Int_t i=0; i<jetArr->GetEntriesFast(); i++) {
 	  mithep::TJet *jet = (mithep::TJet*)((*jetArr)[i]);
 
-	  if(doJetUnc) jet->pt *= (jetunc==kDown) ? (1-jet->unc) : (1+jet->unc);
-
 	  if(toolbox::deltaR(jet->eta,jet->phi,ele->eta,ele->phi) < 0.5) continue;
 	  if(toolbox::deltaR(jet->eta,jet->phi,mu->eta,mu->phi) < 0.5) continue;
 
-	  if(fabs(jet->eta) > 5) continue;
+	  if(fabs(jet->eta) > 4.7) continue;
 	  if(!jet->id) continue;
 
 	  // look for b-jets
 	  Int_t btagopt = 0;
 	  if(isdata||isemb) btagopt = 1;
 	  else btagopt = 2;
-	  Bool_t btagged = isbtagged(jet,btagopt,btageff,mistag);
+	  Bool_t btagged = btsf->isbtagged(jet->pt,jet->eta,jet->csv,jet->matchedId,(isdata||isemb),0,0,is2012);
 	  if((jet->pt > kBJetPtMin) && (fabs(jet->eta) < 2.4)) { // note: bjet can be the same as jet1 or jet2
 	    assert(npt20jets<50);
 	    out->btagArray.AddAt(jet->csv,npt20jets);
 	    npt20jets++;
-	    if(btagged) {
+	     if(btagged) {
 	      nbjets++;
-	      if(!bjet || jet->pt > bjet->pt)
-		bjet = jet; // leading b-jet
-	    }
+	      if(!bjet1 || jet->pt > bjet1->pt) {
+		bjet2 = bjet1; // leading b-jet
+		bjet1 = jet;
+	      } else  if(!bjet2 || jet->pt > bjet2->pt) {
+		bjet2 = jet;
+	      }
+	     }
 	  }
-
+	  
 	  // look for jets
 	  if(jet->pt > kJetPtMin) {
 	    assert(njets<50);
@@ -461,6 +464,7 @@ void selectEmu(const TString conf,         // input config file
 	  }
 	}
 
+	out->fillJets(jet1,jet2,bjet1,bjet2,njets,nbjets,npt20jets,nCentralJets);
 	// get k-factor if necessary
 	Double_t kf=1;
 	if(reallyDoKf) kf = kfFHPValue(gen->vpt_a, hKFactors);
@@ -491,7 +495,7 @@ void selectEmu(const TString conf,         // input config file
 	out->fPUWeight	 = npuWgt;
 	out->fEffWeight	 = trigscale*idscale;
 	out->fWeight	 = weight*kf*npuWgt*trigscale*idscale*embWgt/lumi;
-	out->fillEvent(info,vbfMVA,pvArr->GetEntriesFast());
+	out->fillEvent(info,0,pvArr->GetEntriesFast());
 	 
 	// events passing selection in this file
 	nsel    += weight*kf*npuWgt*trigscale*idscale*embWgt;
@@ -527,7 +531,9 @@ void selectEmu(const TString conf,         // input config file
   delete jetArr;
   delete pvArr;
   delete svfitArr;
-  delete vbfMVA;
+  //delete vbfMVA;
+  delete btsf;
+
 
   //--------------------------------------------------------------------------------------------------------------
   // Summary print out
