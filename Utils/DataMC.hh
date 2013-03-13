@@ -7,12 +7,10 @@
 #include "TRegexp.h"
 #include "TTree.h"
 #include "TBranch.h"
-#include "TRandom1.h"
 #include "TH1D.h"
 #include "TH2D.h"
 #include "BtagSF.hh"
 
-TRandom1 randm(0xDEADBEEF);
 enum { kNo, kDown, kUp };                     // systematic variation
 
 // Get higgs mass point from sample name
@@ -22,7 +20,6 @@ Int_t higgsmass(TString basename)
   stringstream ss(basename(TRegexp("[0-9][0-9]*"),3).Data());
   Int_t mass;
   ss >> mass;
-  //if(basename.Contains("-gf-")) assert(mass>85 && mass<1200);
   return mass;
 }
 
@@ -46,15 +43,11 @@ void setupTrigScale(Int_t is2012)
   lDFile->Close();
 } 
 
-  
 TH1D* kfFHPInit(Int_t mH);
 Double_t kfFHPValue(Double_t pt, TH1D* hKF);
 
 double efficiency(double m, double m0, double sigma, double alpha,double n, double norm);
 
-//Bool_t isbtagged(mithep::TJet *jet, Int_t isdata, UInt_t btageff, UInt_t mistag);
-
-Double_t embUnfoldWgt(Double_t pt1, Double_t eta1, Double_t pt2, Double_t eta2);
 Double_t unskimmedEntries(TString skimname);
 
 
@@ -74,109 +67,134 @@ TH1D* kfFHPInit(Int_t mH)
   kfile->Close();
   return kfhist;
 } 
+
 //--------------------------------------------------------------------------------------------------
 Double_t kfFHPValue(Double_t pt, TH1D* hKF)
 { 
   assert(hKF);
   return hKF->Interpolate(pt);
 }
-//----------------------------------------------------------------------------------------
-/*
-Bool_t isbtagged(mithep::TJet *jet, Int_t isdata, UInt_t btageff, UInt_t mistag)
-{
-
-  //          mistag                         scale factor
-  // TCHEM  0.0175 \pm .0003 \pm .0038      1.21 \pm .02 \pm .17
-  //          btag eff.                      scale factor
-  // TCHEM  0.63 \pm 0.01                   0.93 \pm 0.02 \pm 0.07
-
-  // new scale factors
-  // TCHEM	btag eff: 0.96 \pm 0.04		mistag rate: 0.0286 \pm 0.0003		mistag scale factor: 1.20 \pm 0.14
-  // CSVM	btag eff: 0.97 \pm 0.04		mistag rate: 0.0152 \pm 0.0002		mistag scale factor: 1.10 \pm 0.11
-
-  Bool_t btagged;
-  Double_t demoteProb=0; // ~probability to demote from tagged
-  if(btageff==kNo)        demoteProb = fabs(1-0.97); //1-0.93;  // SF = 0.93 -> 0.07 = (prob to demote from tagged status)
-  else if(btageff==kDown) demoteProb = fabs(1-0.97+0.04); //1-0.93+0.07;
-  else if(btageff==kUp)   demoteProb = fabs(1-0.97-0.04); //1-0.93-0.07;
-  Double_t promoteProb=0; // ~probability to promote to tagged
-  if(mistag==kNo)         promoteProb = fabs(1.10-1)*0.0152/(1-0.0152); //(1.21-1)*0.0145/(1-0.0145);  // (1-SF)*mistag = (prob. to promote to tagged status)*(1-mistag)
-  else if(mistag==kDown)  promoteProb = fabs(1.10-1+0.11)*0.0152/(1-0.0152);
-  else if(mistag==kUp)    promoteProb = fabs(1.10-1-0.11)*0.0152/(1-0.0152);
-
-  UInt_t jetflavor = 0;
-                   
-  if(isdata == 1) {
-    if(jet->csv>0.679) btagged = kTRUE;
-    else               btagged = kFALSE;
-  } else { // MC
-    //if(isdata == 0)jetflavor = abs(jet->mcFlavor);
-    jetflavor = abs(jet->matchedId);
-    if(jetflavor==5) {
-      if(jet->csv>0.679) {
-      if(randm.Uniform()>demoteProb) btagged = kTRUE;  // leave it tagged
-      else                           btagged = kFALSE; // demote it
-      } else                           btagged = kFALSE; // leave it untagged
-    } else { // not bjet
-      if(jet->csv>0.679)                   btagged = kTRUE;  // leave it tagged
-      else if(randm.Uniform()<promoteProb) btagged = kTRUE;  // promote to tagged
-      else                                 btagged = kFALSE; // leave it untagged
-    }
-  }
-
-  return btagged;
-} 
-*/ 
-//----------------------------------------------------------------------------------------
-Double_t embUnfoldWgt(Double_t pt1, Double_t eta1, Double_t pt2, Double_t eta2)
-{
-  TFile *unfFile1   = TFile::Open("mutau.root"); assert(unfFile1->IsOpen());
-  TH2F  *unfWeight1 = (TH2F*) unfFile1->FindObjectAny("hadunf");
-  TH2F  *unfWeight2 = (TH2F*) unfFile1->FindObjectAny("lepunf");
-  double weight1 = unfWeight1->GetBinContent(unfWeight1->GetXaxis()->FindBin(pt1),unfWeight1->GetYaxis()->FindBin(eta1));
-  double weight2 = unfWeight2->GetBinContent(unfWeight2->GetXaxis()->FindBin(pt2),unfWeight2->GetYaxis()->FindBin(eta2));
-  unfFile1->Close();
-  return weight1*weight2;
-}
 
 //----------------------------------------------------------------
-
 Double_t muIDscaleEmu(Double_t mupt, Double_t mueta, Int_t is2012)
 {
-  if((fabs(mueta) > 2.1) || (mupt < 10)) { cout << "mu kinematics out of range" << endl; assert(0); }
-  if(mupt > 20) {
-    if(fabs(mueta) < 1.5)  return is2012 ? 1.006 : 0.992;
-    else   return is2012 ? 1.014 : 0.994;
-  }
-  else if(mupt > 15) {
-    if(fabs(mueta) < 1.5)   return is2012 ? 1.017 : 0.995;
-    else               return is2012 ? 1.025 : 1.002;
-  }
-  else {
-    if(fabs(mueta) < 1.5)   return is2012 ? 0.990 : 0.991;
-    else                 return is2012 ? 1.030 : 1.036;
+  if((fabs(mueta) > 2.4) || (mupt < 10)) { cout << "mu kinematics out of range" << endl; assert(0); }
+  if(is2012) {
+    if(mupt > 35) {
+      if(fabs(mueta) < 0.8)   return 0.9841;
+      else if(fabs(mueta) < 1.2)   return 0.9813;
+      else if(fabs(mueta) < 1.6)   return 0.9919;
+      else if(fabs(mueta) < 2.1)   return 0.9939;
+      else                    return 1.0401;
+    }
+    else if(mupt > 30) {
+      if(fabs(mueta) < 0.8)   return 0.9746;
+      else if(fabs(mueta) < 1.2)   return 0.9797;
+      else if(fabs(mueta) < 1.6)   return 0.9935;
+      else if(fabs(mueta) < 2.1)   return 0.9987;
+      else                    return 1.0785;
+    }
+    else if(mupt > 25) {
+      if(fabs(mueta) < 0.8)   return 0.9691;
+      else if(fabs(mueta) < 1.2)   return 0.9785;
+      else if(fabs(mueta) < 1.6)   return 0.9909;
+      else if(fabs(mueta) < 2.1)   return 0.9991;
+      else                    return 1.0922;
+    }
+    else if(mupt > 20) {
+      if(fabs(mueta) < 0.8)   return 0.9676;
+      else if(fabs(mueta) < 1.2)   return 0.9785;
+      else if(fabs(mueta) < 1.6)   return 0.9883;
+      else if(fabs(mueta) < 2.1)   return 1.0031;
+      else                    return 1.1362;
+    }
+    else if(mupt > 15) {
+      if(fabs(mueta) < 0.8)   return 0.9556;
+      else if(fabs(mueta) < 1.2)   return 0.9635;
+      else if(fabs(mueta) < 1.6)   return 0.9806;
+      else if(fabs(mueta) < 2.1)   return 1.0078;
+      else                    return 1.1422;
+    }
+    else {
+      if(fabs(mueta) < 0.8)   return 0.9811;
+      else if(fabs(mueta) < 1.2)   return 0.9689;
+      else if(fabs(mueta) < 1.6)   return 0.9757;
+      else if(fabs(mueta) < 2.1)   return 1.0069;
+      else                    return 1.1833;
+    }
+  } else {
+    if(mupt > 20) {
+      if(fabs(mueta) < 0.8)      return 0.9998;
+      else if(fabs(mueta) < 1.2) return 1.0006;
+      else                       return 1.0045;
+    }
+    else if(mupt > 15) {
+      if(fabs(mueta) < 0.8)      return 1.0176;
+      else if(fabs(mueta) < 1.2) return 1.0040;
+      else                       return 1.0063;
+    }
+    else {
+      if(fabs(mueta) < 0.8)      return 0.9303;
+      else if(fabs(mueta) < 1.2) return 1.0125;
+      else                       return 0.9994;
+    }
   }
 }
+
 //----------------------------------------------------------------------------------------    
 Double_t eleIDscaleEmu(Double_t elept, Double_t eleeta, Int_t is2012)
 {
   if((fabs(eleeta) > 2.3) || (elept < 10)) { cout << "ele kinematics out of range" << endl; assert(0); }
-  else if(elept > 20) {
-    if(fabs(eleeta) < 0.8) return is2012 ? 0.959 : 0.985 ;
-    else if(fabs(eleeta) < 1.479) return is2012 ?  0.954 : 0.985;
-    else         return is2012 ? 0.968 : 1.012;
-  }
-  else if(elept > 15) {
-    if(fabs(eleeta) < 0.8) return is2012  ? 0.926 : 0.962;
-    else if(fabs(eleeta) < 1.479) return  is2012 ? 0.853 : 0.962;
-    else                     return  is2012 ? 0.838 : 1.148;
-  }
-  else {
-    if(fabs(eleeta) < 0.8) return is2012 ? 0.840 : 1.040;
-    else if(fabs(eleeta) < 1.479) return is2012 ? 0.837 : 1.040;
-    else                     return is2012 ? 0.722 : 0.976;
+  if(is2012) {
+    if(elept > 35) {
+      if(fabs(eleeta) < 0.8)        return 0.9533;                                                                                
+      else if(fabs(eleeta) < 1.479) return 0.9496;
+      else                          return 0.9389;                                                                                
+    }     
+    else if(elept > 30) {                                                                                                                
+      if(fabs(eleeta) < 0.8)        return 0.9301;                                              
+      else if(fabs(eleeta) < 1.479) return 0.9230;
+      else                          return 0.8887;                                                
+    }       
+    else if(elept > 25) { 
+      if(fabs(eleeta) < 0.8)        return 0.9069;                                                                                
+      else if(fabs(eleeta) < 1.479) return 0.8896;                                         
+      else                          return 1.0225;                                                                                
+    }       
+    else if(elept > 20) {
+      if(fabs(eleeta) < 0.8)        return 0.8817;                                        
+      else if(fabs(eleeta) < 1.479) return 0.8492;                                                                                
+      else                          return 0.8057; 
+    }         
+    else if(elept > 15) {                      
+      if(fabs(eleeta) < 0.8)        return 0.8437;                                                                                
+      else if(fabs(eleeta) < 1.479) return 0.8447;                                              
+      else                          return 0.7812;
+    }
+    else {
+      if(fabs(eleeta) < 0.8)        return 0.7570;
+      else if(fabs(eleeta) < 1.479) return 0.7807;
+      else                          return 0.6276;
+    } 
+  } else {
+    if(elept > 20) {
+      if(fabs(eleeta) < 0.8)        return 0.9862;
+      else if(fabs(eleeta) < 1.479) return 0.9786;
+      else                          return 1.0136;
+    }
+    else if(elept > 15) {
+      if(fabs(eleeta) < 0.8)        return 0.9612;
+      else if(fabs(eleeta) < 1.479) return 0.9773;
+      else                          return 1.0600;
+    }
+    else {
+      if(fabs(eleeta) < 0.8)        return 1.0078;
+      else if(fabs(eleeta) < 1.479) return 1.1236;
+      else                          return 0.9336;
+    }
   }
 }
+
 //----------------------------------------------------------------
 Double_t muIDscaleMuTau(Double_t mupt, Double_t mueta, Int_t is2012)
 {
@@ -200,6 +218,7 @@ Double_t muIDscaleMuTau(Double_t mupt, Double_t mueta, Int_t is2012)
     else                 return 0.977*1.047;
   }
 }
+
 //----------------------------------------------------------------
 Double_t eleIDscaleETau(Double_t ept, Double_t eeta, Int_t is2012)
 {
@@ -213,66 +232,142 @@ Double_t eleIDscaleETau(Double_t ept, Double_t eeta, Int_t is2012)
     else                   return is2012 ? 0.959*0.8244 : 0.967*0.938;
   }
 }
+
 //----------------------------------------------------------------------------------------
 Double_t eleTrigScaleEmu(Double_t elept, Double_t eleeta, Int_t is2012)
 {
   if((fabs(eleeta) > 2.3) || (elept < 10)) { cout << "ele kinematics out of range" << endl; assert(0); }
-  else if(elept > 30) {
-    if(fabs(eleeta) < 0.8)        return is2012 ? 1.00 : 1.003;
-    else if(fabs(eleeta) < 1.479) return is2012 ? 0.99 : 1.003;
-    else                          return is2012 ? 0.97 : 1.008;
-  } 
-  else if(elept > 25 && is2012) {
-    if(fabs(eleeta) < 0.8)        return 0.97;
-    else if(fabs(eleeta) < 1.479) return 0.98;
-    else                          return 1.01;
-  } 
-  else if(elept > 20) {
-    if(fabs(eleeta) < 0.8)        return is2012 ? 0.98 : 1.001;
-    else if(fabs(eleeta) < 1.479) return is2012 ? 0.96 : 1.001;
-    else                          return is2012 ? 1.01 : 1.00;
-  } 
-  else if(elept > 15) {
-    if(fabs(eleeta) < 0.8)        return is2012 ? 0.99 : 1.00;
-    else if(fabs(eleeta) < 1.479) return is2012 ? 1.00 : 1.00;
-    else                          return is2012 ? 1.07 : 1.05;
-  } 
-  else {
-    if(fabs(eleeta) < 0.8)        return is2012 ? 0.99 : 0.98;
-    else if(fabs(eleeta) < 1.479) return is2012 ? 0.82 : 0.98;
-    else                          return is2012 ? 0.96 : 0.97;
+  if(is2012) {
+    if(elept > 35) {
+      if(fabs(eleeta) < 0.8)        return 1.0069;
+      else if(fabs(eleeta) < 1.479) return 1.0049;
+      else                          return 0.9989;
+    } 
+    else if(elept > 30) {
+      if(fabs(eleeta) < 0.8)        return 1.0084;
+      else if(fabs(eleeta) < 1.479) return 0.9900;
+      else                          return 0.9817;
+    } 
+    else if(elept > 25) {
+      if(fabs(eleeta) < 0.8)        return 0.9772;
+      else if(fabs(eleeta) < 1.479) return 0.9916;
+      else                          return 0.9609;
+    } 
+    else if(elept > 20) {
+      if(fabs(eleeta) < 0.8)        return 0.9716;
+      else if(fabs(eleeta) < 1.479) return 0.9702;
+      else                          return 0.9726;
+    }
+    else if(elept > 15) {
+      if(fabs(eleeta) < 0.8)        return 0.9841;
+      else if(fabs(eleeta) < 1.479) return 0.9699;
+      else                          return 0.9286;
+    }
+    else {
+      if(fabs(eleeta) < 0.8)        return 0.9529;
+      else if(fabs(eleeta) < 1.479) return 0.8858;
+      else                          return 0.9259;
+    }
+  } else {
+    if(elept > 30) {
+      if(fabs(eleeta) < 0.8)        return 0.99;
+      else if(fabs(eleeta) < 1.479) return 1.00;
+      else                          return 0.99;
+    }
+    else if(elept > 20) {
+      if(fabs(eleeta) < 0.8)        return 0.98;
+      else if(fabs(eleeta) < 1.479) return 0.99;
+      else                          return 0.96;
+    }
+    else if(elept > 15) {
+      if(fabs(eleeta) < 0.8)        return 1.10;
+      else if(fabs(eleeta) < 1.479) return 1.08;
+      else                          return 1.05;
+    } 
+    else {
+      if(fabs(eleeta) < 0.8)        return 0.97;
+      else if(fabs(eleeta) < 1.479) return 0.98;
+      else                          return 0.81;
+    }
   }
 }
+
 //----------------------------------------------------------------------------------------
 Double_t muTrigScaleEmu(Double_t mupt, Double_t mueta, Int_t is2012)
 {
- if((fabs(mueta) > 2.1) || (mupt < 10)) { cout << "muon kinematics out of range" << endl; assert(0); }
-  else if(mupt > 30) {
-    if(fabs(mueta) < 0.8)        return is2012 ? 1.07 : 0.992;
-    else if(fabs(mueta) < 1.2) return is2012 ? 1.12 : 0.992;
-    else                       return is2012 ? 1.12 : 1.06;
-  } 
-  else if(mupt > 25 && is2012) {
-    if(fabs(mueta) < 0.8)        return 1.00;
-    else if(fabs(mueta) < 1.2) return 0.106;
-    else                          return 1.02;
-  } 
-  else if(mupt > 20) {
-    if(fabs(mueta) < 0.8)        return is2012 ? 1.01 : 0.99;
-    else if(fabs(mueta) < 1.2) return is2012 ? 0.98 : 0.99;
-    else                          return is2012 ? 0.96 : 1.04;
-  } 
-  else if(mupt > 15) {
-    if(fabs(mueta) < 0.8)        return is2012 ? 1.00 : 0.99;
-    else if(fabs(mueta) < 1.2) return is2012 ? 1.04 : 0.99;
-    else                          return is2012 ? 1.02 : 1.07;
-  } 
-  else {
-    if(fabs(mueta) < 0.8)        return is2012 ? 1.00 : 1.01;
-    else if(fabs(mueta) < 1.2) return is2012 ? 0.99 : 1.01;
-    else                          return is2012 ? 0.98 : 1.03;
+ if((fabs(mueta) > 2.4) || (mupt < 10)) { cout << "muon kinematics out of range" << endl; assert(0); }
+  if(is2012) {
+    if(mupt > 35) {
+      if(fabs(mueta) < 0.8)        return 0.9991;
+      else if(fabs(mueta) < 1.2)   return 0.9626;
+      else if(fabs(mueta) < 1.6)   return 0.9611;
+      else if(fabs(mueta) < 2.1)   return 0.9314;
+      else                         return 0.8541;
+    }
+    else if(mupt > 30) {
+      if(fabs(mueta) < 0.8)        return 0.9930;
+      else if(fabs(mueta) < 1.2)   return 0.9800;
+      else if(fabs(mueta) < 1.6)   return 0.9958;
+      else if(fabs(mueta) < 2.1)   return 0.9428;
+      else                         return 0.7810;
+    }
+    else if(mupt > 25) {
+      if(fabs(mueta) < 0.8)        return 0.9856;
+      else if(fabs(mueta) < 1.2)   return 0.9818;
+      else if(fabs(mueta) < 1.6)   return 0.9684;
+      else if(fabs(mueta) < 2.1)   return 0.9642;
+      else                         return 0.8370;
+    }
+    else if(mupt > 20) {
+      if(fabs(mueta) < 0.8)        return 0.9937;
+      else if(fabs(mueta) < 1.2)   return 0.9594;
+      else if(fabs(mueta) < 1.6)   return 0.9692;
+      else if(fabs(mueta) < 2.1)   return 0.9438;
+      else                         return 0.7761;
+    }
+    else if(mupt > 15) {
+      if(fabs(mueta) < 0.8)        return 0.9846;
+      else if(fabs(mueta) < 1.2)   return 0.9834;
+      else if(fabs(mueta) < 1.6)   return 0.9793;
+      else if(fabs(mueta) < 2.1)   return 0.9257;
+      else                         return 0.8199;
+    }
+    else {
+      if(fabs(mueta) < 0.8)        return 0.9841;
+      else if(fabs(mueta) < 1.2)   return 0.9742;
+      else if(fabs(mueta) < 1.6)   return 0.9955;
+      else if(fabs(mueta) < 2.1)   return 0.9151;
+      else                         return 0.8067;
+    }
+  } else {
+    if(mupt > 30) {
+      if(fabs(mueta) < 0.8)        return 0.9783;
+      else if(fabs(mueta) < 1.2)   return 0.9669;
+      else                         return 0.9674;
+    }
+    else if(mupt > 25) {
+      if(fabs(mueta) < 0.8)        return 0.9812;
+      else if(fabs(mueta) < 1.2)   return 0.9783;
+      else                         return 0.9700;
+    }
+    else if(mupt > 20) {
+      if(fabs(mueta) < 0.8)        return 1.0035;
+      else if(fabs(mueta) < 1.2)   return 0.9690;
+      else                         return 0.9694;
+    }
+    else if(mupt > 15) {
+      if(fabs(mueta) < 0.8)        return 0.9808;
+      else if(fabs(mueta) < 1.2)   return 0.9791;
+      else                         return 0.9948;
+    }
+    else {
+      if(fabs(mueta) < 0.8)        return 0.9808;
+      else if(fabs(mueta) < 1.2)   return 0.9623;
+      else                         return 0.9602;
+    }
   }
 }
+
 //----------------------------------------------------------------------------------------
 double efficiency(double m, double m0, double sigma, double alpha,
                   double n, double norm) {
@@ -305,6 +400,7 @@ double efficiency(double m, double m0, double sigma, double alpha,
                                    1/TMath::Power(absAlpha - b,n-1)) / (1 - n)) / area;
   }
 }
+
 double eff2012IsoTau12fb(double pt, double eta){
   return (808.411*(0.764166*0.5*(TMath::Erf((pt-33.2236)/2./0.97289/sqrt(pt))+1.))+
 	  4428.0*(0.802387*0.5*(TMath::Erf((pt-38.0971)/2./0.82842/sqrt(pt))+1.))+
@@ -328,7 +424,6 @@ double eff2012Jet12fb(double pt, double eta){
       )/(808.411+4428.0+1783.003+5109.155));
 }
 
-
 double eff2012Jet19fb(double pt, double eta){
 return (abs(eta)<=2.1)*
 ((808.411*(0.99212*0.5*(TMath::Erf((pt-31.3706)/2./1.22821/sqrt(pt))+1.))+
@@ -348,8 +443,6 @@ return (abs(eta)<=2.1)*
 )/(808.411+4428.0+1783.003+5109.155+4131+3143));
 }
 
-
-
 double eff2012IsoTau19fb(double pt, double eta){
 return (808.411*(0.764166*0.5*(TMath::Erf((pt-33.2236)/2./0.97289/sqrt(pt))+1.))+
 4428.0*(0.802387*0.5*(TMath::Erf((pt-38.0971)/2./0.82842/sqrt(pt))+1.))+
@@ -359,6 +452,5 @@ return (808.411*(0.764166*0.5*(TMath::Erf((pt-33.2236)/2./0.97289/sqrt(pt))+1.))
 3143*(0.833004*0.5*(TMath::Erf((pt-37.634)/2./0.777843/sqrt(pt))+1.))
 )/(808.411+4428.0+1783.003+5109.155+4131+3143);
 }
-
 
 #endif
