@@ -48,7 +48,7 @@ Double_t kfFHPValue(Double_t pt, TH1D* hKF);
 
 double efficiency(double m, double m0, double sigma, double alpha,double n, double norm);
 
-Double_t unskimmedEntries(TString skimname);
+Double_t unskimmedEntries(TString skimname)
 {
   Double_t entries;
 
