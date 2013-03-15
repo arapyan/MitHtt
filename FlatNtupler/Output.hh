@@ -179,6 +179,7 @@ public:
   int   fGenMatch; //Matched to ll/l+Tau/Tau+Tau/l+Jet/Tau+Jet/None of above (1/2/3/4/5/0)
  
   int  doRecoil; //Recoil corrections  
+  bool doEmu;    //use Emu version
   UInt_t npt20jets;
   TArrayF btagArray;
   TArrayF jptArray;

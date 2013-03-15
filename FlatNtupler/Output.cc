@@ -111,6 +111,7 @@ Output::Output(TString name):
   fGenEta2(0),
   fGenId2(0),
   doRecoil(0),
+  doEmu(0),
   npt20jets(0),
   fOutputFile(0),
   fEventTree(0),
@@ -125,10 +126,11 @@ Output::Output(TString name):
 void Output::cd() { 
   fOutputFile->cd();
 }
-void Output::setupRecoil(int doRec)
+void Output::setupRecoil(int doRec, bool is2012=true, bool isEmu=false)
 {
-  if(doRec)
-    {
+  doEmu = isEmu;
+  if(!isEmu) {
+    if(doRec) {
       doRecoil = doRec;
       cout << "doing recoil corrections" << endl;
       if(doRecoil == 1) corrector = new RecoilCorrector("$CMSSW_BASE/src/MitHtt/Utils/recoilfits/recoilfit_zmm53X_2012_njet.root");
@@ -137,6 +139,21 @@ void Output::setupRecoil(int doRec)
       corrector->addMCFile      ("$CMSSW_BASE/src/MitHtt/Utils/recoilfits/recoilfit_zmm53X_2012_njet.root");
       corrector->addDataFile    ("$CMSSW_BASE/src/MitHtt/Utils/recoilfits/recoilfit_datamm53X_2012_njet.root");
     }  
+  } else {
+    doRecoil = doRec;
+    cout << "doing recoil corrections" << endl;
+    if(is2012) {
+      if(doRecoil == 1) corrector = new RecoilCorrector("$CMSSW_BASE/src/MitHtt/Utils/recoilfits/recoilfit_higgsem53X_20pv_njet.root");
+      if(doRecoil == 2) corrector = new RecoilCorrector("$CMSSW_BASE/src/MitHtt/Utils/recoilfits/recoilfit_zmm53X_20pv_njet.root");
+      corrector->addMCFile      ("$CMSSW_BASE/src/MitHtt/Utils/recoilfits/recoilfit_zmm53X_20pv_njet.root");
+      corrector->addDataFile    ("$CMSSW_BASE/src/MitHtt/Utils/recoilfits/recoilfit_datamm53X_20pv_njet.root");
+    } else {
+      if(doRecoil == 1) corrector = new RecoilCorrector("$CMSSW_BASE/src/MitHtt/Utils/recoilfits/recoilfit_higgsem42X_20pv_njet.root");
+      if(doRecoil == 2) corrector = new RecoilCorrector("$CMSSW_BASE/src/MitHtt/Utils/recoilfits/recoilfit_zmm42X_20pv_njet.root");
+      corrector->addMCFile      ("$CMSSW_BASE/src/MitHtt/Utils/recoilfits/recoilfit_zmm42X_20pv_njet.root");
+      corrector->addDataFile    ("$CMSSW_BASE/src/MitHtt/Utils/recoilfits/recoilfit_datamm42X_20pv_njet.root");
+    }
+  }
 }
 void Output::setupOutput(TString name) {
   fOutputFile = new TFile( name, "RECREATE" );
@@ -460,8 +477,9 @@ void Output::fillEvent(mithep::TEventInfo *info, HttMVA *vbfmva, int npv)
   double lMVAMet     = fMVAMet;
   double lMVAMetPhi  = fMVAMetPhi;
   
-  if(corrector && doRecoil != 2) corrector->CorrectType1(lMVAMet, lMVAMetPhi, fgenpt, fgenphi, dilep.Pt(), dilep.Phi(), pU1, pU2, 0, 0, fNJets);
-  if(corrector && doRecoil == 2) corrector->CorrectType1(lMVAMet, lMVAMetPhi, fgenpt, fgenphi, lep1 .Pt(), lep1 .Phi(), pU1, pU2, 0, 0, fNJets);
+  if(corrector && doEmu) corrector->CorrectType1(lMVAMet, lMVAMetPhi, fgenpt, fgenphi, dilep.Pt(), dilep.Phi(), pU1, pU2, 0, 0, fNJets);
+  else if(corrector && doRecoil != 2) corrector->CorrectType1(lMVAMet, lMVAMetPhi, fgenpt, fgenphi, dilep.Pt(), dilep.Phi(), pU1, pU2, 0, 0, fNJets);
+  else if(corrector && doRecoil == 2) corrector->CorrectType1(lMVAMet, lMVAMetPhi, fgenpt, fgenphi, lep1 .Pt(), lep1 .Phi(), pU1, pU2, 0, 0, fNJets);
   fMVAMet            = lMVAMet;
   fMVAMetPhi         = lMVAMetPhi;
 
