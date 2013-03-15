@@ -126,7 +126,7 @@ Output::Output(TString name):
 void Output::cd() { 
   fOutputFile->cd();
 }
-void Output::setupRecoil(int doRec, bool is2012=true, bool isEmu=false)
+void Output::setupRecoil(int doRec, bool is2012, bool isEmu)
 {
   doEmu = isEmu;
   if(!isEmu) {

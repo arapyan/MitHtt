@@ -192,7 +192,7 @@ public:
   void fillGen(mithep::TGenInfo *gen);
   void fillEvent(mithep::TEventInfo *event, HttMVA *vbfmva, int npv);  //always to be called the last
   void fillJets(const mithep::TJet *jet1,const mithep::TJet *jet2,const mithep::TJet *bjet1, const mithep::TJet *bjet2, int njets, int bjets, int npt20, int nCentralJets);
-  void setupRecoil(int doRec);
+  void setupRecoil(int doRec, bool is2012=true, bool isEmu=false);
   void save();
   void cd();
 protected:
