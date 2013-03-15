@@ -295,7 +295,7 @@ Double_t eleTrigScaleEmu(Double_t elept, Double_t eleeta, Int_t is2012)
 //----------------------------------------------------------------------------------------
 Double_t muTrigScaleEmu(Double_t mupt, Double_t mueta, Int_t is2012)
 {
- if((fabs(mueta) > 2.4) || (mupt < 10)) { cout << "muon kinematics out of range" << endl; assert(0); }
+  if((fabs(mueta) > 2.4) || (mupt < 10)) { cout << "muon kinematics out of range" << endl; assert(0); }
   if(is2012) {
     if(mupt > 35) {
       if(fabs(mueta) < 0.8)        return 0.9991;
@@ -364,6 +364,146 @@ Double_t muTrigScaleEmu(Double_t mupt, Double_t mueta, Int_t is2012)
       if(fabs(mueta) < 0.8)        return 0.9808;
       else if(fabs(mueta) < 1.2)   return 0.9623;
       else                         return 0.9602;
+    }
+  }
+}
+
+//----------------------------------------------------------------------------------------
+Double_t eleTrigEffEmu(Double_t elept, Double_t eleeta, Int_t is2012)
+{
+  if((fabs(eleeta) > 2.3) || (elept < 10)) { cout << "ele kinematics out of range" << endl; assert(0); }
+  if(is2012) {
+    if(elept > 35) {
+      if(fabs(eleeta) < 0.8)        return 0.9690;
+      else if(fabs(eleeta) < 1.479) return 0.9811;
+      else                          return 0.9777;
+    }
+    else if(elept > 30) {
+      if(fabs(eleeta) < 0.8)        return 0.9528;
+      else if(fabs(eleeta) < 1.479) return 0.9652;
+      else                          return 0.9693;
+    }
+    else if(elept > 25) {
+      if(fabs(eleeta) < 0.8)        return 0.9383;
+      else if(fabs(eleeta) < 1.479) return 0.9681;
+      else                          return 0.9383;
+    }
+    else if(elept > 20) {
+      if(fabs(eleeta) < 0.8)        return 0.9145;
+      else if(fabs(eleeta) < 1.479) return 0.9455;
+      else                          return 0.9354;
+    }
+    else if(elept > 15) {
+      if(fabs(eleeta) < 0.8)        return 0.8758;
+      else if(fabs(eleeta) < 1.479) return 0.9061;
+      else                          return 0.8475;
+    }
+    else {
+      if(fabs(eleeta) < 0.8)        return 0.7217;
+      else if(fabs(eleeta) < 1.479) return 0.7262;
+      else                          return 0.7093;
+    }
+  } else {
+    if(elept > 30) {
+      if(fabs(eleeta) < 0.8)        return 0.9643;
+      else if(fabs(eleeta) < 1.479) return 0.9778;
+      else                          return 0.9737;
+    }
+    else if(elept > 25) {
+      if(fabs(eleeta) < 0.8)        return 0.9394;
+      else if(fabs(eleeta) < 1.479) return 0.9674;
+      else                          return 0.9286;
+    }
+    else if(elept > 20) {
+      if(fabs(eleeta) < 0.8)        return 0.9200;
+      else if(fabs(eleeta) < 1.479) return 0.9515;
+      else                          return 0.9323;
+    }
+    else if(elept > 15) {
+      if(fabs(eleeta) < 0.8)        return 0.8874;
+      else if(fabs(eleeta) < 1.479) return 0.9177;
+      else                          return 0.8500;
+    }
+    else {
+      if(fabs(eleeta) < 0.8)        return 0.7633;
+      else if(fabs(eleeta) < 1.479) return 0.7356;
+      else                          return 0.7010;
+    }
+  }
+}
+
+//----------------------------------------------------------------------------------------
+Double_t muTrigEffEmu(Double_t mupt, Double_t mueta, Int_t is2012)
+{
+  if((fabs(mueta) > 2.4) || (mupt < 10)) { cout << "muon kinematics out of range" << endl; assert(0); }
+  if(is2012) {
+    if(mupt > 35) {
+      if(fabs(mueta) < 0.8)        return 0.9683;
+      else if(fabs(mueta) < 1.2)   return 0.9345;
+      else if(fabs(mueta) < 1.6)   return 0.9098;
+      else if(fabs(mueta) < 2.1)   return 0.9003;
+      else                         return 0.7068;
+    }
+    else if(mupt > 30) {
+      if(fabs(mueta) < 0.8)        return 0.9758;
+      else if(fabs(mueta) < 1.2)   return 0.9314;
+      else if(fabs(mueta) < 1.6)   return 0.9152;
+      else if(fabs(mueta) < 2.1)   return 0.9019;
+      else                         return 0.7278;
+    }
+    else if(mupt > 25) {
+      if(fabs(mueta) < 0.8)        return 0.9711;
+      else if(fabs(mueta) < 1.2)   return 0.9439;
+      else if(fabs(mueta) < 1.6)   return 0.9222;
+      else if(fabs(mueta) < 2.1)   return 0.8909;
+      else                         return 0.7609;
+    }
+    else if(mupt > 20) {
+      if(fabs(mueta) < 0.8)        return 0.9749;
+      else if(fabs(mueta) < 1.2)   return 0.9423;
+      else if(fabs(mueta) < 1.6)   return 0.9375;
+      else if(fabs(mueta) < 2.1)   return 0.9114;
+      else                         return 0.6909;
+    }
+    else if(mupt > 15) {
+      if(fabs(mueta) < 0.8)        return 0.9706;
+      else if(fabs(mueta) < 1.2)   return 0.9284;
+      else if(fabs(mueta) < 1.6)   return 0.9306;
+      else if(fabs(mueta) < 2.1)   return 0.8921;
+      else                         return 0.7389;
+    }
+    else {
+      if(fabs(mueta) < 0.8)        return 0.9713;
+      else if(fabs(mueta) < 1.2)   return 0.9399;
+      else if(fabs(mueta) < 1.6)   return 0.9299;
+      else if(fabs(mueta) < 2.1)   return 0.8614;
+      else                         return 0.6832;
+    }
+  } else {
+    if(mupt > 30) {
+      if(fabs(mueta) < 0.8)        return 0.9671;
+      else if(fabs(mueta) < 1.2)   return 0.9502;
+      else                         return 0.9383;
+    }
+    else if(mupt > 25) {
+      if(fabs(mueta) < 0.8)        return 0.9680;
+      else if(fabs(mueta) < 1.2)   return 0.9550;
+      else                         return 0.9416;
+    }
+    else if(mupt > 20) {
+      if(fabs(mueta) < 0.8)        return 0.9878;
+      else if(fabs(mueta) < 1.2)   return 0.9495;
+      else                         return 0.9379;
+    }
+    else if(mupt > 15) {
+      if(fabs(mueta) < 0.8)        return 0.9668;
+      else if(fabs(mueta) < 1.2)   return 0.9556;
+      else                         return 0.9613;
+    }
+    else {
+      if(fabs(mueta) < 0.8)        return 0.9660;
+      else if(fabs(mueta) < 1.2)   return 0.9314;
+      else                         return 0.9207;
     }
   }
 }
