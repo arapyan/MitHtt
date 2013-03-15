@@ -49,7 +49,20 @@ Double_t kfFHPValue(Double_t pt, TH1D* hKF);
 double efficiency(double m, double m0, double sigma, double alpha,double n, double norm);
 
 Double_t unskimmedEntries(TString skimname);
+{
+  Double_t entries;
 
+  skimname.ReplaceAll("_emu_skim.root","_ntuple.root");
+  TFile unskimmed(skimname);
+  assert(unskimmed.IsOpen());
+  TTree *tree = 0;
+  unskimmed.GetObject("hEvents",tree);
+  assert(tree);
+  entries = (Double_t)tree->GetEntries();
+  unskimmed.Close();
+
+  return entries;
+}
 
 TH1D* kfFHPInit(Int_t mH)
 {
