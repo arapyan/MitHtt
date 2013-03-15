@@ -280,17 +280,29 @@ void Output::save()
   if(doRecoil) delete corrector;
 }
 
-void Output::fillMuon(const mithep::TMuon *muon, double iso, bool passiso)
+void Output::fillMuon(const mithep::TMuon *muon, bool first, double iso, bool passiso)
 {
-  fPt1 = muon->pt;
-  fPhi1 = muon->phi;
-  fEta1 = muon->eta;
-  fM1  = 105.658369e-3;
-  fq1 = muon->q;
-  fIso1 = iso;
-  fD01 = muon->d0;
-  fDZ1 = muon->dz;
-  fPassIso1 = passiso;
+  if(first) {
+    fPt1 = muon->pt;
+    fPhi1 = muon->phi;
+    fEta1 = muon->eta;
+    fM1  = 105.658369e-3;
+    fq1 = muon->q;
+    fIso1 = iso;
+    fD01 = muon->d0;
+    fDZ1 = muon->dz;
+    fPassIso1 = passiso;
+  } else {
+    fPt2 = muon->pt;
+    fPhi2 = muon->phi;
+    fEta2 = muon->eta;
+    fM2  = 105.658369e-3;
+    fq2 = muon->q;
+    fIso2 = iso;
+    fD02 = muon->d0;
+    fDZ2 = muon->dz;
+    fPassIso2 = passiso;
+  }
 }
 
 void Output::fillElectron(const mithep::TElectron *ele, bool first, double iso, bool passiso, unsigned int scale)

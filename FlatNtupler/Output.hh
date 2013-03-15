@@ -185,7 +185,7 @@ public:
   TArrayF jptArray;
   TArrayF jetaArray;
 
-  void fillMuon(const mithep::TMuon *muon, double iso, bool passiso);
+  void fillMuon(const mithep::TMuon *muon, bool location, double iso, bool passiso);
   void fillElectron(const mithep::TElectron *ele, bool location, double iso, bool passiso, unsigned int scale=0);
   void fillTau(const mithep::TPFTau *tau, bool first,  bool passiso);
   void fillCov(mithep::TSVfit *svfit); 	
