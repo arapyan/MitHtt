@@ -186,11 +186,11 @@ public:
   TArrayF jetaArray;
 
   void fillMuon(const mithep::TMuon *muon, double iso, bool passiso);
-  void fillElectron(const mithep::TElectron *ele, bool location, double iso, bool passiso);
+  void fillElectron(const mithep::TElectron *ele, bool location, double iso, bool passiso, unsigned int scale=0);
   void fillTau(const mithep::TPFTau *tau, bool first,  bool passiso);
   void fillCov(mithep::TSVfit *svfit); 	
   void fillGen(mithep::TGenInfo *gen);
-  void fillEvent(mithep::TEventInfo *event, HttMVA *vbfmva, int npv);  //always to be called the last
+  void fillEvent(mithep::TEventInfo *event, HttMVA *vbfmva, int npv, double scalecorr=0);  //always to be called the last
   void fillJets(const mithep::TJet *jet1,const mithep::TJet *jet2,const mithep::TJet *bjet1, const mithep::TJet *bjet2, int njets, int bjets, int npt20, int nCentralJets);
   void setupRecoil(int doRec, bool is2012=true, bool isEmu=false);
   void save();

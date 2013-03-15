@@ -295,11 +295,13 @@ void Output::fillMuon(const mithep::TMuon *muon, double iso, bool passiso)
   fPassIso1 = passiso;
 }
 
-void Output::fillElectron(const mithep::TElectron *ele, bool first, double iso, bool passiso)
+void Output::fillElectron(const mithep::TElectron *ele, bool first, double iso, bool passiso, unsigned int scale)
 {
   if(first)
     {
       fPt1 = ele->pt;
+      if(scale==1) { fPt1 *= 0.99; }
+      else if(scale==2) { fPt1 *= 1.01; }
       fPhi1 = ele->phi;
       fEta1 = ele->eta;
       fM1  = 0.000511;
@@ -446,7 +448,7 @@ void Output::fillGen(mithep::TGenInfo *gen)
   fgenphi = gen->vphi_a;
 }
 
-void Output::fillEvent(mithep::TEventInfo *info, HttMVA *vbfmva, int npv)
+void Output::fillEvent(mithep::TEventInfo *info, HttMVA *vbfmva, int npv, double scalecorr)
 {
   fRun = info->runNum;
   fLumi = info->lumiSec;
@@ -458,7 +460,8 @@ void Output::fillEvent(mithep::TEventInfo *info, HttMVA *vbfmva, int npv)
   fNPU = info->nPU;
   fRho = info->rho;
 
-  fMet = info->pfMET;
+  fMet = info->pfMET + scalecorr;
+  fMVAMet += scalecorr;
   fMetPhi = info->pfMETphi;
   
   TLorentzVector lep1, lep2, dilep;
