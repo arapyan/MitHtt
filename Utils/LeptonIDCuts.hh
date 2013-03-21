@@ -95,7 +95,7 @@ Bool_t passTightPFMuonID(const mithep::TMuon *muon,Bool_t mutau)
   if(muon->nValidHits     < 1)     return kFALSE;
   if(muon->nMatch         < 2)     return kFALSE;
   if(muon->nPixHits       < 1)     return kFALSE;
-  if(muon->nTkHits        < 6)    return kFALSE;
+  if(muon->nTkLayersHit   < 6)    return kFALSE;
   
   if(!(muon->matchesPFCand && muon->matchedPFType==3)) return kFALSE;
   //if(!(muon->matchesPFCand )) return kFALSE;
@@ -310,7 +310,7 @@ Bool_t pass2012EleMVAID(const mithep::TElectron *electron, EWorkingPoint WP, Boo
 {
    // conversion rejection
   if(electron->nExpHitsInner > 0) return kFALSE;
-  if(!electron->isConv)            return kFALSE;
+  if(!electron->isConv)           return kFALSE;
  
   if(etau)
     {
@@ -466,7 +466,7 @@ Bool_t isEleFO(const mithep::TElectron *electron, const Int_t ver)
   
   // conversion rejection
   if(electron->nExpHitsInner > 0) return kFALSE;
-  if(electron->isConv)            return kFALSE;
+  if(!electron->isConv)           return kFALSE;
   
   // barrel/endcap dependent requirments      
   if(fabs(electron->scEta)<1.479) {  
