@@ -429,8 +429,6 @@ void selectEmu(const TString conf,         // input config file
         svfitArr->Clear();
         svfitBr->GetEntry(ientry);
 
-	double mvacov_00=0, mvacov_01=0, mvacov_10=0, mvacov_11=0;
-
         for(Int_t i = 0; i < svfitArr->GetEntriesFast(); i++) {
           mithep::TSVfit *svfit = (mithep::TSVfit*) svfitArr->At(i);
           Int_t id = 0;
@@ -440,15 +438,8 @@ void selectEmu(const TString conf,         // input config file
           if(toolbox::deltaR(ele->eta,ele->phi,svfit->daughter2.Eta(),svfit->daughter2.Phi()) < 0.01 && id == 2) id = 3;
           if(toolbox::deltaR(mu->eta,mu->phi,svfit->daughter2.Eta(),svfit->daughter2.Phi())   < 0.01 && id == 1) id = 4;
           if(id < 3) continue;
-	  //out->fillCov(svfit);
-          mvacov_00 = svfit->mvacov_00;
-          mvacov_01 = svfit->mvacov_01;
-          mvacov_10 = svfit->mvacov_10;
-          mvacov_11 = svfit->mvacov_11;
-          if(mvacov_00==0 && mvacov_01==0 && mvacov_10==0 && mvacov_11==0) continue;
 	  out->fillCov(svfit);
         }
-        if(mvacov_00==0 && mvacov_01==0 && mvacov_10==0 && mvacov_11==0) continue;
 
 	out->fillMuon(mu,0,muonIsoPU(mu),passMuonIsoPU(mu,0));
 	out->fillElectron(ele,1,eleIsoPU(ele),passEleIsoPU(ele,0), elescale);
