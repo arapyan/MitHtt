@@ -23,19 +23,17 @@ namespace mithep
     ~TJet(){}
     
     /// jet kinematics (pt is corrected up to L3/L2L3, ptraw is uncBorrected)
-    float pt, ptraw, eta, phi, mass,pt53,mass53;
+    float pt, ptraw, eta, phi, mass;
     /// beta 
     float beta;
     /// jet uncertainty as a unsigned relative uncertainty on the corrected jet pt
-    float unc,unc53;
+    float unc;
     /// jet area (from Fastjet)
     float area;
     /// combined secondary vertex btag discriminator
     float csv;
     /// jet MVA output
     float mva;
-    /// jet MVA output 53
-    float mva53;
     /// pass or fail MVA id
     unsigned int id;
     /// number of charged hardons in jet
@@ -65,7 +63,7 @@ namespace mithep
     /// PU Likelhiood
     float  pu;
     
-    ClassDef(TJet,7)
+    ClassDef(TJet,8)
   };
 }
 #endif

@@ -92,9 +92,7 @@ HttNtupler::HttNtupler(const char *name, const char *title):
   fMaxAbsZ        (24),
   fMaxRho         ( 2),
   fJetCorrector       ( 0),
-  fJetCorrectorNew    ( 0),
-  fJetUncertainties   ( 0),
-  fJetUncertaintiesNew( 0)
+  fJetUncertainties   ( 0)
 {
   // don't write TObject part of the objects
   TEventInfo::Class()->IgnoreTObjectStreamer();
@@ -126,25 +124,19 @@ HttNtupler::SlaveBegin()
   for(unsigned int icorr=0; icorr<fJetCorrParsv.size(); icorr++){ correctionParameters.push_back(JetCorrectorParameters(fJetCorrParsv[icorr].Data())); }
   fJetCorrector    = new FactorizedJetCorrector(correctionParameters); 
 
-  std::vector<JetCorrectorParameters> correctionParametersNew;
-  for(unsigned int icorr=0; icorr<fJetCorrParsv.size(); icorr++){ correctionParametersNew.push_back(JetCorrectorParameters(fJetCorrParsvNew[icorr].Data())); }
-  fJetCorrectorNew = new FactorizedJetCorrector(correctionParametersNew); 
   // setup jet energy scale uncertainties
-  std::string jetCorrectorParams,jetCorrectorParamsNew;;
+  std::string jetCorrectorParams;
   if(f2012) {
     if(fIsData) 
-      jetCorrectorParams = std::string(TString::Format("%s/src/MitPhysics/data/GR_P_V41_AN2_Uncertainty_AK5PF.txt", getenv("CMSSW_BASE")));
+      jetCorrectorParams = std::string(TString::Format("%s/src/MitPhysics/data/GR_P_V42_AN3_Uncertainty_AK5PF.txt", getenv("CMSSW_BASE")));
     else
       jetCorrectorParams = std::string(TString::Format("%s/src/MitPhysics/data/START53_V7F_Uncertainty_AK5PF.txt", getenv("CMSSW_BASE")));
   }
   else jetCorrectorParams = std::string(TString::Format("%s/src/MitPhysics/data/START42_V17_AK5PF_Uncertainty.txt", getenv("CMSSW_BASE")));
-  jetCorrectorParamsNew = std::string(TString::Format("%s/src/MitPhysics/data/GR_P_V42_AN3_Uncertainty_AK5PF.txt", getenv("CMSSW_BASE")));
   
   JetCorrectorParameters param   (jetCorrectorParams);
-  JetCorrectorParameters paramNew(jetCorrectorParams);
-
   fJetUncertainties    = new JetCorrectionUncertainty(param);
-  fJetUncertaintiesNew = new JetCorrectionUncertainty(JetCorrectorParameters(paramNew));
+ 
   // initialize tools for electron ID
   fEleTools = new ElectronTools();
   // initialize tools for muon ID
@@ -162,17 +154,13 @@ HttNtupler::SlaveBegin()
   fElectronMVAID->Initialize("BDTG method",ElectronIDMVA::kIDEGamma2012NonTrigV1,kTRUE,weightFilesEleID);
 
   fJetIDMVA    = new JetIDMVA();
-  fJetIDMVANew = new JetIDMVA();
   fQGJetIDMVA  = new JetIDMVA();
   if(f2012) {
     fJetIDMVA->Initialize(JetIDMVA::kLoose,
-			  TString(getenv("CMSSW_BASE")+string("/src/MitPhysics/data/mva_JetID_lowpt.weights.xml")),
-                          //TString(getenv("CMSSW_BASE")+string("/src/MitPhysics/data/mva_JetID_highpt.weights.xml")),
-			  TString(getenv("CMSSW_BASE")+string("/src/MitPhysics/data/TMVAClassification_5x_BDT_fullPlusRMS.weights.xml")),
-			  //JetIDMVA::kBaseline,
-			  JetIDMVA::k52,
+			  TString(getenv("CMSSW_BASE")+string("/src/MitPhysics/data/TMVAClassificationCategory_JetID_53X_Dec2012.weights.xml")),
+			  TString(getenv("CMSSW_BASE")+string("/src/MitPhysics/data/TMVAClassificationCategory_JetID_53X_Dec2012.weights.xml")),
+			  JetIDMVA::k53,
 			  TString(getenv("CMSSW_BASE")+string("/src/MitPhysics/Utils/python/JetIdParams_cfi.py")));
-
   } else {
     fJetIDMVA->Initialize(JetIDMVA::kLoose,
 			  TString(getenv("CMSSW_BASE")+string("/src/MitPhysics/data/mva_JetID_lowpt.weights.xml")),
@@ -182,12 +170,6 @@ HttNtupler::SlaveBegin()
 			  JetIDMVA::k42,
 			  TString(getenv("CMSSW_BASE")+string("/src/MitPhysics/Utils/python/JetIdParams_cfi.py")));
   }
-  fJetIDMVANew->Initialize(JetIDMVA::kLoose,
-			  TString(getenv("CMSSW_BASE")+string("/src/MitPhysics/data/TMVAClassificationCategory_JetID_53X_Dec2012.weights.xml")),
-			  TString(getenv("CMSSW_BASE")+string("/src/MitPhysics/data/TMVAClassificationCategory_JetID_53X_Dec2012.weights.xml")),
-			  JetIDMVA::k53,
-			  TString(getenv("CMSSW_BASE")+string("/src/MitPhysics/Utils/python/JetIdParams_cfi.py")));
-
   fQGJetIDMVA->Initialize(JetIDMVA::kLoose,
 			  TString(getenv("CMSSW_BASE")+string("/src/MitPhysics/data/mva_JetID_lowpt.weights.xml")),
 			  TString(getenv("CMSSW_BASE")+string("/src/MitPhysics/data/QG.weights.xml")),
@@ -201,15 +183,15 @@ HttNtupler::SlaveBegin()
   fTauMVAIso2->InitializeGBR(TString(getenv("CMSSW_BASE")+string("/src/MitPhysics/data/gbrfTauIso_v2.root")));
  				 
   fMVAMet     = new MVAMet();
-  fMVAMetNew  = new MVAMet();
+ 
   if(f2012) {
-    fMVAMet->Initialize(TString(getenv("CMSSW_BASE")+string("/src/MitPhysics/data/mva_JetID_lowpt.weights.xml")),
-                   TString(getenv("CMSSW_BASE")+string("/src/MitPhysics/data/mva_JetID_highpt.weights.xml")),
-                   TString(getenv("CMSSW_BASE")+string("/src/MitPhysics/Utils/python/JetIdParams_cfi.py")),
-                   TString(getenv("CMSSW_BASE")+string("/src/MitPhysics/data/gbrmet_53.root")),
-                   TString(getenv("CMSSW_BASE")+string("/src/MitPhysics/data/gbrmetphi_53.root")),
-                   TString(getenv("CMSSW_BASE")+string("/src/MitPhysics/data/gbru1cov_53.root")),
-                   TString(getenv("CMSSW_BASE")+string("/src/MitPhysics/data/gbru2cov_53.root")));
+    fMVAMet->Initialize(TString(getenv("CMSSW_BASE")+string("/src/MitPhysics/data/TMVAClassificationCategory_JetID_MET_53X_Dec2012.weights.xml")),
+			   TString(getenv("CMSSW_BASE")+string("/src/MitPhysics/data/TMVAClassificationCategory_JetID_MET_53X_Dec2012.weights.xml")),
+			   TString(getenv("CMSSW_BASE")+string("/src/MitPhysics/Utils/python/JetIdParams_cfi.py")),
+			   TString(getenv("CMSSW_BASE")+string("/src/MitPhysics/data/gbrmet_53_Dec2012.root")),
+			   TString(getenv("CMSSW_BASE")+string("/src/MitPhysics/data/gbrmetphi_53_Dec2012.root")),
+			   TString(getenv("CMSSW_BASE")+string("/src/MitPhysics/data/gbru1cov_53_Dec2012.root")),
+			   TString(getenv("CMSSW_BASE")+string("/src/MitPhysics/data/gbru2cov_53_Dec2012.root")),JetIDMVA::k53MET);
   } else {
     fMVAMet->Initialize(TString(getenv("CMSSW_BASE")+string("/src/MitPhysics/data/mva_JetID_lowpt.weights.xml")),
                    TString(getenv("CMSSW_BASE")+string("/src/MitPhysics/data/mva_JetID_highpt.weights.xml")),
@@ -219,14 +201,6 @@ HttNtupler::SlaveBegin()
                    TString(getenv("CMSSW_BASE")+string("/src/MitPhysics/data/gbrmetu1_42.root")),
                    TString(getenv("CMSSW_BASE")+string("/src/MitPhysics/data/gbrmetu2_42.root")));
   }
-  fMVAMetNew->Initialize(TString(getenv("CMSSW_BASE")+string("/src/MitPhysics/data/TMVAClassificationCategory_JetID_MET_53X_Dec2012.weights.xml")),
-			 TString(getenv("CMSSW_BASE")+string("/src/MitPhysics/data/TMVAClassificationCategory_JetID_MET_53X_Dec2012.weights.xml")),
-			 TString(getenv("CMSSW_BASE")+string("/src/MitPhysics/Utils/python/JetIdParams_cfi.py")),
-			 TString(getenv("CMSSW_BASE")+string("/src/MitPhysics/data/gbrmet_53_Dec2012.root")),
-			 TString(getenv("CMSSW_BASE")+string("/src/MitPhysics/data/gbrmetphi_53_Dec2012.root")),
-			 TString(getenv("CMSSW_BASE")+string("/src/MitPhysics/data/gbru1cov_53_Dec2012.root")),
-			 TString(getenv("CMSSW_BASE")+string("/src/MitPhysics/data/gbru2cov_53_Dec2012.root")),JetIDMVA::k53MET);
- 
 
   fAntiElectronIDMVA = new AntiElectronIDMVA();
   fAntiElectronIDMVA->Initialize("BDT",
@@ -1040,27 +1014,13 @@ HttNtupler::fillJets()
       fJetUncertainties->setJetPt ( rawMom.Pt()  );
       fJetUncertainties->setJetEta( rawMom.Eta() );
 
-      fJetCorrectorNew->setJetEta( rawMom.Eta() );
-      fJetCorrectorNew->setJetPt ( rawMom.Pt()  );
-      fJetCorrectorNew->setJetPhi( rawMom.Phi() );
-      fJetCorrectorNew->setJetE  ( rawMom.E()   );
-      fJetCorrectorNew->setRho   ( fPUEnergyDensity->At(0)->RhoKt6PFJets() );
-      fJetCorrectorNew->setJetA  ( jet->JetArea() );
-      fJetCorrectorNew->setJetEMF( -99.0 );
-      fJetUncertaintiesNew->setJetPt ( rawMom.Pt()  );
-      fJetUncertaintiesNew->setJetEta( rawMom.Eta() );
-
       double jetcorr      = fJetCorrector   ->getCorrection();
-      double jetcorrnew   = fJetCorrectorNew->getCorrection();
       pPFJet->pt          = rawMom.Pt()*jetcorr;
-      pPFJet->pt53        = rawMom.Pt()*jetcorrnew;
       pPFJet->eta         = rawMom.Eta();
       pPFJet->phi         = rawMom.Phi();
       pPFJet->mass        = rawMom.M()*jetcorr; 
-      pPFJet->mass53      = rawMom.M()*jetcorrnew; 
       if(rawMom.Eta() < 5.2) {
 	pPFJet->unc       = fJetUncertainties   ->getUncertainty(true);
-	pPFJet->unc53     = fJetUncertaintiesNew->getUncertainty(true);
       }
       else
 	pPFJet->unc         = -999;
@@ -1075,7 +1035,6 @@ HttNtupler::fillJets()
       pPFJet->csv         = jet->CombinedSecondaryVertexBJetTagsDisc();
       pPFJet->mva         = fJetIDMVA->MVAValue(jet,fVertex,fPrimVerts,fJetCorrector,fPUEnergyDensity);
       pPFJet->id          = (fJetIDMVA->pass(jet,fVertex,fPrimVerts,fJetCorrector,fPUEnergyDensity) ? 1 : 0) ;
-      pPFJet->mva53       = fJetIDMVANew->MVAValue(jet,fVertex,fPrimVerts,fJetCorrectorNew,fPUEnergyDensity);
       Double_t *pQGVals   = fQGJetIDMVA->QGValue(jet,fVertex,fPrimVerts,fJetCorrector,fPUEnergyDensity,false);
       pPFJet->quark       = pQGVals[0];
       pPFJet->gluon       = pQGVals[1];
@@ -1233,6 +1192,7 @@ HttNtupler::fillSVfit(TClonesArray*& iArr, Particle* lep1, unsigned int lepId1, 
       }
       chgfrac2 = lChargedPtTot/lPtTot;
     }
+ 
   Met MVAMet = fMVAMet->GetMet(false,
 			       lep1->Pt(),lep1->Phi(),lep1->Eta(),chgfrac1,
 			       lep2->Pt(),lep2->Phi(),lep2->Eta(),chgfrac2,
@@ -1242,22 +1202,9 @@ HttNtupler::fillSVfit(TClonesArray*& iArr, Particle* lep1, unsigned int lepId1, 
 			       fJetCorrector,
 			       fPUEnergyDensity,
 			       int(fPrimVerts->GetEntries()));//,lVerbose);
-
+  
   
   TMatrixD* MVACov = fMVAMet->GetMetCovariance();
-
-  Met MVAMetNew = fMVAMetNew->GetMet(false,
-				     lep1->Pt(),lep1->Phi(),lep1->Eta(),chgfrac1,
-				     lep2->Pt(),lep2->Phi(),lep2->Eta(),chgfrac2,
-				     fPFMet->At(0),
-				     fPFCandidates,fVertex,fPrimVerts,
-				     fPFJets,
-				     fJetCorrectorNew,
-				     fPUEnergyDensity,
-				     int(fPrimVerts->GetEntries()));//,lVerbose);
-
-  
-  TMatrixD* MVACovNew = fMVAMetNew->GetMetCovariance();
 
   pSVfit->mvacov_00    = (*MVACov)(0,0);
   pSVfit->mvacov_10    = (*MVACov)(1,0);
@@ -1265,13 +1212,6 @@ HttNtupler::fillSVfit(TClonesArray*& iArr, Particle* lep1, unsigned int lepId1, 
   pSVfit->mvacov_11    = (*MVACov)(1,1);
   pSVfit->mvaMET       = MVAMet.Pt();
   pSVfit->mvaMETphi    = MVAMet.Phi();
-
-  pSVfit->mvacov_0053  = (*MVACovNew)(0,0);
-  pSVfit->mvacov_1053  = (*MVACovNew)(1,0);
-  pSVfit->mvacov_0153  = (*MVACovNew)(0,1);
-  pSVfit->mvacov_1153  = (*MVACovNew)(1,1);
-  pSVfit->mvaMET53     = MVAMetNew.Pt();
-  pSVfit->mvaMETphi53  = MVAMetNew.Phi();
 }
 
 void 

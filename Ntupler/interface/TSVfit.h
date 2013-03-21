@@ -37,22 +37,20 @@ namespace mithep
     double cov_11;
     //MVA met 
     double mvaMET, mvaMETphi;
-    //MVA met 53X
-    double mvaMET53, mvaMETphi53;
     /// MVA met significance matrix element [x|x] (53)
-    double mvacov_00,mvacov_0053;
+    double mvacov_00;
     /// MVA met significance matrix element [y|x]
-    double mvacov_10,mvacov_1053;
+    double mvacov_10;
     /// MVA met significance matrix element [x|y]
-    double mvacov_01,mvacov_0153;
+    double mvacov_01;
     /// MVA met significance matrix element [y|y]
-    double mvacov_11,mvacov_1153;
+    double mvacov_11;
     /// EGenType Id of daughter1 and daughter2
     unsigned int daughterId1, daughterId2;
     /// di-lepton resonance daughters.
     FourVectorM daughter1, daughter2;
 
-    ClassDef(TSVfit, 2);
+    ClassDef(TSVfit, 3);
   };  
 }
 #endif
