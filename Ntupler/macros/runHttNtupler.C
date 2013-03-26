@@ -51,7 +51,7 @@ void runHttNtupler(
   sprintf(output,"%s_%s_ntuple.root",dataset,fileset); 
   
   // muon kinematics
-  const Double_t muPtMin  = 3.0; //3  
+  const Double_t muPtMin  = 7.0; //3  
   const Double_t muPtMax  = 7000;
   const Double_t muEtaMin = -2.4;
   const Double_t muEtaMax =  2.4;
@@ -63,7 +63,7 @@ void runHttNtupler(
   const Double_t eleEtaMax =  2.7;
   
   //tau kinematics
-  const Double_t  tauPtMin = 28; //18
+  const Double_t  tauPtMin = 18; //18
   const Double_t  tauEtaMax = 2.5;//2.5
   
   // jet requirements
