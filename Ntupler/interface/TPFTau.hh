@@ -98,6 +98,8 @@ namespace mithep
     TPFCandidate leadChargedHadronPFCand;
     /// HLT bits for which the offline reconstructed tau could be matched on trigger level
     TriggerObjects hltMatchBits;
+    //l1 match
+    bool l1match;
     /// isolation using computePFTauIso 
     float isoEtPU;
     /// official tau POG isolation  
@@ -108,7 +110,6 @@ namespace mithep
     float puIsoNoZ;
     /// common isolation using pfPileup candidates, ptMin=0., dRMax=0.5, dRMin=0.
     float puIsoNoPt;
-
     //ring isolation	
     float ringIso;
     //new ring isolation	

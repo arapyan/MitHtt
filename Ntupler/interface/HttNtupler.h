@@ -18,6 +18,7 @@
 #include "MitAna/DataCont/interface/RunLumiSet.h"
 #include "MitAna/DataCont/interface/RunLumiRangeMap.h"
 #include "MitAna/DataTree/interface/Names.h"
+#include "MitAna/DataTree/interface/TriggerObjectBase.h"
 
 #include "MitHtt/Ntupler/interface/TEventInfo.hh"
 #include "MitHtt/Ntupler/interface/TGenInfo.hh"
@@ -275,6 +276,8 @@ namespace mithep
     const PileupEnergyDensityCol* fPUEnergyDensity;
     /// muons
     const MuonCol* fMuons;
+    /// trigger objects
+    const TriggerObjectBaseCol* fTrigObj;
     /// electrons
     const ElectronCol* fElectrons;
     /// taus
@@ -417,10 +420,14 @@ namespace mithep
     ElectronIDMVA* fElectronMVAIDTrig;
     /// Jet ID MVA
     JetIDMVA* fJetIDMVA;
+    /// Jet ID MVA moriond
+    JetIDMVA* fJetIDMVAold;
     /// Quark Gluon ID MVA
     JetIDMVA* fQGJetIDMVA;
     /// MET MVA
     MVAMet* fMVAMet;
+    /// MET MVA for 53X 	 
+    MVAMet* fMVAMetold;
     /// Tau ring ISO
     TauIsoMVA * fTauMVAIso;
    /// Tau ring ISO
@@ -460,6 +467,7 @@ namespace mithep
     ReqBranch( Names::gkGenJetBrn   , fGenJets         );
     ReqBranch( fMCEvtInfoName       , fMCEvtInfo       );
     ReqBranch( fEmbedWeightName     , fEmbedWeight     ); 
+    ReqBranch( "HLTObjects"     , fTrigObj     ); 
     //ReqBranch( fDCASigName          , fDCASigs         );
   } 
 

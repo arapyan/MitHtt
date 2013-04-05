@@ -62,6 +62,7 @@ HttNtupler::HttNtupler(const char *name, const char *title):
   fPileup         ( 0),
   fPUEnergyDensity( 0),
   fMuons          ( 0),
+  fTrigObj        ( 0),
   fElectrons      ( 0),
   fPFJets         ( 0),
   fPFMet          ( 0),
@@ -154,6 +155,7 @@ HttNtupler::SlaveBegin()
   fElectronMVAID->Initialize("BDTG method",ElectronIDMVA::kIDEGamma2012NonTrigV1,kTRUE,weightFilesEleID);
 
   fJetIDMVA    = new JetIDMVA();
+  fJetIDMVAold = new JetIDMVA();
   fQGJetIDMVA  = new JetIDMVA();
   if(f2012) {
     fJetIDMVA->Initialize(JetIDMVA::kLoose,
@@ -170,6 +172,13 @@ HttNtupler::SlaveBegin()
 			  JetIDMVA::k42,
 			  TString(getenv("CMSSW_BASE")+string("/src/MitPhysics/Utils/python/JetIdParams_cfi.py")));
   }
+  fJetIDMVAold->Initialize(JetIDMVA::kLoose,
+			TString(getenv("CMSSW_BASE")+string("/src/MitPhysics/data/mva_JetID_lowpt.weights.xml")),
+			//TString(getenv("CMSSW_BASE")+string("/src/MitPhysics/data/mva_JetID_highpt.weights.xml")),
+			  TString(getenv("CMSSW_BASE")+string("/src/MitPhysics/data/TMVAClassification_5x_BDT_fullPlusRMS.weights.xml")),
+			//JetIDMVA::kBaseline,
+			JetIDMVA::k52,
+			TString(getenv("CMSSW_BASE")+string("/src/MitPhysics/Utils/python/JetIdParams_cfi.py")));
   fQGJetIDMVA->Initialize(JetIDMVA::kLoose,
 			  TString(getenv("CMSSW_BASE")+string("/src/MitPhysics/data/mva_JetID_lowpt.weights.xml")),
 			  TString(getenv("CMSSW_BASE")+string("/src/MitPhysics/data/QG.weights.xml")),
@@ -183,6 +192,7 @@ HttNtupler::SlaveBegin()
   fTauMVAIso2->InitializeGBR(TString(getenv("CMSSW_BASE")+string("/src/MitPhysics/data/gbrfTauIso_v2.root")));
  				 
   fMVAMet     = new MVAMet();
+  fMVAMetold  = new MVAMet();
  
   if(f2012) {
     fMVAMet->Initialize(TString(getenv("CMSSW_BASE")+string("/src/MitPhysics/data/TMVAClassificationCategory_JetID_MET_53X_Dec2012.weights.xml")),
@@ -201,6 +211,13 @@ HttNtupler::SlaveBegin()
                    TString(getenv("CMSSW_BASE")+string("/src/MitPhysics/data/gbrmetu1_42.root")),
                    TString(getenv("CMSSW_BASE")+string("/src/MitPhysics/data/gbrmetu2_42.root")));
   }
+  fMVAMetold->Initialize(TString(getenv("CMSSW_BASE")+string("/src/MitPhysics/data/mva_JetID_lowpt.weights.xml")),
+                   TString(getenv("CMSSW_BASE")+string("/src/MitPhysics/data/mva_JetID_highpt.weights.xml")),
+                   TString(getenv("CMSSW_BASE")+string("/src/MitPhysics/Utils/python/JetIdParams_cfi.py")),
+                   TString(getenv("CMSSW_BASE")+string("/src/MitPhysics/data/gbrmet_53.root")),
+                   TString(getenv("CMSSW_BASE")+string("/src/MitPhysics/data/gbrmetphi_53.root")),
+                   TString(getenv("CMSSW_BASE")+string("/src/MitPhysics/data/gbru1cov_53.root")),
+                   TString(getenv("CMSSW_BASE")+string("/src/MitPhysics/data/gbru2cov_53.root")));
 
   fAntiElectronIDMVA = new AntiElectronIDMVA();
   fAntiElectronIDMVA->Initialize("BDT",
@@ -222,7 +239,7 @@ HttNtupler::SlaveBegin()
 void 
 HttNtupler::BeginRun()
 {
-  if(HasHLTInfo() && fPrintTable) { GetHLTTable()->Print(); }
+  if(HasHLTInfo() && fPrintTable) { GetHLTTable()->Print();}
 }
 
 void 
@@ -235,7 +252,7 @@ HttNtupler::SlaveTerminate()
 {
   //fEventTree ->Print(); 
   fOutputFile->Write(); fOutputFile->Close(); cleanup();
-  delete fJetCorrector; delete fJetUncertainties; delete fEleTools, delete fMuonTools, delete metSign;delete fElectronMVAID; delete fJetIDMVA; delete fTauMVAIso;delete fMVAMet; delete fAntiElectronIDMVA;
+  delete fJetCorrector; delete fJetUncertainties; delete fEleTools, delete fMuonTools, delete metSign;delete fElectronMVAID; delete fJetIDMVA; delete fJetIDMVAold; delete fTauMVAIso;delete fMVAMet; delete fMVAMetold; delete fAntiElectronIDMVA;
 
   // dump json file
   TString jsonfname = fOutputName.ReplaceAll("root","json");
@@ -267,6 +284,36 @@ HttNtupler::Process()
   // increment the number of events that have been processed
   IncNEventsProcessed();
 
+  LoadBranch("HLTObjects");
+
+ //  if( HasHLTInfo() )
+//     {
+//       const TriggerTable* hltTable = GetHLTTable(); assert(hltTable);
+//       cout << "what is going on" << endl;
+//       //for(unsigned int itrig=0; itrig<fTriggerNamesv.size(); ++itrig){
+//       //const TriggerName* trigname = hltTable->Get(fTriggerNamesv[itrig].Data()); if(!trigname) continue;
+// 	const TList* list = GetHLTObjectsTable()->GetList("HLT_IsoMu18_eta2p1_MediumIsoPFTau25_Trk5_eta2p1_v7");
+// 	if(list)
+// 	  {
+// 	    // cout << fTriggerNamesv[itrig] << endl;
+// 	     TIter iter(list->MakeIterator());
+// 	    const TriggerObject* to = dynamic_cast<const TriggerObject*>(iter.Next()); 
+// 	    while( to ){  
+// 	      if(to)
+// 		cout << to->ModuleName() << " " <<  " " << to->TriggerType() << " " << to->IsHLT() << "  " << to->Pt() << " " << to->Eta() << " " << to->Phi() << "  " << to->Mass() <<  endl;
+// 	      //}
+// 	      to = dynamic_cast<const TriggerObject*>(iter.Next());
+// 	    }
+// 	    for(unsigned int i=0; i<fTrigObj->GetEntries(); ++i){
+// 	      const TriggerObjectBase *trigobj=fTrigObj->At(i);
+// 	      if(trigobj->Pt() > 44 && !trigobj->HasType() && trigobj->Eta() != 0)
+// 		cout << trigobj->Pt() << " " << trigobj->Eta() << "  " << trigobj->Phi() << "  " <<  trigobj->Type() << "  " << trigobj->IsHLT() << " " << trigobj->IsL1() << " " << trigobj->TagInd() <<  endl;
+// 	    } 
+// 	  }
+// 	//}
+//     }
+
+
   int lLep = 0;  int lLepHigh = 0;
   for(unsigned int i0 = 0; i0 < fMuons->GetEntries(); i0++)     if(looseMuId (fMuons->At(i0)      ,lLepHigh)) lLep++;
   for(unsigned int i0 = 0; i0 < fElectrons->GetEntries(); i0++) if(looseEleId(fElectrons->At(i0),0,lLepHigh)) lLep++;
@@ -285,7 +332,7 @@ HttNtupler::Process()
     }
 
   hEventsTree->Fill();
-
+  
   // load the rest of the relevant Bambu branches
   loadBambuBranches();
 
@@ -384,6 +431,7 @@ HttNtupler::fillGenerator()
       int id = fabs(p->PdgId());
       if((lCountPartons)                 && (id == 1 || id == 2 || id == 3 || id == 4 || id == 5 || id == 6 || id == 21)) lNPartons++;
       if((fUseGen==ESampleType::kW)      &&  id  == 24)  lCountPartons = true;  // Start counting partons after we find the W
+      if((fUseGen==ESampleType::kZ)    &&  id  == 23)  lCountPartons = true;  // Start counting partons after we find the Z
     } 
   }
   for(unsigned int i=0; i<fParticles->GetEntries(); ++i){
@@ -465,7 +513,7 @@ HttNtupler::fillGenerator()
       (d->Charge() > 0 ) ?  dau1_b = d : dau2_b = d;
     }
   }
-  else if(boson_b) fillMCParticles(boson_b,dau1_b,dau2_b);
+  //else if(boson_b) fillMCParticles(boson_b,dau1_b,dau2_b);
   // madgraph zz sample...
   if(fUseGen==ESampleType::kVV && boson_a->NDaughters()==5) {
     dau1_a = dau2_a = dau1_b = dau2_b = 0;
@@ -797,7 +845,8 @@ HttNtupler::fillElecs()
     pElectron->scID            = ele->SCluster()->GetUniqueID();
     pElectron->trkID           = (ele->HasTrackerTrk()) ? ele->TrackerTrk()->GetUniqueID() : 0;
     pElectron->isEcalDriven    = ele->IsEcalDriven();
-    pElectron->isConv          = fEleTools->PassConversionFilterPFAOD(ele,fConversions,fVertex);//XXX
+    pElectron->isConv          = fEleTools->PassConversionFilterPFAOD(ele,fConversions,fVertex,0,1e-6,2.0,1,0);//XXX
+    //pElectron->isConv          = isConversion(ele);
     pElectron->isEB            = ele->IsEB();
     pElectron->ip3d            = ele->Ip3dPV();
     pElectron->ip3dSig         = ele->Ip3dPVSignificance();
@@ -962,6 +1011,12 @@ HttNtupler::fillPFTaus()
       if( pftau->DiscriminationByTightCombinedIsolationDBSumPtCorr()  ) pPFTau->hpsDiscriminators |= TPFTau::kTightCombIso;
       // HLT matching
       pPFTau->hltMatchBits = matchHLT(pftau->Eta(), pftau->Phi(), pftau->Pt());
+      pPFTau->l1match = kFALSE;
+      for(unsigned int i=0; i<fTrigObj->GetEntries(); ++i){
+	const TriggerObjectBase *trigobj=fTrigObj->At(i);
+	if(trigobj->Pt() > 44 && !trigobj->HasType() && trigobj->Eta() != 0)
+	  if(MathUtils::DeltaR(trigobj->Phi(), trigobj->Eta(), pftau->Phi(), pftau->Eta())<0.5) pPFTau->l1match = kTRUE;  
+      } 
     }
   }
 }
@@ -1035,6 +1090,8 @@ HttNtupler::fillJets()
       pPFJet->csv         = jet->CombinedSecondaryVertexBJetTagsDisc();
       pPFJet->mva         = fJetIDMVA->MVAValue(jet,fVertex,fPrimVerts,fJetCorrector,fPUEnergyDensity);
       pPFJet->id          = (fJetIDMVA->pass(jet,fVertex,fPrimVerts,fJetCorrector,fPUEnergyDensity) ? 1 : 0) ;
+      pPFJet->mvaold      = fJetIDMVAold->MVAValue(jet,fVertex,fPrimVerts,fJetCorrector,fPUEnergyDensity);
+      pPFJet->idold       = (fJetIDMVAold->pass(jet,fVertex,fPrimVerts,fJetCorrector,fPUEnergyDensity) ? 1 : 0);
       Double_t *pQGVals   = fQGJetIDMVA->QGValue(jet,fVertex,fPrimVerts,fJetCorrector,fPUEnergyDensity,false);
       pPFJet->quark       = pQGVals[0];
       pPFJet->gluon       = pQGVals[1];
@@ -1077,6 +1134,12 @@ HttNtupler::fillJets()
 
       pPFJet->matchedId    = matchedId;
       pPFJet->hltMatchBits = matchHLT(jet->Eta(), jet->Phi(), jet->Pt());
+      pPFJet->l1match = kFALSE;
+      for(unsigned int i=0; i<fTrigObj->GetEntries(); ++i){
+	const TriggerObjectBase *trigobj=fTrigObj->At(i);
+	if(trigobj->Pt() > 44 && !trigobj->HasType() && trigobj->Eta() != 0)
+	  if(MathUtils::DeltaR(trigobj->Phi(), trigobj->Eta(), jet->Phi(), jet->Eta())<0.5) pPFJet->l1match = kTRUE;  
+      } 
     }
   }
 }
@@ -1202,9 +1265,20 @@ HttNtupler::fillSVfit(TClonesArray*& iArr, Particle* lep1, unsigned int lepId1, 
 			       fJetCorrector,
 			       fPUEnergyDensity,
 			       int(fPrimVerts->GetEntries()));//,lVerbose);
+  Met MVAMetold = fMVAMetold->GetMet(false,
+			       lep1->Pt(),lep1->Phi(),lep1->Eta(),chgfrac1,
+			       lep2->Pt(),lep2->Phi(),lep2->Eta(),chgfrac2,
+			       fPFMet->At(0),
+			       fPFCandidates,fVertex,fPrimVerts,
+			       fPFJets,
+			       fJetCorrector,
+			       fPUEnergyDensity,
+			       int(fPrimVerts->GetEntries()));//,lVerbose);
   
   
   TMatrixD* MVACov = fMVAMet->GetMetCovariance();
+
+  TMatrixD* MVACovold = fMVAMetold->GetMetCovariance();
 
   pSVfit->mvacov_00    = (*MVACov)(0,0);
   pSVfit->mvacov_10    = (*MVACov)(1,0);
@@ -1212,6 +1286,13 @@ HttNtupler::fillSVfit(TClonesArray*& iArr, Particle* lep1, unsigned int lepId1, 
   pSVfit->mvacov_11    = (*MVACov)(1,1);
   pSVfit->mvaMET       = MVAMet.Pt();
   pSVfit->mvaMETphi    = MVAMet.Phi();
+  
+  pSVfit->mvacov_00old  = (*MVACovold)(0,0);
+  pSVfit->mvacov_10old  = (*MVACovold)(1,0);
+  pSVfit->mvacov_01old  = (*MVACovold)(0,1);
+  pSVfit->mvacov_11old  = (*MVACovold)(1,1);
+  pSVfit->mvaMETold     = MVAMetold.Pt();
+  pSVfit->mvaMETphiold  = MVAMetold.Phi();
 }
 
 void 
@@ -1233,7 +1314,8 @@ HttNtupler::visibleMCMomentum(const MCParticle* tauLepton)
 { 
   FourVectorM visMomentum;
   // descend as long as particle is its own daughter in the listing
-  while(tauLepton->NDaughters()==1){ tauLepton = tauLepton->FindDaughter(tauLepton->PdgId()); }
+  while(tauLepton && (tauLepton->NDaughters()==1)){ tauLepton = tauLepton->FindDaughter(tauLepton->PdgId()); }
+  if(!tauLepton) return visMomentum;
   visMomentum+=tauLepton->Mom();
   // loop tau daughters and subract neutrino momenta from the original tau momentum
   for(unsigned int idx=0; idx<tauLepton->NDaughters(); ++idx){ 

@@ -34,8 +34,12 @@ namespace mithep
     float csv;
     /// jet MVA output
     float mva;
+    /// moriond jet id
+    float mvaold;
     /// pass or fail MVA id
     unsigned int id;
+    /// pass or tail moriond mva id 
+    unsigned int idold;
     /// number of charged hardons in jet
     unsigned int nCharged;
     /// charged electromagnetic energy over uncorrected jet energy
@@ -56,6 +60,8 @@ namespace mithep
     float genpt,geneta,genphi;
     /// HLT bits for which the offline reconstructed jet could be matched on trigger level
     TriggerObjects  hltMatchBits;
+    //l1 match
+    bool l1match;
     /// Quark Likelihood
     float  quark;
     /// Gluon Likelhiood
@@ -63,7 +69,7 @@ namespace mithep
     /// PU Likelhiood
     float  pu;
     
-    ClassDef(TJet,8)
+    ClassDef(TJet,9)
   };
 }
 #endif
