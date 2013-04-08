@@ -51,7 +51,7 @@ void runHttNtupler(
   sprintf(output,"%s_%s_ntuple.root",dataset,fileset); 
   
   // muon kinematics
-  const Double_t muPtMin  = 7.0; //3  
+  const Double_t muPtMin  = 3.0; //7  
   const Double_t muPtMax  = 7000;
   const Double_t muEtaMin = -2.4;
   const Double_t muEtaMax =  2.4;
@@ -255,12 +255,12 @@ void runHttNtupler(
   mymod->AddTrigger("HLT_Mu17_Mu8_v14",kHLT_Mu17_Mu8,"hltL3fL1DoubleMu10MuOpenL1f0L2f10L3Filtered17",kHLT_Mu17_Mu8_Mu1Obj,0,"hltL3pfL1DoubleMu10MuOpenL1f0L2pf0L3PreFiltered8",kHLT_Mu17_Mu8_Mu2Obj,0);
   mymod->AddTrigger("HLT_Mu17_Mu8_v15",kHLT_Mu17_Mu8,"hltL3fL1DoubleMu10MuOpenL1f0L2f10L3Filtered17",kHLT_Mu17_Mu8_Mu1Obj,0,"hltL3pfL1DoubleMu10MuOpenL1f0L2pf0L3PreFiltered8",kHLT_Mu17_Mu8_Mu2Obj,0);
   mymod->AddTrigger("HLT_Mu17_Mu8_v16",kHLT_Mu17_Mu8,"hltL3fL1DoubleMu10MuOpenL1f0L2f10L3Filtered17",kHLT_Mu17_Mu8_Mu1Obj,0,"hltL3pfL1DoubleMu10MuOpenL1f0L2pf0L3PreFiltered8",kHLT_Mu17_Mu8_Mu2Obj,0);
-  mymod->AddTrigger("HLT_Mu17_Mu8_v17",kHLT_Mu17_Mu8,"hltL3fL1DoubleMu10MuOpenL1f0L2f10L3Filtered17",kHLT_Mu17_Mu8_Mu1Obj,0,"hltL3pfL1DoubleMu10MuOpenL1f0L2pf0L3PreFiltered8",kHLT_Mu17_Mu8_Mu2Obj,0);//auto
-  mymod->AddTrigger("HLT_Mu17_Mu8_v18",kHLT_Mu17_Mu8,"hltL3fL1DoubleMu10MuOpenL1f0L2f10L3Filtered17",kHLT_Mu17_Mu8_Mu1Obj,0,"hltL3pfL1DoubleMu10MuOpenL1f0L2pf0L3PreFiltered8",kHLT_Mu17_Mu8_Mu2Obj,0);//auto
-  mymod->AddTrigger("HLT_Mu17_Mu8_v19",kHLT_Mu17_Mu8,"hltL3fL1DoubleMu10MuOpenL1f0L2f10L3Filtered17",kHLT_Mu17_Mu8_Mu1Obj,0,"hltL3pfL1DoubleMu10MuOpenL1f0L2pf0L3PreFiltered8",kHLT_Mu17_Mu8_Mu2Obj,0);//auto
-  mymod->AddTrigger("HLT_Mu17_Mu8_v21",kHLT_Mu17_Mu8,"hltL3fL1DoubleMu10MuOpenL1f0L2f10L3Filtered17",kHLT_Mu17_Mu8_Mu1Obj,0,"hltL3pfL1DoubleMu10MuOpenL1f0L2pf0L3PreFiltered8",kHLT_Mu17_Mu8_Mu2Obj,0);//auto
   mymod->AddTrigger("HLT_Mu17_Mu8_v7",kHLT_Mu17_Mu8,"hltL3fL1DoubleMu10MuOpenL1f0L2f10L3Filtered17",kHLT_Mu17_Mu8_Mu1Obj,0,"hltL3pfL1DoubleMu10MuOpenL1f0L2pf0L3PreFiltered8",kHLT_Mu17_Mu8_Mu2Obj,0);//auto
-  mymod->AddTrigger("HLT_Mu17_Mu8_v22",kHLT_Mu17_Mu8,"hltL3fL1DoubleMu10MuOpenL1f0L2f10L3Filtered17",kHLT_Mu17_Mu8_Mu1Obj,0,"hltL3pfL1DoubleMu10MuOpenL1f0L2pf0L3PreFiltered8",kHLT_Mu17_Mu8_Mu2Obj,0);//auto
+  mymod->AddTrigger("HLT_Mu17_Mu8_v17",kHLT_Mu17_Mu8,"hltL3fL1DoubleMu10MuOpenL1f0L2f10L3Filtered17",kHLT_Mu17_Mu8_Mu1Obj,0,"hltL3pfL1DoubleMu10MuOpenL1f0L2pf0L3PreFiltered8",kHLT_Mu17_Mu8_Mu2Obj,0);
+  mymod->AddTrigger("HLT_Mu17_Mu8_v18",kHLT_Mu17_Mu8,"hltL3fL1DoubleMu10MuOpenOR3p5L1f0L2f10L3Filtered17",kHLT_Mu17_Mu8_Mu1Obj,0,"hltL3pfL1DoubleMu10MuOpenOR3p5L1f0L2pf0L3PreFiltered8",kHLT_Mu17_Mu8_Mu2Obj,0);
+  mymod->AddTrigger("HLT_Mu17_Mu8_v19",kHLT_Mu17_Mu8,"hltL3fL1DoubleMu10MuOpenOR3p5L1f0L2f10L3Filtered17",kHLT_Mu17_Mu8_Mu1Obj,0,"hltL3pfL1DoubleMu10MuOpenOR3p5L1f0L2pf0L3PreFiltered8",kHLT_Mu17_Mu8_Mu2Obj,0);
+  mymod->AddTrigger("HLT_Mu17_Mu8_v21",kHLT_Mu17_Mu8,"hltL3fL1DoubleMu10MuOpenOR3p5L1f0L2f10L3Filtered17",kHLT_Mu17_Mu8_Mu1Obj,0,"hltL3pfL1DoubleMu10MuOpenOR3p5L1f0L2pf0L3PreFiltered8",kHLT_Mu17_Mu8_Mu2Obj,0);
+  mymod->AddTrigger("HLT_Mu17_Mu8_v22",kHLT_Mu17_Mu8,"hltL3fL1DoubleMu10MuOpenOR3p5L1f0L2f10L3Filtered17",kHLT_Mu17_Mu8_Mu1Obj,0,"hltL3pfL1DoubleMu10MuOpenOR3p5L1f0L2pf0L3PreFiltered8",kHLT_Mu17_Mu8_Mu2Obj,0);
   mymod->AddTrigger("HLT_Mu8_Jet40_v2",kHLT_Mu8_Jet40,"hltL3Mu8Jet20L3Filtered8",kHLT_Mu8_Jet40_MuObj,0,"hltJet40",kHLT_Mu8_Jet40_JetObj,0);
   mymod->AddTrigger("HLT_Mu8_Jet40_v3",kHLT_Mu8_Jet40,"hltL3Mu8Jet20L3Filtered8",kHLT_Mu8_Jet40_MuObj,0,"hltJet40",kHLT_Mu8_Jet40_JetObj,0);
   mymod->AddTrigger("HLT_Mu8_Jet40_v4",kHLT_Mu8_Jet40,"hltL3Mu8Jet20L3Filtered8",kHLT_Mu8_Jet40_MuObj,0,"hltJet40",kHLT_Mu8_Jet40_JetObj,0);
