@@ -32,7 +32,7 @@
 #include "MitHtt/Ntupler/interface/TSVfit.h"
 
 #include "MitHtt/Ntupler/interface/HiggsAnaDefs.hh"
-#include "MitHtt/Ntupler/interface/MetSignificance.h"
+//#include "MitHtt/Ntupler/interface/MetSignificance.h"
 #include "MitPhysics/Utils/interface/ElectronTools.h"
 #include "MitPhysics/Utils/interface/MuonTools.h"
 #include "MitPhysics/Utils/interface/ElectronIDMVA.h"
@@ -44,7 +44,7 @@
 #include "CondFormats/JetMETObjects/interface/FactorizedJetCorrector.h"
 #include "CondFormats/JetMETObjects/interface/JetCorrectionUncertainty.h"
 
-#include "MitHtt/Ntupler/interface/AntiElectronIDMVA.h"
+//#include "MitHtt/Ntupler/interface/AntiElectronIDMVA.h"
 
 /// forward declarations
 class TString;
@@ -210,7 +210,7 @@ namespace mithep
     /// fill input information for svfit for a given svfit array
     void fillSVfit(TClonesArray*& iArr, Particle* lep1, unsigned int lepId1, Particle* lep2, unsigned int lepId2, TMatrixD iMatrix, double dcaSig3D, double dcaSig2D, double dca3DErr, double dca2DErr);
     /// fill input information for svfit for a given svfit array
-    void fillSVfit(TClonesArray*& iArr, Particle* lep1, unsigned int lepId1, Particle* lep2, unsigned int lepId2, TMatrixD iMatrix);
+    void fillSVfit(TClonesArray*& iArr, Particle* lep1, unsigned int lepId1, Particle* lep2, unsigned int lepId2);
 
   protected:
 
@@ -413,7 +413,7 @@ namespace mithep
     /// muon tools
     MuonTools* fMuonTools;
     //met significance
-    MetSignificance* metSign;
+    //MetSignificance* metSign;
     /// electron ID MVA
     ElectronIDMVA* fElectronMVAID;
     /// electron ID MVA for triggered electrons
@@ -433,7 +433,7 @@ namespace mithep
    /// Tau ring ISO
     TauIsoMVA * fTauMVAIso2;
     //AntiElectron ID MVA
-    AntiElectronIDMVA * fAntiElectronIDMVA;
+    //AntiElectronIDMVA * fAntiElectronIDMVA;
     /// list JSON files to be applied
     std::vector<TString> fJSONv;
     /// map of certified runs and lumi sections (for internal use)
@@ -491,7 +491,7 @@ namespace mithep
     // open file and configure branches
     fOutputFile    = new TFile( fOutputName, "RECREATE" );
     fEventTree     = new TTree( "Events"   , "Events"   );
-    hEventsTree        = new TTree("hEvents","all events");
+    hEventsTree    = new TTree("hEvents","all events");
     if( (fIsData!=1) && fUseGen ){ fEventTree->Branch( "Gen", &fGenInfo ); }
     fEventTree->Branch( "Info"       , &fEventInfo      );
     fEventTree->Branch( "Muon"       , &fMuonArr        );

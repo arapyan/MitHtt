@@ -142,7 +142,7 @@ HttNtupler::SlaveBegin()
   fEleTools = new ElectronTools();
   // initialize tools for muon ID
   fMuonTools = new MuonTools();
-  metSign = new MetSignificance();
+  //metSign = new MetSignificance();
  
   std::vector<std::string> weightFilesEleID;
   weightFilesEleID.push_back(getenv("CMSSW_BASE")+std::string("/src/MitHtt/data/ElectronMVA/Electrons_BDTG_NonTrigV0_Cat1.weights.xml"));
@@ -219,15 +219,15 @@ HttNtupler::SlaveBegin()
                    TString(getenv("CMSSW_BASE")+string("/src/MitPhysics/data/gbru1cov_53.root")),
                    TString(getenv("CMSSW_BASE")+string("/src/MitPhysics/data/gbru2cov_53.root")));
 
-  fAntiElectronIDMVA = new AntiElectronIDMVA();
-  fAntiElectronIDMVA->Initialize("BDT",
-				 TString(getenv("CMSSW_BASE")+string("/src/MitHtt/data/AntiElectronMVA/TMVAClassification_v2_X_0BL_BDT.weights.xml")),
-				 TString(getenv("CMSSW_BASE")+string("/src/MitHtt/data/AntiElectronMVA/TMVAClassification_v2_1_1BL_BDT.weights.xml")),
-				 TString(getenv("CMSSW_BASE")+string("/src/MitHtt/data/AntiElectronMVA/TMVAClassification_v2_0_1BL_BDT.weights.xml")),
-				 TString(getenv("CMSSW_BASE")+string("/src/MitHtt/data/AntiElectronMVA/TMVAClassification_v2_X_0EC_BDT.weights.xml")),
-				 TString(getenv("CMSSW_BASE")+string("/src/MitHtt/data/AntiElectronMVA/TMVAClassification_v2_1_1EC_BDT.weights.xml")),
-				 TString(getenv("CMSSW_BASE")+string("/src/MitHtt/data/AntiElectronMVA/TMVAClassification_v2_0_1EC_BDT.weights.xml"))
-				 );
+  //fAntiElectronIDMVA = new AntiElectronIDMVA();
+  //fAntiElectronIDMVA->Initialize("BDT",
+  //				 TString(getenv("CMSSW_BASE")+string("/src/MitHtt/data/AntiElectronMVA/TMVAClassification_v2_X_0BL_BDT.weights.xml")),
+  //			 TString(getenv("CMSSW_BASE")+string("/src/MitHtt/data/AntiElectronMVA/TMVAClassification_v2_1_1BL_BDT.weights.xml")),
+  //			 TString(getenv("CMSSW_BASE")+string("/src/MitHtt/data/AntiElectronMVA/TMVAClassification_v2_0_1BL_BDT.weights.xml")),
+  //			 TString(getenv("CMSSW_BASE")+string("/src/MitHtt/data/AntiElectronMVA/TMVAClassification_v2_X_0EC_BDT.weights.xml")),
+  //			 TString(getenv("CMSSW_BASE")+string("/src/MitHtt/data/AntiElectronMVA/TMVAClassification_v2_1_1EC_BDT.weights.xml")),
+  //			 TString(getenv("CMSSW_BASE")+string("/src/MitHtt/data/AntiElectronMVA/TMVAClassification_v2_0_1EC_BDT.weights.xml"))
+  //			 );
   
   // setup selection with JSON file, if necessary
   for(unsigned int idx=0; idx<fJSONv.size(); ++idx){
@@ -252,13 +252,12 @@ HttNtupler::SlaveTerminate()
 {
   //fEventTree ->Print(); 
   fOutputFile->Write(); fOutputFile->Close(); cleanup();
-  delete fJetCorrector; delete fJetUncertainties; delete fEleTools, delete fMuonTools, delete metSign;delete fElectronMVAID; delete fJetIDMVA; delete fJetIDMVAold; delete fTauMVAIso;delete fMVAMet; delete fMVAMetold; delete fAntiElectronIDMVA;
-
   // dump json file
   TString jsonfname = fOutputName.ReplaceAll("root","json");
   if( fIsData ){
     fRunLumiSet.DumpJSONFile(jsonfname.Data());
   }
+  delete fJetCorrector; delete fJetUncertainties; delete fEleTools, delete fMuonTools, delete fElectronMVAID; delete fJetIDMVA; delete fJetIDMVAold; delete fTauMVAIso;delete fMVAMet; delete fMVAMetold; 
 }
 
 void 
@@ -357,7 +356,7 @@ HttNtupler::Process()
   // loop and fill jets
   fillJets();
   // loop and fill photons
-  fillPhotons();
+  //fillPhotons();
   // fill the tree
   fEventTree->Fill();
 }
@@ -963,7 +962,7 @@ HttNtupler::fillPFTaus()
       pPFTau->puIsoNoPt   = computeCommonIso((const ChargedParticle*) pftau,                   fPFPileUp    ,  0., 0.5,     0., 0);
       pPFTau->ringIso     =  fTauMVAIso ->MVAValue(pftau,fPUEnergyDensity->At(0)->Rho());
       pPFTau->ringIso2    =  fTauMVAIso2->MVAValue(pftau,fPUEnergyDensity->At(0)->Rho());
-      pPFTau->antiEleID   =  fAntiElectronIDMVA->MVAValue(pPFTau);
+      pPFTau->antiEleID   =  0.0;//fAntiElectronIDMVA->MVAValue(pPFTau);
       pPFTau->antiEleMVA2    = pftau->MVA2rawElectronRejection();
       pPFTau->antiEleMVA3    = pftau->MVA3rawElectronRejection();
       pPFTau->antiEleMVA2Cat = pftau->MVA2rawElectronRejectionCategory();
@@ -1012,11 +1011,11 @@ HttNtupler::fillPFTaus()
       // HLT matching
       pPFTau->hltMatchBits = matchHLT(pftau->Eta(), pftau->Phi(), pftau->Pt());
       pPFTau->l1match = kFALSE;
-      for(unsigned int i=0; i<fTrigObj->GetEntries(); ++i){
-	const TriggerObjectBase *trigobj=fTrigObj->At(i);
-	if(trigobj->Pt() > 44 && !trigobj->HasType() && trigobj->Eta() != 0)
-	  if(MathUtils::DeltaR(trigobj->Phi(), trigobj->Eta(), pftau->Phi(), pftau->Eta())<0.5) pPFTau->l1match = kTRUE;  
-      } 
+     //  for(unsigned int i=0; i<fTrigObj->GetEntries(); ++i){
+// 	const TriggerObjectBase *trigobj=fTrigObj->At(i);
+// 	if(trigobj->Pt() > 44 && !trigobj->HasType() && trigobj->Eta() != 0)
+// 	  if(MathUtils::DeltaR(trigobj->Phi(), trigobj->Eta(), pftau->Phi(), pftau->Eta())<0.5) pPFTau->l1match = kTRUE;  
+//       } 
     }
   }
 }
@@ -1074,7 +1073,7 @@ HttNtupler::fillJets()
       pPFJet->eta         = rawMom.Eta();
       pPFJet->phi         = rawMom.Phi();
       pPFJet->mass        = rawMom.M()*jetcorr; 
-      if(rawMom.Eta() < 5.2) {
+      if(fabs(rawMom.Eta()) < 5.2) {
 	pPFJet->unc       = fJetUncertainties   ->getUncertainty(true);
       }
       else
@@ -1134,12 +1133,12 @@ HttNtupler::fillJets()
 
       pPFJet->matchedId    = matchedId;
       pPFJet->hltMatchBits = matchHLT(jet->Eta(), jet->Phi(), jet->Pt());
-      pPFJet->l1match = kFALSE;
-      for(unsigned int i=0; i<fTrigObj->GetEntries(); ++i){
-	const TriggerObjectBase *trigobj=fTrigObj->At(i);
-	if(trigobj->Pt() > 44 && !trigobj->HasType() && trigobj->Eta() != 0)
-	  if(MathUtils::DeltaR(trigobj->Phi(), trigobj->Eta(), jet->Phi(), jet->Eta())<0.5) pPFJet->l1match = kTRUE;  
-      } 
+     //  pPFJet->l1match = kFALSE;
+//       for(unsigned int i=0; i<fTrigObj->GetEntries(); ++i){
+// 	const TriggerObjectBase *trigobj=fTrigObj->At(i);
+// 	if(trigobj->Pt() > 44 && !trigobj->HasType() && trigobj->Eta() != 0)
+// 	  if(MathUtils::DeltaR(trigobj->Phi(), trigobj->Eta(), jet->Phi(), jet->Eta())<0.5) pPFJet->l1match = kTRUE;  
+//       } 
     }
   }
 }
@@ -1181,7 +1180,7 @@ HttNtupler::fillSVfit()
 { 
   //Reset caching
   //fMVAMet->reset();
-  metSign->reset();
+  //metSign->reset();
 
   int lNHigh = 0;
   for(unsigned int idx=0; idx<fMuons->GetEntries(); ++idx){ 
@@ -1189,8 +1188,7 @@ HttNtupler::fillSVfit()
     for(unsigned int jdx=0; jdx<fElectrons->GetEntries(); ++jdx){ 
       const Electron* pElectron = fElectrons->At(jdx); if( !looseEleId(pElectron,1,lNHigh) ){ continue; }
       if( MathUtils::DeltaR(pElectron->Mom(), pMu->Mom()) < 0.3 ){ continue; }
-      TMatrixD lMetMatrix = metSign->getSignificance(fPFJets, fPFCandidates, 0,0, pMu, pElectron);	
-      fillSVfit(fSVfitEMuArr, (Particle*)pMu, EGenType::kMuon, (Particle*)pElectron, EGenType::kElectron, lMetMatrix);
+      fillSVfit(fSVfitEMuArr, (Particle*)pMu, EGenType::kMuon, (Particle*)pElectron, EGenType::kElectron);
     }
   }
   for(unsigned int idx=0; idx<fPFTaus->GetEntries(); ++idx){ 
@@ -1198,35 +1196,32 @@ HttNtupler::fillSVfit()
     for(unsigned int jdx=0; jdx<fMuons->GetEntries(); ++jdx){
       const Muon* pMu = fMuons->At(jdx); if( !looseMuId(pMu,lNHigh) ){ continue; }
       if( MathUtils::DeltaR(pPFTau->Mom(), pMu->Mom())<0.3 ){ continue; }
-      TMatrixD lMetMatrix = metSign->getSignificance(fPFJets, fPFCandidates, pPFTau,0,pMu, 0);
-      fillSVfit(fSVfitMuTauArr, (Particle*)pMu, EGenType::kMuon, (Particle*)pPFTau, EGenType::kTau, lMetMatrix);
+      fillSVfit(fSVfitMuTauArr, (Particle*)pMu, EGenType::kMuon, (Particle*)pPFTau, EGenType::kTau);
     }
     for(unsigned int jdx=0; jdx<fElectrons->GetEntries(); ++jdx){ 
       const Electron* pElectron = fElectrons->At(jdx); if( !looseEleId(pElectron,1,lNHigh) ){ continue; }
       if( MathUtils::DeltaR(pPFTau->Mom(), pElectron->Mom())<0.3 ){ continue; }
-      TMatrixD lMetMatrix = metSign->getSignificance(fPFJets, fPFCandidates, pPFTau, 0,0, pElectron);	
-      fillSVfit(fSVfitETauArr, (Particle*)pElectron, EGenType::kElectron, (Particle*)pPFTau, EGenType::kTau, lMetMatrix);
+      fillSVfit(fSVfitETauArr, (Particle*)pElectron, EGenType::kElectron, (Particle*)pPFTau, EGenType::kTau);
     }
     for(unsigned int jdx=0; jdx<fPFTaus->GetEntries(); ++jdx){ 
       const PFTau* pPFTau2 = fPFTaus->At(jdx); if( !looseTauId(pPFTau2) ){ continue; }
       if( MathUtils::DeltaR(pPFTau->Mom(), pPFTau2->Mom())<0.3 ){ continue; }
-      TMatrixD lMetMatrix = metSign->getSignificance(fPFJets, fPFCandidates, pPFTau, pPFTau2,0,0);
-      fillSVfit(fSVfitTauTauArr, (Particle*)pPFTau2, EGenType::kTau, (Particle*)pPFTau, EGenType::kTau, lMetMatrix);
+      fillSVfit(fSVfitTauTauArr, (Particle*)pPFTau2, EGenType::kTau, (Particle*)pPFTau, EGenType::kTau);
     }
   }
 }
 
 void 
-HttNtupler::fillSVfit(TClonesArray*& iArr, Particle* lep1, unsigned int lepId1, Particle* lep2, unsigned int lepId2, TMatrixD iMatrix) 
+HttNtupler::fillSVfit(TClonesArray*& iArr, Particle* lep1, unsigned int lepId1, Particle* lep2, unsigned int lepId2) 
 {
-  TClonesArray& rSVfitArr = *iArr;
-  const int index = rSVfitArr.GetEntries();
-  new(rSVfitArr[index]) TSVfit();
-  TSVfit* pSVfit = (TSVfit*)rSVfitArr[index];
-  pSVfit->daughter1 = lep1->Mom(); pSVfit->daughterId1 = lepId1;
-  pSVfit->daughter2 = lep2->Mom(); pSVfit->daughterId2 = lepId2;
-  pSVfit->cov_00 = iMatrix(0,0)  ; pSVfit->cov_10 = iMatrix(1,0);
-  pSVfit->cov_01 = iMatrix(0,1)  ; pSVfit->cov_11 = iMatrix(1,1);
+   TClonesArray& rSVfitArr = *iArr;
+   const int index = rSVfitArr.GetEntries();
+   new(rSVfitArr[index]) TSVfit();
+   TSVfit* pSVfit = (TSVfit*)rSVfitArr[index];
+   pSVfit->daughter1 = lep1->Mom(); pSVfit->daughterId1 = lepId1;
+   pSVfit->daughter2 = lep2->Mom(); pSVfit->daughterId2 = lepId2;
+   pSVfit->cov_00 = 0.0  ; pSVfit->cov_10 = 0.0;
+   pSVfit->cov_01 = 0.0  ; pSVfit->cov_11 = 0.0;
 
   double chgfrac1 = 1;
   double chgfrac2 = 1;
@@ -1671,7 +1666,7 @@ HttNtupler::looseEleId(const Electron* elec, bool conv,int &iNHigh)
   if( elec->Eta() > fEleEtaMax                       ) return false;
   if( !fEleTools->PassSpikeRemovalFilter(elec)       ) return false;
   if(conv)
-    if( isConversion(elec)                           ) return false;
+    if( fEleTools->PassConversionFilterPFAOD(elec,fConversions,fVertex,0,1e-6,2.0,1,0)) return false;
   if( fUseGen==ESampleType::kEmbed && !elec->BestTrk()                 ) return false;
   if( elec->BestTrk()->NExpectedHitsInner() > 0      ) return false;
   if( elec->Pt()            > fEleHighEtMin          ) iNHigh++;

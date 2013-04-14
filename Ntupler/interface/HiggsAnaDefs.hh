@@ -238,7 +238,10 @@ enum ETriggerBit {
 
   //Tau parked
   kHLT_DoubleMediumIsoPFTau35_Trk1_eta2p1        =106,
-  kHLT_DoubleMediumIsoPFTau35_Trk5_eta2p1        =107
+  kHLT_DoubleMediumIsoPFTau35_Trk5_eta2p1        =107,
+  kHLT_IsoMu18_eta2p1_MediumIsoPFTau25_Trk1_eta2p1 = 108,
+  k2HLT_IsoMu18_eta2p1_MediumIsoPFTau25_Trk5_eta2p1 = 109,
+  k2HLT_IsoMu18_eta2p1_MediumIsoPFTau25_Trk1_eta2p1 = 110
 };
 
 const unsigned int kNTrigObj = 256;
@@ -428,8 +431,14 @@ enum ETriggerObject {
   kHLT_hltTripleL2Jets30eta3Obj                        =157,	
 
   //Tau parked dataset
-  kHLT_DoubleMediumIsoPFTau35_Trk1_eta2p1Obj           =158,
-  kHLT_DoubleMediumIsoPFTau35_Trk5_eta2p1Obj           =159
+  kHLT_DoubleMediumIsoPFTau35_Trk1_eta2p1Obj            =158,
+  kHLT_DoubleMediumIsoPFTau35_Trk5_eta2p1Obj            =159,
+  kHLT_IsoMu18_eta2p1_MediumIsoPFTau25_Trk1_eta2p1TauObj=160,
+  kHLT_IsoMu18_eta2p1_MediumIsoPFTau25_Trk1_eta2p1MuObj =161,
+  k2HLT_IsoMu18_eta2p1_MediumIsoPFTau25_Trk1_eta2p1TauObj=162,
+  k2HLT_IsoMu18_eta2p1_MediumIsoPFTau25_Trk1_eta2p1MuObj =163,
+  k2HLT_IsoMu18_eta2p1_MediumIsoPFTau25_Trk5_eta2p1TauObj=164,
+  k2HLT_IsoMu18_eta2p1_MediumIsoPFTau25_Trk5_eta2p1MuObj=165
 };
 
 #endif
