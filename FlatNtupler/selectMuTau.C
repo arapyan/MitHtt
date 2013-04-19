@@ -52,6 +52,15 @@
 
 #endif
 
+double prong3(double pt) {
+  return 0.012+0.001*TMath::Min(TMath::Max(pt-32,0.0),18.0);
+}
+
+double prong1(double pt) {
+  return 0.015+0.001*TMath::Min(TMath::Max(pt-45,0.0),10.0);
+}
+
+
 const Double_t pi = 3.14159265358979;
 
 //=== MAIN MACRO =================================================================================================
@@ -135,9 +144,9 @@ void selectMuTau(const TString conf="mutau.conf",  // input config file
   const Double_t kMuonMass = 105.658369e-3;
 
   const Double_t kTauPtMin = 20;
-  const Double_t kMuPtMin  = 17;
+  const Double_t kMuPtMin  = 20;
 
-  const Double_t kJetPtMin   = 20;
+  const Double_t kJetPtMin   = 30;
   const Double_t kBJetPtMin  = 20;
  
   Bool_t doKFactors = kTRUE;
@@ -208,9 +217,12 @@ void selectMuTau(const TString conf="mutau.conf",  // input config file
       Int_t  doRecoil   = (sfname.Contains("ztt") || sfname.Contains("-zll") || sfname.Contains("zjets")) && !isemb;
       if((snamev[isam].Contains("wjets") || snamev[isam].Contains("w1jets") ||  snamev[isam].Contains("w2jets") || snamev[isam].Contains("w3jets") || snamev[isam].Contains("w4jets") ) && !isemb) doRecoil = 2;
       if((snamev[isam].Contains("_sm_") || snamev[isam].Contains("_mssm_")) && !isemb) doRecoil = 3;
+      Bool_t tauescale = (doRecoil==3) || sfname.Contains("ztt")  || isemb;
 
       Bool_t getGen     = sfname.Contains("wjets") || (doRecoil > 0) || reallyDoKf || ismadz ||isemb || ismssm;
-      out->setupRecoil(doRecoil);
+      out->setupRecoil(0);
+      if(tauescale)
+	cout << "Applying tau energy scale" << endl;
 
       // PU reweighting
       TString pileupReweightFile;
@@ -271,7 +283,7 @@ void selectMuTau(const TString conf="mutau.conf",  // input config file
       // loop over events
       for(UInt_t ientry=0; ientry<eventTree->GetEntriesFast(); ientry++) {
 	if(ientry%100000 == 0) 	cout << "processing " << ientry << " -- " << float(ientry)/float(eventTree->GetEntriesFast()) << endl;
-	
+
 	if(getGen) genBr->GetEntry(ientry);
 	//if((fabs(gen->id_1_a) + fabs(gen->id_2_a) == 36 && ) && gen->pt_1_b > 20 && gen->pt_2_b > 20)  lNEvents++;
 	if((fabs(gen->id_1_a) + fabs(gen->id_2_a) == 36 && (fabs(gen->id_1_a) == 17 || fabs(gen->id_2_a) == 17)) && gen->pt_1_b > 20 && gen->pt_2_b > 20)  lNEvents++;
@@ -290,18 +302,17 @@ void selectMuTau(const TString conf="mutau.conf",  // input config file
 	// trigger
  	if(is2012)
 	  {
- 	    if(!isemb && !(info->triggerBits[kHLT_IsoMu18_eta2p1_LooseIsoPFTau20] || info->triggerBits[kHLT_IsoMu17_eta2p1_LooseIsoPFTau20] || info->triggerBits[kHLT_Mu18_eta2p1_LooseIsoPFTau20] || info->triggerBits[kHLT_Mu17_eta2p1_LooseIsoPFTau20])) continue;
-	    //if(!isemb && !(info->triggerBits[kHLT_IsoMu17_eta2p1_LooseIsoPFTau20])) continue;// || info->triggerBits[kHLT_Mu18_eta2p1_LooseIsoPFTau20] || info->triggerBits[kHLT_IsoMu18_eta2p1_LooseIsoPFTau20] || 
-	    
+ 	    if(!isemb && !(info->triggerBits[kHLT_IsoMu18_eta2p1_LooseIsoPFTau20] || info->triggerBits[kHLT_IsoMu17_eta2p1_LooseIsoPFTau20] || info->triggerBits[kHLT_Mu18_eta2p1_LooseIsoPFTau20] || info->triggerBits[kHLT_Mu17_eta2p1_LooseIsoPFTau20])) continue;   
       }
  	else
 	  if(!isemb && !(info->triggerBits[kHLT_IsoMu12_LooseIsoPFTau10] || info->triggerBits[kHLT_IsoMu15_LooseIsoPFTau15] || info->triggerBits[kHLT_IsoMu15_eta2p1_LooseIsoPFTau20])) continue;
 	
         //+ good primary vertex
         if(!info->hasGoodPV) continue;
-	
+
 	pvArr->Clear();
 	pvBr->GetEntry(ientry);	
+	double nprong, ngamma,lshift=0;
 
         // loop through HPSTaus
         
@@ -314,37 +325,40 @@ void selectMuTau(const TString conf="mutau.conf",  // input config file
 	  {
 	    const mithep::TPFTau *tau = dynamic_cast<mithep::TPFTau *>(tauArr->At(i));
 	    assert(tau);
-         
+	   
 	    // Tau ID
 	    if(!(passtauIdMu(tau))) continue;
+	   
+	    if(tauescale)
+	      {
+		if(tau->nSignalPFChargedHadrCands==1 && tau->nSignalPFGammaCands==0)
+		  lshift = 0.00;
+		else if(tau->nSignalPFChargedHadrCands==1 && tau->nSignalPFGammaCands>0)
+		  lshift = prong1(tau->pt);
+		else
+		  lshift = prong3(tau->pt);
+	      }
+	    // Tau Kinematics
+	    if(!((1.0+lshift)*tau->pt > kTauPtMin && fabs(tau->eta) < 2.3)) continue;
 	    
-		// Tau Kinematics
-	    if(!(tau->pt > kTauPtMin && fabs(tau->eta) < 2.3)) continue;
-	       
 	    //Tau HLT
 	    Bool_t trigmatch = kFALSE;
 	    // trigger matching
 	    if(is2012)
 	      trigmatch = ((info->triggerBits[kHLT_IsoMu18_eta2p1_LooseIsoPFTau20] && tau->hltMatchBits[kHLT_IsoMu18_eta2p1_LooseIsoPFTau20_TauObj]) || (info->triggerBits[kHLT_IsoMu17_eta2p1_LooseIsoPFTau20] && tau->hltMatchBits[kHLT_IsoMu17_eta2p1_LooseIsoPFTau20_TauObj]) ||(info->triggerBits[kHLT_Mu18_eta2p1_LooseIsoPFTau20] && tau->hltMatchBits[kHLT_Mu18_eta2p1_LooseIsoPFTau20_TauObj]) || (info->triggerBits[kHLT_Mu17_eta2p1_LooseIsoPFTau20] && tau->hltMatchBits[kHLT_Mu17_eta2p1_LooseIsoPFTau20_TauObj]));
-	    //trigmatch = ((info->triggerBits[kHLT_IsoMu17_eta2p1_LooseIsoPFTau20] && tau->hltMatchBits[kHLT_IsoMu17_eta2p1_LooseIsoPFTau20_TauObj])); 
-	    //|| (info->triggerBits[kHLT_Mu17_eta2p1_LooseIsoPFTau20] && tau->hltMatchBits[kHLT_Mu17_eta2p1_LooseIsoPFTau20_TauObj]));
 	    else
 	      trigmatch = ((info->triggerBits[kHLT_IsoMu12_LooseIsoPFTau10] && tau->hltMatchBits[kHLT_IsoMu12_LooseIsoPFTau10_TauObj]) || (info->triggerBits[kHLT_IsoMu15_LooseIsoPFTau15] && tau->hltMatchBits[kHLT_IsoMu15_LooseIsoPFTau15_TauObj]) ||(info->triggerBits[kHLT_IsoMu15_eta2p1_LooseIsoPFTau20] && tau->hltMatchBits[kHLT_IsoMu15_eta2p1_LooseIsoPFTau20_TauObj]));
 	    
 	    if(!isemb && !trigmatch)     continue;
-	    
+	   
 	    // Tau Isolation
-	    //if(!(tau->ringIso > 0.795)) continue;
-	    
-	    if(!(tau->hcalOverP + tau->ecalOverP > 0.2 ||
-		 tau->nSignalPFChargedHadrCands > 1 ||
-		 tau->nSignalPFGammaCands > 0)) continue;
-	    
+	    if(!(tau->ringIso > 0.790)) continue;
+	  
 	    goodHPSTaus.push_back(tau);
 	    if(!leadTau || (tau->pt > leadTau->pt && (tau->ringIso > leadTau->ringIso || tau->ringIso > 0.795)) || (tau->ringIso > leadTau->ringIso && (leadTau->ringIso < 0.795)) )
 	      leadTau = tau;
           }	
-       
+	
 	if(goodHPSTaus.size()<1) continue;
 
 	// loop through muons
@@ -361,23 +375,21 @@ void selectMuTau(const TString conf="mutau.conf",  // input config file
 	  // trigger matching
 	  if(is2012)
 	    trigmatch = ((info->triggerBits[kHLT_IsoMu18_eta2p1_LooseIsoPFTau20] && muon->hltMatchBits[kHLT_IsoMu18_eta2p1_LooseIsoPFTau20_MuObj]) || (info->triggerBits[kHLT_IsoMu17_eta2p1_LooseIsoPFTau20] && muon->hltMatchBits[kHLT_IsoMu17_eta2p1_LooseIsoPFTau20_MuObj]) ||(info->triggerBits[kHLT_Mu18_eta2p1_LooseIsoPFTau20] && muon->hltMatchBits[kHLT_Mu18_eta2p1_LooseIsoPFTau20_MuObj]) || (info->triggerBits[kHLT_Mu17_eta2p1_LooseIsoPFTau20] && muon->hltMatchBits[kHLT_Mu17_eta2p1_LooseIsoPFTau20_MuObj]) );
-	  //trigmatch = (//(info->triggerBits[kHLT_IsoMu18_eta2p1_LooseIsoPFTau20] && muon->hltMatchBits[kHLT_IsoMu18_eta2p1_LooseIsoPFTau20_MuObj]) || 
-	  //		 (info->triggerBits[kHLT_IsoMu17_eta2p1_LooseIsoPFTau20] && muon->hltMatchBits[kHLT_IsoMu17_eta2p1_LooseIsoPFTau20_MuObj]));// ||(info->triggerBits[kHLT_Mu18_eta2p1_LooseIsoPFTau20] && muon->hltMatchBits[kHLT_Mu18_eta2p1_LooseIsoPFTau20_MuObj]) || (info->triggerBits[kHLT_Mu17_eta2p1_LooseIsoPFTau20] && muon->hltMatchBits[kHLT_Mu17_eta2p1_LooseIsoPFTau20_MuObj]) );
 	  else
 	    trigmatch = ((info->triggerBits[kHLT_IsoMu12_LooseIsoPFTau10] && muon->hltMatchBits[kHLT_IsoMu12_LooseIsoPFTau10_MuObj]) || (info->triggerBits[kHLT_IsoMu15_LooseIsoPFTau15] && muon->hltMatchBits[kHLT_IsoMu15_LooseIsoPFTau15_MuObj]) ||(info->triggerBits[kHLT_IsoMu15_eta2p1_LooseIsoPFTau20] && muon->hltMatchBits[kHLT_IsoMu15_eta2p1_LooseIsoPFTau20_MuObj]));
-	   
 	  if(!isemb && !trigmatch)              continue;
-	  
 	  if(muon->pt < kMuPtMin)		continue;
 	  if(fabs(muon->eta) > 2.1)		continue;
-	  if(!(passMuonIsoPU(muon,2)))          continue;
- 
-	  double pIso = muonIsoPU(muon);
+	  if(!(muonIsoPU(muon)<0.5)) continue;
 	  goodMuonsv.push_back(muon);
+	  double pIso = muonIsoPU(muon);
 	  if(!leadMu || (muon->pt > leadMu->pt && (pIso < muonIsoPU(leadMu) || pIso < 0.1)) || ( pIso  < muonIsoPU(leadMu) && ( muonIsoPU(leadMu)  > 0.1))) 
 	    leadMu = muon;
 	}
+
 	if(!(leadMu && leadTau)) continue;
+	if(toolbox::deltaR(leadTau->eta, leadTau->phi, leadMu->eta, leadMu->phi) < 0.5) continue;
+		
 	// Di-muon veto
 	//
 	Bool_t diMuon = kFALSE;
@@ -393,6 +405,7 @@ void selectMuTau(const TString conf="mutau.conf",  // input config file
 		
 		if(mu1 != mu2 &&
 		   passPFMuonID(mu1) && passPFMuonID(mu2) &&
+		   fabs(mu1->eta) < 2.4 && fabs(mu2->eta) < 2.4 && 
 		   mu1->q + mu2->q == 0 &&
 		   mu1->pt > 15.0 && mu2->pt > 15.0 &&
 		   (muonIsoPU(mu1)) < 0.3 && 
@@ -412,14 +425,14 @@ void selectMuTau(const TString conf="mutau.conf",  // input config file
         electronBr->GetEntry(ientry);                                                                                                                                                                 
 	for(Int_t i = 0; i < eleArr->GetEntries(); i++)                                                                                                                                             
 	  {                                                                                                                                                                                          
-	    const mithep::TElectron *ele = (mithep::TElectron *)(eleArr->At(i));                                                                                                                     
+	    const mithep::TElectron *ele = (mithep::TElectron *)(eleArr->At(i));                                                                                                                
 	    //if(toolbox::deltaR(leadMu ->eta,leadMu ->phi,ele->eta,ele->phi) < 0.3)  continue;                                                                             
 	    //if(toolbox::deltaR(leadTau->eta,leadTau->phi,ele->eta,ele->phi) < 0.3)  continue;                                                                                                           
 	    if(ele->pt < 10.0) continue;                                                                                                                                                            
 	    if(fabs(ele->eta) > 2.5) continue;                                                                                                                                                       
 	    if(!(pass2012EleMVAID(ele,kLoose,1))) continue;                                                                                                                                         
 	    if(eleIsoPU(ele) > 0.3) continue;                                                                                                                                                        
-	    thirdlep=true;                                                                                                                                                                              
+	    thirdlep=true;                                                                                                                                                                         
 	  }                                                                                                                                                                                             
 	for(Int_t i=0; i<muonArr->GetEntriesFast(); i++) {                                                                                                                                         
 	  const mithep::TMuon *muon      = (mithep::TMuon*)     (muonArr->At(i));                                                                                                                   
@@ -429,16 +442,16 @@ void selectMuTau(const TString conf="mutau.conf",  // input config file
 	  if(fabs(muon->eta) > 2.4) continue;                                                                                                                                                                                             
 	  if(!passTightPFMuonID(muon,1)) continue;
 	  if(muonIsoPU(muon) > 0.3) continue;                                                                                                                                                                                             
-	  thirdlep=true;                                                                                                                                                                                                                  
+	  thirdlep=true;        
 	}                                                                                                                                                                                                                                 
-	//thrid lepton veto (WlHhadhad)                                                                                                                                                                                                   
-	if(thirdlep) continue;                                                                                                                                                                                                            
-
-	out->fillMuon(leadMu,muonIsoPU(leadMu),passMuonIsoPU(leadMu,1));
-	out->fillTau(leadTau,0,leadTau->ringIso > 0.795);
+	//thrid lepton veto (WlHhadhad)                                                                                                                                         
+	if(thirdlep) continue;
+	out->fillMuon(leadMu,1,muonIsoPU(leadMu),passMuonIsoPU(leadMu,1));
+	out->fillTau(leadTau,0,leadTau->ringIso > 0.795,tauescale);
 	// SVFit
         svfitArr->Clear();
         svfitBr->GetEntry(ientry);
+	bool svf=false;
         for(Int_t i = 0; i < svfitArr->GetEntriesFast(); i++) {
 	 
           mithep::TSVfit *svfit = (mithep::TSVfit*) svfitArr->At(i);
@@ -451,7 +464,13 @@ void selectMuTau(const TString conf="mutau.conf",  // input config file
           if(id < 3) continue;
 	 
 	  out->fillCov(svfit);
+	  svf=true;
         }
+	if(!svf) 
+	  {
+	    cout << "No svfit information" << endl;
+	    continue;
+	  }
         //if(cov_00==0 && cov_01==0 && cov_10==0 && cov_11==0) continue;
         // loop through jets      
         jetArr->Clear();
@@ -464,7 +483,7 @@ void selectMuTau(const TString conf="mutau.conf",  // input config file
 	  if(doJetUnc) jet->pt *= (jetunc==kDown) ? (1-jet->unc) : (1+jet->unc);
           if(toolbox::deltaR(jet->eta,jet->phi,leadMu->eta,leadMu->phi) < 0.5) continue;
           if(toolbox::deltaR(jet->eta,jet->phi,leadTau->eta,leadTau->phi) < 0.5) continue;
-          if(fabs(jet->eta) > 5) continue;
+          if(fabs(jet->eta) > 4.7) continue;
 	  if(!jet->id) continue;
 	  // look for b-jets
 	  Int_t btagopt = 0;
@@ -500,7 +519,9 @@ void selectMuTau(const TString conf="mutau.conf",  // input config file
 	if(njets>1) {
           for(Int_t i=2; i<jetArr->GetEntriesFast(); i++) {
             mithep::TJet *jet = (mithep::TJet*)((*jetArr)[i]);
-	    if(!(jet->pt > kJetPtMin && fabs(jet->eta)<5 && jet->id==1)) continue;
+	    if(toolbox::deltaR(jet->eta,jet->phi,leadTau->eta,leadTau->phi) < 0.5) continue;
+	    if(toolbox::deltaR(jet->eta,jet->phi,leadMu->eta,leadMu->phi) < 0.5) continue;
+	    if(!(jet->pt > kJetPtMin && fabs(jet->eta)<4.5 && jet->id==1)) continue;
 	    if(jet1->eta > jet2->eta && jet->eta > jet2->eta && jet->eta < jet1->eta) nCentralJets++;
 	    else if(jet2->eta > jet1->eta && jet->eta > jet1->eta && jet->eta < jet2->eta) nCentralJets++;
 	  }
@@ -510,11 +531,12 @@ void selectMuTau(const TString conf="mutau.conf",  // input config file
         Double_t kf=1;
         if(reallyDoKf) kf = kfFHPValue(gen->vpt_a, hKFactors);
 	
+
 	//W+Jets
-	if(doRecoil == 2 && is2012 && gen->npartons == 1) kf  *= 1.01816485663843465e-01*treeEntries/14507227.;
-	if(doRecoil == 2 && is2012 && gen->npartons == 2) kf  *= 2.40280352247856446e-02*treeEntries/14507227.;
-	if(doRecoil == 2 && is2012 && gen->npartons == 3) kf  *= 1.60199657314561254e-02*treeEntries/14507227.;
-	if(doRecoil == 2 && is2012 && gen->npartons == 4) kf  *= 8.56682212538505301e-03*treeEntries/14507227.;
+	if(doRecoil == 2 && is2012 && gen->npartons == 1) kf  *= 1.193*0.12514*treeEntries/18281279.;
+        if(doRecoil == 2 && is2012 && gen->npartons == 2) kf  *= 1.193*0.0306*treeEntries/18281279.;
+        if(doRecoil == 2 && is2012 && gen->npartons == 3) kf  *= 1.193*0.02*treeEntries/18281279.;
+        if(doRecoil == 2 && is2012 && gen->npartons == 4) kf  *= 1.193*0.00993*treeEntries/18281279.;
 
 
 	// do vertex reweighting
@@ -531,10 +553,19 @@ void selectMuTau(const TString conf="mutau.conf",  // input config file
 	// trigger scale factor for MC
 	Double_t trigscale = 1;
 	if(doTrigScale && !isemb && !is2012) trigscale=fMuTrigSF->GetBinContent(fMuTrigSF->FindBin(leadMu->pt, leadMu->eta))*fTauTrigSF->GetBinContent(fTauTrigSF->FindBin(leadTau->pt, leadTau->eta));
-
 	
+	if(tauescale)
+	  {
+	    if(leadTau->nSignalPFChargedHadrCands==1 && leadTau->nSignalPFGammaCands==0)
+	      lshift = 0.00;
+	    else if(leadTau->nSignalPFChargedHadrCands==1 && leadTau->nSignalPFGammaCands>0)
+	      lshift = prong1(leadTau->pt);
+	    else
+	      lshift = prong3(leadTau->pt);
+	  }
+
 	if(doTrigScale && !isemb && is2012) 
-	  trigscale = tautrigscale->eff(leadTau->pt,leadTau->eta) * mutrigscale->eff(leadMu->pt,leadMu->eta);
+	  trigscale = tautrigscale->eff((1.0+lshift)*leadTau->pt,leadTau->eta) * mutrigscale->eff(leadMu->pt,leadMu->eta);
 	
 	// embedding weight for embedded sample
 	Double_t embWgt = 1;
