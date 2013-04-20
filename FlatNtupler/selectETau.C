@@ -56,6 +56,14 @@
 
 const Double_t pi = 3.14159265358979;
 
+double prong3(double pt) {
+  return 0.012+0.001*TMath::Min(TMath::Max(pt-32,0.0),18.0);
+}
+
+double prong1(double pt) {
+  return 0.015+0.001*TMath::Min(TMath::Max(pt-45,0.0),10.0);
+}
+
 //=== MAIN MACRO =================================================================================================
 
 void selectETau(const TString conf="etau.conf",         // input config file
@@ -136,7 +144,7 @@ void selectETau(const TString conf="etau.conf",         // input config file
   enum { eMC, eMuEl, eDiMu, eMu, eDiEl, eEl };  // dataset type  
 
   const Double_t kTauPtMin = 20;
-  const Double_t kElePtMin  = 20;
+  const Double_t kElePtMin  = 24;
 
   const Double_t kJetPtMin   = 30;
   const Double_t kBJetPtMin  = 20;
@@ -211,9 +219,12 @@ void selectETau(const TString conf="etau.conf",         // input config file
       if((snamev[isam].Contains("wjets") || snamev[isam].Contains("w1jets") ||  snamev[isam].Contains("w2jets") || snamev[isam].Contains("w3jets") || snamev[isam].Contains("w4jets") ) && !isemb) doRecoil = 2;
       if((snamev[isam].Contains("_sm_") || snamev[isam].Contains("_mssm_")) && !isemb) doRecoil = 3;
       Bool_t getGen     = sfname.Contains("wjets") || (doRecoil > 0) || reallyDoKf || ismadz ||isemb || ismssm;
+      Bool_t tauescale = (doRecoil==3) || sfname.Contains("zllm")  || isemb;
 
-      out->setupRecoil(doRecoil);
+      out->setupRecoil(0);
       
+      if(tauescale)
+	cout << "Applying tau energy scale" << endl;
 
       // PU reweighting
       TString pileupReweightFile;
@@ -288,6 +299,7 @@ void selectETau(const TString conf="etau.conf",         // input config file
 
 	// certified run selection
         mithep::RunLumiRangeMap::RunLumiPairType rl(info->runNum, info->lumiSec);
+  
         if(hasJSON && !rlrm.HasRunLumi(rl)) continue;
 	//trigger
 	if(is2012)
@@ -301,7 +313,8 @@ void selectETau(const TString conf="etau.conf",         // input config file
         if(!info->hasGoodPV) continue;
 	pvArr->Clear();
 	pvBr->GetEntry(ientry);	
-	
+
+	double nprong, ngamma,lshift=0;
 	// loop through electrons
         vector<const mithep::TElectron*> looseElev;
 	vector<const mithep::TElectron*> goodElev;
@@ -319,18 +332,19 @@ void selectETau(const TString conf="etau.conf",         // input config file
 	  else
 	    trigmatch = ((info->triggerBits[kHLT_Ele15_CaloIdVT_TrkIdT_LooseIsoPFTau15] && ele->hltMatchBits[kHLT_Ele15_CaloIdVT_TrkIdT_LooseIsoPFTau15_EleObj]) || (info->triggerBits[kHLT_Ele15_CaloIdVT_TrkIdT_TightIsoPFTau20] && ele->hltMatchBits[kHLT_Ele15_CaloIdVT_TrkIdT_TightIsoPFTau20_EleObj]) ||(info->triggerBits[kHLT_Ele18_CaloIdVT_TrkIdT_MediumIsoPFTau20] && ele->hltMatchBits[kHLT_Ele18_CaloIdVT_TrkIdT_MediumIsoPFTau20_EleObj]) ||  (info->triggerBits[kHLT_Ele18_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_MediumIsoPFTau20] && ele->hltMatchBits[kHLT_Ele18_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_MediumIsoPFTau20_EleObj]) ||(info->triggerBits[kHLT_Ele20_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_MediumIsoPFTau20] && ele->hltMatchBits[kHLT_Ele20_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_MediumIsoPFTau20_EleObj]));
 	  
-	  //if(!isemb && !trigmatch)     continue;
+	  if(!isemb && !trigmatch)     continue;
 	  if(ele->pt < kElePtMin)		continue;
 	  if(fabs(ele->eta) > 2.1)		continue;
 	  if(!(pass2012EleMVAID(ele,kTight,1))) continue;
-	  
 	  if(!(passEleIsoPU(ele,2)))  continue;
+	  if(!(eleIsoPU(ele)<0.5)) continue;
 	  goodElev.push_back(ele);
 	  double pIso = eleIsoPU(ele);
 	  if(!leadEle || (ele->pt > leadEle->pt && (pIso < eleIsoPU(leadEle) || pIso < 0.1)) || ( pIso  < eleIsoPU(leadEle) && ( eleIsoPU(leadEle)  > 0.1))) 
 	    leadEle = ele;
         }
        	if(!leadEle) continue;
+	
         // loop through HPSTaus
         
 	tauArr->Clear();
@@ -346,10 +360,20 @@ void selectETau(const TString conf="etau.conf",         // input config file
 	    // Tau ID
 	    if(!tauIdElectron(tau)) continue;
 	    if(!(tauIdElectronMVA(tau,tau->antiEleID))) continue;
-	       
-		// Tau Kinematics
-	    if(!(tau->pt > kTauPtMin && fabs(tau->eta) < 2.3)) continue;
+	    bool tt = tau->hpsDiscriminators & mithep::TPFTau::kMVAEle;
+	   
+	    if(tauescale)
+	      {
+		if(tau->nSignalPFChargedHadrCands==1 && tau->nSignalPFGammaCands==0)
+		  lshift = 0.00;
+		else if(tau->nSignalPFChargedHadrCands==1 && tau->nSignalPFGammaCands>0)
+		  lshift = prong1(tau->pt);
+		else
+		  lshift = prong3(tau->pt);
+	      }
 	    
+		// Tau Kinematics
+	    if(!((1.0+lshift)*tau->pt > kTauPtMin && fabs(tau->eta) < 2.3)) continue;
 	    Bool_t trigmatch = kFALSE;
 	    // trigger matching
 	    if(is2012)
@@ -357,21 +381,17 @@ void selectETau(const TString conf="etau.conf",         // input config file
 	    else
 	      trigmatch = ((info->triggerBits[kHLT_Ele15_CaloIdVT_TrkIdT_LooseIsoPFTau15] && tau->hltMatchBits[kHLT_Ele15_CaloIdVT_TrkIdT_LooseIsoPFTau15_TauObj]) || (info->triggerBits[kHLT_Ele15_CaloIdVT_TrkIdT_TightIsoPFTau20] && tau->hltMatchBits[kHLT_Ele15_CaloIdVT_TrkIdT_TightIsoPFTau20_TauObj]) ||(info->triggerBits[kHLT_Ele18_CaloIdVT_TrkIdT_MediumIsoPFTau20] && tau->hltMatchBits[kHLT_Ele18_CaloIdVT_TrkIdT_MediumIsoPFTau20_TauObj]) ||  (info->triggerBits[kHLT_Ele18_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_MediumIsoPFTau20] && tau->hltMatchBits[kHLT_Ele18_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_MediumIsoPFTau20_TauObj]) ||(info->triggerBits[kHLT_Ele20_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_MediumIsoPFTau20] && tau->hltMatchBits[kHLT_Ele20_CaloIdVT_CaloIsoT_TrkIdT_TrkIsoT_MediumIsoPFTau20_TauObj]));
        	    
-	    //if(!isemb && !trigmatch)     continue;
-	
+	    if(!isemb && !trigmatch)     continue;
+	   
 	    // Tau Isolation
-	    //if(!(tau->ringIso > 0.795)) continue;
-		     
-	    //if(!(tau->hcalOverP + tau->ecalOverP > 0.2 ||
-	    //   tau->nSignalPFChargedHadrCands > 1 ||
-	    // tau->nSignalPFGammaCands > 0)) continue;
+	    if(!(tau->ringIso > 0.790)) continue;
 
 	    goodHPSTaus.push_back(tau);
 	    if(!leadTau || (tau->pt > leadTau->pt && (tau->ringIso > leadTau->ringIso || tau->ringIso > 0.795)) || (tau->ringIso > leadTau->ringIso && (leadTau->ringIso < 0.795)) )
 	      leadTau = tau;
           }	
 	if(goodHPSTaus.size()<1) continue;
-	
+
 	Bool_t diElectron = kFALSE;
 	for(Int_t i = 0; i < eleArr->GetEntries(); i++)
 	  {
@@ -397,10 +417,10 @@ void selectETau(const TString conf="etau.conf",         // input config file
 	      }
 	  }
 	//cout << " here ----> " << diElectron << " -- "  <<  leadTau  << " -- " << leadEle  << endl;
+	if(!leadTau && !leadEle) continue;
+	if(toolbox::deltaR(leadTau->eta, leadTau->phi, leadEle->eta, leadEle->phi) < 0.5) continue;
 
 	if(diElectron) continue;
-	if(!leadTau && !leadEle) continue;
-
 	bool thirdlep=false;                                                                                                                                                                                                              
 	for(Int_t i = 0; i < eleArr->GetEntries(); i++)                                                                                                                                                                                   
 	  {                                                                                                                                                                                                                               
@@ -426,27 +446,32 @@ void selectETau(const TString conf="etau.conf",         // input config file
 	  thirdlep=true;                                                                                                                                                                               
 	}                                                                                                                                                                                            
 	//thrid lepton veto (WlHhadhad)                                                                                                                                                              
-	if(thirdlep) continue;                                                                                                                             
+	if(thirdlep) continue;   
 
 	out->fillElectron(leadEle,1,eleIsoPU(leadEle),passEleIsoPU(leadEle,1));
-	out->fillTau(leadTau,0,leadTau->ringIso > 0.795);
+	out->fillTau(leadTau,0,leadTau->ringIso > 0.795,tauescale);
 
 	// SVFit
         svfitArr->Clear();
         svfitBr->GetEntry(ientry);
-
+	bool svf=false;
+        
         for(Int_t i = 0; i < svfitArr->GetEntriesFast(); i++) {
           mithep::TSVfit *svfit = (mithep::TSVfit*) svfitArr->At(i);
           Int_t id = 0;
-	  if(toolbox::deltaR(leadTau->eta,leadTau->phi,svfit->daughter1.Eta(),svfit->daughter1.Phi()) < 0.01           ) id = 1;
+          if(toolbox::deltaR(leadTau->eta,leadTau->phi,svfit->daughter1.Eta(),svfit->daughter1.Phi()) < 0.01           ) id = 1;
           if(toolbox::deltaR(leadEle->eta,leadEle->phi,svfit->daughter1.Eta(),svfit->daughter1.Phi()) < 0.01 && id == 0) id = 2;
           if(id == 0) continue;
 	  if(toolbox::deltaR(leadTau->eta,leadTau->phi,svfit->daughter2.Eta(),svfit->daughter2.Phi()) < 0.01 && id == 2) id = 3;
           if(toolbox::deltaR(leadEle->eta,leadEle->phi,svfit->daughter2.Eta(),svfit->daughter2.Phi()) < 0.01 && id == 1) id = 4;
-          if(id < 3) continue;
+          if(id < 3)  continue;
 	  out->fillCov(svfit);
+	  svf = true;
         }
-        //if(cov_00==0 && cov_01==0 && cov_10==0 && cov_11==0) continue;
+// 	if(!svf)
+// 	  {
+// 	    cout << "No svfit my friend" << endl;
+// 	    continue; }
 	
         // loop through jets      
         jetArr->Clear();
@@ -459,13 +484,13 @@ void selectETau(const TString conf="etau.conf",         // input config file
 	  if(doJetUnc) jet->pt *= (jetunc==kDown) ? (1-jet->unc) : (1+jet->unc);
           if(toolbox::deltaR(jet->eta,jet->phi,leadTau->eta,leadTau->phi) < 0.5) continue;
           if(toolbox::deltaR(jet->eta,jet->phi,leadEle->eta,leadEle->phi) < 0.5) continue;
-          if(fabs(jet->eta) > 5) continue;
+          if(fabs(jet->eta) > 4.7) continue;
 	  if(!jet->id) continue;
 	  // look for b-jets
 	  Int_t btagopt = 0;
 	  if(isdata||isemb) btagopt = 1;
 	  else btagopt = 2;
-	  Bool_t btagged =  btagged = btsf->isbtagged(jet->pt, jet->eta, jet->csv, jet->mcFlavor, isdata ,0, 0, is2012);
+	  Bool_t btagged = btsf->isbtagged(jet->pt, jet->eta, jet->csv, jet->mcFlavor, isdata ,0, 0, is2012);
 	  if((jet->pt > kBJetPtMin) && (fabs(jet->eta) < 2.4)) { // note: bjet can be the same as jet1 or jet2
 	    assert(npt20jets<50);
 	    out->btagArray.AddAt(jet->csv,npt20jets);
@@ -495,7 +520,9 @@ void selectETau(const TString conf="etau.conf",         // input config file
 	if(njets>1) {
           for(Int_t i=2; i<jetArr->GetEntriesFast(); i++) {
             mithep::TJet *jet = (mithep::TJet*)((*jetArr)[i]);
-	    if(!(jet->pt > kJetPtMin && fabs(jet->eta)<5 && jet->id==1)) continue;
+	    if(toolbox::deltaR(jet->eta,jet->phi,leadTau->eta,leadTau->phi) < 0.5) continue;
+	    if(toolbox::deltaR(jet->eta,jet->phi,leadEle->eta,leadEle->phi) < 0.5) continue;
+	    if(!(jet->pt > kJetPtMin && fabs(jet->eta)<4.7 && jet->id==1)) continue;
 	    if(jet1->eta > jet2->eta && jet->eta > jet2->eta && jet->eta < jet1->eta) nCentralJets++;
 	    else if(jet2->eta > jet1->eta && jet->eta > jet1->eta && jet->eta < jet2->eta) nCentralJets++;
 	  }
@@ -528,8 +555,19 @@ void selectETau(const TString conf="etau.conf",         // input config file
 	Double_t trigscale = 1;
 	if(doTrigScale && !isemb && !is2012) trigscale=fMuTrigSF->GetBinContent(fMuTrigSF->FindBin(leadEle->pt, leadEle->eta))*fTauTrigSF->GetBinContent(fTauTrigSF->FindBin(leadTau->pt, leadTau->eta));
 	
+
+	if(tauescale)
+	  {
+	    if(leadTau->nSignalPFChargedHadrCands==1 && leadTau->nSignalPFGammaCands==0)
+	      lshift = 0.00;
+	    else if(leadTau->nSignalPFChargedHadrCands==1 && leadTau->nSignalPFGammaCands>0)
+	      lshift = prong1(leadTau->pt);
+	    else
+	      lshift = prong3(leadTau->pt);
+	  }
+
 	if(doTrigScale && !isemb && is2012) 
-	  trigscale = tautrigscale->eff(leadTau->pt,leadTau->eta) * eletrigscale->eff(leadEle->pt,leadEle->eta);
+	  trigscale = tautrigscale->eff((1.0+lshift)*leadTau->pt,leadTau->eta) * eletrigscale->eff(leadEle->pt,leadEle->eta);
 	if(isnan(trigscale) || isinf(trigscale)) trigscale = 1.;
 	
 	Double_t embWgt = 1;
@@ -587,7 +625,7 @@ void selectETau(const TString conf="etau.conf",         // input config file
   if(!doNpuRwgt) cout << endl << endl << "Not doing npv reweight!" << endl;
   cout << endl; 
   
-  gBenchmark->Show("selectETau");
+  gBenchmark->Show("selectTau");
 }
 
 
