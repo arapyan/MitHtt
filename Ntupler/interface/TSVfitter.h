@@ -28,24 +28,41 @@ namespace mithep
     ~TSVfitter(){}
     /// do the fit 
     TLorentzVector fit(TSVfit* fit, double met, double metPhi);
+    double integrateMarkov(TSVfit* fit, double met, double metPhi, int id);
     double integrate(TSVfit* fit, double met, double metPhi, int id);
     //return additional variables
     float          fittedMET()    {return fFittedMET;}
     float          measMET()      {return fMeasMET;}
     float          fittedMETPhi() {return fFittedMETPhi;}
     float          measMETPhi()   {return fMeasMETPhi;}
-    float          massUnc()      {return fMassUnc;}
     int            status()       {return fstatus;}
 
+    //markov chain variables
+    float      massUnc()      {return fMassUnc;}
+    float      GetPt()   {return fPtMarkov;}
+    float      GetPhi()  {return fPhiMarkov;}
+    float      GetPtUnc() {return fPtMarkovUnc;}
+    float      GetPhiUnc() {return fPhiMarkovUnc;}
+    float      GetEta() {return fEtaMarkov;}
+    float      GetEtaUnc() {return fEtaMarkovUnc;}
+
   protected:
+    //Markov Chain DiTau system
     float fMassUnc;         //Uncertainty
+    float fPtMarkov;   
+    float fEtaMarkov;
+    float fPhiMarkov;
+    float fPhiMarkovUnc;
+    float fEtaMarkovUnc;
+    float fPtMarkovUnc;
+    //**************************************************
     int fstatus;             //valid solution?
     float fFittedMET;       //Best fit MET
     float fMeasMET;         //Original MET
     float fFittedMETPhi;    //Best fit MET phi
     float fMeasMETPhi;      //Original MET phi
     /// root class definition
-    ClassDef(TSVfitter,2)
+    ClassDef(TSVfitter,3)
   };  
 }
 #endif
