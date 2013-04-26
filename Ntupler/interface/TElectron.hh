@@ -100,8 +100,12 @@ namespace mithep
     float puIsoNoZ;
     // total delta beta corrected isolation
     float pfDeltaBetaIso;
+    // number of tracker layers from associated ctf trk
+    int kfhits;
+    // additional variables for MVA ID
+    float kfChi2, gsfChi2, etaWidth, phiWidth, deltaEtaCalo, E1x5E5x5, R9, eleEoPout, psOverRaw;
 
-    ClassDef(TElectron, 6)
+    ClassDef(TElectron, 7)
   };
 }
 #endif

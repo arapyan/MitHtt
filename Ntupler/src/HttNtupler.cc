@@ -828,6 +828,7 @@ HttNtupler::fillElecs()
     pElectron->fBrem           = ele->FBrem();
     pElectron->deltaEtaIn      = ele->DeltaEtaSuperClusterTrackAtVtx();
     pElectron->deltaPhiIn      = ele->DeltaPhiSuperClusterTrackAtVtx();
+    pElectron->deltaEtaCalo    = ele->DeltaEtaSeedClusterTrackAtCalo();
     pElectron->sigiEtaiEta     = ele->CoviEtaiEta();
     pElectron->nExpHitsInner   = ele->BestTrk()->NExpectedHitsInner();
     pElectron->partnerDeltaCot = ele->ConvPartnerDCotTheta();
@@ -838,7 +839,7 @@ HttNtupler::fillElecs()
     pElectron->P               = ele->P();
     pElectron->ip3d            = ele->Ip3dPV();
     pElectron->ip3dSig         = ele->Ip3dPVSignificance();
-    pElectron->sigiPhiiPhi     = ele->SCluster()->Seed()->CoviPhiiPhi();
+    pElectron->sigiPhiiPhi     = !TMath::IsNaN(ele->SCluster()->Seed()->CoviPhiiPhi()) ? TMath::Sqrt(ele->SCluster()->Seed()->CoviPhiiPhi()) : 0;
     pElectron->nBrem           = ele->NumberOfClusters()-1;  
     pElectron->hltMatchBits    = matchHLT(ele->SCluster()->Eta(), ele->SCluster()->Phi(), ele->SCluster()->Et());
     pElectron->scID            = ele->SCluster()->GetUniqueID();
@@ -857,6 +858,15 @@ HttNtupler::fillElecs()
     pElectron->d0BsSig         = ele->D0PVBSSignificance();
     pElectron->ip3dBs          = ele->Ip3dPVBS();
     pElectron->ip3dBsSig       = ele->Ip3dPVBSSignificance();
+    pElectron->kfChi2          = ele->HasTrackerTrk() ? ele->TrackerTrk()->RChi2() : 0;
+    pElectron->kfhits          = ele->HasTrackerTrk() ? ele->CTFTrkNLayersWithMeasurement() : -1;
+    pElectron->gsfChi2         = ele->BestTrk()->Chi2() / ele->BestTrk()->Ndof();
+    pElectron->etaWidth        = ele->SCluster()->EtaWidth();
+    pElectron->phiWidth        = ele->SCluster()->PhiWidth();
+    pElectron->E1x5E5x5        = ele->E55() != 0 ? 1.0 - (ele->E15()/ele->E55()) : -1.0;
+    pElectron->R9              = ele->SCluster()->R9();
+    pElectron->eleEoPout       = ele->EEleClusterOverPout();
+    pElectron->psOverRaw       = ele->SCluster()->PreshowerEnergy() / ele->SCluster()->RawEnergy();
 
     ElectronTools::EElectronEffectiveAreaTarget EffectiveAreaTarget;
     if(fIsData || fUseGen == ESampleType::kEmbed) EffectiveAreaTarget = ElectronTools::kEleEAData2012;
