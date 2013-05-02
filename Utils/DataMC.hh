@@ -88,6 +88,30 @@ Double_t kfFHPValue(Double_t pt, TH1D* hKF)
   return hKF->Interpolate(pt);
 }
 
+Bool_t passJetIDMVA(Double_t pt, Double_t eta, Double_t mvaVal)
+{
+
+  int lPtId = 0; 
+  if(pt > 30) lPtId = 1;
+  
+  int lEtaId = 0;
+  if(fabs(eta) > 2.5  && fabs(eta) < 2.75) lEtaId = 1; 
+  if(fabs(eta) > 2.75 && fabs(eta) < 3.0 ) lEtaId = 2; 
+  if(fabs(eta) > 3.0  && fabs(eta) < 5.0 ) lEtaId = 3; 
+
+  double fMVACut[2][4];
+  double Pt2030_Loose[4]    = {-0.63,-0.60,-0.55,-0.45};
+  double Pt3050_Loose[4]    = {-0.63,-0.60,-0.55,-0.45};
+  for(int i = 0; i < 4; i++) {
+    fMVACut[0][i] = Pt2030_Loose[i];
+    fMVACut[1][i] = Pt3050_Loose[i];
+  }
+  
+  double lMVACut = fMVACut[lPtId][lEtaId];
+  if(mvaVal < lMVACut) return false;
+  return true;
+
+}
 //----------------------------------------------------------------
 Double_t muIDscaleEmu(Double_t mupt, Double_t mueta, Int_t is2012)
 {
