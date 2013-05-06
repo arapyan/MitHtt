@@ -157,6 +157,7 @@ HttNtupler::SlaveBegin()
   fJetIDMVA    = new JetIDMVA();
   fJetIDMVAold = new JetIDMVA();
   fQGJetIDMVA  = new JetIDMVA();
+
   if(f2012) {
     fJetIDMVA->Initialize(JetIDMVA::kLoose,
 			  TString(getenv("CMSSW_BASE")+string("/src/MitPhysics/data/TMVAClassificationCategory_JetID_53X_Dec2012.weights.xml")),
@@ -186,7 +187,8 @@ HttNtupler::SlaveBegin()
 			  TString(getenv("CMSSW_BASE")+string("/src/MitPhysics/Utils/python/JetIdParams_cfi.py")));
   
   fTauMVAIso  = new TauIsoMVA();
-  fTauMVAIso ->Initialize(TString(getenv("CMSSW_BASE")+string("/src/MitPhysics/data/SXIsoMVA_BDTG.weights.xml")));
+  //fTauMVAIso ->Initialize(TString(getenv("CMSSW_BASE")+string("/src/MitPhysics/data/SXIsoMVA_BDTG.weights.xml")));
+  fTauMVAIso->InitializeGBR(TString(getenv("CMSSW_BASE")+string("/src/MitPhysics/data/gbrfTauIso_apr29a.root")));
 
   fTauMVAIso2 = new TauIsoMVA();
   fTauMVAIso2->InitializeGBR(TString(getenv("CMSSW_BASE")+string("/src/MitPhysics/data/gbrfTauIso_v2.root")));
@@ -218,7 +220,7 @@ HttNtupler::SlaveBegin()
                    TString(getenv("CMSSW_BASE")+string("/src/MitPhysics/data/gbrmetphi_53.root")),
                    TString(getenv("CMSSW_BASE")+string("/src/MitPhysics/data/gbru1cov_53.root")),
                    TString(getenv("CMSSW_BASE")+string("/src/MitPhysics/data/gbru2cov_53.root")));
-
+  
   //fAntiElectronIDMVA = new AntiElectronIDMVA();
   //fAntiElectronIDMVA->Initialize("BDT",
   //				 TString(getenv("CMSSW_BASE")+string("/src/MitHtt/data/AntiElectronMVA/TMVAClassification_v2_X_0BL_BDT.weights.xml")),
@@ -970,8 +972,8 @@ HttNtupler::fillPFTaus()
       pPFTau->puIso       = computeCommonIso((const ChargedParticle*) pftau,                   fPFPileUp    , 0.5, 0.3, 0.0001, 0);
       pPFTau->puIsoNoZ    = computeCommonIso((const ChargedParticle*) pftau, (PFCandidateCol*)fPFCandidates, 0.5, 0.5, 0.0001, 0);
       pPFTau->puIsoNoPt   = computeCommonIso((const ChargedParticle*) pftau,                   fPFPileUp    ,  0., 0.5,     0., 0);
-      pPFTau->ringIso     =  fTauMVAIso ->MVAValue(pftau,fPUEnergyDensity->At(0)->Rho());
-      pPFTau->ringIso2    =  fTauMVAIso2->MVAValue(pftau,fPUEnergyDensity->At(0)->Rho());
+      pPFTau->ringIso     =  fTauMVAIso ->MVAValue(pftau,fPUEnergyDensity->At(0)->RhoKt6PFJets());
+      pPFTau->ringIso2    =  fTauMVAIso2->MVAValue(pftau,fPUEnergyDensity->At(0)->RhoKt6PFJets());
       pPFTau->antiEleID   =  0.0;//fAntiElectronIDMVA->MVAValue(pPFTau);
       pPFTau->antiEleMVA2    = pftau->MVA2rawElectronRejection();
       pPFTau->antiEleMVA3    = pftau->MVA3rawElectronRejection();
@@ -1193,14 +1195,14 @@ HttNtupler::fillSVfit()
   //metSign->reset();
 
   int lNHigh = 0;
-  for(unsigned int idx=0; idx<fMuons->GetEntries(); ++idx){ 
-    const Muon* pMu = fMuons->At(idx); if( !looseMuId(pMu,lNHigh) ){ continue; }
-    for(unsigned int jdx=0; jdx<fElectrons->GetEntries(); ++jdx){ 
-      const Electron* pElectron = fElectrons->At(jdx); if( !looseEleId(pElectron,1,lNHigh) ){ continue; }
-      if( MathUtils::DeltaR(pElectron->Mom(), pMu->Mom()) < 0.3 ){ continue; }
-      fillSVfit(fSVfitEMuArr, (Particle*)pMu, EGenType::kMuon, (Particle*)pElectron, EGenType::kElectron);
-    }
-  }
+//   for(unsigned int idx=0; idx<fMuons->GetEntries(); ++idx){ 
+//     const Muon* pMu = fMuons->At(idx); if( !looseMuId(pMu,lNHigh) ){ continue; }
+//     for(unsigned int jdx=0; jdx<fElectrons->GetEntries(); ++jdx){ 
+//       const Electron* pElectron = fElectrons->At(jdx); if( !looseEleId(pElectron,1,lNHigh) ){ continue; }
+//       if( MathUtils::DeltaR(pElectron->Mom(), pMu->Mom()) < 0.3 ){ continue; }
+//       fillSVfit(fSVfitEMuArr, (Particle*)pMu, EGenType::kMuon, (Particle*)pElectron, EGenType::kElectron);
+//     }
+//   }
   for(unsigned int idx=0; idx<fPFTaus->GetEntries(); ++idx){ 
     const PFTau* pPFTau = fPFTaus->At(idx); if( !looseTauId(pPFTau) ){ continue; }
     for(unsigned int jdx=0; jdx<fMuons->GetEntries(); ++jdx){
@@ -1661,7 +1663,8 @@ HttNtupler::looseTauId(const PFTau* tau)
   if( tau->Pt() < fPFTauPtMin                        ) return false;
   if( fabs(tau->Eta()) > fPFTauEtaMax                ) return false;
   if( !tau->DiscriminationByLooseElectronRejection() ) return false;
-  if( !tau->DiscriminationByLooseMuonRejection()     ) return false;
+  //if( !tau->DiscriminationByLooseMuonRejection()     ) return false;
+  if( !tau->LooseMuonRejection2()     ) return false;
   if( !tau->DiscriminationByDecayModeFinding()       ) return false;
   //if( !tau->DiscriminationByLooseMVAIsolation()      ) return false;
   //if( !tau->DiscriminationByLooseIsolation()         ) return false;
@@ -1676,7 +1679,7 @@ HttNtupler::looseEleId(const Electron* elec, bool conv,int &iNHigh)
   if( elec->Eta() > fEleEtaMax                       ) return false;
   if( !fEleTools->PassSpikeRemovalFilter(elec)       ) return false;
   if(conv)
-    if( fEleTools->PassConversionFilterPFAOD(elec,fConversions,fVertex,0,1e-6,2.0,1,0)) return false;
+    if( !fEleTools->PassConversionFilterPFAOD(elec,fConversions,fVertex,0,1e-6,2.0,1,0)) return false;
   if( fUseGen==ESampleType::kEmbed && !elec->BestTrk()                 ) return false;
   if( elec->BestTrk()->NExpectedHitsInner() > 0      ) return false;
   if( elec->Pt()            > fEleHighEtMin          ) iNHigh++;
