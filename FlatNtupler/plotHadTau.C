@@ -18,20 +18,24 @@
 int fWId   ;//= 2;
 int fQCDId ;//= 4;
 std::string *fFreeWeights = 0;
+std::string fIso = " byCombinedIsolationDeltaBetaCorrRaw3Hits_2 < 1.0 ";
+//std::string fIso = "byIsolationMVA2raw_2 > 0.85";
+//std::string fIso = "iso_2 > 0.795";
 
 void drawVBFSpec(TTree **iTree,TH1F **iH,TH1F **iHSS,TH1F **iHMT,TH1F **iHLIS,TH1F **iHTIS,TH1F **iHNMT,TH1F **iHMTSS,TH1F **iHTemp,int iN,std::string iVar,std::string iCut,bool is2012,TFile * iFile = 0,std::string iDirName="",bool *iUseScale,TH1F** iHHigh,TH1F** iHLow) { 
-  std::string lVBF = "*(njetingap == 2 && mjj >  500 && jdeta > 3.5 )" 
+  std::string lVBF = "*(njetingap  == 0 && mjj >  500 && jdeta > 3.5)";// && nbtag == 0)"; 
   for(int i0 = 0; i0 < iN; i0++) {
       //iHNMT [i0]   = draw(iVar,iTree[i0],i0,iCut+"*(q_1*q_2 < 0)*(mtMVA_1 > -10)*(iso_1 < 0.1 && iso_2  >  0.795)               "+lVBF," nm_{T}");
       //iHMTSS[i0]   = draw(iVar,iTree[i0],i0,iCut+"*(q_1*q_2 > 0)*(mtMVA_1 > -10)*(iso_1 < 0.3 && iso_2  > -0.50 )               "+lVBF," nm_{T} SS");
-    iH    [i0]   = draw(iVar,iTree[i0],i0,iCut+"*(q_1*q_2 < 0)*(mtMVA_1 < 20)*(iso_1 < 0.1 && iso_2  >  0.795 )               "+lVBF," Main");
-    iHSS  [i0]   = draw(iVar,iTree[i0],i0,iCut+"*(q_1*q_2 > 0)*(mtMVA_1 < 20)*(iso_1 < 0.3 && iso_2  >  0.50  && iso_1 > 0.1 )"+lVBF," Same Sign");
-    iHMT  [i0]   = draw(iVar,iTree[i0],i0,iCut+"*              (mtMVA_1 > 70)*(iso_1 < 0.3 && iso_2  >  0.795 )               "+lVBF," m_{T} > 70 GeV");
-    iHNMT [i0]   = draw(iVar,iTree[i0],i0,iCut+"*(q_1*q_2 < 0)*(mtMVA_1 >  0)*(iso_1 < 0.3 && iso_2  >  0.795 )               "+lVBF," No m");
-    iHMTSS[i0]   = draw(iVar,iTree[i0],i0,iCut+"*(q_1*q_2 > 0)*(mtMVA_1 > 70)*(iso_1 < 0.3 && iso_2  > -0.50  )               "+lVBF," XNomSS");
+    iH    [i0]   = draw(iVar,iTree[i0],i0,iCut+"*(q_1*q_2 < 0)*(mtMVA_1 < 20)*(iso_1 < 0.1 &&  "+fIso+" )                 "+lVBF," Main");
+    iHSS  [i0]   = draw(iVar,iTree[i0],i0,iCut+"*(q_1*q_2 > 0)*(mtMVA_1 < 20)*(iso_1 < 0.3 &&  "+fIso+"  && iso_1 > 0.1 )"+lVBF," Same Sign");
+    iHMT  [i0]   = draw(iVar,iTree[i0],i0,iCut+"*              (mtMVA_1 > 70 && mtMVA_1 < 120)*(iso_1 < 0.1 &&  "+fIso+" && m_sv < 145)"+lVBF," m_{T} > 70 GeV");
+    iHNMT [i0]   = draw(iVar,iTree[i0],i0,iCut+"*(q_1*q_2 < 0)*(mtMVA_1 >  0)                 *(iso_1 < 0.3 &&  "+fIso+" )"+lVBF," No m");
+    iHMTSS[i0]   = draw(iVar,iTree[i0],i0,iCut+"*(q_1*q_2 > 0)*(mtMVA_1 > 70 && mtMVA_1 < 120)*(iso_1 < 0.1 &&  "+fIso+" )"+lVBF," XNomSS");
     iHTemp[i0]   = draw(iVar,iTree[i0],i0,iCut+"*(q_1*q_2 < 0)*"+fFreeWeights[i0]                                                   ," XFree");
-    iHLIS [i0]   = draw(iVar,iTree[i0],i0,iCut+"*(q_1*q_2 > 0)*(mtMVA_1 < 20)*(iso_1 < 0.3 && iso_2  >  0.5 && iso_1 > 0.1)"  ," X2 Jet Loose Iso SS Cut");
-    iHTIS [i0]   = draw(iVar,iTree[i0],i0,iCut+"*(q_1*q_2 > 0)*(mtMVA_1 < 20)*(iso_1 < 0.1 && iso_2  >  0.78 )"               ," Y2 Jet Tight Iso SS Cut");
+    iHLIS [i0]   = draw(iVar,iTree[i0],i0,iCut+"*(q_1*q_2 > 0)*(mtMVA_1 < 20)*(iso_1 < 0.3 &&  "+fIso+" & iso_1 > 0.1)"  ," X2 Jet Loose Iso SS Cut");
+    iHTIS [i0]   = draw(iVar,iTree[i0],i0,iCut+"*(q_1*q_2 > 0)*(mtMVA_1 < 20)*(iso_1 < 0.1 &&  "+fIso+" )"               ," Y2 Jet Tight Iso SS Cut");
+    cout << " +===> " << iHLIS[i0]->Integral() << " -- " << iHTIS[i0]->Integral() << endl;
     if(iFile == 0    ) continue;
     iHHigh[i0]   = 0;
     iHLow[i0]    = 0;
@@ -47,18 +51,16 @@ void drawVBFSpec(TTree **iTree,TH1F **iH,TH1F **iHSS,TH1F **iHMT,TH1F **iHLIS,TH
     lMTMC ->Add(iHMT[i0]);
     lMTMCS->Add(iHMTSS[i0]);
   }
-  double lDataInt   = iHMT[iN-1]->Integral(-1,1000) - lMTMC->Integral(-1,1000); 
+  double lDataInt   = iHMT[iN-1]  ->Integral(-1,1000) - lMTMC ->Integral(-1,1000); 
   double lDataSSInt = iHMTSS[iN-1]->Integral(-1,1000) - lMTMCS->Integral(-1,1000); 
-  double lWSF       = float(iHMT[fWId]->Integral(-1,1000))/lDataInt;
+  double lWSF       = float(iHMT  [fWId]->Integral(-1,1000))/lDataInt;
   double lWSFSS     = float(iHMTSS[fWId]->Integral(-1,1000))/lDataSSInt;
-  cout << "===> W Boson Scale Factor : " << lWSF << " -W- " << lWSFSS << endl;//iHMT[fWId]->Integral(-1,1000)/lDataInt;
-  // << " -Data- "<< lDataInt << " - " << iHMT[iN-1]->Integral(-1,1000) << "  MC- " << lMTMC->Integral(-1,1000) << endl;
+  cout << "===> W Boson Scale Factor : " << lWSF << " -W- " << lWSFSS  << " -Data- "<< lDataInt << " - " << iHMT[iN-1]->Integral(-1,1000) << "  MC- " << lMTMC->Integral(-1,1000) << endl;
   if(lWSF   == 0) lWSF   = 1.;
   if(lWSFSS == 0) lWSFSS = 1.;
   iH    [fWId]->Scale(1./lWSF);
   iHSS  [fWId]->Scale(1./lWSF);
   iHMT  [fWId]->Scale(1./lWSF);
-  iHNMT [fWId]->Scale(1./lWSF);
   iHMTSS[fWId]->Scale(1./lWSF);
   //!!!!! Do we need to do this
   //iHLIS [fWId]->Scale(1./lWSF);
@@ -93,7 +95,7 @@ void drawVBFSpec(TTree **iTree,TH1F **iH,TH1F **iHSS,TH1F **iHMT,TH1F **iHLIS,TH
   iH     [fQCDId] = iHSS  [fQCDId];
   //Generic Template Definition for the loose cuts
   for(int i0 = 0; i0 < iN-1; i0++) {
-    if(i0 == fQCDId) continue;
+    if(i0 == fQCDId || i0 == 0) continue; //Keep full selection for Z and QCD
     double pInt = iH[i0]->Integral();
     iH[i0] = iHTemp[i0];
     iH[i0]->Scale(pInt/iH[i0]->Integral());
@@ -101,15 +103,16 @@ void drawVBFSpec(TTree **iTree,TH1F **iH,TH1F **iHSS,TH1F **iHMT,TH1F **iHLIS,TH
   //Make Data card
   if(iFile !=0) makeDataCard(iFile,iH,iHHigh,iHLow,iN,iDirName,fString);
   //Additional Crap
+  //iHNMT [fWId]->Scale(1./lWSF);
   //iHMTSS [fQCDId]->Scale(lTightLooseRatio);
   //iHNMT  [fQCDId] = iHMTSS[fQCDId];
 
   //Blind
   //for(int i0 = 0; i0 < iH[iN-1]->GetNbinsX()+1; i0++) if(iH[iN-1]->GetXaxis()->GetBinCenter(i0) > 60 && iH[iN-1]->GetXaxis()->GetBinCenter(i0) < 130) iH[iN-1]->SetBinContent(i0,0);
   //Draw the plot
-  //draw(iH    ,iN,iVar+"VBFA",iVar);
-  //draw(iHSS  ,iN,iVar+"VBFB",iVar);
-  //draw(iHMT  ,iN,iVar+"VBFC",iVar);
+  draw(iH    ,iN,iVar+"VBFA",iVar);
+  draw(iHSS  ,iN,iVar+"VBFB",iVar);
+  draw(iHMT  ,iN,iVar+"VBFC",iVar);
   //draw(iHLIS ,iN,iVar+"VBFD",iVar);
   //draw(iHTIS ,iN,iVar+"VBFE",iVar);
   //draw(iHMTSS,iN,iVar+"VBFF",iVar);
@@ -152,8 +155,8 @@ void drawSpec(TTree **iTree,TH1F **iH,TH1F **iHSS,TH1F **iHMT,TH1F **iHNMT,TH1F 
   double lWSF       = float(iHMT[fWId]->Integral(-1,1000))/lDataInt;
   double lDataSSInt = iHMTS[iN-1]->Integral(-1,1000) - lMTMCS->Integral(-1,1000); 
   double lWSFSS     = float(iHMTS[fWId]->Integral(-1,1000))/lDataSSInt;
-  cout << "===> W Boson    Scale Factor : " << lWSF   << " -W- " << endl;//iHMT[fWId]->Integral(-1,1000)/lDataInt;
-  cout << "===> W Boson SS Scale Factor : " << lWSFSS << " -W- " << endl;//iHMT[fWId]->Integral(-1,1000)/lDataInt;
+  cout << "===> W Boson    Scale Factor : " << lWSF   << " -W- " << iHMT[fWId]->Integral(-1,1000) << " -- " << iH[fWId]->Integral(-1,1000)   << endl;
+  cout << "===> W Boson SS Scale Factor : " << lWSFSS << " -W- " << iHMT[fWId]->Integral(-1,1000) << endl; 
   if(lWSF   == 0) lWSF   = 1.;
   if(lWSFSS == 0) lWSFSS = 1.;
   iH    [fWId]->Scale(1./lWSF);
@@ -166,7 +169,7 @@ void drawSpec(TTree **iTree,TH1F **iH,TH1F **iHSS,TH1F **iHMT,TH1F **iHNMT,TH1F 
   for(int i0 = 0; i0 < iN-1; i0++) {if(i0 == fQCDId) continue;    lSS  ->Add(iHSS  [i0]);  }
   iHSS  [fQCDId]->Add(lSS  ,-1); 
   //Scale the Shape
-  if(lQCDShape != 0) lQCDShape->Scale(iHSS[fQCDId]->Integral());
+  if(lQCDShape != 0) lQCDShape->Scale(iHSS[fQCDId]->Integral()/lQCDShape->Integral());
   if(lQCDShape != 0) iHSS  [fQCDId] = lQCDShape;
   
   for(int i0 = 0; i0 < iHSS  [fQCDId]->GetNbinsX()+1; i0++) if(iHSS  [fQCDId]->GetBinContent(i0) < 0) iHSS  [fQCDId]->SetBinContent(i0,0);
@@ -179,7 +182,7 @@ void drawSpec(TTree **iTree,TH1F **iH,TH1F **iHSS,TH1F **iHMT,TH1F **iHNMT,TH1F 
   //TH1F *lSSMT = (TH1F*) iHSS[0]->Clone("SSTmpmT"); clear(lSSMT);
   //for(int i0 = 0; i0 < iN-1; i0++) {if(i0 == fQCDId) continue;    lSSMT->Add(iHSSMT[i0]);  }
   //iHSSMT[fQCDId]->Add(lSSMT,-1); 
-  //clear(iHMT [fQCDId]);
+  clear(iHMT [fQCDId]);
   //clear(iHNMT[fQCDId]);
   //for(int i0 = 0; i0 < iHSSMT[fQCDId]->GetNbinsX()+1; i0++) if(iHSSMT[fQCDId]->GetBinContent(i0) < 0) iHSSMT[fQCDId]->SetBinContent(i0,0);
   //iHSSMT[fQCDId]->Scale(1.06);
@@ -192,9 +195,9 @@ void drawSpec(TTree **iTree,TH1F **iH,TH1F **iHSS,TH1F **iHMT,TH1F **iHNMT,TH1F 
   //for(int i0 = 0; i0 < iH[iN-1]->GetNbinsX()+1; i0++) if(iH[iN-1]->GetXaxis()->GetBinCenter(i0) > 100 && iH[iN-1]->GetXaxis()->GetBinCenter(i0) < 150) iH[iN-1]->SetBinContent(i0,0);
  
   //Draw the plot
-  //draw(iH   ,iN,iVar+"A"+iName,iVar);
-  //draw(iHSS ,iN,iVar+"B"+iName,iVar);
-  //draw(iHMT ,iN,iVar+"C"+iName,iVar);
+  draw(iH   ,iN,iVar+"A"+iName,iVar);
+  draw(iHSS ,iN,iVar+"B"+iName,iVar);
+  draw(iHMT ,iN,iVar+"C"+iName,iVar);
   //draw(iHNMT,iN,iVar+"D"+iName,iVar);
   //draw(iHMTS,iN,iVar+"E"+iName,iVar);
 }
