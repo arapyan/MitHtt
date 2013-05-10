@@ -32,6 +32,7 @@ Bool_t passLooseEleID(const mithep::TElectron *electron);
 Bool_t passEleMVAID(const mithep::TElectron *electron, Double_t mvaValue);
 Bool_t passEleNonTrigMVA(const mithep::TElectron *electron, EWorkingPoint WP);
 Bool_t pass2012EleMVAID(const mithep::TElectron *electron, EWorkingPoint WP, Bool_t etau);
+Bool_t passTrigNoIPEleMVAID(const mithep::TElectron *electron, Double_t mvaValue, EWorkingPoint WP, Bool_t etau);
 Bool_t passEleIdVeto(const mithep::TElectron *ele);
 //Bool_t passEleIso(const mithep::TElectron *electron);
 Bool_t passEleIsoPU(const mithep::TElectron *electron, int xtau);
@@ -325,6 +326,81 @@ Bool_t pass2012EleMVAID(const mithep::TElectron *electron, EWorkingPoint WP, Boo
   return passEleNonTrigMVA(electron,WP);
 }  
 
+//--------------------------------------------------------------------------------------------------
+Bool_t passTrigNoIPEleMVAID(const mithep::TElectron *electron, Double_t mvaValue, EWorkingPoint WP, Bool_t etau)
+{
+   // conversion rejection
+  if(electron->nExpHitsInner > 0) return kFALSE;
+  if(!electron->isConv)           return kFALSE;
+ 
+  if(etau)
+    {
+      if(fabs(electron->d0) > 0.045) return kFALSE;
+      if(fabs(electron->dz) > 0.2)   return kFALSE;
+    }
+  else
+    {
+      if(fabs(electron->d0) > 0.02)   return kFALSE;
+      if(fabs(electron->dz) > 0.1)    return kFALSE;
+    }
+
+  if(fabs(electron->scEta) < 1.479)
+  {
+    // barrel
+    if(electron->sigiEtaiEta      > 0.01)  return kFALSE;
+    if(fabs(electron->deltaPhiIn) > 0.15)  return kFALSE;
+    if(fabs(electron->deltaEtaIn) > 0.007) return kFALSE;
+    if(electron->HoverE           > 0.12)  return kFALSE;
+
+    if(electron->trkIso03                         > 0.2*(electron->pt)) return kFALSE;
+    if(TMath::Max(electron->emIso03-1,Float_t(0)) > 0.2*(electron->pt)) return kFALSE;
+    if(electron->hadIso03                         > 0.2*(electron->pt)) return kFALSE;
+
+  } else {
+    // endcap
+    if(electron->sigiEtaiEta      > 0.03)  return kFALSE;
+    if(fabs(electron->deltaPhiIn) > 0.10)  return kFALSE;
+    if(fabs(electron->deltaEtaIn) > 0.009) return kFALSE;
+    if(electron->HoverE           > 0.10)  return kFALSE;
+
+    if(electron->trkIso03 > 0.2*(electron->pt)) return kFALSE;
+    if(electron->emIso03  > 0.2*(electron->pt)) return kFALSE;
+    if(electron->hadIso03 > 0.2*(electron->pt)) return kFALSE;
+
+  }
+
+  Int_t subdet = 0;
+  if (fabs(electron->scEta) < 0.8) subdet = 0;
+  else if (fabs(electron->scEta) < 1.479) subdet = 1;
+  else subdet = 2;
+  Int_t ptBin = 0;
+  if (electron->pt > 20.0) ptBin = 1;
+  Int_t MVABin = -1;
+  if (subdet == 0 && ptBin == 0) MVABin = 0;
+  if (subdet == 1 && ptBin == 0) MVABin = 1;
+  if (subdet == 2 && ptBin == 0) MVABin = 2;
+  if (subdet == 0 && ptBin == 1) MVABin = 3;
+  if (subdet == 1 && ptBin == 1) MVABin = 4;
+  if (subdet == 2 && ptBin == 1) MVABin = 5;
+
+  Double_t MVACut = -9999;
+  if (MVABin == 0) MVACut = -0.5375;
+  if (MVABin == 1) MVACut = -0.375;
+  if (MVABin == 2) MVACut = -0.025;
+  if(WP==kLoose) {
+    if (MVABin == 3) MVACut = 0.325;
+    if (MVABin == 4) MVACut = 0.775;
+    if (MVABin == 5) MVACut = 0.775;
+  }
+  else if(WP==kTight) {
+    if (MVABin == 3) MVACut = 0.55;
+    if (MVABin == 4) MVACut = 0.9;
+    if (MVABin == 5) MVACut = 0.925;
+  }
+  if (mvaVal > MVACut) return kTRUE;
+  return kFALSE;
+
+}  
 ////////////////////////////////////////////////////
 // VBTF WP95 Electron ID
 Bool_t passEleIdVeto(const mithep::TElectron *ele)
