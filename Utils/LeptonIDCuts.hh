@@ -94,7 +94,7 @@ Bool_t passTightPFMuonID(const mithep::TMuon *muon,Bool_t mutau)
     }
   if(muon->muNchi2        > 10)    return kFALSE;
   if(muon->nValidHits     < 1)     return kFALSE;
-  if(muon->nMatch         < 2)     return kFALSE;
+  if(muon->nSeg           < 2)     return kFALSE;
   if(muon->nPixHits       < 1)     return kFALSE;
   if(muon->nTkLayersHit   < 6)    return kFALSE;
   
@@ -311,7 +311,7 @@ Bool_t pass2012EleMVAID(const mithep::TElectron *electron, EWorkingPoint WP, Boo
 {
    // conversion rejection
   if(electron->nExpHitsInner > 0) return kFALSE;
-  if(!electron->isConv)           return kFALSE;
+  if(electron->isConv)           return kFALSE;
  
   if(etau)
     {
@@ -325,13 +325,12 @@ Bool_t pass2012EleMVAID(const mithep::TElectron *electron, EWorkingPoint WP, Boo
     }
   return passEleNonTrigMVA(electron,WP);
 }  
-
 //--------------------------------------------------------------------------------------------------
 Bool_t passTrigNoIPEleMVAID(const mithep::TElectron *electron, Double_t mvaValue, EWorkingPoint WP, Bool_t etau)
 {
    // conversion rejection
   if(electron->nExpHitsInner > 0) return kFALSE;
-  if(!electron->isConv)           return kFALSE;
+  if(electron->isConv)           return kFALSE;
  
   if(etau)
     {
@@ -397,10 +396,11 @@ Bool_t passTrigNoIPEleMVAID(const mithep::TElectron *electron, Double_t mvaValue
     if (MVABin == 4) MVACut = 0.9;
     if (MVABin == 5) MVACut = 0.925;
   }
-  if (mvaVal > MVACut) return kTRUE;
+  if (mvaValue > MVACut) return kTRUE;
   return kFALSE;
 
 }  
+
 ////////////////////////////////////////////////////
 // VBTF WP95 Electron ID
 Bool_t passEleIdVeto(const mithep::TElectron *ele)
@@ -490,7 +490,7 @@ Double_t eleIsoPU(const mithep::TElectron *electron)
 {
   Double_t chargedIso = electron->pfIsoCharged;
   Double_t elept = electron->pt;
-  Double_t neutralIso = max(electron->pfIsoNeutral + electron->pfIsoGammaNoZ - 0.5 * electron->puIso, 0.0);
+  Double_t neutralIso = max(electron->pfIsoNeutral + electron->pfIsoGamma - 0.5 * electron->puIso, 0.0);
 
   return (chargedIso+neutralIso)/elept;
 }
@@ -515,22 +515,23 @@ Bool_t isSoftMuon(const mithep::TMuon *muon)
 //--------------------------------------------------------------------------------------------------
 Bool_t isMuonFO(const mithep::TMuon *muon, const Int_t ver)
 {
-  if(ver<3) if(muon->nTkHits	  < 11)    return kFALSE;
-  if(ver<3) if(muon->nPixHits	  < 1)     return kFALSE;
-  if(muon->muNchi2	  > 10)    return kFALSE;
-  if(muon->nMatch 	  < 2)     return kFALSE;
-  if(muon->nValidHits	  < 1)     return kFALSE;
-  if(muon->ptErr/muon->pt > 0.1)   return kFALSE;
-  if(fabs(muon->dz)       > 0.1)   return kFALSE;
+  if(ver<3) {if(muon->nTkHits	  < 11)    return kFALSE;}
+  if(ver<3) {if(muon->nPixHits	  < 1)     return kFALSE;}
+  if(ver<4) {if(muon->muNchi2	  > 10)    return kFALSE;}
+  if(ver<4) {if(muon->nMatch 	  < 2)     return kFALSE;}
+  if(ver<4) {if(muon->nValidHits	  < 1)     return kFALSE;}
+  if(ver<4) {if(muon->ptErr/muon->pt > 0.1)   return kFALSE;}
+  if(ver<5) if(fabs(muon->dz)       > 0.1)   return kFALSE;
   if(fabs(muon->d0)       > 0.2)   return kFALSE;  
   if(!(muon->typeBits & kGlobal))  return kFALSE;
-  if(ver<3) if(!(muon->typeBits & kTracker)) return kFALSE;
+  if(ver<3) {if(!(muon->typeBits & kTracker)) return kFALSE;}
 
   Double_t iso = (muon->trkIso03 + muon->emIso03 + muon->hadIso03)/muon->pt;
   if(ver==1) return (iso<1.0);
   if(ver==2) return (iso<0.4);
   if(ver==3) return (muon->trkIso03/muon->pt<0.2 && muon->emIso03/muon->pt<0.2 && muon->hadIso03/muon->pt<0.2);
-  if(ver==4) return kTRUE;
+  if(ver==4) return (muon->trkIso03/muon->pt<0.4 && muon->emIso03/muon->pt<0.4 && muon->hadIso03/muon->pt<0.4);
+  if(ver==5) return ((muon->pt>20 && muon->trkIso03/muon->pt<0.4 && muon->emIso03/muon->pt<0.4 && muon->hadIso03/muon->pt<0.4) || (muon->pt<=20 && muon->trkIso03<8. && muon->emIso03<8. && muon->hadIso03<8.));
   
   return kFALSE;
 }
@@ -542,7 +543,7 @@ Bool_t isEleFO(const mithep::TElectron *electron, const Int_t ver)
   
   // conversion rejection
   if(electron->nExpHitsInner > 0) return kFALSE;
-  if(!electron->isConv)           return kFALSE;
+  if(electron->isConv)           return kFALSE;
   
   // barrel/endcap dependent requirments      
   if(fabs(electron->scEta)<1.479) {  
