@@ -187,8 +187,8 @@ HttNtupler::SlaveBegin()
 			  TString(getenv("CMSSW_BASE")+string("/src/MitPhysics/Utils/python/JetIdParams_cfi.py")));
   
   fTauMVAIso  = new TauIsoMVA();
-  fTauMVAIso ->Initialize(TString(getenv("CMSSW_BASE")+string("/src/MitPhysics/data/SXIsoMVA_BDTG.weights.xml")));
-  //fTauMVAIso->InitializeGBR(TString(getenv("CMSSW_BASE")+string("/src/MitPhysics/data/gbrfTauIso_apr29a.root")));
+  //fTauMVAIso ->Initialize(TString(getenv("CMSSW_BASE")+string("/src/MitPhysics/data/SXIsoMVA_BDTG.weights.xml")));
+  fTauMVAIso->InitializeGBR(TString(getenv("CMSSW_BASE")+string("/src/MitPhysics/data/gbrfTauIso_apr29a.root")));
 
   fTauMVAIso2 = new TauIsoMVA();
   fTauMVAIso2->InitializeGBR(TString(getenv("CMSSW_BASE")+string("/src/MitPhysics/data/gbrfTauIso_v2.root")));
@@ -425,7 +425,7 @@ HttNtupler::fillGenerator()
   bool lNext = false;
   bool lCountPartons = false;
   int  lNPartons = 0;
-  if((fUseGen==ESampleType::kW)) { 
+  if(fUseGen==ESampleType::kW || fUseGen==ESampleType::kZ) { 
     for(unsigned int i=0; i<fParticles->GetEntries(); ++i) { 
       const MCParticle* p = fParticles->At(i);
       if(p->Status() != 3) continue;
@@ -1212,14 +1212,14 @@ HttNtupler::fillSVfit()
   //metSign->reset();
 
   int lNHigh = 0;
-//   for(unsigned int idx=0; idx<fMuons->GetEntries(); ++idx){ 
-//     const Muon* pMu = fMuons->At(idx); if( !looseMuId(pMu,lNHigh) ){ continue; }
-//     for(unsigned int jdx=0; jdx<fElectrons->GetEntries(); ++jdx){ 
-//       const Electron* pElectron = fElectrons->At(jdx); if( !looseEleId(pElectron,1,lNHigh) ){ continue; }
-//       if( MathUtils::DeltaR(pElectron->Mom(), pMu->Mom()) < 0.3 ){ continue; }
-//       fillSVfit(fSVfitEMuArr, (Particle*)pMu, EGenType::kMuon, (Particle*)pElectron, EGenType::kElectron);
-//     }
-//   }
+  for(unsigned int idx=0; idx<fMuons->GetEntries(); ++idx){ 
+    const Muon* pMu = fMuons->At(idx); if( !looseMuId(pMu,lNHigh) ){ continue; }
+    for(unsigned int jdx=0; jdx<fElectrons->GetEntries(); ++jdx){ 
+      const Electron* pElectron = fElectrons->At(jdx); if( !looseEleId(pElectron,1,lNHigh) ){ continue; }
+      if( MathUtils::DeltaR(pElectron->Mom(), pMu->Mom()) < 0.3 ){ continue; }
+      fillSVfit(fSVfitEMuArr, (Particle*)pMu, EGenType::kMuon, (Particle*)pElectron, EGenType::kElectron);
+    }
+  }
   for(unsigned int idx=0; idx<fPFTaus->GetEntries(); ++idx){ 
     const PFTau* pPFTau = fPFTaus->At(idx); if( !looseTauId(pPFTau) ){ continue; }
     for(unsigned int jdx=0; jdx<fMuons->GetEntries(); ++jdx){
