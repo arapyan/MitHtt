@@ -63,8 +63,12 @@ namespace mithep
     bool hasGoodPV;
     /// embedding weight (for embedding sample only) 
     float embWeight;
+    /// various flavours of embedded weights for RecHit samples
+    float embGenWeight, embSpinnerWeight, embSpinnerFlipWeight, embSpinnerPlusWeight, embSpinnerMinusWeight;
+    float embMuEffWeight, embMuEffWeightUp, embMuEffWeightDown, embMuRadWeight, embMuRadWeightUp, embMuRadWeightDown;
+    float embGenTau2VsGenTau1PtGen, embGenTau2VsGenTau1EtaGen, embDiTauMassVsGenDiTauPtGen, embGenTau2VsGenTau1PtRec, embGenTau2VsGenTau1EtaRec, embDiTauMassVsGenDiTauPtRec;
 
-    ClassDef(TEventInfo, 2)
+    ClassDef(TEventInfo, 3)
   };
 }
 #endif
