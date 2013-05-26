@@ -128,10 +128,10 @@ HttNtupler::SlaveBegin()
   // setup jet energy scale uncertainties
   std::string jetCorrectorParams;
   if(f2012) {
-    if(fIsData) 
-      jetCorrectorParams = std::string(TString::Format("%s/src/MitPhysics/data/GR_P_V42_AN3_Uncertainty_AK5PF.txt", getenv("CMSSW_BASE")));
+    if(fIsData || fUseGen==ESampleType::kEmbed) 
+      jetCorrectorParams = std::string(TString::Format("%s/src/MitPhysics/data/Summer13_V1_DATA_Uncertainty_AK5PF.txt", getenv("CMSSW_BASE")));
     else
-      jetCorrectorParams = std::string(TString::Format("%s/src/MitPhysics/data/START53_V7F_Uncertainty_AK5PF.txt", getenv("CMSSW_BASE")));
+      jetCorrectorParams = std::string(TString::Format("%s/src/MitPhysics/data/Summer13_V1_MC_Uncertainty_AK5PF.txt", getenv("CMSSW_BASE")));
   }
   else jetCorrectorParams = std::string(TString::Format("%s/src/MitPhysics/data/START42_V17_AK5PF_Uncertainty.txt", getenv("CMSSW_BASE")));
   
@@ -187,8 +187,8 @@ HttNtupler::SlaveBegin()
 			  TString(getenv("CMSSW_BASE")+string("/src/MitPhysics/Utils/python/JetIdParams_cfi.py")));
   
   fTauMVAIso  = new TauIsoMVA();
-  //fTauMVAIso ->Initialize(TString(getenv("CMSSW_BASE")+string("/src/MitPhysics/data/SXIsoMVA_BDTG.weights.xml")));
-  fTauMVAIso->InitializeGBR(TString(getenv("CMSSW_BASE")+string("/src/MitPhysics/data/gbrfTauIso_apr29a.root")));
+  fTauMVAIso ->Initialize(TString(getenv("CMSSW_BASE")+string("/src/MitPhysics/data/SXIsoMVA_BDTG.weights.xml")));
+  //fTauMVAIso->InitializeGBR(TString(getenv("CMSSW_BASE")+string("/src/MitPhysics/data/gbrfTauIso_apr29a.root")));
 
   fTauMVAIso2 = new TauIsoMVA();
   fTauMVAIso2->InitializeGBR(TString(getenv("CMSSW_BASE")+string("/src/MitPhysics/data/gbrfTauIso_v2.root")));
@@ -696,6 +696,23 @@ HttNtupler::fillCommon(TriggerBits& trigBits)
   fEventInfo.mvaCov01     = (*MVACov)(0,1);
   fEventInfo.mvaCov11     = (*MVACov)(1,1);
   fEventInfo.embWeight    = (fUseGen==ESampleType::kEmbed) ? fEmbedWeight->At(fEmbedWeight->GetEntries()-1)->Weight() : 1;  
+  fEventInfo.embGenWeight		= (f2012 && fUseGen==ESampleType::kEmbed) ? fEmbedWeight->At(fEmbedWeight->GetEntries()-1)->GenWeight() : 1;  
+  fEventInfo.embSpinnerWeight		= (f2012 && fUseGen==ESampleType::kEmbed) ? fEmbedWeight->At(fEmbedWeight->GetEntries()-1)->SpinnerWeight() : 1;  
+  fEventInfo.embSpinnerFlipWeight	= (f2012 && fUseGen==ESampleType::kEmbed) ? fEmbedWeight->At(fEmbedWeight->GetEntries()-1)->SpinnerFlipWeight() : 1;  
+  fEventInfo.embSpinnerPlusWeight	= (f2012 && fUseGen==ESampleType::kEmbed) ? fEmbedWeight->At(fEmbedWeight->GetEntries()-1)->SpinnerPlusWeight() : 1;  
+  fEventInfo.embSpinnerMinusWeight	= (f2012 && fUseGen==ESampleType::kEmbed) ? fEmbedWeight->At(fEmbedWeight->GetEntries()-1)->SpinnerMinusWeight() : 1;  
+  fEventInfo.embMuEffWeight		= (f2012 && fUseGen==ESampleType::kEmbed) ? fEmbedWeight->At(fEmbedWeight->GetEntries()-1)->MuEffWeight() : 1;  
+  fEventInfo.embMuEffWeightUp		= (f2012 && fUseGen==ESampleType::kEmbed) ? fEmbedWeight->At(fEmbedWeight->GetEntries()-1)->MuEffWeightUp() : 1;  
+  fEventInfo.embMuEffWeightDown		= (f2012 && fUseGen==ESampleType::kEmbed) ? fEmbedWeight->At(fEmbedWeight->GetEntries()-1)->MuEffWeightDown() : 1;  
+  fEventInfo.embMuRadWeight		= (f2012 && fUseGen==ESampleType::kEmbed) ? fEmbedWeight->At(fEmbedWeight->GetEntries()-1)->MuRadWeight() : 1;  
+  fEventInfo.embMuRadWeightUp		= (f2012 && fUseGen==ESampleType::kEmbed) ? fEmbedWeight->At(fEmbedWeight->GetEntries()-1)->MuRadWeightUp() : 1;  
+  fEventInfo.embMuRadWeightDown		= (f2012 && fUseGen==ESampleType::kEmbed) ? fEmbedWeight->At(fEmbedWeight->GetEntries()-1)->MuRadWeightDown() : 1;  
+  fEventInfo.embGenTau2VsGenTau1PtGen	= (f2012 && fUseGen==ESampleType::kEmbed) ? fEmbedWeight->At(fEmbedWeight->GetEntries()-1)->GenTau2VsGenTau1PtGen() : 1;  
+  fEventInfo.embGenTau2VsGenTau1EtaGen	= (f2012 && fUseGen==ESampleType::kEmbed) ? fEmbedWeight->At(fEmbedWeight->GetEntries()-1)->GenTau2VsGenTau1EtaGen() : 1;  
+  fEventInfo.embDiTauMassVsGenDiTauPtGen= (f2012 && fUseGen==ESampleType::kEmbed) ? fEmbedWeight->At(fEmbedWeight->GetEntries()-1)->DiTauMassVsGenDiTauPtGen() : 1;  
+  fEventInfo.embGenTau2VsGenTau1PtRec	= (f2012 && fUseGen==ESampleType::kEmbed) ? fEmbedWeight->At(fEmbedWeight->GetEntries()-1)->GenTau2VsGenTau1PtRec() : 1;  
+  fEventInfo.embGenTau2VsGenTau1EtaRec	= (f2012 && fUseGen==ESampleType::kEmbed) ? fEmbedWeight->At(fEmbedWeight->GetEntries()-1)->GenTau2VsGenTau1EtaRec() : 1;  
+  fEventInfo.embDiTauMassVsGenDiTauPtRec= (f2012 && fUseGen==ESampleType::kEmbed) ? fEmbedWeight->At(fEmbedWeight->GetEntries()-1)->DiTauMassVsGenDiTauPtRec() : 1;  
 }
 
 void 
@@ -847,7 +864,7 @@ HttNtupler::fillElecs()
     pElectron->scID            = ele->SCluster()->GetUniqueID();
     pElectron->trkID           = (ele->HasTrackerTrk()) ? ele->TrackerTrk()->GetUniqueID() : 0;
     pElectron->isEcalDriven    = ele->IsEcalDriven();
-    pElectron->isConv          = fEleTools->PassConversionFilterPFAOD(ele,fConversions,fVertex,0,1e-6,2.0,1,0);//XXX
+    pElectron->isConv          = !fEleTools->PassConversionFilterPFAOD(ele,fConversions,fVertex,0,1e-6,2.0,1,0);//XXX
     //pElectron->isConv          = isConversion(ele);
     pElectron->isEB            = ele->IsEB();
     pElectron->ip3d            = ele->Ip3dPV();
@@ -1412,24 +1429,25 @@ HttNtupler::isConversion(const Electron* ele)
   const bool matchCkf                = true;
   const bool requireArbitratedMerged = false;
   for(unsigned int ifc=0; ifc<fConversions->GetEntries(); ++ifc){
-    if(!(fConversions->At(ifc)->Prob() > probMin) && (!requireArbitratedMerged || fConversions->At(ifc)->Quality().Quality(ConversionQuality::arbitratedMerged)) && (fConversions->At(ifc)->LxyCorrected((BaseVertex*)fVertex) > lxyMin)) continue;
     bool conversionMatchFound = false;
     for(unsigned int d=0; d<fConversions->At(ifc)->NDaughters(); ++d){
-      const ChargedParticle *pParticle = 0;
-      try{fConversions->At(ifc)->Daughter(d); } catch(exception e) {continue;}
-      try{pParticle = dynamic_cast<const ChargedParticle*>(fConversions->At(ifc)->Daughter(d));} catch(exception e) {cout << " Cance' " << endl; continue;}
-      //if(pParticle == 0) cout << " ---> Missing Particle " << ifc << " - " << d << endl;
-      if(pParticle == 0) continue;
-      //if(dynamic_cast<const ChargedParticle*>(fConversions->At(ifc)->Daughter(d))->Pt()  < 1.) continue;
-      const Track* trk = 0;
-      try{trk = pParticle->Trk();} catch(exception e) {continue;}
-      if(trk == 0) continue;
+      const Track* trk = dynamic_cast<const ChargedParticle*>(fConversions->At(ifc)->Daughter(d))->Trk();
       if( ele->GsfTrk() == trk || (matchCkf && ele->TrackerTrk()==trk) ){ conversionMatchFound = true; break; }
-      const StableData* sd = dynamic_cast<const StableData*> (fConversions->At(ifc)->DaughterDat(d));
-      isGoodConversion = true;
-      if( sd->NWrongHits() > nWrongHitsMax ){ isGoodConversion = false; }
     }
-    if(isGoodConversion) break; 
+    if( conversionMatchFound ){
+      isGoodConversion = (fConversions->At(ifc)->Prob() > probMin) && (!requireArbitratedMerged || fConversions->At(ifc)->Quality().Quality(ConversionQuality::arbitratedMerged)) && (fConversions->At(ifc)->LxyCorrected((BaseVertex*)fBeamSpot->At(0)) > lxyMin);
+      if( isGoodConversion == true ){
+        for(unsigned int d=0; d<fConversions->At(ifc)->NDaughters(); ++d){
+          const Track* trk = dynamic_cast<const ChargedParticle*> (fConversions->At(ifc)->Daughter(d))->Trk();
+          if( trk ){
+            const StableData* sd = dynamic_cast<const StableData*> (fConversions->At(ifc)->DaughterDat(d));
+            if( sd->NWrongHits() > nWrongHitsMax ){ isGoodConversion = false; }
+          } 
+	  else { isGoodConversion = false; }
+        }
+      }
+    }
+    if(isGoodConversion == true){ break; }
   }
   return isGoodConversion;
 }
