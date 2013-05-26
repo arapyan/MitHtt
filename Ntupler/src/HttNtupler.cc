@@ -1040,11 +1040,11 @@ HttNtupler::fillPFTaus()
       // HLT matching
       pPFTau->hltMatchBits = matchHLT(pftau->Eta(), pftau->Phi(), pftau->Pt());
       pPFTau->l1match = kFALSE;
-     //  for(unsigned int i=0; i<fTrigObj->GetEntries(); ++i){
-// 	const TriggerObjectBase *trigobj=fTrigObj->At(i);
-// 	if(trigobj->Pt() > 44 && !trigobj->HasType() && trigobj->Eta() != 0)
-// 	  if(MathUtils::DeltaR(trigobj->Phi(), trigobj->Eta(), pftau->Phi(), pftau->Eta())<0.5) pPFTau->l1match = kTRUE;  
-//       } 
+      for(unsigned int i=0; i<fTrigObj->GetEntries(); ++i){
+	const TriggerObjectBase *trigobj=fTrigObj->At(i);
+	if(trigobj->Pt() > 44 && !trigobj->HasType() && trigobj->Eta() != 0)
+	  if(MathUtils::DeltaR(trigobj->Phi(), trigobj->Eta(), pftau->Phi(), pftau->Eta())<0.5) pPFTau->l1match = kTRUE;  
+      } 
     }
   }
 }
@@ -1162,12 +1162,12 @@ HttNtupler::fillJets()
 
       pPFJet->matchedId    = matchedId;
       pPFJet->hltMatchBits = matchHLT(jet->Eta(), jet->Phi(), jet->Pt());
-     //  pPFJet->l1match = kFALSE;
-//       for(unsigned int i=0; i<fTrigObj->GetEntries(); ++i){
-// 	const TriggerObjectBase *trigobj=fTrigObj->At(i);
-// 	if(trigobj->Pt() > 44 && !trigobj->HasType() && trigobj->Eta() != 0)
-// 	  if(MathUtils::DeltaR(trigobj->Phi(), trigobj->Eta(), jet->Phi(), jet->Eta())<0.5) pPFJet->l1match = kTRUE;  
-//       } 
+      pPFJet->l1match = kFALSE;
+      for(unsigned int i=0; i<fTrigObj->GetEntries(); ++i){
+	const TriggerObjectBase *trigobj=fTrigObj->At(i);
+	if(trigobj->Pt() > 44 && !trigobj->HasType() && trigobj->Eta() != 0)
+	  if(MathUtils::DeltaR(trigobj->Phi(), trigobj->Eta(), jet->Phi(), jet->Eta())<0.5) pPFJet->l1match = kTRUE;  
+      } 
     }
   }
 }
