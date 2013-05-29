@@ -343,7 +343,7 @@ Bool_t passTrigNoIPEleMVAID(const mithep::TElectron *electron, Double_t mvaValue
       if(fabs(electron->dz) > 0.1)    return kFALSE;
     }
 
-  if(fabs(electron->scEta) < 1.479)
+  /*if(fabs(electron->scEta) < 1.479)
   {
     // barrel
     if(electron->sigiEtaiEta      > 0.01)  return kFALSE;
@@ -366,7 +366,7 @@ Bool_t passTrigNoIPEleMVAID(const mithep::TElectron *electron, Double_t mvaValue
     if(electron->emIso03  > 0.2*(electron->pt)) return kFALSE;
     if(electron->hadIso03 > 0.2*(electron->pt)) return kFALSE;
 
-  }
+  }*/
 
   Int_t subdet = 0;
   if (fabs(electron->scEta) < 0.8) subdet = 0;
