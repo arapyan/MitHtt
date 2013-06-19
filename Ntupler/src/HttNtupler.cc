@@ -210,8 +210,8 @@ HttNtupler::SlaveBegin()
                    TString(getenv("CMSSW_BASE")+string("/src/MitPhysics/Utils/python/JetIdParams_cfi.py")),
                    TString(getenv("CMSSW_BASE")+string("/src/MitPhysics/data/gbrmet_42.root")),
                    TString(getenv("CMSSW_BASE")+string("/src/MitPhysics/data/gbrmetphi_42.root")),
-                   TString(getenv("CMSSW_BASE")+string("/src/MitPhysics/data/gbrmetu1_42.root")),
-                   TString(getenv("CMSSW_BASE")+string("/src/MitPhysics/data/gbrmetu2_42.root")));
+                   TString(getenv("CMSSW_BASE")+string("/src/MitPhysics/data/gbru1cov_42.root")),
+                   TString(getenv("CMSSW_BASE")+string("/src/MitPhysics/data/gbru2cov_42.root")));
   }
   fMVAMetold->Initialize(TString(getenv("CMSSW_BASE")+string("/src/MitPhysics/data/mva_JetID_lowpt.weights.xml")),
                    TString(getenv("CMSSW_BASE")+string("/src/MitPhysics/data/mva_JetID_highpt.weights.xml")),
@@ -1680,9 +1680,9 @@ HttNtupler::looseTauId(const PFTau* tau)
 { 
   if( tau->Pt() < fPFTauPtMin                        ) return false;
   if( fabs(tau->Eta()) > fPFTauEtaMax                ) return false;
-  if( !tau->DiscriminationByLooseElectronRejection() ) return false;
+  //if( !tau->DiscriminationByLooseElectronRejection() ) return false;
   //if( !tau->DiscriminationByLooseMuonRejection()     ) return false;
-  if( !tau->LooseMuonRejection2()     ) return false;
+  //if( !tau->LooseMuonRejection2()     ) return false;
   if( !tau->DiscriminationByDecayModeFinding()       ) return false;
   //if( !tau->DiscriminationByLooseMVAIsolation()      ) return false;
   //if( !tau->DiscriminationByLooseIsolation()         ) return false;
