@@ -51,19 +51,19 @@ void runHttNtupler(
   sprintf(output,"%s_%s_ntuple.root",dataset,fileset); 
   
   // muon kinematics
-  const Double_t muPtMin  = 3.0; //7  
+  const Double_t muPtMin  = 10.0; //7  
   const Double_t muPtMax  = 7000;
   const Double_t muEtaMin = -2.4;
   const Double_t muEtaMax =  2.4;
 
   // electron kinematics
-  const Double_t eleEtMin  = 7.0; //7
+  const Double_t eleEtMin  = 10.0; //7
   const Double_t eleEtMax  = 7000;
   const Double_t eleEtaMin = -2.7;
   const Double_t eleEtaMax =  2.7;
   
   //tau kinematics
-  const Double_t  tauPtMin = 18; //18
+  const Double_t  tauPtMin =  18; //18
   const Double_t  tauEtaMax = 2.5;//2.5
   
   // jet requirements
@@ -91,7 +91,7 @@ void runHttNtupler(
   Dataset *d = NULL;
   d = c->FindDataset(book,dataset,fileset);
   ana->AddDataset(d);
-  //ana->AddFile("/castor/cern.ch/user/p/paus/filefi/029/r12c-tau-pr-v2/F8ED0695-7BF1-E111-86F5-002481E94C7E.root");
+  //ana->AddFile("/castor/cern.ch/user/p/paus/filefi/025/f11-h125tt-gf-v14b-bp/0253B667-22FB-E011-B319-90E6BA442EEB.root");
   //
   // setup ntupler module
   //
