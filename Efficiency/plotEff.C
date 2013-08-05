@@ -372,7 +372,7 @@ void plotEff(const TString conf,          // input file
     mass = data.mass;
     wgt  = 1;
     if (doPUReweighting) {
-      Int_t npuxbin = puWeights->GetXaxis()->FindFixBin(TMath::Min(double(data.npu), 34.499));
+      Int_t npuxbin = puWeights->GetXaxis()->FindFixBin(TMath::Min(double(data.npu), 59.999));
       wgt = puWeights->GetBinContent(npuxbin);
     }
     
@@ -411,7 +411,7 @@ void plotEff(const TString conf,          // input file
     for(UInt_t ibin=0; ibin<rhoNbins; ibin++)
       if((data.rho >= rhoBinEdgesv[ibin]) && (data.rho < rhoBinEdgesv[ibin+1]))
         irho = ibin;
-    if(irho<0) continue;
+    if(irho<0) irho=0;
         
     if(data.pass) {
       passTreePtv[ipt]->Fill();
@@ -1232,7 +1232,7 @@ void generateHistTemplates(const TString infilename,
     for(UInt_t ibin=0; ibin<rhoNbins; ibin++)
       if((data.rho >= rhoEdgesv[ibin]) && (data.rho < rhoEdgesv[ibin+1]))
         irho = ibin;
-    if(irho<0) continue;
+    if(irho<0) irho=0;
         
     if(data.pass) {
       passPt[ipt]->Fill(data.mass);
@@ -1852,7 +1852,7 @@ void performFit(Double_t &resEff, Double_t &resErrl, Double_t &resErrh,
   // Define free parameters
   UInt_t NsigMax     = passTree->GetEntries()+failTree->GetEntries();
   UInt_t NbkgFailMax = failTree->GetEntries();
-  RooRealVar Nsig("Nsig","Signal Yield",0.70*NsigMax,0,NsigMax);
+  RooRealVar Nsig("Nsig","Signal Yield",0.90*NsigMax,0,NsigMax);
   RooRealVar eff("eff","Efficiency",0.70,0,1.0);
   RooRealVar NbkgPass("NbkgPass","Background count in PASS sample",10,0,4000);
   if(bkgpass==0) NbkgPass.setVal(0);
@@ -1861,10 +1861,10 @@ void performFit(Double_t &resEff, Double_t &resErrl, Double_t &resErrh,
 
     
   RooFormulaVar NsigPass("NsigPass","eff*Nsig",RooArgList(eff,Nsig));	 
-m.setRange("signalRange",76.,106.);
-RooExtendPdf esignalPass("esignalPass","esignalPass",*(sigPass->model),NsigPass,"signalRange");
-RooExtendPdf ebackgroundPass("ebackgroundPass","ebackgroundPass",*(bkgPass->model),NbkgPass,"signalRange");
-RooAddPdf modelPass("modelPass","Model for PASS sample", (bkgpass>0) ? RooArgList(esignalPass,ebackgroundPass) : RooArgList(esignalPass));
+  m.setRange("signalRange",76.,106.);
+  RooExtendPdf esignalPass("esignalPass","esignalPass",*(sigPass->model),NsigPass,"signalRange");
+  RooExtendPdf ebackgroundPass("ebackgroundPass","ebackgroundPass",*(bkgPass->model),NbkgPass,"signalRange");
+  RooAddPdf modelPass("modelPass","Model for PASS sample", (bkgpass>0) ? RooArgList(esignalPass,ebackgroundPass) : RooArgList(esignalPass));
 //  RooAddPdf modelPass("modelPass","Model for PASS sample",
 //                      (bkgpass>0) ? RooArgList(*(sigPass->model),*(bkgPass->model)) :  RooArgList(*(sigPass->model)),
 //		      (bkgpass>0) ? RooArgList(NsigPass,NbkgPass) : RooArgList(NsigPass));
