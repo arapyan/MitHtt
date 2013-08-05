@@ -35,17 +35,17 @@
 #include <string>                   // C++ string class
 #include <sstream>                  // class for parsing strings
 
-#include "Common/Efficiency/CPlot.hh"	    // helper class for plots
-#include "Common/Efficiency/MitStyleRemix.hh"  // style settings for drawing
-#include "Common/Efficiency/MyTools.hh"	    // miscellaneous helper functions
-#include "Common/Efficiency/CEffUser1D.hh"     // class for handling efficiency graphs
-#include "Common/Efficiency/CEffUser2D.hh"     // class for handling efficiency tables
+#include "MitHtt/Common/CPlot.hh"	    // helper class for plots
+#include "MitHtt/Common/MitStyleRemix.hh"  // style settings for drawing
+#include "MitHtt/Common/MyTools.hh"	    // miscellaneous helper functions
+#include "MitHtt/Common/CEffUser1D.hh"     // class for handling efficiency graphs
+#include "MitHtt/Common/CEffUser2D.hh"     // class for handling efficiency tables
 
 // structure for output ntuple
 #include "EffData.hh"
 
-#include "Goodies/ZSignals.hh"
-#include "Goodies/ZBackgrounds.hh"
+#include "MitHtt/Common/ZSignals.hh"
+#include "MitHtt/Common/ZBackgrounds.hh"
 #endif
 
 // RooFit headers
