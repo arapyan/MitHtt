@@ -16,6 +16,14 @@ Output::Output(TString name):
   fPUWeight(0),
   fEffWeight(0),
   fWeight(0),
+  fEmbWeight(0),
+  fEmbKinWeight(0),
+  fEmbIdScale(0),
+  fEmbGenWeight(0), 
+  fEmbSpinnerWeight(0),
+  fEmbMuEff(0),
+  fEmbMuRad(0),
+  fEmbKinMassWeight(0),
   fMass(0),
   fMVis(0),
   fPt1(0),
@@ -102,6 +110,7 @@ Output::Output(TString name):
   fPtHMVA(0),
   fNBTag(0),
   fNJets(0),
+  fNJetsClean(0),
   fGenPt1(0),
   fGenPhi1(0),
   fGenEta1(0),
@@ -110,11 +119,43 @@ Output::Output(TString name):
   fGenPhi2(0),
   fGenEta2(0),
   fGenId2(0),
+  fVisGenPt1(0),
+  fVisGenPhi1(0),
+  fVisGenEta1(0),
+  fVisGenId1(0),
+  fVisGenPt2(0),
+  fVisGenPhi2(0),
+  fVisGenEta2(0),
+  fVisGenId2(0),
+  byCombinedIsolationDeltaBetaCorrRaw3Hits1(0),
+  byCombinedIsolationDeltaBetaCorrRaw3Hits2(0),
+  againstElectronMVA3raw1(0),
+  againstElectronMVA3raw2(0),
+  byIsolationMVA2raw1(0),
+  byIsolationMVA2raw2(0),
+  againstMuonLoose21(0),
+  againstMuonLoose22(0),
+  againstMuonMedium21(0),
+  againstMuonMedium22(0),
+  againstMuonTight21(0),
+  againstMuonTight22(0),
+  passAntiEleMVA31(0),
+  passAntiEleMVA32(0),
+  passAntiEleNewWPMVA31(0),
+  passAntiEleNewWPMVA32(0),
+  antitightele1(0),
+  antitightele2(0),
+  fpartons(0),
+  fGenMatch(0),
+  fLepMatchAny(0),
+  fGenMatchLep(0),
   doRecoil(0),
   doEmu(0),
   npt20jets(0),
   fOutputFile(0),
   fEventTree(0),
+  lshift1(0),
+  lshift2(0),
   corrector(0)
 {
   btagArray.Set(50);
@@ -136,14 +177,14 @@ void Output::setupRecoil(int doRec, bool is2012, bool isEmu)
       if(doRecoil == 1) corrector = new RecoilCorrector("$CMSSW_BASE/src/MitHtt/Utils/recoilfits/recoilfit_zmm53X_2012_njet.root");
       if(doRecoil == 2) corrector = new RecoilCorrector("$CMSSW_BASE/src/MitHtt/Utils/recoilfits/recoilfit_wjets53X_20pv_njet.root");
       if(doRecoil == 3) corrector = new RecoilCorrector("$CMSSW_BASE/src/MitHtt/Utils/recoilfits/recoilfit_higgs53X_20pv_njet.root");
-      corrector->addMCFile      ("$CMSSW_BASE/src/MitHtt/Utils/recoilfits/recoilfit_zmm53X_2012_njet.root");
-      corrector->addDataFile    ("$CMSSW_BASE/src/MitHtt/Utils/recoilfits/recoilfit_datamm53X_2012_njet.root");
+      corrector->addMCFile      ("$CMSSW_BASE/src/MitHtt/Utils/recoilfits/recoilfit_zmm53XRR_2012_njet.root");
+      corrector->addDataFile    ("$CMSSW_BASE/src/MitHtt/Utils/recoilfits/recoilfit_datamm53XRR_2012_njet.root");
     } else {
       if(is2012) {
 	if(doRecoil == 1) corrector = new RecoilCorrector("$CMSSW_BASE/src/MitHtt/Utils/recoilfits/recoilfit_higgsem53X_20pv_njet.root");
 	if(doRecoil == 2) corrector = new RecoilCorrector("$CMSSW_BASE/src/MitHtt/Utils/recoilfits/recoilfit_zmm53X_20pv_njet.root");
-	corrector->addMCFile      ("$CMSSW_BASE/src/MitHtt/Utils/recoilfits/recoilfit_zmm53X_20pv_njet.root");
-	corrector->addDataFile    ("$CMSSW_BASE/src/MitHtt/Utils/recoilfits/recoilfit_datamm53X_20pv_njet.root");
+	corrector->addMCFile      ("$CMSSW_BASE/src/MitHtt/Utils/recoilfits/recoilfit_zmm53XRR_2012_njet.root");
+	corrector->addDataFile    ("$CMSSW_BASE/src/MitHtt/Utils/recoilfits/recoilfit_datamm53XRR_2012_njet.root");
       } else {
 	if(doRecoil == 1) corrector = new RecoilCorrector("$CMSSW_BASE/src/MitHtt/Utils/recoilfits/recoilfit_higgsem42X_20pv_njet.root");
 	if(doRecoil == 2) corrector = new RecoilCorrector("$CMSSW_BASE/src/MitHtt/Utils/recoilfits/recoilfit_zmm42X_20pv_njet.root");
@@ -169,10 +210,18 @@ void Output::setupOutput(TString name) {
   fEventTree->Branch("puweight",&fPUWeight,"fPUWeight/F");
   fEventTree->Branch("effweight",&fEffWeight,"fEffWeight/F");
   fEventTree->Branch("weight",&fWeight,"fWeight/F");
+  fEventTree->Branch("embweight",&fEmbWeight,"fEmbWeight/F");
+  fEventTree->Branch("embkinweight",&fEmbKinWeight,"fEmbKinWeight/F");
+  fEventTree->Branch("embgenweight",&fEmbGenWeight,"fEmbGenWeight/F");
+  fEventTree->Branch("embspinnerweight",&fEmbSpinnerWeight,"fEmbSpinnerWeight/F");
+  fEventTree->Branch("embmueffeweight",&fEmbMuEff,"fEmbMuEff/F");
+  fEventTree->Branch("embmuradweight",&fEmbMuRad,"fEmbMuRad/F");
+  fEventTree->Branch("embkinmassweight",&fEmbKinMassWeight,"fEmbKinMassWeight/F");
+  fEventTree->Branch("emblid",&fEmbIdScale,"fEmbIdScale/F");
   fEventTree->Branch("genmass",&fMass,"fMass/F");
   fEventTree->Branch("genpt",&fgenpt,"fgenpt/F");
   fEventTree->Branch("genphi",&fgenphi,"fgenphi/F");
-  fEventTree->Branch("m_vis",&fMVis,"fMVis/F");
+  fEventTree->Branch("mvis",&fMVis,"fMVis/F");
   fEventTree->Branch("pt_1",&fPt1,"fPt1/F");
   fEventTree->Branch("phi_1",&fPhi1,"fPhi1/F");
   fEventTree->Branch("eta_1",&fEta1,"fEta1/F");
@@ -233,11 +282,11 @@ void Output::setupOutput(TString name) {
   fEventTree->Branch("jmva_2",&fJMVA2,"fJMVA2/F");
   fEventTree->Branch("jcsv_2",&fJcsv2,"fJcsv2/F");
   fEventTree->Branch("jpass_2",&fJPass2,"fJPass2/O");
-  fEventTree->Branch("bpt_1",&fBTagPt1,"fBtagPt1/F");
-  fEventTree->Branch("beta_1",&fBTagEta1,"fBTagEta1/F");
-  fEventTree->Branch("bphi_1",&fBTagPhi1,"fBTagPhi1/F");
-  fEventTree->Branch("bm_1",&fBTagM1,"fBTagM1/F");
-  fEventTree->Branch("bcsv_1",&fbcsv1,"fbcsv1/F");
+  fEventTree->Branch("bpt",&fBTagPt1,"fBtagPt1/F");
+  fEventTree->Branch("beta",&fBTagEta1,"fBTagEta1/F");
+  fEventTree->Branch("bphi",&fBTagPhi1,"fBTagPhi1/F");
+  fEventTree->Branch("bm",&fBTagM1,"fBTagM1/F");
+  fEventTree->Branch("bcsv",&fbcsv1,"fbcsv1/F");
   fEventTree->Branch("bpt_2",&fBTagPt2,"fBtagPt2/F");
   fEventTree->Branch("beta_2",&fBTagEta2,"fBTagEta2/F");
   fEventTree->Branch("bphi_2",&fBTagPhi2,"fBTagPhi2/F");
@@ -254,7 +303,8 @@ void Output::setupOutput(TString name) {
   fEventTree->Branch("pth",&fPtH,"fPtH/F");
   fEventTree->Branch("pthmva",&fPtHMVA,"fPtHMVA/F");
   fEventTree->Branch("nbtag",&fNBTag,"fNBTag/I");
-  fEventTree->Branch("njets",&fNJets,"fNJets/I");
+  fEventTree->Branch("njets",&fNJetsClean,"fNJetsClean/I");
+  fEventTree->Branch("njetsRaw",&fNJets,"fNJets/I");
   fEventTree->Branch("genlpt_1",&fGenPt1,"fJGenPt1/F");
   fEventTree->Branch("genlphi_1",&fGenPhi1,"fGenPhi1/F");
   fEventTree->Branch("genleta_1",&fGenEta1,"fGenEta1/F");
@@ -263,9 +313,38 @@ void Output::setupOutput(TString name) {
   fEventTree->Branch("genlphi_2",&fGenPhi2,"fGenPhi2/F");
   fEventTree->Branch("genleta_2",&fGenEta2,"fGenEta2/F");
   fEventTree->Branch("genlid_2",&fGenId2 ,"fGenId2/I");
+  fEventTree->Branch("genvislpt_1",&fVisGenPt1,"fVisGenPt1/F");
+  fEventTree->Branch("genvislphi_1",&fVisGenPhi1,"fVisGenPhi1/F");
+  fEventTree->Branch("genvisleta_1",&fVisGenEta1,"fVisGenEta1/F");
+  fEventTree->Branch("genvislid_1",&fVisGenId1 ,"fVisGenId1/I");
+  fEventTree->Branch("genvislpt_2",&fVisGenPt2,"fJVisGenPt2/F");
+  fEventTree->Branch("genvislphi_2",&fVisGenPhi2,"fVisGenPhi2/F");
+  fEventTree->Branch("genvisleta_2",&fVisGenEta2,"fVisGenEta2/F");
+  fEventTree->Branch("genvislid_2",&fVisGenId2 ,"fVisGenId2/I");
   fEventTree->Branch("genmatch",&fGenMatch ,"fGenMatch/I");
+  fEventTree->Branch("genlepmatch",&fLepMatchAny ,"fLepMatchAny/I");
+  fEventTree->Branch("genmatchlep",&fGenMatchLep ,"fGenMatchLep/I");
   fEventTree->Branch("vbfmva",&fMVA,"fMVA/F");
   fEventTree->Branch("njetingap",&fNJetInGap,"fNJetInGap/I");
+  fEventTree->Branch("byCombinedIsolationDeltaBetaCorrRaw3Hits_1",&byCombinedIsolationDeltaBetaCorrRaw3Hits1,"byCombinedIsolationDeltaBetaCorrRaw3Hits1/F");
+  fEventTree->Branch("byCombinedIsolationDeltaBetaCorrRaw3Hits_2",&byCombinedIsolationDeltaBetaCorrRaw3Hits2,"byCombinedIsolationDeltaBetaCorrRaw3Hits2/F");
+  fEventTree->Branch("againstElectronMVA3raw_1",&againstElectronMVA3raw1,"againstElectronMVA3raw1/F");
+  fEventTree->Branch("againstElectronMVA3raw_2",&againstElectronMVA3raw2,"againstElectronMVA3raw2/F");
+  fEventTree->Branch("byIsolationMVA2raw_1",&byIsolationMVA2raw1,"byIsolationMVA2raw1/F");
+  fEventTree->Branch("byIsolationMVA2raw_2",&byIsolationMVA2raw2,"byIsolationMVA2raw2/F");
+  fEventTree->Branch("againstMuonLoose2_1",&againstMuonLoose21,"againstMuonLoose21/F");
+  fEventTree->Branch("againstMuonLoose2_2",&againstMuonLoose22,"againstMuonLoose22/F");
+  fEventTree->Branch("againstMuonMedium2_1",&againstMuonMedium21,"againstMuonMedium21/F");
+  fEventTree->Branch("againstMuonMedium2_2",&againstMuonMedium22,"againstMuonMedium22/F");
+  fEventTree->Branch("againstMuonTight2_1",&againstMuonTight21,"againstMuonTight21/F");
+  fEventTree->Branch("againstMuonTight2_2",&againstMuonTight22,"againstMuonTight22/F");
+  fEventTree->Branch("passAntiEleMVA3_1",&passAntiEleMVA31,"passAntiEleMVA31/F");
+  fEventTree->Branch("passAntiEleMVA3_2",&passAntiEleMVA32,"passAntiEleMVA32/F");
+  fEventTree->Branch("passAntiEleNewWPMVA3_1",&passAntiEleNewWPMVA31,"passAntiEleNewWPMVA31/F");
+  fEventTree->Branch("passAntiEleNewWPMVA3_2",&passAntiEleNewWPMVA32,"passAntiEleNewWPMVA32/F");
+  fEventTree->Branch("Npartons",&fpartons,"fpartons/F");
+  fEventTree->Branch("antitightele_1",&antitightele1,"antitightele1/O");
+  fEventTree->Branch("antitightele_2",&antitightele2,"antitightele2/O");
   fEventTree->Branch("npt20jets",&npt20jets);
   fEventTree->Branch("btagArray",&btagArray);
   fEventTree->Branch("jptArray",&jptArray);
@@ -335,14 +414,12 @@ void Output::fillElectron(const mithep::TElectron *ele, bool first, double iso, 
     }
 }
 
-void Output::fillTau(const mithep::TPFTau *tau, bool first, bool passiso)
+void Output::fillTau(const mithep::TPFTau *tau, bool first, bool passiso, bool tauescorr, float antielemva3nwp)
 {
   if(first)
     {
-      fPt1 = tau->pt;
       fPhi1 = tau->phi;
       fEta1 = tau->eta;
-      fM1  = tau->m;
       fq1 = tau->q;
       fIso1 = tau->ringIso;
       fD01 =  tau->leadChargedHadronPFCand.d0;
@@ -351,13 +428,31 @@ void Output::fillTau(const mithep::TPFTau *tau, bool first, bool passiso)
       fngamma1  = tau->nSignalPFGammaCands;
       fnprong1  = tau->nSignalPFChargedHadrCands;
       fantiele1   = (tau->hpsDiscriminators & mithep::TPFTau::kMVAEle);
+      antitightele1 = (tau->hpsDiscriminators & mithep::TPFTau::kTightEle);
+      passAntiEleMVA31 = tau->passAntiEleMVA3;
+      passAntiEleNewWPMVA31 = antielemva3nwp;
+      if(tauescorr)
+	{
+	  if(fnprong1==1 && fngamma1==0)
+	    lshift1 = 0.0;
+	  else if(fnprong1==1 && fngamma1>0)
+	    lshift1 = prong1(tau->pt);
+	  else
+	    lshift1 = prong3(tau->pt);
+	}     
+      fPt1=(1.0+lshift1)*tau->pt;
+      fM1 = (1.0+lshift1)*tau->m;
+      byCombinedIsolationDeltaBetaCorrRaw3Hits1 = tau->rawIso3Hits;
+      againstElectronMVA3raw1 = tau->antiEleMVA3;
+      byIsolationMVA2raw1  = tau->ringIso2;
+      if(tau->passAntiMu2>0) againstMuonLoose21=1;
+      if(tau->passAntiMu2>1.5) againstMuonMedium21=1;
+      if(tau->passAntiMu2>2.5) againstMuonTight21=1;
     }
   else
     {
-      fPt2 = tau->pt;
       fPhi2 = tau->phi;
       fEta2 = tau->eta;
-      fM2  = tau->m;
       fq2 = tau->q;
       fIso2 = tau->ringIso;
       fD02 =  tau->leadChargedHadronPFCand.d0;
@@ -366,6 +461,27 @@ void Output::fillTau(const mithep::TPFTau *tau, bool first, bool passiso)
       fngamma2  = tau->nSignalPFGammaCands;
       fnprong2  = tau->nSignalPFChargedHadrCands;
       fantiele2   = (tau->hpsDiscriminators & mithep::TPFTau::kMVAEle);	
+      antitightele2 = (tau->hpsDiscriminators & mithep::TPFTau::kTightEle);
+      passAntiEleMVA32 = tau->passAntiEleMVA3;
+      passAntiEleNewWPMVA32 = antielemva3nwp;
+      if(tauescorr)
+	{
+	  if(fnprong2==1 && fngamma2==0)
+	    lshift2 =0.0;
+	  else if(fnprong2==1 && fngamma2>0)
+	    lshift2 = prong1(tau->pt);
+	  else
+	    lshift2 = prong3(tau->pt);
+	}     
+      fPt2=(1.0+lshift2)*tau->pt;
+      fM2 = (1.0+lshift2)*tau->m;
+      byCombinedIsolationDeltaBetaCorrRaw3Hits2 = tau->rawIso3Hits;
+      againstElectronMVA3raw2 = tau->antiEleMVA3;
+      byIsolationMVA2raw2  = tau->ringIso2;
+      if(tau->passAntiMu2>0) againstMuonLoose22=1;
+      //againstMuonLoose22 = tau->hpsDiscriminators & mithep::TPFTau::kTightMu;
+      if(tau->passAntiMu2>1.5) againstMuonMedium22=1;
+      if(tau->passAntiMu2>2.5) againstMuonTight22=1;
     }
 }
 
@@ -383,7 +499,7 @@ void Output::fillCov(mithep::TSVfit *svfit)
   fMVACov11 = svfit->mvacov_11;
 }
 
-void Output::fillJets(const mithep::TJet *jet1,const mithep::TJet *jet2, const mithep::TJet *bjet1, const mithep::TJet *bjet2, int njets, int nbjets, int npt20,int nCentralJets)
+void Output::fillJets(const mithep::TJet *jet1,const mithep::TJet *jet2, const mithep::TJet *bjet1, const mithep::TJet *bjet2, int njetsclean, int njets, int nbjets, int npt20,int nCentralJets)
 {
   fJPt1		 = (jet1) ? jet1->pt  : 0;
   fJEta1	 = (jet1) ? jet1->eta : 0;
@@ -411,6 +527,7 @@ void Output::fillJets(const mithep::TJet *jet1,const mithep::TJet *jet2, const m
   fBTagPhi2	 = (bjet2) ? bjet2->phi : 0; 
   fBTagM2	 = (bjet2) ? bjet2->mass : 0; 
   fbcsv2         = (bjet2) ? bjet2->csv : 0;
+  fNJetsClean    = njetsclean;
   fNJets         = njets;
   fNBTag         = nbjets;
   fNJetInGap	 = (njets>1) ? nCentralJets : 0;
@@ -439,14 +556,81 @@ void Output::fillGen(mithep::TGenInfo *gen)
     fGenPhi1 = gen->phi_2_a;
     fGenId1  = gen->id_2_a; 
   } 
+  if(gen->pt_1_b > gen->pt_2_b) {
+    fVisGenPt1  = gen->pt_1_b;
+    fVisGenEta1 = gen->eta_1_b;
+    fVisGenPhi1 = gen->phi_1_b;
+    fVisGenId1  = gen->id_1_b; 
+    fVisGenPt2  = gen->pt_2_b;
+    fVisGenEta2 = gen->eta_2_b;
+    fVisGenPhi2 = gen->phi_2_b;
+    fVisGenId2  = gen->id_2_b; 
+  } else {
+    fVisGenPt2  = gen->pt_1_b;
+    fVisGenEta2 = gen->eta_1_b;
+    fVisGenPhi2 = gen->phi_1_b;
+    fVisGenId2  = gen->id_1_b; 
+    fVisGenPt1  = gen->pt_2_b;
+    fVisGenEta1 = gen->eta_2_b;
+    fVisGenPhi1 = gen->phi_2_b;
+    fVisGenId1  = gen->id_2_b; 
+  } 
   int lNTauMatch = 0;
   int lNLepMatch = 0;
+  fLepMatchAny = 0;
   fGenMatch = 0;
+  fGenMatchLep = 0;
   
-  if(toolbox::deltaR(fEta1,fPhi1,fGenEta1,fGenPhi1) < 0.3) {if(fabs(fGenId1) > 14)  {lNTauMatch++;} else{lNLepMatch++;}}
-  if(toolbox::deltaR(fEta1,fPhi1,fGenEta2,fGenPhi2) < 0.3) {if(fabs(fGenId2) > 14)  {lNTauMatch++;} else {lNLepMatch++;}}
-  if(toolbox::deltaR(fEta2,fPhi2,fGenEta1,fGenPhi1) < 0.3) {if(fabs(fGenId1) > 14)  {lNTauMatch++;} else {lNLepMatch++;}}
-  if(toolbox::deltaR(fEta2,fPhi2,fGenEta2,fGenPhi2) < 0.3) {if(fabs(fGenId2) > 14)  {lNTauMatch++;} else {lNLepMatch++;}}
+  if(toolbox::deltaR(fEta1,fPhi1,fGenEta1,fGenPhi1) < 0.3) 
+    {
+      if(fabs(fGenId1) > 14)  
+	{
+	  lNTauMatch++;
+	  if(fabs(fGenId1) == 17 || fabs(fGenId1) == 18)
+	    fGenMatchLep++;
+	} 
+      else
+	{lNLepMatch++;}
+    }
+  if(toolbox::deltaR(fEta1,fPhi1,fGenEta2,fGenPhi2) < 0.3) 
+    {
+      if(fabs(fGenId2) > 14)  
+	{
+	  lNTauMatch++;
+	  if(fabs(fGenId2) == 17 || fabs(fGenId2) == 18)
+	    fGenMatchLep++;
+	} 
+      else 
+	{lNLepMatch++;}
+    }
+  if(toolbox::deltaR(fEta2,fPhi2,fGenEta1,fGenPhi1) < 0.3) 
+    {
+      if(fabs(fGenId1) > 14)  
+	{
+	  lNTauMatch++;
+	  if(fabs(fGenId1) == 17 || fabs(fGenId1) == 18)
+	    fGenMatchLep++;
+	} 
+      else {
+	lNLepMatch++;
+      if(fGenPt1>8)
+	fLepMatchAny++;
+      }
+    }
+  if(toolbox::deltaR(fEta2,fPhi2,fGenEta2,fGenPhi2) < 0.3) 
+    {
+      if(fabs(fGenId2) > 14)  
+	{
+	  lNTauMatch++;
+	  if(fabs(fGenId2) == 17 || fabs(fGenId2) == 18)
+	    fGenMatchLep++;
+	} 
+      else {
+	lNLepMatch++;
+	if(fGenPt2>8)
+	  fLepMatchAny++;
+      }
+    }
   if(lNLepMatch == 2                   ) fGenMatch = 1;
   if(lNTauMatch == 1 && lNLepMatch == 1) fGenMatch = 2;
   if(lNTauMatch == 2                   ) fGenMatch = 3;
@@ -456,6 +640,7 @@ void Output::fillGen(mithep::TGenInfo *gen)
   fMass  = gen->vmass_a;
   fgenpt = gen->vpt_a;
   fgenphi = gen->vphi_a;
+  fpartons = gen->npartons;
 }
 
 void Output::fillEvent(mithep::TEventInfo *info, HttMVA *vbfmva, int npv, double scalecorr)
@@ -467,13 +652,31 @@ void Output::fillEvent(mithep::TEventInfo *info, HttMVA *vbfmva, int npv, double
   fpvx = info->pvx;
   fpvy = info->pvy;
   fpvz = info->pvz;
-  fNPU = info->nPU;
+  fNPU = info->nPUTrue;
   fRho = info->rho;
 
   fMet = info->pfMET + scalecorr;
   fMVAMet += scalecorr;
   fMetPhi = info->pfMETphi;
-  
+  //fMVAMet     = info->mvaMET;
+  //MVAMetPhi  = info->mvaMETphi;
+  //fMVACov00 = info->mvaCov00;
+  //fMVACov01 = info->mvaCov01;
+  //fMVACov10 = info->mvaCov10;
+  //fMVACov11 = info->mvaCov11;
+  TLorentzVector ldvecr1; ldvecr1.SetPtEtaPhiM(fPt1*lshift1/(lshift1+1),fEta1,fPhi1,fM1*lshift1/(1.0+lshift1));
+  TLorentzVector ldvecr2; ldvecr2.SetPtEtaPhiM(fPt2*lshift2/(lshift2+1),fEta2,fPhi2,fM2*lshift2/(1.0+lshift2));
+  TLorentzVector lVMet;  lVMet.SetPtEtaPhiM(fMet,0,fMetPhi,0);
+  TLorentzVector lVMVAMet;  lVMVAMet.SetPtEtaPhiM(fMVAMet,0,fMVAMetPhi,0);
+  lVMet  -= ldvecr1;
+  lVMet  -= ldvecr2;
+  lVMVAMet  -= ldvecr1;
+  lVMVAMet  -= ldvecr2;
+  fMet=lVMet.Pt();
+  fMetPhi=lVMet.Phi();
+  fMVAMet=lVMVAMet.Pt();
+  fMVAMetPhi=lVMVAMet.Phi();
+
   TLorentzVector lep1, lep2, dilep;
   lep1.SetPtEtaPhiM(fPt1, fEta1, fPhi1,fM1);
   lep2.SetPtEtaPhiM(fPt2, fEta2, fPhi2,fM2);
@@ -491,7 +694,7 @@ void Output::fillEvent(mithep::TEventInfo *info, HttMVA *vbfmva, int npv, double
   double lMVAMetPhi  = fMVAMetPhi;
   
   if(corrector && doEmu) corrector->CorrectType1(lMVAMet, lMVAMetPhi, fgenpt, fgenphi, dilep.Pt(), dilep.Phi(), pU1, pU2, 0, 0, fNJets);
-  else if(corrector && doRecoil != 2) corrector->CorrectType1(lMVAMet, lMVAMetPhi, fgenpt, fgenphi, dilep.Pt(), dilep.Phi(), pU1, pU2, 0, 0, fNJets);
+  else if(corrector && doRecoil != 2) corrector->CorrectType1(lMVAMet, lMVAMetPhi, fgenpt, fgenphi, dilep.Pt(), dilep.Phi(), pU1, pU2, 0, 0, fNJetsClean);
   else if(corrector && doRecoil == 2) corrector->CorrectType1(lMVAMet, lMVAMetPhi, fgenpt, fgenphi, lep1 .Pt(), lep1 .Phi(), pU1, pU2, 0, 0, fNJets);
   fMVAMet            = lMVAMet;
   fMVAMetPhi         = lMVAMetPhi;
@@ -521,21 +724,36 @@ void Output::fillEvent(mithep::TEventInfo *info, HttMVA *vbfmva, int npv, double
   fPZetaVis	 = (l1+l2).Dot(bisector);
   fPZetaMiss	 = metv.Dot(bisector);
   fPZetaMVAMiss  = mvametv.Dot(bisector);
-  fMJJ		 = (fNJets>1) ? dijet.M() : 0;
-  fJDEta	 = (fNJets>1) ? fabs(fJEta1 - fJEta2) : 0;
-  fJDPhi	 = (fNJets>1) ? toolbox::deltaPhi(fJPhi1,fJPhi2) : 0;
-  fDiJetPt	 = (fNJets>1) ? dijet.Pt()  : 0;
-  fDiJetPhi	 = (fNJets>1) ? dijet.Phi() : 0;
-  fHDJetPhi	 = (fNJets>1) ? toolbox::deltaPhi(dijet.Phi(),higgs.Phi()) : 0;
-  fVisJetEta	 = (fNJets>1) ? TMath::Min(fabs(dilep.Eta()-fJEta1),fabs(dilep.Eta()-fJEta2)) : 0;
+  fMJJ		 = (fNJetsClean>1) ? dijet.M() : 0;
+  fJDEta	 = (fNJetsClean>1) ? fabs(fJEta1 - fJEta2) : 0;
+  fJDPhi	 = (fNJetsClean>1) ? toolbox::deltaPhi(fJPhi1,fJPhi2) : 0;
+  fDiJetPt	 = (fNJetsClean>1) ? dijet.Pt()  : 0;
+  fDiJetPhi	 = (fNJetsClean>1) ? dijet.Phi() : 0;
+  fHDJetPhi	 = (fNJetsClean>1) ? toolbox::deltaPhi(dijet.Phi(),higgs.Phi()) : 0;
+  fVisJetEta	 = (fNJetsClean>1) ? TMath::Min(fabs(dilep.Eta()-fJEta1),fabs(dilep.Eta()-fJEta2)) : 0;
   fPtVis	 = dilep.Pt();
   fPtH		 = higgs.Pt();
   fPtHMVA        = higgsmvamet.Pt();
   fMVA		 = (vbfmva)  ? vbfmva->MVAValue(fMJJ, fJDEta, fJDPhi, fDiJetPt, fPtH, fHDJetPhi, fVisJetEta, fPtVis) : 0;
   fEventTree->Fill();
 } 
+//double Output::prong1(double pt)
+//{
+// return 0.025+0.001*TMath::Min(TMath::Max(pt-45,0.0),10.0);
+//}
+//double Output::prong3(double pt)
+//{
+//  return 0.012+0.001*TMath::Min(TMath::Max(pt-32,0.0),18.0);
+//}
 
-
+double Output::prong1(double pt)
+{
+  return 0.012;
+}
+double Output::prong3(double pt)
+{
+  return 0.012;
+}
 
 
         

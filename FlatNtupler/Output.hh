@@ -50,6 +50,14 @@ public:
   float fPUWeight;  //Pileup Weight
   float fEffWeight; //Efficiency Scale factor
   float fWeight;    //mcweight*puweight*effweight
+  float fEmbWeight; //embedded weight
+  float fEmbKinWeight; //kinematic (unfolding) weight3
+  float fEmbIdScale; //id efficiency applied to embedded?
+  float fEmbGenWeight; 
+  float fEmbSpinnerWeight;
+  float fEmbMuEff;
+  float fEmbMuRad;
+  float fEmbKinMassWeight;
 
   //Mass variables
   float fMass;      //gen mass if applicible 
@@ -166,6 +174,7 @@ public:
   int fNBTag;   
   //number of jets passing jet id (pt > 30)
   int fNJets;
+  int fNJetsClean;  // cleaned against hadronic taus
 
   //generator lepton pt, eta, phi for embedded
   float fGenPt1;  //pT leading
@@ -176,7 +185,39 @@ public:
   float fGenPhi2; //Phi sub-leading
   float fGenEta2; //Eta sub-leading
   int   fGenId2;  //Pdg Id leading
+  float fVisGenPt1;  //pT Vis leading
+  float fVisGenPhi1; //Phi Vis leading
+  float fVisGenEta1; //Eta Vis leading
+  int   fVisGenId1;  //Pdg Id leading
+  float fVisGenPt2;  //pT  Vis sub-leading
+  float fVisGenPhi2; //Phi Vis sub-leading
+  float fVisGenEta2; //Eta Vis sub-leading
+  int   fVisGenId2;  //Pdg Id leading
+
+  // new tau discriminators
+  float byCombinedIsolationDeltaBetaCorrRaw3Hits1;
+  float byCombinedIsolationDeltaBetaCorrRaw3Hits2;
+  float againstElectronMVA3raw1;
+  float againstElectronMVA3raw2;
+  float byIsolationMVA2raw1;
+  float byIsolationMVA2raw2;
+  float againstMuonLoose21;
+  float againstMuonLoose22;
+  float againstMuonMedium21;
+  float againstMuonMedium22;
+  float againstMuonTight21;
+  float againstMuonTight22;
+  float passAntiEleMVA31;
+  float passAntiEleMVA32;
+  float passAntiEleNewWPMVA31;
+  float passAntiEleNewWPMVA32;
+  bool  antitightele1;
+  bool  antitightele2;
+  float fpartons;
+  
   int   fGenMatch; //Matched to ll/l+Tau/Tau+Tau/l+Jet/Tau+Jet/None of above (1/2/3/4/5/0)
+  int   fLepMatchAny; //Another definition of ZL
+  int   fGenMatchLep; //For extra shape to be added to embedded
  
   int  doRecoil; //Recoil corrections  
   bool doEmu;    //use Emu version
@@ -187,11 +228,11 @@ public:
 
   void fillMuon(const mithep::TMuon *muon, bool location, double iso, bool passiso);
   void fillElectron(const mithep::TElectron *ele, bool location, double iso, bool passiso, unsigned int scale=0);
-  void fillTau(const mithep::TPFTau *tau, bool first,  bool passiso);
+  void fillTau(const mithep::TPFTau *tau, bool first,  bool passiso, bool tauescorr, float passantielemva3);
   void fillCov(mithep::TSVfit *svfit); 	
   void fillGen(mithep::TGenInfo *gen);
   void fillEvent(mithep::TEventInfo *event, HttMVA *vbfmva, int npv, double scalecorr=0);  //always to be called the last
-  void fillJets(const mithep::TJet *jet1,const mithep::TJet *jet2,const mithep::TJet *bjet1, const mithep::TJet *bjet2, int njets, int bjets, int npt20, int nCentralJets);
+  void fillJets(const mithep::TJet *jet1,const mithep::TJet *jet2,const mithep::TJet *bjet1, const mithep::TJet *bjet2, int njetsclean,int njets, int bjets, int npt20, int nCentralJets);
   void setupRecoil(int doRec, bool is2012=true, bool isEmu=false);
   void save();
   void cd();
@@ -201,6 +242,11 @@ protected:
   /// output tree
   TTree* fEventTree;
   void setupOutput(TString name);
+  //Tau energy scale correction
+  double prong3(double pt);
+  double prong1(double pt);
+  double lshift1;
+  double lshift2;
    // recoil corrections
   RecoilCorrector *corrector;	
 };
