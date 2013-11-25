@@ -233,43 +233,73 @@ Double_t eleIDscaleEmu(Double_t elept, Double_t eleeta, Int_t is2012)
 }
 
 //----------------------------------------------------------------
+Double_t muIDIsoscaleMuTau(Double_t mupt, Double_t mueta, Int_t is2012)
+{
+  if((fabs(mueta) > 2.1) || (mupt < 10)) { cout << "mu kinematics out of range" << endl; assert(0); }
+  if(mupt > 30) {
+    if     (fabs(mueta) < 0.8)  return is2012 ? 0.9852*0.9883  : 0.9977*0.9895;
+    else if(fabs(mueta) < 1.2)  return is2012 ? 0.9852*0.9937  : 0.9893*0.9936;
+    else                        return is2012 ? 0.9884*0.9996  : 0.9829*0.9960;
+  }
+  else if(mupt > 20) {
+    if     (fabs(mueta) < 0.8)  return is2012 ? 0.9818*0.9494  : 0.9962*1.0011;
+    else if(fabs(mueta) < 1.2)  return is2012 ? 0.9829*0.9835  : 0.9904*0.9834;
+    else                        return is2012 ? 0.9869*0.9923  : 0.9828*0.9975;
+  }
+  else {
+    if     (fabs(mueta) < 0.8)  return 0.9963*0.9910;
+    else if(fabs(mueta) < 1.2)  return 0.9846*0.9643;
+    else                        return 0.9830*0.9504;
+  }
+}
+//----------------------------------------------------------------
 Double_t muIDscaleMuTau(Double_t mupt, Double_t mueta, Int_t is2012)
 {
   if((fabs(mueta) > 2.1) || (mupt < 10)) { cout << "mu kinematics out of range" << endl; assert(0); }
   if(mupt > 30) {
-    if     (fabs(mueta) < 0.8)  return is2012 ? 0.9872*0.9857  : 1.030*1.010;
-    else if(fabs(mueta) < 1.2)  return is2012 ? 0.9924*0.9805  : 0.997*0.990;
-    else                        return is2012 ? 1.0012*0.9900  : 0.997*0.990;
+    if     (fabs(mueta) < 0.8)  return is2012 ? 0.9852  : 0.9977;
+    else if(fabs(mueta) < 1.2)  return is2012 ? 0.9852 : 0.9893;
+    else                        return is2012 ? 0.9884  : 0.9829;
   }
   else if(mupt > 20) {
-    if     (fabs(mueta) < 0.8)  return is2012 ? 0.9685*0.9853  : 0.977*0.995;
-    else if(fabs(mueta) < 1.2)  return is2012 ? 0.9808*0.9818  : 0.984*0.986;
-    else                        return is2012 ? 0.9972*0.9899  : 0.984*0.986;
-  }
-  else if(mupt > 17 && !is2012) {
-    if(fabs(mueta) < 1.)   return 0.997*0.930;
-    else                  return 0.986*0.929;
+    if     (fabs(mueta) < 0.8)  return is2012 ? 0.9818 : 0.9962;
+    else if(fabs(mueta) < 1.2)  return is2012 ? 0.9829 : 0.9904;
+    else                        return is2012 ? 0.9869 : 0.9828;
   }
   else {
-    if(fabs(mueta) < 1.6)   return 0.945*0.989;
-    else                 return 0.977*1.047;
+    if     (fabs(mueta) < 0.8)  return 0.9963;
+    else if(fabs(mueta) < 1.2)  return 0.9846;
+    else                        return 0.9830;
   }
 }
 
+
 //----------------------------------------------------------------
-Double_t eleIDscaleETau(Double_t ept, Double_t eeta, Int_t is2012)
+Double_t eleIDIsoscaleETau(Double_t ept, Double_t eeta, Int_t is2012)
 {
   if((fabs(eeta) > 2.1) || (ept < 10)) { cout << "electron kinematics out of range" << endl; assert(0); }
   if(ept > 30) {
-    if(fabs(eeta) < 1.479)  return is2012 ? 0.982*0.949 : 1.044*0.984;
-    else                    return is2012 ? 0.995*0.926 : 0.989*0.977;
+    if(fabs(eeta) < 1.479)  return is2012 ? 0.9486*0.9804 : 0.9826*0.9845;
+    else                    return is2012 ? 0.8866*0.99 : 0.9689*0.9971;
   }
   else {
-    if(fabs(eeta) < 1.479) return is2012 ? 0.947*0.9100 : 0.955*0.980 ;
-    else                   return is2012 ? 0.959*0.8244 : 0.967*0.938;
+    if(fabs(eeta) < 1.479) return is2012 ? 0.8999*0.9417 : 0.9590*0.9907;
+    else                   return is2012 ? 0.7945*0.9471 : 0.9462*0.9875;
   }
 }
-
+//----------------------------------------------------------------
+Double_t eleIDScaleETau(Double_t ept, Double_t eeta, Int_t is2012)
+{
+  if((fabs(eeta) > 2.1) || (ept < 10)) { cout << "electron kinematics out of range" << endl; assert(0); }
+  if(ept > 30) {
+    if(fabs(eeta) < 1.479)  return is2012 ? 0.9486 : 0.9826;
+    else                    return is2012 ? 0.8866 : 0.9689;
+  }
+  else {
+    if(fabs(eeta) < 1.479) return is2012 ? 0.8999 : 0.9590;
+    else                   return is2012 ? 0.7945 : 0.9462;
+  }
+}
 //----------------------------------------------------------------------------------------
 Double_t eleTrigScaleEmu(Double_t elept, Double_t eleeta, Int_t is2012)
 {
@@ -577,7 +607,113 @@ double efficiency(double m, double m0, double sigma, double alpha,
                                    1/TMath::Power(absAlpha - b,n-1)) / (1 - n)) / area;
   }
 }
-
+//2011 ltau triger efficiency
+double eff2011TrigEle(double e_pt, double eta,bool turnon)
+{
+  double ele_trg_data=1.0;
+  double ele_trg_mc=1.0;
+  if(fabs(eta)<1.479)
+    {
+      double ele15_eb = efficiency(e_pt, 14.8474, 0.634431, 0.547211, 2.11286, 0.978835);
+      double ele18_eb = efficiency(e_pt, 18.318, 0.811329, 0.938142, 1.85834, 0.927328);
+      double ele20_eb = efficiency(e_pt, 20.244, 0.783044, 0.672118, 2.35819, 0.972123);
+      ele_trg_mc = efficiency(e_pt, 16.9487, 0.162306, 0.0506008, 2.37608, 0.973829);
+      ele_trg_data = (0.41 * ele15_eb) + (0.39 * ele18_eb) + (0.2 * ele20_eb);
+    }
+  else
+    {
+      double ele15_ee = efficiency(e_pt, 16.47, 1.20691, 1.54605, 1.68873, 0.985916);
+      double ele18_ee = efficiency(e_pt, 16.9487, 0.162306, 0.0506008, 2.37608, 0.973829);
+      double ele20_ee = efficiency(e_pt, 22.4559, 1.70818, 0.917021, 3.86463, 0.964978);
+      ele_trg_mc = efficiency(e_pt, 18.05, 1.66609, 2.3836, 1.49316, 1.01229);
+      ele_trg_data = (0.41 * ele15_ee) + (0.39 * ele18_ee) + (0.2 * ele20_ee);
+    }
+  if(turnon)
+    return ele_trg_data;
+  else
+    return ele_trg_data/ele_trg_mc;
+}
+double eff2011TrigMu(double pt, double eta,bool turnon)
+{
+  double mu_trg_data=1.0;
+  double mu_trg_mc=1.0;
+  if(fabs(eta)<0.8)
+    {
+      double mu12 = 0.920;
+      double mu15 = 0.917;
+      double mu15_2p1 = efficiency(pt, 15.9877, 2.90938e-07, 2.63922e-11, 5.81194, 0.906943);
+      mu_trg_mc = 0.923;
+      mu_trg_data = (0.034 * mu12) + (0.368 * mu15) + (0.598 * mu15_2p1);
+    }
+  else if(fabs(eta)>0.8 && fabs(eta)<1.2)
+    {
+      double mu12 = 0.868;
+      double mu15 = 0.871;
+      double mu15_2p1 = efficiency(pt, 15.9995, 1.35931e-07, 7.88264e-11, 4.60253, 0.855461);
+      mu_trg_data = (0.034 * mu12) + (0.368 * mu15) + (0.598 * mu15_2p1);
+      mu_trg_mc = 0.879;
+    }
+  else
+    {
+      double mu12 = 0.845;
+      double mu15 = 0.864;
+      double mu15_2p1 = efficiency(pt, 15.9084, 2.27242e-12, 8.77174e-14, 1.00241, 12.9909);
+      mu_trg_data = (0.034 * mu12) + (0.368 * mu15) + (0.598 * mu15_2p1);
+      mu_trg_mc = 0.839;
+    }
+  if(turnon)
+    return mu_trg_data;
+  else
+    return mu_trg_data/mu_trg_mc;
+}
+double eff2011TrigMuTau(double t_pt, double eta,bool turnon){
+  double tau_trg_data = 1.0;
+  double tau_trg_mc = 1.0;
+  if(fabs(eta)<1.5)
+    {
+      double tau10l_eb = efficiency(t_pt, 13.6046,   1.66291,   1.71551,   141.929,   0.910686);
+      double tau15l_eb = efficiency(t_pt, 13.9694,   0.084835,  0.057743,  1.50674,   0.984976);
+      double tau20l_eb = efficiency(t_pt, 19.2102,   1.26519,   2.48994,   1.04699,  1.3492);
+      tau_trg_data = (0.043 * tau10l_eb) + (0.359 * tau15l_eb) + (0.598 * tau20l_eb);
+      tau_trg_mc = efficiency(t_pt, 14.4601, 0.0485272, 0.03849, 1.48324, 0.965257);
+    }
+  else
+    {
+      double tau10l_ee = efficiency(t_pt, -0.392211,   7.90467,   5.48228,   134.599,   0.925858);
+      double tau15l_ee = efficiency(t_pt, 14.435,  1.34952,   2.43996,   1.03631,   1.79081);
+      double tau20l_ee = efficiency(t_pt, 19.2438,   1.37298,   1.76448,   1.73935,   0.901291);
+      tau_trg_data = (0.043 * tau10l_ee) + (0.359 * tau15l_ee) + (0.598 * tau20l_ee);
+      tau_trg_mc = efficiency(t_pt, 14.4451, 0.0790573, 0.0732472, 1.47046, 0.942028);
+    }
+  if(turnon)
+    return tau_trg_data;
+  else
+    return tau_trg_data/tau_trg_mc;
+}
+double eff2011TrigEleTau(double t_pt, double eta,bool turnon){
+  double tau_trg_data = 1.0;
+  double tau_trg_mc = 1.0;
+  if(fabs(eta)<1.5)
+    {
+      double tau20l_eb = efficiency(t_pt, 19.3916,  0.996964,  1.70131,   1.38002,   0.903245);
+      double tau20m_eb = efficiency(t_pt, 19.5667,  1.15203 ,  1.68126,   1.40025,   0.848033);
+      double tau20t_eb = efficiency(t_pt, 19.6013,  0.987317,  1.08015,   1.88592,   0.776894);
+      tau_trg_mc = efficiency(t_pt, 19.468, 0.0615381, 0.0349325, 1.59349, 0.860096);
+      tau_trg_data = (0.25 * tau20l_eb) + (0.59 * tau20m_eb) + (0.16 * tau20t_eb);
+    }
+  else
+    {
+      double tau20l_ee = efficiency(t_pt, 18.8166,  0.526632,  0.20666,   6.80392,   0.903245);
+      double tau20m_ee = efficiency(t_pt, 18.8476,  0.528963,  0.16717,   3.65814,   0.749759);
+      double tau20t_ee = efficiency(t_pt, 18.8859,  0.271301,  0.128008,  1.50993,   0.825122);
+      tau_trg_mc = efficiency(t_pt, 19.3862, 0.247148, 0.123187, 2.87108, 0.790894);
+      tau_trg_data = (0.25 * tau20l_ee) + (0.59 * tau20m_ee) + (0.16 * tau20t_ee);
+    }
+  if(turnon)
+    return tau_trg_data;
+  else
+    return tau_trg_data/tau_trg_mc;
+}
 double eff2012IsoTau12fb(double pt, double eta){
   return (808.411*(0.764166*0.5*(TMath::Erf((pt-33.2236)/2./0.97289/sqrt(pt))+1.))+
 	  4428.0*(0.802387*0.5*(TMath::Erf((pt-38.0971)/2./0.82842/sqrt(pt))+1.))+
@@ -629,5 +765,96 @@ return (808.411*(0.764166*0.5*(TMath::Erf((pt-33.2236)/2./0.97289/sqrt(pt))+1.))
 3143*(0.833004*0.5*(TMath::Erf((pt-37.634)/2./0.777843/sqrt(pt))+1.))
 )/(808.411+4428.0+1783.003+5109.155+4131+3143);
 }
+
+
+// Tau Parked with HLT_DoubleMediumIsoPFTau35_Trk*_eta2p1_v*
+double eff2012IsoParkedTau19fb_Simone(double pt, double eta){
+  
+  // for real Taus mT<20
+  if ( fabs(eta) < 1.4 )
+    {
+      return (  0.883869 * 0.5 * (TMath::Erf((pt-43.8723)/2./0.946593 /sqrt(pt))+1.) ) ; 
+      
+    }
+  
+    else
+      {
+	return (  0.798480 * 0.5 * (TMath::Erf((pt-43.1362)/2./1.04861  /sqrt(pt))+1.) ) ;
+      }
+  
+}
+ 
+
+double eff2012IsoParkedTau19fbMC(double pt, double eta)
+  {
+    return ( 0.813769 * 0.5 * (TMath::Erf((pt-39.9322)/2./0.819354  /sqrt(pt))+1.) ) ;
+  }
+
+double eff2012IsoParkedTau19fbData(double pt, double eta)
+  {
+    return ( 0.826969 * 0.5 * (TMath::Erf((pt-42.2274)/2./0.783258  /sqrt(pt))+1.) ) ;
+  }
+
+double eff2012IsoParkedTau19fbMCMSSM(double pt, double eta)
+  {
+    if(pt<140)
+      return ( 0.813769 * 0.5 * (TMath::Erf((pt-39.9322)/2./0.819354  /sqrt(pt))+1.) ) ;
+    else
+      return 1.0;
+  }
+
+double eff2012IsoParkedTau19fbDataMSSM(double pt, double eta)
+  {
+    if(pt<140)
+      return ( 0.826969 * 0.5 * (TMath::Erf((pt-42.2274)/2./0.783258  /sqrt(pt))+1.) ) ;
+    else if(pt>400) return 2.03467;
+    else if (pt>300) return 1.31593;
+    else if (pt>250) return 1.25698;
+    else if (pt>200) return 1.18941;
+    else if (pt>180) return 1.17448;
+    else if (pt>160) return 1.0964;
+    else return 1.09279;
+  }
+  
+double eff2012IsoTau19fbData(double pt, double eta){
+
+    // for real Taus mT<20
+    if ( fabs(eta) < 1.4 )
+    {
+      return (  808.411  * ( 0.764166 * 0.5 * (TMath::Erf((pt-33.2236)/2./0.97289 /sqrt(pt))+1.))   // 2012A by Bastian not split in eta
+              + 4428.0   * ( 0.75721  * 0.5 * (TMath::Erf((pt-39.0836)/2./1.07753 /sqrt(pt))+1.))   // 2012B
+              + 6892.158 * ( 0.791464 * 0.5 * (TMath::Erf((pt-38.4932)/2./1.01232 /sqrt(pt))+1.))   // 2012C measured in v2 only
+              + 7274.    * ( 0.779446 * 0.5 * (TMath::Erf((pt-38.4603)/2./1.01071 /sqrt(pt))+1.)) ) // 2012D measured in one go
+              /( 808.411 + 4428.0 + 6892.158 + 7274. );
+    }
+    
+    else
+    {
+      return (  808.411  * ( 0.764166 * 0.5 * (TMath::Erf((pt-33.2236)/2./0.97289 /sqrt(pt))+1.))   // 2012A by Bastian not split in eta
+              + 4428.0   * ( 0.693788 * 0.5 * (TMath::Erf((pt-37.7719)/2./1.09202 /sqrt(pt))+1.))   // 2012B
+              + 6892.158 * ( 0.698909 * 0.5 * (TMath::Erf((pt-36.5533)/2./1.05743 /sqrt(pt))+1.))   // 2012C measured in v2 only
+              + 7274.    * ( 0.703532 * 0.5 * (TMath::Erf((pt-38.8609)/2./1.05514 /sqrt(pt))+1.)) ) // 2012D measured in one go
+              /( 808.411 + 4428.0 + 6892.158 + 7274. );
+    }
+    
+  }
+
+  double eff2012IsoTau19fbMC(double pt, double eta){
+
+    // for real Taus using ggH120
+    if ( fabs(eta) < 1.4 )
+    {
+      return ( 0.807425 * 0.5 * (TMath::Erf((pt-35.2214)/2./1.04214  /sqrt(pt))+1.) ) ;
+    }
+    
+    else
+    {
+      return ( 0.713068 * 0.5 * (TMath::Erf((pt-33.4584)/2./0.994692 /sqrt(pt))+1.) ) ;
+    }
+    
+  }
+
+
+
 
 #endif
