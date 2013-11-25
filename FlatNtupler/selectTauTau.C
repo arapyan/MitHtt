@@ -54,12 +54,20 @@
 
 const Double_t pi = 3.14159265358979;
 
+//double prong3(double pt) {
+//  return 0.012+0.001*TMath::Min(TMath::Max(pt-32,0.0),18.0);
+//}
+
+//double prong1(double pt) {
+//  return 0.025+0.001*TMath::Min(TMath::Max(pt-45,0.0),10.0);
+//}
+
 double prong3(double pt) {
-  return 0.012+0.001*TMath::Min(TMath::Max(pt-32,0.0),18.0);
+  return 0.012;
 }
 
 double prong1(double pt) {
-  return 0.015+0.001*TMath::Min(TMath::Max(pt-45,0.0),10.0);
+  return 0.012;
 }
 
 
@@ -75,7 +83,7 @@ void selectTauTau(const TString conf="tautau.conf",  // input config file
   //--------------------------------------------------------------------------------------------------------------
   // Settings 
   //============================================================================================================== 
-
+  
   vector<TString>  snamev;      // sample name (for output file)  
   vector<CSample*> samplev;     // data/MC samples
   //
@@ -190,25 +198,36 @@ void selectTauTau(const TString conf="tautau.conf",  // input config file
       TString sfname    = samp->fnamev[ifile];
   
       // which corrections to apply where
-      Bool_t isdata     = !(samp->typev[ifile]==eMC);
       Bool_t isemb      = snamev[isam].Contains("emb");
+      Bool_t isdata     = !(samp->typev[ifile]==eMC || isemb);
       Bool_t reallyDoKf = doKFactors && sfname.Contains("-gf-");
-      Bool_t ismadz     = sfname.Contains("ztt") || sfname.Contains("-zjets"); // madgraph z samples
-      Bool_t ismadzmm   = snamev[isam].Contains("zmm") && (sfname.Contains("-zll") || sfname.Contains("-zjets")); // madgraph z samples 
+      Bool_t ismadz     = snamev[isam].Contains("ztt-mad"); // madgraph z samples
+      Bool_t ismadzmm   =  snamev[isam].Contains("zll"); // madgraph z samples 
       Bool_t ismssm     = sfname.Contains("-ggh-") || sfname.Contains("-bbh-");
       Bool_t doIdScale  = !isdata;
       Bool_t doTrigScale= !isdata;
-      Int_t  doRecoil   = (sfname.Contains("ztt") || sfname.Contains("-zll") || sfname.Contains("zjets")) && !isemb;
+      Int_t  doRecoil   = (snamev[isam].Contains("ztt") || snamev[isam].Contains("zll") || sfname.Contains("zjets")) && !isemb;
       if(snamev[isam].Contains("wjets") || snamev[isam].Contains("w1jets") ||  snamev[isam].Contains("w2jets") || snamev[isam].Contains("w3jets") || snamev[isam].Contains("w4jets")) doRecoil = 2;
       if(snamev[isam].Contains("_sm_") || snamev[isam].Contains("_mssm_")) doRecoil = 3;
       Bool_t getGen     = doRecoil || ismadz ||isemb || ismssm || ismadzmm;
-      Bool_t tauescale = (doRecoil==3) || sfname.Contains("zllm")  || isemb;
+      Bool_t tauescale = (doRecoil==3) || sfname.Contains("zllm")  ||  sfname.Contains("z1jetsm50") || sfname.Contains("z2jetsm50") || sfname.Contains("z3jetsm50") || sfname.Contains("z4jetsm50") ||  isemb;
       //if(sfname.Contains("vtth")) getGen=0;
    
+      //tauescale=0;
+      cout << sfname << endl;
+      cout << snamev[isam] << endl;
+      cout << ismadzmm << endl;
+      cout << ismadz << endl;
+      cout << isemb << endl;
+      out->setupRecoil(doRecoil,1,0);
+      if(doRecoil)
+	cout << "Doing recoil " << doRecoil << endl;
+      if(ismadzmm)
+	tauescale=0;
+      if(tauescale)
+	cout << "Applying tau energy scale" << endl;
       if(tauescale) cout << "Applying tau energy scale corrections" << endl;
-   
-      out->setupRecoil(0);
-      cout << doRecoil << endl;
+     
      
       // PU reweighting
       TString pileupReweightFile;
@@ -217,21 +236,24 @@ void selectTauTau(const TString conf="tautau.conf",  // input config file
 	pileupReweightFile = "$CMSSW_BASE/src/MitHtt/data/pileup/PUWeights_Fall11toFull2011_PixelLumi_50bins.root";
       } //else pileupReweightFile = "$CMSSW_BASE/src/MitHtt/data/pileup/PUWeights_S1253XTo2012_12ifb.root";
       else 
-	pileupReweightFile = "$CMSSW_BASE/src/MitHtt/data/pileup/PUWeights_S1253XTo2012_19ifb.root";
+	pileupReweightFile = "$CMSSW_BASE/src/MitHtt/data/pileup/PUWeights_2012.root";
       TH1F *puWeights = 0;
       TFile *pufile = new TFile(pileupReweightFile.Data());
-      puWeights = (TH1F*)pufile->Get("puWeights");
-
+      puWeights = (TH1F*)pufile->Get("pileup");
+     
       // setup selecting with JSON file, if necessary
       Bool_t hasJSON = kFALSE;
       mithep::RunLumiRangeMap rlrm;
-      if(isdata && (samp->jsonv[ifile].CompareTo("NONE")!=0)) { 
+     
+      if((isdata || isemb) && (samp->jsonv[ifile].CompareTo("NONE")!=0)) {
+	cout << "embedded" << endl;
         hasJSON = kTRUE;
 	cout << endl;
 	cout << samp->jsonv[ifile] << endl;
 	ifstream jsonchk; jsonchk.open(samp->jsonv[ifile].Data()); assert(jsonchk.is_open()); jsonchk.close();
         rlrm.AddJSONFile(samp->jsonv[ifile].Data()); 
       }
+     
 
       // k-factors
       TH1D *hKFactors = (reallyDoKf) ? kfFHPInit(higgsmass(sfname)) : 0;
@@ -275,17 +297,25 @@ void selectTauTau(const TString conf="tautau.conf",  // input config file
 	if(ientry%100000 == 0) cout << "processing " << float(ientry)/float(eventTree->GetEntriesFast()) << endl;
 	if(getGen)  genBr->GetEntry(ientry);
         infoBr->GetEntry(ientry);
+	
+	if(ismadz && !ismadzmm && (fabs(gen->id_1_a)<15 || fabs(gen->id_1_a)>19)) continue;
+	
+        // skip non-mumu events in madgraph sample for zmm
+        if(ismadzmm && (fabs(gen->id_1_a)>14 && fabs(gen->id_1_a)<20)) continue;
 
 	//cout << info->runNum << " " << info->lumiSec << " " << info->evtNum << endl;
-       
+
 	// certified run selection
         mithep::RunLumiRangeMap::RunLumiPairType rl(info->runNum, info->lumiSec);
         if(hasJSON && !rlrm.HasRunLumi(rl)) continue;
 
 	// trigger
- 	if(!isemb  && !(info->triggerBits[kHLT_DoubleMediumIsoPFTau30_Trk5_eta2p1_Jet30] || info->triggerBits[kHLT_DoubleMediumIsoPFTau25_Trk5_eta2p1_Jet30] || info->triggerBits[kHLT_DoubleMediumIsoPFTau30_Trk1_eta2p1_Jet30] || info->triggerBits[kHLT_DoubleMediumIsoPFTau35_Trk1_eta2p1] || info->triggerBits[kHLT_DoubleMediumIsoPFTau35_Trk5_eta2p1])) continue;
-	//if(isdata  && !(info->triggerBits[kHLT_DoubleMediumIsoPFTau35_Trk1_eta2p1_Prong1])) continue;
-
+ 	//if(!isemb  && !(info->triggerBits[kHLT_DoubleMediumIsoPFTau30_Trk5_eta2p1_Jet30] || info->triggerBits[kHLT_DoubleMediumIsoPFTau25_Trk5_eta2p1_Jet30] || info->triggerBits[kHLT_DoubleMediumIsoPFTau30_Trk1_eta2p1_Jet30] || info->triggerBits[kHLT_DoubleMediumIsoPFTau35_Trk1_eta2p1] || info->triggerBits[kHLT_DoubleMediumIsoPFTau35_Trk5_eta2p1])) continue;
+	if(!isemb  && !(info->triggerBits[kHLT_DoubleMediumIsoPFTau35_Trk1_eta2p1] || info->triggerBits[kHLT_DoubleMediumIsoPFTau35_Trk5_eta2p1])) continue;
+	//if(isemb && !(info->triggerBits[kHLT_Mu17_Mu8])) continue;
+	
+	//if(!isemb  && !(info->triggerBits[kHLT_DoubleMediumIsoPFTau30_Trk5_eta2p1_Jet30] || info->triggerBits[kHLT_DoubleMediumIsoPFTau25_Trk5_eta2p1_Jet30] || info->triggerBits[kHLT_DoubleMediumIsoPFTau30_Trk1_eta2p1_Jet30])) continue;
+	
         // good primary vertex
         if(!info->hasGoodPV) continue;
 	pvArr->Clear();
@@ -306,7 +336,7 @@ void selectTauTau(const TString conf="tautau.conf",  // input config file
 	    assert(tau);
         
 	    // Tau ID
-	    if(!passtauIdMu(tau)) continue;
+	    if(!passtauId(tau)) continue;
 	    
 	    if(tauescale)
 	      {
@@ -322,33 +352,71 @@ void selectTauTau(const TString conf="tautau.conf",  // input config file
 	    if(!((1.0+lshift)*tau->pt > kTauPtMin && fabs(tau->eta) < 2.1)) continue;
 	  
 	    //Tau HLT
-	    Bool_t trigmatch = ((info->triggerBits[kHLT_DoubleMediumIsoPFTau25_Trk5_eta2p1_Jet30] && tau->hltMatchBits[kHLT_DoubleMediumIsoPFTau25_Trk5_eta2p1_Jet30Obj]) || (info->triggerBits[kHLT_DoubleMediumIsoPFTau30_Trk5_eta2p1_Jet30] && tau->hltMatchBits[kHLT_DoubleMediumIsoPFTau30_Trk5_eta2p1_Jet30Obj]) || (info->triggerBits[kHLT_DoubleMediumIsoPFTau30_Trk1_eta2p1_Jet30] && tau->hltMatchBits[kHLT_DoubleMediumIsoPFTau30_Trk1_eta2p1_Jet30Obj]) || (info->triggerBits[kHLT_DoubleMediumIsoPFTau35_Trk1_eta2p1] && tau->hltMatchBits[kHLT_DoubleMediumIsoPFTau35_Trk1_eta2p1Obj]) || (info->triggerBits[kHLT_DoubleMediumIsoPFTau35_Trk5_eta2p1] && tau->hltMatchBits[kHLT_DoubleMediumIsoPFTau35_Trk5_eta2p1Obj]));
-	    //Bool_t trigmatch = (info->triggerBits[kHLT_DoubleMediumIsoPFTau35_Trk1_eta2p1_Prong1] && tau->hltMatchBits[kHLT_DoubleMediumIsoPFTau35_Trk1_eta2p1_Prong1Obj]);
+	    //Bool_t trigmatch = ((info->triggerBits[kHLT_DoubleMediumIsoPFTau25_Trk5_eta2p1_Jet30] && tau->hltMatchBits[kHLT_DoubleMediumIsoPFTau25_Trk5_eta2p1_Jet30Obj]) || (info->triggerBits[kHLT_DoubleMediumIsoPFTau30_Trk5_eta2p1_Jet30] && tau->hltMatchBits[kHLT_DoubleMediumIsoPFTau30_Trk5_eta2p1_Jet30Obj]) || (info->triggerBits[kHLT_DoubleMediumIsoPFTau30_Trk1_eta2p1_Jet30] && tau->hltMatchBits[kHLT_DoubleMediumIsoPFTau30_Trk1_eta2p1_Jet30Obj]) || (info->triggerBits[kHLT_DoubleMediumIsoPFTau35_Trk1_eta2p1] && tau->hltMatchBits[kHLT_DoubleMediumIsoPFTau35_Trk1_eta2p1Obj]) || (info->triggerBits[kHLT_DoubleMediumIsoPFTau35_Trk5_eta2p1] && tau->hltMatchBits[kHLT_DoubleMediumIsoPFTau35_Trk5_eta2p1Obj]));
+	    //Bool_t trigmatch = ((info->triggerBits[kHLT_DoubleMediumIsoPFTau25_Trk5_eta2p1_Jet30] && tau->hltMatchBits[kHLT_DoubleMediumIsoPFTau25_Trk5_eta2p1_Jet30Obj]) || (info->triggerBits[kHLT_DoubleMediumIsoPFTau30_Trk5_eta2p1_Jet30] && tau->hltMatchBits[kHLT_DoubleMediumIsoPFTau30_Trk5_eta2p1_Jet30Obj]) || (info->triggerBits[kHLT_DoubleMediumIsoPFTau30_Trk1_eta2p1_Jet30] && tau->hltMatchBits[kHLT_DoubleMediumIsoPFTau30_Trk1_eta2p1_Jet30Obj]));
+	    Bool_t trigmatch = ((info->triggerBits[kHLT_DoubleMediumIsoPFTau35_Trk1_eta2p1] && tau->hltMatchBits[kHLT_DoubleMediumIsoPFTau35_Trk1_eta2p1Obj]) || (info->triggerBits[kHLT_DoubleMediumIsoPFTau35_Trk5_eta2p1] && tau->hltMatchBits[kHLT_DoubleMediumIsoPFTau35_Trk5_eta2p1Obj]));
+	   
 	    if(!isemb && !trigmatch)     continue;
 	   
 	   
 	    // Tau Isolation
-	    if(!(tau->ringIso > 0.5)) continue; //0.921 tight
-	    
-	    if(!leadTau || tau->ringIso > leadTau->ringIso)
+	    //if(!(tau->ringIso > 0.5)) continue; //0.921 tight
+	    if(!(tau->rawIso3Hits < 1.0)) continue;
+	    // if(!(tau->hcalOverP + tau->ecalOverP > 0.2 ||
+// 		 tau->nSignalPFChargedHadrCands > 1 ||
+// 	    	 tau->nSignalPFGammaCands > 0)) continue;
+	 
+	    if(!leadTau || tau->rawIso3Hits < leadTau->rawIso3Hits)
 	      {
 		subTau = leadTau;
 		leadTau = tau;
-	      } else if(!subTau || tau->ringIso > subTau->ringIso) {
+	      } else if(!subTau || tau->rawIso3Hits < subTau->rawIso3Hits) {
 	      subTau = tau;
 	    }
-          }	
+	  }
+	
 
  	if(!(leadTau && subTau)) continue;
-	if(subTau->pt < leadTau->pt)
+
+	double lshift1=0,lshift2=0;
+ 
+	if(tauescale)
 	  {
-	    out->fillTau(leadTau,1,leadTau->ringIso > 0.884,tauescale);
-	    out->fillTau(subTau,0,subTau->ringIso > 0.884,tauescale);
+	    if(leadTau->nSignalPFChargedHadrCands==1 && leadTau->nSignalPFGammaCands==0)
+	      lshift1 = 0.00;
+	    else if(leadTau->nSignalPFChargedHadrCands==1 && leadTau->nSignalPFGammaCands>0)
+	      lshift1 = prong1(leadTau->pt);
+	    else
+	      lshift1 = prong3(leadTau->pt);
+	    
+	    if(subTau->nSignalPFChargedHadrCands==1 && subTau->nSignalPFGammaCands==0)
+	      lshift2 = 0.00;
+	    else if(subTau->nSignalPFChargedHadrCands==1 && subTau->nSignalPFGammaCands>0)
+	      lshift2 = prong1(subTau->pt);
+	    else
+	      lshift2 = prong3(subTau->pt);
+	  }
+	
+	float passele=0, passele2=0;
+	if(passAntiEMVA3(leadTau->antiEleMVA3Cat,leadTau->antiEleMVA3,"Loose"))    passele++;
+	if(passAntiEMVA3(leadTau->antiEleMVA3Cat,leadTau->antiEleMVA3,"Medium"))    passele++;
+	if(passAntiEMVA3(leadTau->antiEleMVA3Cat,leadTau->antiEleMVA3,"Tight"))    passele++;
+	if(passAntiEMVA3(leadTau->antiEleMVA3Cat,leadTau->antiEleMVA3,"VeryTight"))    passele++;
+
+	if(passAntiEMVA3(subTau->antiEleMVA3Cat,subTau->antiEleMVA3,"Loose"))    passele2++;
+	if(passAntiEMVA3(subTau->antiEleMVA3Cat,subTau->antiEleMVA3,"Medium"))    passele2++;
+	if(passAntiEMVA3(subTau->antiEleMVA3Cat,subTau->antiEleMVA3,"Tight"))    passele2++;
+	if(passAntiEMVA3(subTau->antiEleMVA3Cat,subTau->antiEleMVA3,"VeryTight"))    passele2++;
+
+	if((1.0+lshift2)*subTau->pt < (1.0+lshift1)*leadTau->pt)
+	  {
+	    out->fillTau(leadTau,1,leadTau->ringIso > 0.884,tauescale,passele);
+	    out->fillTau(subTau,0,subTau->ringIso > 0.884,tauescale,passele2);
 	  }
 	else
 	  {
-	    out->fillTau(leadTau,0,leadTau->ringIso > 0.884,tauescale);
-	    out->fillTau(subTau,1,subTau->ringIso > 0.884,tauescale);
+	    out->fillTau(leadTau,0,leadTau->ringIso > 0.884,tauescale,passele);
+	    out->fillTau(subTau,1,subTau->ringIso > 0.884,tauescale,passele2);
 	  }
 	
 
@@ -362,7 +430,7 @@ void selectTauTau(const TString conf="tautau.conf",  // input config file
 	  {
 	    const mithep::TElectron *ele = (mithep::TElectron *)(electronArr->At(i));
 	    assert(ele);
-	    if(ele->pt < 10.0) continue;
+	    if(ele->pt < 1.0) continue;
 	    if(fabs(ele->eta) > 2.5) continue;
 	    if(!(pass2012EleMVAID(ele,kLoose,1))) continue;
 	    if(eleIsoPU(ele) > 0.3) continue;
@@ -399,18 +467,25 @@ void selectTauTau(const TString conf="tautau.conf",  // input config file
         // loop through jets      
         jetArr->Clear();
         jetBr->GetEntry(ientry);
-        UInt_t njets = 0, nbjets = 0;
+        UInt_t njets = 0, njetsclean=0, nbjets = 0;
         const mithep::TJet *jet1=0, *jet2=0, *bjet1=0, *bjet2=0;
 	out->btagArray.Reset();	out->jptArray.Reset();	out->jetaArray.Reset();	UInt_t npt20jets=0;
         for(Int_t i=0; i<jetArr->GetEntriesFast(); i++) {
 	  mithep::TJet *jet = (mithep::TJet*)((*jetArr)[i]);
 	  
-          if(toolbox::deltaR(jet->eta,jet->phi,leadTau->eta,leadTau->phi) < 0.5) continue;
+	  if(toolbox::deltaR(jet->eta,jet->phi,leadTau->eta,leadTau->phi) < 0.5) continue;
+	  
+	  if(fabs(jet->eta) > 4.7) continue;
+	  //if(!jet->id) continue;
+	  if(!passJetIDMVA(jet->pt,jet->eta,jet->mva)) continue;
+	  if(jet->pt > kJetPtMin) {
+	    njets++;
+	  }
+	  	  
+ 
           if(toolbox::deltaR(jet->eta,jet->phi,subTau->eta,subTau->phi) < 0.5) continue;
 
-          if(fabs(jet->eta) > 4.7) continue;
-	  if(!jet->id) continue;
-
+         
 	  // look for b-jets
 	  Int_t btagopt = 0;
 	  if(isdata||isemb) btagopt = 1;
@@ -434,10 +509,10 @@ void selectTauTau(const TString conf="tautau.conf",  // input config file
 
 	  // look for jets
           if(jet->pt > kJetPtMin) {
-            assert(njets<50);
-            out->jptArray.AddAt(jet->pt,njets);
-            out->jetaArray.AddAt(jet->eta,njets);
-  	    njets++;
+            assert(njetsclean<50);
+            out->jptArray.AddAt(jet->pt,njetsclean);
+            out->jetaArray.AddAt(jet->eta,njetsclean);
+  	    njetsclean++;
 	    if(!jet1 || jet->pt > jet1->pt) { // jet1 is highest pt, jet2 next highest
 	      jet2 = jet1;
 	      jet1 = jet;
@@ -447,23 +522,52 @@ void selectTauTau(const TString conf="tautau.conf",  // input config file
           }		    
         }
 
-        //if(!jet1) continue;
-	//if(!isemb)  
-	//  if(!(jet1->hltMatchBits[kHLT_hltTripleL2Jets30eta3Obj])) continue;
+	// trigger scale factor for MC
+	Double_t trigscale = 1;
 
+// 	if(!isemb && (((info->triggerBits[kHLT_DoubleMediumIsoPFTau25_Trk5_eta2p1_Jet30] && leadTau->hltMatchBits[kHLT_DoubleMediumIsoPFTau25_Trk5_eta2p1_Jet30Obj] && subTau->hltMatchBits[kHLT_DoubleMediumIsoPFTau25_Trk5_eta2p1_Jet30Obj]) || (info->triggerBits[kHLT_DoubleMediumIsoPFTau30_Trk5_eta2p1_Jet30] && leadTau->hltMatchBits[kHLT_DoubleMediumIsoPFTau30_Trk5_eta2p1_Jet30Obj] && subTau->hltMatchBits[kHLT_DoubleMediumIsoPFTau30_Trk5_eta2p1_Jet30Obj]) || (info->triggerBits[kHLT_DoubleMediumIsoPFTau30_Trk1_eta2p1_Jet30] && leadTau->hltMatchBits[kHLT_DoubleMediumIsoPFTau30_Trk1_eta2p1_Jet30Obj] && subTau->hltMatchBits[kHLT_DoubleMediumIsoPFTau30_Trk1_eta2p1_Jet30Obj])) && !((info->triggerBits[kHLT_DoubleMediumIsoPFTau35_Trk1_eta2p1] && leadTau->hltMatchBits[kHLT_DoubleMediumIsoPFTau35_Trk1_eta2p1Obj] && subTau->hltMatchBits[kHLT_DoubleMediumIsoPFTau35_Trk1_eta2p1Obj]) || (info->triggerBits[kHLT_DoubleMediumIsoPFTau35_Trk5_eta2p1] && leadTau->hltMatchBits[kHLT_DoubleMediumIsoPFTau35_Trk5_eta2p1Obj] && subTau->hltMatchBits[kHLT_DoubleMediumIsoPFTau35_Trk5_eta2p1Obj]))))
+// 	{
+// 	    if(!jet1) continue;
+// 	    if(!(jet1->hltMatchBits[kHLT_hltTripleL2Jets30eta3Obj])) continue;
+// 	    if(!(jet1->pt>50.0)) continue;
+// 	    if(!(fabs(jet1->eta)<3.0)) continue;
+// 	    if(doTrigScale)
+// 	      trigscale =  (eff2012IsoTau19fbData((1.0+lshift1)*leadTau->pt,leadTau->eta)/eff2012IsoTau19fbMC((1.0+lshift1)*leadTau->pt,leadTau->eta))*(eff2012IsoTau19fbData((1.0+lshift2)*subTau->pt,subTau->eta)/eff2012IsoTau19fbMC((1.0+lshift2)*subTau->pt,subTau->eta));
+// 	}
+// 	else
+// 	  {
+// 	    if(doTrigScale)
+// 	      trigscale =  (eff2012IsoParkedTau19fbDataMSSM((1.0+lshift1)*leadTau->pt,leadTau->eta)/eff2012IsoParkedTau19fbMCMSSM((1.0+lshift1)*leadTau->pt,leadTau->eta))*(eff2012IsoParkedTau19fbDataMSSM((1.0+lshift2)*subTau->pt,subTau->eta)/eff2012IsoParkedTau19fbMCMSSM((1.0+lshift2)*subTau->pt,subTau->eta));
+// 	    trigscale =  (eff2012IsoParkedTau19fbData((1.0+lshift1)*leadTau->pt,leadTau->eta)/eff2012IsoParkedTau19fbMC((1.0+lshift1)*leadTau->pt,leadTau->eta))*(eff2012IsoParkedTau19fbData((1.0+lshift2)*subTau->pt,subTau->eta)/eff2012IsoParkedTau19fbMC((1.0+lshift2)*subTau->pt,subTau->eta));
+// 	  }
+	
+ // 	if(doTrigScale && !isemb)
+// 	{
+// 	  trigscale =  (eff2012IsoParkedTau19fbData((1.0+lshift1)*leadTau->pt,leadTau->eta)/eff2012IsoParkedTau19fbMC((1.0+lshift1)*leadTau->pt,leadTau->eta))*(eff2012IsoParkedTau19fbData((1.0+lshift2)*subTau->pt,subTau->eta)/eff2012IsoParkedTau19fbMC((1.0+lshift2)*subTau->pt,subTau->eta));
+// 	}
+
+	if(doTrigScale && !isemb)
+	{
+	  trigscale =  (eff2012IsoParkedTau19fbDataMSSM((1.0+lshift1)*leadTau->pt,leadTau->eta)/eff2012IsoParkedTau19fbMCMSSM((1.0+lshift1)*leadTau->pt,leadTau->eta))*(eff2012IsoParkedTau19fbDataMSSM((1.0+lshift2)*subTau->pt,subTau->eta)/eff2012IsoParkedTau19fbMCMSSM((1.0+lshift2)*subTau->pt,subTau->eta));
+	}
+	
+ 	if(doTrigScale && isemb)
+	trigscale =  eff2012IsoParkedTau19fbData((1.0+lshift1)*leadTau->pt,leadTau->eta)*eff2012IsoParkedTau19fbData((1.0+lshift2)*subTau->pt,subTau->eta);
+					       
 	Int_t nCentralJets=0;
-	if(njets>1) {
+	if(njetsclean>1) {
           for(Int_t i=2; i<jetArr->GetEntriesFast(); i++) {
             mithep::TJet *jet = (mithep::TJet*)((*jetArr)[i]);
 	    if(toolbox::deltaR(jet->eta,jet->phi,leadTau->eta,leadTau->phi) < 0.5) continue;
 	    if(toolbox::deltaR(jet->eta,jet->phi,subTau->eta,subTau->phi) < 0.5) continue;
-	    if(!(jet->pt > kJetPtMin && fabs(jet->eta)<4.7 && jet->id==1)) continue;
+	    //if(!(jet->pt > kJetPtMin && fabs(jet->eta)<4.7 && jet->id==1)) continue;
+	    if(!(jet->pt > kJetPtMin && fabs(jet->eta)<4.7 && passJetIDMVA(jet->pt,jet->eta,jet->mva))) continue;
 	    if(jet1->eta > jet2->eta && jet->eta > jet2->eta && jet->eta < jet1->eta) nCentralJets++;
 	    else if(jet2->eta > jet1->eta && jet->eta > jet1->eta && jet->eta < jet2->eta) nCentralJets++;
 	  }
         }
 	
-	out->fillJets(jet1,jet2,bjet1,bjet2,njets,nbjets,npt20jets,nCentralJets);
+	out->fillJets(jet1,jet2,bjet1,bjet2,njetsclean,njets,nbjets,npt20jets,nCentralJets);
 
         // get k-factor if necessary
         Double_t kf=1;
@@ -476,33 +580,53 @@ void selectTauTau(const TString conf="tautau.conf",  // input config file
 	  Int_t npuxbin = puWeights->GetXaxis()->FindFixBin(TMath::Min(double(info->nPUTrue), 59.499));
 	  npuWgt = puWeights->GetBinContent(npuxbin);
 	}
+		
+// 	//W+Jets
+// 	if(doRecoil == 2 && is2012 && gen->npartons == 1) kf  *= 0.308*treeEntries/56883397.;
+//         if(doRecoil == 2 && is2012 && gen->npartons == 2) kf  *= 0.090*treeEntries/56883397.;
+//         if(doRecoil == 2 && is2012 && gen->npartons == 3) kf  *= 0.061*treeEntries/56883397.;
+//         if(doRecoil == 2 && is2012 && gen->npartons == 4) kf  *= 0.030*treeEntries/56883397.;
 
+	
 	//W+Jets
-	if(doRecoil == 2 && is2012 && gen->npartons == 1) kf  *= 1.193*0.12514*treeEntries/18281279.;
-        if(doRecoil == 2 && is2012 && gen->npartons == 2) kf  *= 1.193*0.0306*treeEntries/18281279.;
-        if(doRecoil == 2 && is2012 && gen->npartons == 3) kf  *= 1.193*0.02*treeEntries/18281279.;
-        if(doRecoil == 2 && is2012 && gen->npartons == 4) kf  *= 1.193*0.00993*treeEntries/18281279.;
+	if(doRecoil == 2 && is2012 && gen->npartons == 1) kf  *= 0.203*treeEntries/75276487.;
+        if(doRecoil == 2 && is2012 && gen->npartons == 2) kf  *= 0.064*treeEntries/75276487.;
+        if(doRecoil == 2 && is2012 && gen->npartons == 3) kf  *= 0.041*treeEntries/75276487.;
+        if(doRecoil == 2 && is2012 && gen->npartons == 4) kf  *= 0.039*treeEntries/75276487.;
 
-// 	//Z+Jets
-	//if(doRecoil == 1 && is2012 && gen->npartons == 1) kf *= 0.1194132424856*treeEntries/30459503.;
-	//if(doRecoil == 1 && is2012 && gen->npartons == 2) kf *= 0.4427371*treeEntries/30459503.;
-	//if(doRecoil == 1 && is2012 && gen->npartons == 3) kf *= 0.046562596*treeEntries/30459503.;
-	//if(doRecoil == 1 && is2012 && gen->npartons == 4) kf *= 0.0358235025*treeEntries/30459503.;
+	//Z+Jets
+	if(doRecoil == 1 && is2012 && gen->npartons == 1) kf *= 0.19275*treeEntries/29960737.;
+	if(doRecoil == 1 && is2012 && gen->npartons == 2) kf *= 0.0767*treeEntries/29960737.;
+	if(doRecoil == 1 && is2012 && gen->npartons == 3) kf *= 0.047146*treeEntries/29960737.;
+	if(doRecoil == 1 && is2012 && gen->npartons == 4) kf *= 0.03572*treeEntries/29960737.;
+
 
 	// lepton ID corrections
 	Double_t idscale = 1;
 	
-	// trigger scale factor for MC
-	Double_t trigscale = 1;
-	if(doTrigScale)
-	  trigscale =  eff2012IsoTau19fb(leadTau->pt,leadTau->eta)*eff2012IsoTau19fb(subTau->pt,subTau->eta);
-	if(doTrigScale && jet1) trigscale *= eff2012Jet12fb(jet1->pt,jet1->eta);
-
 	// embedding weight for embedded sample
-	Double_t embWgt = 1;
+	//Double_t embWgt = 1;
+	Double_t embWgt = 1,embgenWgt=1,embspinWgt=1,embmueffWgt=1,embmuradWgt=1,embkinmass=1;
+	Double_t embkinWgt = 1;
       	if(!isdata) out->fillGen(gen);
-	if(isemb)  embWgt=info->embWeight;
-
+	if(isemb) 
+	  {
+	    embWgt = info->embGenWeight*info->embSpinnerWeight*info->embMuEffWeight*info->embMuRadWeight;
+	    //embkinWgt = info->embDiTauMassVsGenDiTauPtRec*info->embGenTau2VsGenTau1PtRec*info->embGenTau2VsGenTau1EtaRec;
+	    embgenWgt = info->embGenWeight;
+	    embspinWgt = info->embSpinnerWeight;
+	    embmueffWgt = info->embMuEffWeight;
+	    embmuradWgt = info->embMuRadWeight;
+	    embkinmass = info->embDiTauMassVsGenDiTauPtRec;
+	  }
+	out->fEmbWeight = embWgt;
+	out->fEmbKinWeight = embkinWgt;
+	out->fEmbIdScale = idscale;
+	out->fEmbGenWeight = embgenWgt;
+	out->fEmbSpinnerWeight = embspinWgt;
+	out->fEmbMuEff = embmueffWgt;
+	out->fEmbMuRad =   embmuradWgt;
+	out->fEmbKinMassWeight = embkinmass;
 	out->fMCWeight	 = weight*kf*embWgt/lumi;
 	out->fPUWeight	 = npuWgt;
 	out->fEffWeight	 = trigscale*idscale;
