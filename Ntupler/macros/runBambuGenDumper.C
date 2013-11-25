@@ -8,13 +8,13 @@
 #include <TROOT.h>
 #include "MitAna/DataUtil/interface/Debug.h"
 #include "MitAna/TreeMod/interface/Analysis.h"
-#include "HiggsAna/Ntupler/interface/BambuGenDumperMod.hh"
+#include "MitHtt/Ntupler/interface/BambuGenDumperMod.hh"
 #endif
 
 using namespace mithep;
 
 //--------------------------------------------------------------------------------------------------
-void runBambuGenDumper(const char *file = "/castor/cern.ch/user/p/paus/filefi/020/p11-wm-v1g1-pu/B4AF460D-FD4F-E011-B619-0015178C4B24.root")
+void runBambuGenDumper(const char *file = "/castor/cern.ch/user/p/pharris/Bambu/029a/s12-dy2jets-v7a/PFAOD_61_000.root")
 {  
   gDebugMask  = Debug::kAnalysis;
   gDebugLevel = 1;

@@ -709,6 +709,13 @@ void runHttNtupler(
   mymod->AddTrigger("HLT_IsoMu15_L1ETM20_v3",kHLT_IsoMu15_L1ETM20,"",kHLT_IsoMu15_L1ETM20_MuObj);//auto
   mymod->AddTrigger("HLT_IsoMu15_L1ETM20_v4",kHLT_IsoMu15_L1ETM20,"",kHLT_IsoMu15_L1ETM20_MuObj);//auto
 
+  mymod->AddTrigger("HLT_IsoMu15_eta2p1_L1ETM20_v0", kHLT_IsoMu15_eta2p1_L1ETM20, "", kHLT_IsoMu15_eta2p1_L1ETM20_MuObj);
+  mymod->AddTrigger("HLT_IsoMu15_eta2p1_L1ETM20_v3",kHLT_IsoMu15_eta2p1_L1ETM20,"",kHLT_IsoMu15_eta2p1_L1ETM20_MuObj);//auto
+  mymod->AddTrigger("HLT_IsoMu15_eta2p1_L1ETM20_v4",kHLT_IsoMu15_eta2p1_L1ETM20,"",kHLT_IsoMu15_eta2p1_L1ETM20_MuObj);//auto
+  mymod->AddTrigger("HLT_IsoMu15_eta2p1_L1ETM20_v5",kHLT_IsoMu15_eta2p1_L1ETM20,"",kHLT_IsoMu15_eta2p1_L1ETM20_MuObj);//auto
+  mymod->AddTrigger("HLT_IsoMu15_eta2p1_L1ETM20_v6",kHLT_IsoMu15_eta2p1_L1ETM20,"",kHLT_IsoMu15_eta2p1_L1ETM20_MuObj);//auto
+  mymod->AddTrigger("HLT_IsoMu15_eta2p1_L1ETM20_v7",kHLT_IsoMu15_eta2p1_L1ETM20,"",kHLT_IsoMu15_eta2p1_L1ETM20_MuObj);//auto
+
   // Tau + Muon triggers
   mymod->AddTrigger("HLT_IsoMu12_LooseIsoPFTau10_v0",kHLT_IsoMu12_LooseIsoPFTau10,"hltSingleMuIsoL3IsoFiltered12",kHLT_IsoMu12_LooseIsoPFTau10_MuObj, 0,"hltFilterIsoMu12IsoPFTau10LooseIsolation",kHLT_IsoMu12_LooseIsoPFTau10_TauObj, 0);
   mymod->AddTrigger("HLT_IsoMu12_LooseIsoPFTau10_v1",kHLT_IsoMu12_LooseIsoPFTau10,"hltSingleMuIsoL3IsoFiltered12",kHLT_IsoMu12_LooseIsoPFTau10_MuObj,0,"hltFilterIsoMu12IsoPFTau10LooseIsolation",kHLT_IsoMu12_LooseIsoPFTau10_TauObj,0);//auto
