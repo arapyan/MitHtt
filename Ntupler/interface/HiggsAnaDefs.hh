@@ -241,7 +241,8 @@ enum ETriggerBit {
   kHLT_DoubleMediumIsoPFTau35_Trk5_eta2p1        =107,
   kHLT_IsoMu18_eta2p1_MediumIsoPFTau25_Trk1_eta2p1 = 108,
   k2HLT_IsoMu18_eta2p1_MediumIsoPFTau25_Trk5_eta2p1 = 109,
-  k2HLT_IsoMu18_eta2p1_MediumIsoPFTau25_Trk1_eta2p1 = 110
+  k2HLT_IsoMu18_eta2p1_MediumIsoPFTau25_Trk1_eta2p1 = 110,
+  kHLT_IsoMu15_eta2p1_L1ETM20 = 111 
 };
 
 const unsigned int kNTrigObj = 256;
@@ -438,7 +439,10 @@ enum ETriggerObject {
   k2HLT_IsoMu18_eta2p1_MediumIsoPFTau25_Trk1_eta2p1TauObj=162,
   k2HLT_IsoMu18_eta2p1_MediumIsoPFTau25_Trk1_eta2p1MuObj =163,
   k2HLT_IsoMu18_eta2p1_MediumIsoPFTau25_Trk5_eta2p1TauObj=164,
-  k2HLT_IsoMu18_eta2p1_MediumIsoPFTau25_Trk5_eta2p1MuObj=165
+  k2HLT_IsoMu18_eta2p1_MediumIsoPFTau25_Trk5_eta2p1MuObj=165,
+
+  //mu+met trigger
+  kHLT_IsoMu15_eta2p1_L1ETM20_MuObj=166
 };
 
 #endif
